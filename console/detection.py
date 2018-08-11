@@ -1,5 +1,5 @@
 '''
-    console - An easy to use ANSI escape sequence and console utility library.
+    console - An easy to use console utility and ANSI escape sequence library.
     © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     This module contains capability detection routines for use under ANSI
@@ -189,8 +189,12 @@ def _read_until(infile=sys.stdin, maxchars=20, end=RS):
 def get_cursor_pos():
     ''' Return the current column number of the terminal cursor.
         Used to figure out if we need to print an extra newline.
+
+        Returns:
+            (x, y) - as tuple of integers
+            (,)    - empty tuple, if an error occurred.
     '''
-    values = (0, 0)
+    values = ()
     if sys.stdout.isatty():
         import tty, termios
 
@@ -205,10 +209,9 @@ def get_cursor_pos():
         # parse response
         resp = resp.lstrip(CSI)
         try:
-            values = tuple( int(token) for token in resp.partition(';')[::2] )
-
+            values = tuple( int(token) for token in resp.partition(';')[::-2] )
         except Exception as err:
-            log.error('%s', err)
+            log.error('parse error: %s', err)
 
     return values
 

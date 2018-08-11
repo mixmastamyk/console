@@ -20,7 +20,8 @@
 Console
 ============
 
-*Yet another ANSI-sequence library.  Easy, comprehensive*
+*Yet another console helper and ANSI-sequence library.
+Hopefully comprehensive and easy to use.*
 
 This module makes it easy to generate inline codes used to display colors and
 character styles in ANSI-compatible terminals and emulators,
@@ -42,6 +43,7 @@ Using it looks a little something like this::
     <p>But wait!&nbsp;  There's a
     <s><span style="opacity: .9">shitload</span></s>
     <s><span style="opacity: .9">crapton</span></s>
+    err,
     <i>lot</i> more!</p>
 
 
@@ -62,6 +64,9 @@ Installen-Sie, Bitte
 ::
 
     ⏵ pip3 install --user console
+
+`Colorama <https://pypi.python.org/pypi/colorama>`_
+may be needed to see come of these examples under a legacy version of Windows.
 
 
 Another One, huh 🤔
@@ -100,7 +105,7 @@ In the Python world,
 there hasn't been much direct support for terminal sequences in the standard
 library,
 beyond curses and termios
-(which overlap somewhat in functionality with ANSI sequences of course).
+(which overlap somewhat in functionality with this package and themselves).
 They are low-level interfaces however,
 focused on "full screen" terminal apps and tty control respectively.
 Perhaps styling a text snippet here and there was thought too… trivial.
@@ -116,7 +121,7 @@ usually providing 8 colors, and a few styles/effects like bold and underline.
 Unfortunately,
 one or more important items are often missing:
 
-    - Python3 support
+    - Python3 support (currently 3.6 required but porting under consideration)
     - Palette auto-detection, support and deactivation:
 
       - 16 color palette
@@ -127,7 +132,7 @@ one or more important items are often missing:
       setting titles, etc.
     - Still maintained
     - Has tests
-    - Standard color names support - TODO
+    - Standard color name support - TODO
 
 Most have an easy to use design, but may still miss one of these nice to haves:
 
@@ -140,17 +145,19 @@ Looked over all of these and picked a few design cues from several:
 .. hlist::
 
     - ansi
-    - colorama.ansi
-    - click.style
     - ansicolors
-    - kolors (terminfo)
-    - style  - check out
-    - blessings
     - blessed (terminfo?)
-    - pycolor
+    - blessings
+    - click style and utilities
+    - colorama.ansi
     - colorize
-    - fabric.colors
     - escape
+    - fabric.colors
+    - kolors (terminfo)
+    - pycolor
+    - pygments
+    - style - check out
+    - termcolor
 
 
 
@@ -183,6 +190,12 @@ If you have pytest installed, tests can be run in the install folder?
 ::
 
     ⏵ pytest -s
+
+
+TODOs
+-----------
+
+- detect colorama
 
 
 

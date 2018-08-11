@@ -1,5 +1,5 @@
 '''
-    console - An easy to use ANSI escape sequence and console utility library.
+    console - An easy to use console utility and ANSI escape sequence library.
     © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     Demos showing what the library and terminal combo can do.

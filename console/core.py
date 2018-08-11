@@ -1,5 +1,5 @@
 '''
-    console - An easy to use ANSI escape sequence and console utility library.
+    console - An easy to use console utility and ANSI escape sequence library.
     © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     Complicated Gobbyldegook providing the simple interface,
@@ -83,9 +83,10 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         '''
         # route on first letter - must have length one to be called:
         first_letter, digits = name[0], name[1:]
+        digit_len = len(digits)
 
         if first_letter == 'i':
-            if not digits or len(digits) > 3:     # bdsm
+            if not digits or digit_len > 3:     # bdsm
                 raise AttributeError('index %r not found. Check length of '
                                      'numeric portion, must be from 1 to 3 '
                                      'digits only.' % name)
@@ -98,11 +99,23 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             else:
                 return empty
 
+        elif first_letter == 'n':
+            if not digit_len == 3:
+                raise AttributeError('%r not found. Check length, hex portion '
+                                     'must be 3 characters only.' % name)
+            from .proximity import find_nearest_color_hexstr
+
+            nearest_idx = find_nearest_color_hexstr(digits)
+
+            if 'extended' in self._palette_support:  # build entry
+                return self._get_extended_palette_entry(name, str(nearest_idx))
+            else:
+                return empty
+
         elif first_letter == 't':
-            dig_len = len(digits)
-            if dig_len == 6:
+            if digit_len == 6:
                 pass
-            elif dig_len == 3:  # double chars:  b0b -> bb00bb
+            elif digit_len == 3:  # double chars:  b0b -> bb00bb
                 digits = ''.join([ch*2 for ch in digits])
             else:
                 raise AttributeError('%r not found. Check length, hex portion '
@@ -123,20 +136,20 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
 
     def _get_extended_palette_entry(self, name, index):
         ''' Compute extended entry, once on the fly. '''
-        attr = _PaletteEntry(self, name.upper(), index)
-        attr._codes.insert(0, self._start_codes_extended)  # short for a deque
-        setattr(self, name, attr)  # cached for later
+        values = [self._start_codes_extended, index]
+        attr = _PaletteEntry(self, name.upper(), ';'.join(values))
+        setattr(self, name, attr)  # now cached
         return attr
 
     def _get_true_palette_entry(self, name, hexdigits):
         ''' Compute truecolor entry, once on the fly. '''
         values = [self._start_codes_true]
-        # convert hex attribute name, ex 'tBB00BB', to ints to 'R', 'G', 'B':
+        # convert hex attribute name, ex 'BB00BB', to ints to 'R', 'G', 'B':
         values.extend(str(int(hexdigits[idx:idx+2], 16)) for idx in (0, 2 ,4))
 
         # Render first values as string and place as first code:
         attr = _PaletteEntry(self, name.upper(), ';'.join(values))
-        setattr(self, name, attr)  # cached for later
+        setattr(self, name, attr)  # now cached
         return attr
 
     def clear(self):
