@@ -1,5 +1,5 @@
 '''
-    console - An easy to use ANSI escape sequence library.
+    console - An easy to use ANSI escape sequence and console utility library.
     © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     Complicated Gobbyldegook providing the simple interface,
@@ -10,13 +10,14 @@
 import sys
 import logging
 
+from . import _CHOSEN_PALETTE
 from .constants import CSI
 from .disabled import dummy, empty
 
 
 ALL_PALETTES = ('basic', 'extended', 'truecolor')
 log = logging.getLogger(__name__)
-chosen_palette = None
+_END = CSI + '0m'
 
 
 class _BasicPaletteBuilder:
@@ -25,7 +26,7 @@ class _BasicPaletteBuilder:
         A base-class that modifies the attributes of child container classes on
         initialization.  Integer attributes are recognized as ANSI codes to be
         wrapped with a manager object to provide mucho additional
-        functionality.  Most useful for the basic 8/16 color palette.
+        functionality.  Useful for the basic 8/16 color/fx palettes.
     '''
     def __new__(cls, autodetect=True, palettes=None):
         ''' Override new() to replace the class entirely on deactivation.
@@ -37,15 +38,10 @@ class _BasicPaletteBuilder:
         '''
         self = super().__new__(cls)
         if autodetect:
-            # defer loading detection so logging can start before demo
-            from .detection import choose_palette
-            global chosen_palette  # check once only
-            chosen_palette = chosen_palette or choose_palette()
-
-            if chosen_palette:  # enable "up to" the chosen palette level:
-                palettes = ALL_PALETTES[:ALL_PALETTES.index(chosen_palette)+1]
+            if _CHOSEN_PALETTE:  # enable "up to" the chosen palette level:
+                palettes = ALL_PALETTES[:ALL_PALETTES.index(_CHOSEN_PALETTE)+1]
             else:
-                self = dummy    # None, deactivate completely
+                self = dummy                        # None, deactivate
                 palettes = ()                       # skipen-Sie
 
         else:  # set palette manually
@@ -74,13 +70,16 @@ class _BasicPaletteBuilder:
                         attr = empty
                     setattr(self, name, attr)
 
+    def __repr__(self):  # TODO
+        return f'{self.__class__.__name__}(palettes={self._palette_support})'
+
 
 class _HighColorPaletteBuilder(_BasicPaletteBuilder):
     ''' Container/Router for ANSI extended & truecolor palettes. '''
 
     def __getattr__(self, name):
-        ''' Traffic cop - called only when an attribute is missing, so once per
-            palette entry attribute.
+        ''' Traffic cop - called only when an attribute is missing,
+            once per palette entry attribute.
         '''
         # route on first letter - must have length one to be called:
         first_letter, digits = name[0], name[1:]
@@ -119,7 +118,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                 return empty
 
         else:
-            raise AttributeError('%r is not a recognized attribute name '
+            raise AttributeError('%r is not a recognized attribute name or '
                                  'format.' % name)
 
     def _get_extended_palette_entry(self, name, index):
@@ -135,7 +134,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         # convert hex attribute name, ex 'tBB00BB', to ints to 'R', 'G', 'B':
         values.extend(str(int(hexdigits[idx:idx+2], 16)) for idx in (0, 2 ,4))
 
-        # Render first values as one string and place as first code:
+        # Render first values as string and place as first code:
         attr = _PaletteEntry(self, name.upper(), ';'.join(values))
         setattr(self, name, attr)  # cached for later
         return attr
@@ -166,7 +165,7 @@ class _PaletteEntry:
     def __init__(self, parent, name, code, out=sys.stdout):
         self.parent = parent
         self.default = (parent.default if hasattr(parent, 'default')
-                                       else parent.end)
+                                       else parent.end)  # style
         self.name = name
         self._codes = [str(code)]           # the initial code
         self._out = out                     # for redirection
@@ -177,10 +176,19 @@ class _PaletteEntry:
             return str(self) + other
 
         elif isinstance(other, _PaletteEntry):
-            # Make copy, so codes don't pile up after each addition:
-            # Render first values once as one string and place as first code:
-            return _PaletteEntry(self.parent, self.name,
-                                  ';'.join(self._codes + other._codes))
+            # Make a copy, so codes don't pile up after each addition
+            # Render initial values once as string and place as first code:
+            newcodes = self._codes + other._codes
+            #~ log.debug('codes for new instance: %r', newcodes)
+            attr = _PaletteEntry(self.parent, self.name,
+                                 ';'.join(newcodes))
+            same_category = self.parent is other.parent
+            #~ log.debug('palette entries match: %s', same_category)
+
+            if not same_category:  # different, use end instead of default
+                attr.default = _END
+
+            return attr
         else:
             raise TypeError('Addition to type %r not supported.' % type(other))
 
@@ -201,18 +209,24 @@ class _PaletteEntry:
         print(self.parent.default, file=self._out, end='')
 
     def __call__(self, text, *styles):
-        if hasattr(self, 'end'):
-            end = self.end
-        else:
-            end = self.end = CSI + '0m'     # cache on 1st access
-
+        # if category different, copy uses end instead of default, see addition
         for attr in styles:
             self += attr
 
-        return f'{self}{text}{end}'
+        return f'{self}{text}{self.default}'
 
     def __str__(self):
         return f'{CSI}{";".join(self._codes)}m'
 
     def __repr__(self):
-        return repr(self.__str__())
+        return self.__str__()
+
+    def template(self, placeholder='{}'):
+        ''' Returns a template string from this Entry with its attributes.
+
+            Placeholder can be '%s', '{}', '${}' or other depending on your
+            needs.
+
+            TODO: also needs end solved.
+        '''
+        return f'{self}{placeholder}{self.default}'

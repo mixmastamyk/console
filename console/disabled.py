@@ -1,5 +1,5 @@
 '''
-    console - An easy to use ANSI escape sequence library.
+    console - An easy to use ANSI escape sequence and console utility library.
     © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     A class to mimic ANSI Style container classes so they do not print when the
@@ -32,14 +32,15 @@ class _EmptyAttribute(str):
 
 class _DummyCollection:
     '''  Returns empty strings as attributes. '''
-    def __init__(self):
-        self.empty = _EmptyAttribute()
+    def __init__(self, empty):
+        self.empty = empty
 
     def __getattr__(self, name):
+        ''' Called only when an attribute is missing. '''
         attr = self.empty
-        setattr(self, name, attr)
+        setattr(self, name, attr)  # ready next time
         return attr
 
 
-dummy = _DummyCollection()
 empty = _EmptyAttribute()
+dummy = _DummyCollection(empty)

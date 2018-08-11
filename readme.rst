@@ -27,7 +27,7 @@ character styles in ANSI-compatible terminals and emulators,
 as well as other functionality such clearing screens,
 moving cursors,
 and setting title bars.
-It looks a little something like this::
+Using it looks a little something like this::
 
     >>> from console import fg, bg, fx
 
@@ -39,14 +39,16 @@ It looks a little something like this::
 
 .. raw:: html
 
-    <p>But wait!  There's a <s><span style="opacity: .9">shitload</span></s>
-    Giant-Robot-sized portion more!</p>
+    <p>But wait!&nbsp;  There's a
+    <s><span style="opacity: .9">shitload</span></s>
+    <s><span style="opacity: .9">crapton</span></s>
+    <i>lot</i> more!</p>
 
 
 ␛[1;3m \ *Introduction* ␛[0m
 --------------------------------------
 
-Lost?  What are terminals and ANSI escape codes?
+What are terminals and ANSI escape codes?  Lost?
 See the links below for background information:
 
     - `Terminal Emulator <https://en.wikipedia.org/wiki/Terminal_emulator>`_
@@ -62,93 +64,108 @@ Installen-Sie, Bitte
     ⏵ pip3 install --user console
 
 
-Another One, eh 🤔?
+Another One, huh 🤔
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Well, ANSI escape codes have been standard on UNIX
 with the belt-and-suspenders crowd for several decades,
-and even saw use on DOS and BBSs back in the day.
+and even saw use on DOS and BBS back in the day.
 With the advent of macOS (X),
-a whole new generation of bearded-hipsters was exposed to the command-line and
-terminal environment.
+a whole new generation of bearded-hipsters have been exposed to the command-line
+and terminal environment.
 
 Finally with Windows 10──\
-the Ballmer "I'm a PC" lame-o-barrier has finally been breached,
-allowing *multi-decade-late*
+the "I'm a PC" Ballmer-barrier has been breached,
+finally allowing *multi-decade-late*
 `improvements
 <http://www.nivot.org/blog/post/2016/02/04/Windows-10-TH2-(v1511)-Console-Host-Enhancements>`_
 to be made to its until-now pathetic "console,"
-analogous to a virtual terminal,
-as a Yugo to a BMW.
+vaguely analogous to a virtual terminal,
+as a Yugo is to a BMW.
+It's now supercharged.
 
 So, the three major platforms now support ANSI escape sequences.
 Again!
 What's old is new again.
+(Cue
+`KC and the Sunshine Band,
+<https://www.youtube.com/watch?v=OM7zRfHG0no>`_
+uh-huh uh-huh)
 
 
-Python and the Cheeseshop
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Meanwhile, over at the Cheeseshop…
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In the Python world,
-there has never been much direct support for terminal sequences in the standard
+there hasn't been much direct support for terminal sequences in the standard
 library,
 beyond curses and termios
-(which overlap somewhat in functionality with this of course).
-They are low-level interfaces however
+(which overlap somewhat in functionality with ANSI sequences of course).
+They are low-level interfaces however,
 focused on "full screen" terminal apps and tty control respectively.
 Perhaps styling a text snippet here and there was thought too… trivial.
-Not exactly rocket surgery.
 
 And so, now there are ad-hoc ANSI codes being generated in every command-line
 app and eleventy million micro-libs on the PyPI Cheeseshop doing the same.
 Looks to be a fun exercise and somewhat of a rite of passage to create one---\
-and good luck finding an appropriate name on PyPi.
+good luck finding an appropriate name on PyPI.
 
 While most of the modules have plenty going for them in their areas of focus,
 they generally aren't very comprehensive──\
-providing 8 colors, and a few styles/effects like bold and underline.
-One or more items that are often missing:
+usually providing 8 colors, and a few styles/effects like bold and underline.
+Unfortunately,
+one or more important items are often missing:
 
     - Python3 support
-    - Styles, cursor movements, clearing the screen,
-      setting titles, etc.
     - Palette auto-detection, support and deactivation:
 
       - 16 color palette
       - 256 extended color palette - rare
       - 16M color palette - rarer
 
-    - Maintained
+    - Styles, cursor movements, clearing the screen,
+      setting titles, etc.
+    - Still maintained
     - Has tests
     - Standard color names support - TODO
 
-Most have an easy to use design, but may sill miss one of these nice to haves:
+Most have an easy to use design, but may still miss one of these nice to haves:
 
     - Composable objects
-    - Short names
+    - Concise names
     - No capital, mixed, camel-case names on instances.
 
-Looked over these and picked a few design cues from several:
+Looked over all of these and picked a few design cues from several:
+
+.. hlist::
 
     - ansi
     - colorama.ansi
     - click.style
     - ansicolors
-    - kolors                - terminfo?
+    - kolors (terminfo)
     - style  - check out
-    - blessings / blessed   - terminfo?
-    - pycolor?
+    - blessings
+    - blessed (terminfo?)
+    - pycolor
     - colorize
     - fabric.colors
     - escape
 
-.. ~ Outside of colorama for Ballmer/Windows support I don't use m'
 
 
 Getting Started
 ------------------
 
-blah
+Here we go::
+
+    >>> from console import fg, bg, fx
+
+    >>> fg.green + 'Hello World' + fg.default
+    '\x1b[32mHello World\x1b[39m'
+
+    >>> print(bg.purple, fx.italic, '⛈ PURPLE RAIN ⛈', fx.end)
+      ⛈ PURPLE RAIN ⛈
 
 
 
@@ -175,6 +192,7 @@ Legalese
     - © 2018, Mike Miller
     - Released under the LGPL, version 3+.
     - Enterprise Pricing:
-      1 MEEllion dollars!  (only have to sell *one* copy!)
+      1 MEEllion dollars!
+      (only have to sell *one* copy!)
 
 

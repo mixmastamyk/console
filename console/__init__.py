@@ -1,12 +1,19 @@
 '''
-    console - An easy to use ANSI escape sequence library.
+    console - An easy to use ANSI escape sequence and console utility library.
     © 2018, Mike Miller - Released under the LGPL, version 3+.
 '''
 
+# detect palette before anything else
+from .detection import choose_palette as _choose_palette
+
+_CHOSEN_PALETTE = _choose_palette()
+
+# now we can import other modules
 from .style import fg, bg, fx, defx
+from .screen import screen as sc
 
 
-fg, bg, fx, defx    # quiet pyflakes
+fg, bg, fx, defx, sc    # quiet pyflakes
 _DEBUG = False
 
 

@@ -1,22 +1,22 @@
 '''
-    console - An easy to use ANSI escape sequence library.
+    console - An easy to use ANSI escape sequence and console utility library.
     © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     This module generates ANSI character codes to move the cursor around,
     and terminal windows.
 
-    TODO: reconcile these with core classes.
 
 '''
+from . import _CHOSEN_PALETTE
 from .constants import CSI, ESC
-from .disabled import dummy, empty
-
-chosen_palette = None
+from .disabled import dummy
 
 
 class _TemplateString(str):
     ''' A template string that renders itself with default arguments when
         created, and may also be called with another argument.
+
+        TODO: reconcile with core classes.
     '''
     def __new__(cls, code, arg='%d'):
         return str.__new__(cls, CSI + arg + code)
@@ -80,15 +80,10 @@ class Screen:
         self = super().__new__(cls)
 
         if autodetect and not force:
-            # defer loading detection so logging can start before detection
-            from .detection import choose_palette
-            global chosen_palette  # check once only
-            chosen_palette = chosen_palette or choose_palette()
-
-            if not chosen_palette:
+            if not _CHOSEN_PALETTE:
                 self = dummy        # None, deactivate completely
-
         # else: continue on unabated
+
         return self
 
     def __init__(self, **kwargs):
@@ -96,9 +91,11 @@ class Screen:
         for name in dir(self):
             if not name.startswith('_'):
                 value = getattr(self, name)
+
                 if type(value) is str and not value.startswith(ESC):
                     attr = _TemplateString(value)
                     setattr(self, name, attr)
+
                 elif type(value) is tuple:
                     attr = _TemplateString(*value)
                     setattr(self, name, attr)

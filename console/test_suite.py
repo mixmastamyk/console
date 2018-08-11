@@ -239,8 +239,9 @@ if True:  # fold
     def test_attribute_call():
         text = bg.purple('⛈ PURPLE RAIN ⛈')
 
-        #~ assert text == '\x1b[45m⛈ PURPLE\xa0RAIN ⛈\x1b[49m'
-        assert text == '\x1b[45m⛈ PURPLE\xa0RAIN ⛈\x1b[0m'
+        assert text == '\x1b[45m⛈ PURPLE\xa0RAIN ⛈\x1b[49m'
+        # does better check now:
+        #~ assert text == '\x1b[45m⛈ PURPLE\xa0RAIN ⛈\x1b[0m'
 
     def test_attribute_call_plus_styles():
         linkstyle = fg.blue + fx.underline

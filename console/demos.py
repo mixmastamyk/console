@@ -1,5 +1,5 @@
 '''
-    console - An easy to use ANSI escape sequence library.
+    console - An easy to use ANSI escape sequence and console utility library.
     © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     Demos showing what the library and terminal combo can do.
@@ -33,7 +33,6 @@ if __name__ == '__main__':
     def make_header(i):
         return f'  {fx.dim}{i+1:02d}{fx.end} '
 
-
     def build_demos(caption, obj, extra_style=''):
         ''' Iterate over a Palette container and collect the items to add to
             demos.
@@ -47,7 +46,6 @@ if __name__ == '__main__':
                 else:
                     items.append(f'{attr}{attr.name}{fx.end}')
         return caption + ' '.join(items)
-
 
     def run():
         ''' Run the demos. '''

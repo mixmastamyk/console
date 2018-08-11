@@ -1,18 +1,25 @@
 '''
-    console - An easy to use ANSI escape sequence library.
+    console - An easy to use ANSI escape sequence and console utility library.
     © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     This module contains utility and convenience functions for use under ANSI
     compatible terminals.
+
+    See also:
+
+        - getpass
+
 '''
 import logging
 import re
 
 from .constants import OSC, BEL
 from .screen import screen
-from . import _DEBUG
+from .detection import is_a_tty
+from . import _DEBUG, _CHOSEN_PALETTE
 
-ansi_pattern = re.compile(r'(\x9b|\x1b\[)[0-?]*[ -/]*[@-~]')
+
+ansi_seq_finder = re.compile(r'(\x9b|\x1b\[)[0-?]*[ -/]*[@-~]')
 log = logging.getLogger(__name__)
 
 
@@ -41,7 +48,7 @@ def clear_line(mode=2):
 
 
 def clear_screen(mode=2):
-    ''' Clear the terminal screen.
+    ''' Clear the terminal screen. (Aliased to clear also)
 
         Arguments:
             mode:  0 - Clear cursor to end of screen, cursor stays.
@@ -51,20 +58,24 @@ def clear_screen(mode=2):
     '''
     write(screen.erase(mode))
 
+clear = clear_screen
+
 
 def reset_terminal():
-    ''' Reset the terminal window.
+    ''' Reset the terminal window. (Aliased to cls also)
 
         Greater than a fullscreen terminal clear, also clears the scrollback
         buffer.  May expose bugs in dumb terminals.
+
+        TODO: add windows support.
     '''
     write(screen.reset)
 
 
 def set_title(title):
     ''' Set the title of the terminal window/tab. '''
-    write(f'{OSC}2;{title}{BEL}')
-    return title
+    if _CHOSEN_PALETTE:  # TODO: overridable?
+        write(f'{OSC}2;{title}{BEL}')
 
 
 def strip_ansi(line):
@@ -74,7 +85,7 @@ def strip_ansi(line):
 
         https://stackoverflow.com/a/38662876/450917
     '''
-    return ansi_pattern.sub('', line)
+    return ansi_seq_finder.sub('', line)
 
 
 def ansi_len(line):
@@ -86,3 +97,33 @@ def ansi_len(line):
 
 
 cls = reset_terminal
+
+
+# -- wait key implementations ------------------------------------------------
+try:
+    from msvcrt import getch as _getch  # Win32
+except ImportError:                     # UNIX
+    from .detection import _getch
+
+
+def wait_key():
+    ''' Waits for a keypress at the console and returns it.
+
+        Returns immediately under i/o redirection.
+    '''
+    if is_a_tty():
+        return _getch()
+
+
+def pause(message='Press any key to continue…'):
+    ''' Analogous to the DOS pause command, with a modifiable message.
+
+        https://en.wikipedia.org/wiki/List_of_DOS_commands#PAUSE
+
+        DOC:  In addition to that, it will also become a
+            NOP (no operation instruction) if the script is not run interactively.
+            is a tty?
+    '''
+    if is_a_tty():
+        print(message, end=' ', flush=True)
+        return wait_key()

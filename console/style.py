@@ -1,6 +1,7 @@
 '''
-    console - An easy to use ANSI escape sequence library.
+    console - An easy to use ANSI escape sequence and console utility library.
     © 2018, Mike Miller - Released under the LGPL, version 3+.
+
         Module inspired by: colorama.ansi.py © Jonathan Hartley 2013.
 
     This module is focused on the escape codes concerning character styles
@@ -13,8 +14,7 @@
          and section 5:
          #SGR_(Select_Graphic_Rendition)_parameters
 
-    A user of this library needn't create any of these unless customization is
-    needed.
+    A user of this library needn't create any of these.
 '''
 from .core import _BasicPaletteBuilder, _HighColorPaletteBuilder
 
@@ -127,9 +127,11 @@ class EffectsPalette(_BasicPaletteBuilder):
 
 
 class EffectsTerminator(_BasicPaletteBuilder):
-    ''' Rarely used codes to turn off specific style features, not supported
-        very well.  Generally, use of EffectsPalette.end is simpler and more
-        reliable.  "I'll be baaahck."
+    ''' "I'll be baahhck."
+
+        Rarely used codes to turn off specific style features, not supported at
+        times.  Generally, use of EffectsPalette.end is simpler and more
+        reliable.
     '''
     # convenience:
     end             = 0
