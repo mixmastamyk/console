@@ -126,6 +126,7 @@ one or more important items are often missing:
 
       - 16 color palette
       - 256 extended color palette - rare
+      - find nearest color - rare
       - 16M color palette - rarer
 
     - Styles, cursor movements, clearing the screen,
@@ -138,7 +139,7 @@ Most have an easy to use design, but may still miss one of these nice to haves:
 
     - Composable objects
     - Concise names
-    - No capital, mixed, camel-case names on instances.
+    - Discourage capital, mixed, camel-case names on instances.
 
 Looked over all of these and picked a few design cues from several:
 
@@ -196,6 +197,7 @@ TODOs
 -----------
 
 - detect colorama
+- some utils still output when disabled?
 
 
 

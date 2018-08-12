@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-    console - An easy to use console utility and ANSI escape sequence library.
-    Portions © 2018, Mike Miller - Released under BSD License
+    console - Comprehensive escape sequence utility library for terminals.
+    Minor portions © 2018, Mike Miller - Released under BSD License
 
     console.proximity
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~
 
     Given an 8-bit RGB color,
     find the closest extended 8-bit terminal color index.
@@ -29,7 +29,7 @@ _color_table = []
 
 def _build_color_table():
 
-    # colors 0..15: 16 basic colors
+    # colors 0..15: 16 basic colors, xterm palette
     _color_table.append((0x00, 0x00, 0x00))  # 0
     _color_table.append((0xcd, 0x00, 0x00))  # 1
     _color_table.append((0x00, 0xcd, 0x00))  # 2
@@ -64,7 +64,15 @@ def _build_color_table():
 
 
 def find_nearest_color_index(r, g, b):
+    ''' Given three integers representing R, G, and B,
+        return the nearest color index.
 
+        Arguments:
+            r, g, b - int - of range 0…255
+
+        Returns:
+            Integer index, or None on error.
+    '''
     distance = 257*257*3  # "infinity" (max distance from #000000 to #ffffff)
     match = 0
 
@@ -88,10 +96,17 @@ def find_nearest_color_hexstr(hexdigits):
     ''' Given a three-character hex digit string, return the nearest color
         index.
 
-        Returns Integer index or None when an error occurs.
+        Arguments:
+            hexdigits - str - a three digit hex string, e.g. 'f0f'
+
+        Returns:
+            Integer index, or None on error.
     '''
     try:
-        triplet = tuple( (int(digit, 16) * 16) for digit in hexdigits )
+        triplet = []
+        for digit in hexdigits:
+            digit = int(digit, 16)
+            triplet.append((digit * 16) + digit)
     except ValueError as err:
         return None
 
@@ -103,6 +118,7 @@ _build_color_table()
 
 if __name__ == '__main__':
 
+    # test ints
     triplets = (
         (0, 0, 0),
         (16, 16, 16),
@@ -112,25 +128,36 @@ if __name__ == '__main__':
         (256, 256, 256),
     )
     for trip in triplets:
-
-        print('int closest color:', '%4d' % find_nearest_color_index(*trip),
-              trip)
+        print('int closest color: %-15s--> %4d' %
+            (trip, find_nearest_color_index(*trip))
+        )
 
     print()
+
+    # test hex strings
     triplets = (
         '000',
         '111',
+        '222',
+        '333',
+        '444',
+        '555',
+        '666',
+        '777',
+        '888',
+        '999',
+        'aaa',
+        'bbb',
+        'ccc',
+        'ddd',
+        'eee',
+        'fff',
+
         'f00',
         '0f0',
         'b0b',
-        'fff',  # hmm, clips at 240
     )
     for trip in triplets:
-
-        print('hex closest color:', '%4d' % find_nearest_color_hexstr(trip),
-              trip)
-
-
-
-
-
+        print('hex closest color:          %r --> %4d' %
+            (trip, find_nearest_color_hexstr(trip))
+        )

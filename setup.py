@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-# tests require pytest
+#!/usr/bin/env python3
 
 from os.path import dirname, join
 try:
@@ -10,27 +8,31 @@ except ImportError:
 
 from console.constants import __version__
 
-keywords = 'ansi terminal color cursor style pycolor escape sequence blessings'
-tests_require = ('pytest'),
+
+# additional metadata
+extras_require = dict(webcolors=('webcolors',))
 install_requires = ('ezenv',)
+keywords = 'ansi terminal escape sequence color cursor style screen detection'
+tests_require = ('pytest'),
 
 
-def read(fname):
-    with open(join(dirname(__file__), fname)) as f:
-        return f.read()
+def slurp(filename):
+    with open(join(dirname(__file__), filename)) as infile:
+        return infile.read()
 
 
 setup(
     name                = 'console',
+    description         = 'Comprehensive escape sequence utility library for terminals.',
 
     author_email        = 'mixmastamyk@github.com',
     author              = 'Mike Miller',
-    description         = 'A more comprehensive, easy to use ANSI library.',
+    extras_require      = extras_require,
+    install_requires    = install_requires,
     keywords            = keywords,
     license             = 'LGPL 3',
-    long_description    = read('readme.rst'),
+    long_description    = slurp('readme.rst'),
     packages            = ('console',),
-    install_requires    = install_requires,
     tests_require       = tests_require,
     url                 = 'https://github.com/mixmastamyk/console',
     version             = __version__,

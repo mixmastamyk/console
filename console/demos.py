@@ -1,5 +1,5 @@
 '''
-    console - An easy to use console utility and ANSI escape sequence library.
+    console - Comprehensive escape sequence utility library for terminals.
     © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     Demos showing what the library and terminal combo can do.
@@ -50,8 +50,8 @@ if __name__ == '__main__':
     def run():
         ''' Run the demos. '''
         print('\nConsole - ANSI lib demos, here we go:\n')
-        hello_world = f'''Hello: {fx.bold + fg.blue}Hello {fx.reverse + fg.yellow
-                          }World{fg.default + defx.reverse}!{fx.end}'''
+        hello_world = f'''Hello: {fx.bold + fg.blue}Hello {fx.reverse +
+                        fg.yellow}World{fg.default + defx.reverse}!{fx.end}'''
 
         demos = [
             hello_world,

@@ -1,5 +1,5 @@
 '''
-    console - An easy to use console utility and ANSI escape sequence library.
+    console - Comprehensive escape sequence utility library for terminals.
     © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     This module contains capability detection routines for use under ANSI
@@ -8,7 +8,6 @@
     See also:
 
         - os & shutil.get_terminal_size
-
 '''
 import sys
 import logging
@@ -41,13 +40,31 @@ class TermStack:
                                self.orig_attrs)
 
 
-def is_a_tty(outfile=sys.stdout):
-    ''' Detect terminal or something else, such as output redirection.
+def choose_palette(force_to='basic'):
+    ''' Make a best effort to automatically determine whether to enable
+        ANSI color sequences, and if so, which palette to use.
 
-        Returns: Boolean or None if not found.
+        This is the main function of the module—meant to be used unless
+        something more specific is needed.
+
+        Takes the following factors into account:
+
+        - Whether output stream is a TTY.
+        - TERM, ANSICON environment variables
+        - CLICOLOR, NO_COLOR environment variables
+
+        Returns:
+            None, 'basic', 'extended', or 'true'
     '''
-    result = outfile.isatty() if hasattr(outfile, 'isatty') else None
-    log.debug(result)
+    result = None
+
+    if color_is_forced():
+        result = detect_palette_support() or force_to
+
+    elif is_a_tty() and color_is_allowed():
+        result = detect_palette_support()
+
+    log.debug('%r', result)
     return result
 
 
@@ -118,44 +135,14 @@ def detect_palette_support():
     return result
 
 
-def choose_palette(force_to='basic'):
-    ''' Make a best effort to automatically determine whether to enable
-        ANSI color sequences, and if so, which palette to use.
+def is_a_tty(outfile=sys.stdout):
+    ''' Detect terminal or something else, such as output redirection.
 
-        This is the main function of the module—meant to be used unless you
-        need something different.
-
-        Takes the following factors into account:
-
-        - Whether output stream is a TTY.
-        - TERM, ANSICON environment variables
-        - CLICOLOR, NO_COLOR environment variables
-
-        Returns None, 'basic', 'extended', or 'true'
+        Returns: Boolean or None if not found.
     '''
-    result = None
-
-    if color_is_forced():
-        result = detect_palette_support() or force_to
-
-    elif is_a_tty() and color_is_allowed():
-        result = detect_palette_support()
-
-    log.debug('%r', result)
+    result = outfile.isatty() if hasattr(outfile, 'isatty') else None
+    log.debug(result)
     return result
-
-
-def get_theme():
-    ''' Supported on xterm, perhaps others.
-
-        See notes on query_terminal_color().
-    '''
-    theme = 'dark'
-    for component in query_terminal_color('background'):
-        if component and component[0] > '7':
-            theme = 'light'
-            break
-    return theme
 
 
 # -- tty, termios ------------------------------------------------------------
@@ -195,7 +182,7 @@ def get_cursor_pos():
             (,)    - empty tuple, if an error occurred.
     '''
     values = ()
-    if sys.stdout.isatty():
+    if is_a_tty():
         import tty, termios
 
         with TermStack() as fd:
@@ -208,12 +195,25 @@ def get_cursor_pos():
 
         # parse response
         resp = resp.lstrip(CSI)
-        try:
+        try:  # reverse
             values = tuple( int(token) for token in resp.partition(';')[::-2] )
         except Exception as err:
-            log.error('parse error: %s', err)
+            log.error('parse error: %s on %r', err, resp)
 
     return values
+
+
+def get_theme():
+    ''' Supported on xterm, perhaps others.
+
+        See notes on query_terminal_color().
+    '''
+    theme = 'dark'
+    for component in query_terminal_color('background'):
+        if component and component[0] > '7':
+            theme = 'light'
+            break
+    return theme
 
 
 def query_terminal_color(name):
@@ -271,5 +271,3 @@ def query_terminal_color(name):
                 colors = []                             # empty on failure
 
     return colors
-
-

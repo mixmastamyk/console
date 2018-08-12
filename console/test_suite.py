@@ -158,7 +158,7 @@ if True:  # fold
 
     def test_fgextn_three_digits():
 
-        assert str(fg.nf0f) == CSI + '38;5;233m'
+        assert str(fg.nf0f) == CSI + '38;5;13m'
 
     def test_fgextn_four_digits():
         with pytest.raises(AttributeError) as err:
@@ -173,7 +173,7 @@ if True:  # fold
 
     def test_bgextn_three_digits():
 
-        assert str(bg.n080) == CSI + '48;5;111m'
+        assert str(bg.n080) == CSI + '48;5;28m'
 
     def test_bgextn_too_long():
         with pytest.raises(AttributeError) as err:

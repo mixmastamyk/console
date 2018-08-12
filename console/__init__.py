@@ -1,9 +1,9 @@
 '''
-    console - An easy to use console utility and ANSI escape sequence library.
+    console - Comprehensive escape sequence utility library for terminals.
     © 2018, Mike Miller - Released under the LGPL, version 3+.
 '''
 
-# detect palette before anything else
+# detect palette before anything else, other modules dependent
 from .detection import choose_palette as _choose_palette
 
 _CHOSEN_PALETTE = _choose_palette()

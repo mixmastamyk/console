@@ -1,5 +1,5 @@
 '''
-    console - An easy to use console utility and ANSI escape sequence library.
+    console - Comprehensive escape sequence utility library for terminals.
     © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     This module contains utility and convenience functions for use under ANSI
@@ -8,7 +8,6 @@
     See also:
 
         - getpass
-
 '''
 import logging
 import re
@@ -109,7 +108,9 @@ except ImportError:                     # UNIX
 def wait_key():
     ''' Waits for a keypress at the console and returns it.
 
-        Returns immediately under i/o redirection.
+        Returns:
+            char or ESC - depending on key hit.
+            None - immediately under i/o redirection, not an interactive tty.
     '''
     if is_a_tty():
         return _getch()
@@ -120,10 +121,10 @@ def pause(message='Press any key to continue…'):
 
         https://en.wikipedia.org/wiki/List_of_DOS_commands#PAUSE
 
-        DOC:  In addition to that, it will also become a
-            NOP (no operation instruction) if the script is not run interactively.
-            is a tty?
+        Returns:
+            char or ESC - depending on key hit.
+            None - immediately under i/o redirection, not an interactive tty.
     '''
-    if is_a_tty():
+    if is_a_tty():  # not sure if both of these should check
         print(message, end=' ', flush=True)
         return wait_key()

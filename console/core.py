@@ -1,11 +1,10 @@
 '''
-    console - An easy to use console utility and ANSI escape sequence library.
+    console - Comprehensive escape sequence utility library for terminals.
     © 2018, Mike Miller - Released under the LGPL, version 3+.
 
-    Complicated Gobbyldegook providing the simple interface,
-    is located here.
+    Complicated Gobbyldegook providing a simple interface located here.
 
-    Classes here not meant to be instantiated by client code.
+    Classes below not meant to be instantiated by client code.
 '''
 import sys
 import logging
@@ -15,9 +14,10 @@ from .constants import CSI
 from .disabled import dummy, empty
 
 
-ALL_PALETTES = ('basic', 'extended', 'truecolor')
-log = logging.getLogger(__name__)
+ALL_PALETTES = ('basic', 'extended', 'truecolor')  # variants 'x11', 'web'
 _END = CSI + '0m'
+X11_RGB_FILE = '/etc/X11/rgb.txt'
+log = logging.getLogger(__name__)
 
 
 class _BasicPaletteBuilder:
@@ -77,56 +77,86 @@ class _BasicPaletteBuilder:
 class _HighColorPaletteBuilder(_BasicPaletteBuilder):
     ''' Container/Router for ANSI extended & truecolor palettes. '''
 
+    def __init__(self, x11_rgb_filename=X11_RGB_FILE, **kwargs):
+        super().__init__(**kwargs)
+        self._x11_color_map = {}
+        self._x11_rgb_filename = x11_rgb_filename
+
     def __getattr__(self, name):
         ''' Traffic cop - called only when an attribute is missing,
-            once per palette entry attribute.
+            once per palette entry attribute.  #BDSM
         '''
-        # route on first letter - must have length one to be called:
-        first_letter, digits = name[0], name[1:]
-        digit_len = len(digits)
+        # route on first letter - must have length one to be here:
+        first_letter, index = name[0], name[1:]
+        idx_len = len(index)
 
-        if first_letter == 'i':
-            if not digits or digit_len > 3:     # bdsm
+        if first_letter == 'i':     # INDEXED aka EXTENDED
+            if not index or idx_len > 3:
                 raise AttributeError('index %r not found. Check length of '
                                      'numeric portion, must be from 1 to 3 '
-                                     'digits only.' % name)
-            if not digits.isdigit():
+                                     'index only.' % name)
+            if not index.isdigit():
                 raise AttributeError('index %r not found. i+digits, holmes.' %
                                      name)
 
             if 'extended' in self._palette_support:  # build entry
-                return self._get_extended_palette_entry(name, digits)
+                return self._get_extended_palette_entry(name, index)
             else:
                 return empty
 
-        elif first_letter == 'n':
-            if not digit_len == 3:
+        elif first_letter == 'n':   # NEAREST
+            if not idx_len == 3:
                 raise AttributeError('%r not found. Check length, hex portion '
                                      'must be 3 characters only.' % name)
-            from .proximity import find_nearest_color_hexstr
-
-            nearest_idx = find_nearest_color_hexstr(digits)
 
             if 'extended' in self._palette_support:  # build entry
+                from .proximity import find_nearest_color_hexstr
+                nearest_idx = find_nearest_color_hexstr(index)
+
                 return self._get_extended_palette_entry(name, str(nearest_idx))
             else:
                 return empty
 
-        elif first_letter == 't':
-            if digit_len == 6:
+        elif first_letter == 't':   # TRUE
+            if idx_len == 6:
                 pass
-            elif digit_len == 3:  # double chars:  b0b -> bb00bb
-                digits = ''.join([ch*2 for ch in digits])
+            elif idx_len == 3:  # double chars:  b0b -> bb00bb
+                index = ''.join([ch*2 for ch in index])
             else:
                 raise AttributeError('%r not found. Check length, hex portion '
                                      'must be 3 or 6 characters only.' % name)
             try:
-                int(digits, 16)  # poor-man's ishexdigit()
+                int(index, 16)  # poor-man's ishexdigit()
             except ValueError:
                 raise AttributeError('%r not found---not hex digits.' % name)
 
             if 'truecolor' in self._palette_support:  # build entry
-                return self._get_true_palette_entry(name, digits)
+                return self._get_true_palette_entry(name, index)
+            else:
+                return empty
+
+        elif first_letter == 'x':   # X11
+            if idx_len < 3:  # red is shortest name
+                raise AttributeError('%r not found. Check length, name portion '
+                                     'must be at least 3 characters.' % name)
+
+            if 'truecolor' in self._palette_support:
+                return self._get_x11_palette_entry(name, index[1:])  # chop _
+            else:
+                return empty
+
+        elif first_letter == 'w':   # WEBCOLORS
+            if idx_len < 3:  # red may be shortest name
+                raise AttributeError('%r not found. Check length, name portion '
+                                     'must be at least 3 characters.' % name)
+
+            if 'truecolor' in self._palette_support:
+                try:  # need to make import-ant decision here:-D
+                    import webcolors
+                    return self._get_web_palette_entry(webcolors, name,
+                                                       index[1:])  # chop _
+                except ImportError:
+                    return empty
             else:
                 return empty
 
@@ -137,9 +167,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
     def _get_extended_palette_entry(self, name, index):
         ''' Compute extended entry, once on the fly. '''
         values = [self._start_codes_extended, index]
-        attr = _PaletteEntry(self, name.upper(), ';'.join(values))
-        setattr(self, name, attr)  # now cached
-        return attr
+        return self._create_entry(name, values)
 
     def _get_true_palette_entry(self, name, hexdigits):
         ''' Compute truecolor entry, once on the fly. '''
@@ -147,14 +175,35 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         # convert hex attribute name, ex 'BB00BB', to ints to 'R', 'G', 'B':
         values.extend(str(int(hexdigits[idx:idx+2], 16)) for idx in (0, 2 ,4))
 
-        # Render first values as string and place as first code:
+        return self._create_entry(name, values)
+
+    def _get_x11_palette_entry(self, name, color_name):
+        ''' Find X11 entry, once on the fly. '''
+        values = [self._start_codes_true]
+        if not self._x11_color_map:
+            self._x11_color_map = load_x11_color_map(self._x11_rgb_filename)
+        # convert name to 'R', 'G', 'B':    - below:  empty tuple
+        values.extend(self._x11_color_map[color_name.lower()])
+
+        return self._create_entry(name, values)
+
+    def _get_web_palette_entry(self, webcolors, name, color_name):
+        ''' Find X11 entry, once on the fly. '''
+        values = [self._start_codes_true]
+        values.extend(str(i) for i in webcolors.name_to_rgb(color_name.lower()))
+        return self._create_entry(name, values)  # TODO:
+
+    def _create_entry(self, name, values):
+        ''' Render first values as string and place as first code,
+            save, and return attr
+        '''
         attr = _PaletteEntry(self, name.upper(), ';'.join(values))
         setattr(self, name, attr)  # now cached
         return attr
 
     def clear(self):
-        ''' Clears the palette, to save memory.
-            Useful for truecolor palette, perhaps.
+        ''' Cleanse the palette to clear memory.
+            Useful for truecolor, perhaps.
         '''
         self.__dict__.clear()
 
@@ -192,11 +241,11 @@ class _PaletteEntry:
             # Make a copy, so codes don't pile up after each addition
             # Render initial values once as string and place as first code:
             newcodes = self._codes + other._codes
-            #~ log.debug('codes for new instance: %r', newcodes)
+            #~ log.debug('codes for new instance: %r', newcodes)  # noisy
             attr = _PaletteEntry(self.parent, self.name,
                                  ';'.join(newcodes))
             same_category = self.parent is other.parent
-            #~ log.debug('palette entries match: %s', same_category)
+            #~ log.debug('palette entries match: %s', same_category)  # noisy
 
             if not same_category:  # different, use end instead of default
                 attr.default = _END
@@ -239,7 +288,25 @@ class _PaletteEntry:
 
             Placeholder can be '%s', '{}', '${}' or other depending on your
             needs.
-
-            TODO: also needs end solved.
         '''
         return f'{self}{placeholder}{self.default}'
+
+
+def load_x11_color_map(filename=X11_RGB_FILE):
+    ''' Load and parse X11's rgb.txt '''
+    x11_color_map = {}
+
+    with open(filename) as infile:
+
+        for line in infile:
+            if line.startswith('!') or line.isspace():
+                continue
+
+            tokens = line.rstrip().split(maxsplit=3)
+            key = tokens[3]
+            if ' ' in key:  # skip names with spaces to match webcolors
+                continue
+
+            x11_color_map[key.lower()] = tuple( token for token in tokens[:3] )
+
+    return x11_color_map

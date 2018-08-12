@@ -1,5 +1,5 @@
 '''
-    console - An easy to use console utility and ANSI escape sequence library.
+    console - Comprehensive escape sequence utility library for terminals.
     © 2018, Mike Miller - Released under the LGPL, version 3+.
 
         Module inspired by: colorama.ansi.py © Jonathan Hartley 2013.
@@ -13,8 +13,6 @@
     See: http://en.wikipedia.org/wiki/_escape_code
          and section 5:
          #SGR_(Select_Graphic_Rendition)_parameters
-
-    A user of this library needn't create any of these.
 '''
 from .core import _BasicPaletteBuilder, _HighColorPaletteBuilder
 
