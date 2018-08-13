@@ -2,19 +2,29 @@
 
 .. raw:: html
 
-    <div style="font-family: monospace, fixed; font-weight: bold; background: inherit; padding: 1rem; text-align: center; border-radius: .3em">
-    <span style=";color:#729fcf">&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span><span style=";color:#3465a4">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;</span><br />
-    <span style=";color:#729fcf">&#9474;</span><span style="">&#160;&#160;&#160;</span><span style=";color:#729fcf">&#9487;&#9473;&#9592;&#9487;</span><span style=";color:#3465a4">&#9473;&#9491;&#9487;&#9491;&#9595;&#9487;&#9473;&#9491;&#9487;&#9473;&#9491;&#9595;</span><span style="">&#160;&#160;</span><span style=";color:#3465a4">&#9487;&#9473;</span><span style=";color:#b4b8b0">&#9592;</span><span style="">&#160;&#160;&#160;</span><span style=";color:#b4b8b0">&#9474;</span><br />
-    <span style=";color:#3465a4">&#9474;</span><span style="">&#160;&#160;&#160;</span><span style=";color:#3465a4">&#9475;</span><span style="">&#160;&#160;</span><span style=";color:#3465a4">&#9475;</span><span style="">&#160;</span><span style=";color:#3465a4">&#9475;&#9475;&#9495;&#9515;&#9495;&#9473;&#9491;</span><span style=";color:#b4b8b0">&#9475;</span><span style="">&#160;</span><span style=";color:#b4b8b0">&#9475;&#9475;</span><span style="">&#160;&#160;</span><span style=";color:#b4b8b0">&#9507;&#9592;</span><span style="">&#160;&#160;&#160;&#160;</span><span style=";color:#b4b8b0">&#9474;</span><br />
-    <span style=";color:#3465a4">&#9474;</span><span style="">&#160;&#160;&#160;</span><span style=";color:#3465a4">&#9495;&#9473;&#9592;&#9495;</span><span style=";color:#b4b8b0">&#9473;&#9499;&#9593;</span><span style="">&#160;</span><span style=";color:#b4b8b0">&#9593;&#9495;&#9473;&#9499;&#9495;&#9473;&#9499;&#9495;&#9473;&#9592;&#9495;&#9473;</span><span style=";color:#555">&#9592;</span><span style="">&#160;&#160;&#160;</span><span style=";color:#555">&#9474;</span><br />
-    <span style=";color:#b4b8b0">&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span><span style=";color:#555">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;</span><br />
-    </div>
+
+    <pre style="
+        font-family: 'source code pro', monospace;
+        font-weight: bold;
+        padding: .4rem;
+        text-align: center;
+        border-radius: .3em
+    ">
+    ┌───────────────────────────┐
+    │   ┏━╸┏━┓┏┓╻┏━┓┏━┓╻  ┏━╸   │
+    │   ┃  ┃ ┃┃┗┫┗━┓┃ ┃┃  ┣╸    │
+    │   ┗━╸┗━┛╹ ╹┗━┛┗━┛┗━╸┗━╸   │
+    └───────────────────────────┘
+    </pre>
 
     <div style="text-align: center; padding: .6em">
         <i>Tonight we're gonna party like it's 1979…</i><br><br>
         ╰─(˙𝀓˙)─╮  ╭─(＾0＾)─╯
     </div>
     <br>
+
+
+
 
 
 Console
@@ -47,7 +57,7 @@ Using it looks a little something like this::
     <i>lot</i> more!</p>
 
 
-␛[1;3m \ *Introduction* ␛[0m
+␛[1;3m \ *Hello World* ␛[0m
 --------------------------------------
 
 What are terminals and ANSI escape codes?  Lost?
@@ -64,6 +74,8 @@ Installen-Sie, Bitte
 ::
 
     ⏵ pip3 install --user console
+
+    # console[webcolors]  # for webcolor support
 
 `Colorama <https://pypi.python.org/pypi/colorama>`_
 may be needed to see come of these examples under a legacy version of Windows.

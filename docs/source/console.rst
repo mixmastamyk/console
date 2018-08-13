@@ -44,6 +44,14 @@ console.disabled module
     :undoc-members:
     :show-inheritance:
 
+console.proximity module
+------------------------
+
+.. automodule:: console.proximity
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 console.screen module
 ---------------------
 

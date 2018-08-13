@@ -15,15 +15,40 @@ h1, h2, h3, h4, h5 {
     font-family: "Source Code Pro", monospace, monospace !important;
 }
 
-a {
+a, div.sphinxsidebar a {
     color: #0c0;
     font-family: "Source Code Pro", monospace, monospace !important;
     padding: 0 .2em;
 }
-a:hover {
+a:hover, div.sphinxsidebar a:hover {
     background: #0c0;
     color: #222 !important;
 }
-a:visited {
+a:visited, div.sphinxsidebar a:visited {
     color: #090;
 }
+
+div.sphinxsidebar a {
+    color: #aaa;
+    text-decoration: none;
+    border-bottom: 1px dotted #666;
+}
+div.sphinxsidebar input {
+    background: #101010;
+    border: 1px solid #444;
+    font-family: "Source Code Pro", monospace, monospace !important;
+    font-size: 1em;
+}
+
+.admonition, .seealso {
+    background-color: #111 !important;
+    border-color: #444 !important;
+    border-radius: .3em;
+}
+
+code, span.pre  {
+    background-color: inherit !important;
+    color: inherit !important;
+    border-bottom: 0;
+}
+

@@ -1,6 +1,6 @@
 '''
-    console - Comprehensive escape sequence utility library for terminals.
-    © 2018, Mike Miller - Released under the LGPL, version 3+.
+    | console - Comprehensive escape sequence utility library for terminals.
+    | © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     This module contains capability detection routines for use under ANSI
     compatible terminals.
@@ -238,9 +238,9 @@ def query_terminal_color(name):
         Returns:
             A list of four-digit hex strings after parsing,
             the fourth digit is the least significant and can be chopped if
-            needed::
+            needed:
 
-                ['DEAD', 'BEEF', 'CAFE']
+            ``['DEAD', 'BEEF', 'CAFE']``
 
             If an error occurs during retrieval or parsing,
             the list will be empty.
