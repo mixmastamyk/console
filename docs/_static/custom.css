@@ -16,16 +16,31 @@ h1, h2, h3, h4, h5 {
 }
 
 a, div.sphinxsidebar a {
+/*
     color: #0c0;
+    color: #d0964b;
+*/
+    color: #d70;
     font-family: "Source Code Pro", monospace, monospace !important;
     padding: 0 .2em;
 }
 a:hover, div.sphinxsidebar a:hover {
+/*
     background: #0c0;
+    background: #d0964b;
+*/
+    background: #d70;
     color: #222 !important;
 }
+/*
 a:visited, div.sphinxsidebar a:visited {
     color: #090;
+    color: #b50;
+}
+*/
+a:active, div.sphinxsidebar a:active {
+    background: #e80;
+    color: #222 !important;
 }
 
 div.sphinxsidebar a {
@@ -52,3 +67,53 @@ code, span.pre  {
     border-bottom: 0;
 }
 
+.center {
+    text-align: center;
+}
+#logo {
+    border-radius: .3em;
+    font-family: 'source code pro', monospace;
+    font-weight: bold;
+    padding: 1rem;
+}
+
+#subtitle {
+    text-align: center;
+    padding: .6em
+      margin-bottom: 1rem
+}
+#subtitle i {
+    text-align: center;
+    padding: .6em
+
+}
+
+
+/*
+syntax highlighting
+*/
+.highlight .kn, .highlight .k {
+/*
+    color: #4080f0;
+*/
+    color: #3894e8;
+    font-weight: bold;
+}
+.highlight .go {
+    color: FireBrick;
+    font-weight: normal;
+}
+.highlight .gp, .highlight .o {
+    color: #c8964b;
+    font-weight: normal;
+}
+.highlight .n, .highlight .nn {
+    color: #c8c8c8;
+    font-weight: normal;
+}
+.highlight .s1 {
+    color: FireBrick;
+}
+.highlight .se {
+    color: IndianRed;
+}

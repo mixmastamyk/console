@@ -10,7 +10,10 @@ from console.constants import __version__
 
 
 # additional metadata
-extras_require = dict(webcolors=('webcolors',))
+extras_require = dict(
+    webcolors=('webcolors',),
+    colorama=('colorama',),
+)
 install_requires = ('ezenv',)
 keywords = 'ansi terminal escape sequence color cursor style screen detection'
 tests_require = ('pytest'),
