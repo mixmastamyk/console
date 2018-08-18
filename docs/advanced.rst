@@ -1,9 +1,25 @@
 
-Advanced Topics
+Additional Topics
 =======================
 
 
-Note:
+What's that, you say?
+More than you wanted to know on the subject can be found here.
+Read on:
+
+    - `Terminal Emulator <https://en.wikipedia.org/wiki/Terminal_emulator>`_
+    - `ANSI Escape Codes <http://en.wikipedia.org/wiki/ANSI_escape_code>`_
+    - `XTerm Control Sequences
+      <http://invisible-island.net/xterm/ctlseqs/ctlseqs.html>`_
+      (`PDF <https://www.x.org/docs/xterm/ctlseqs.pdf>`_)
+
+For example,
+to render the text "Hello World" with the attributes of italic and bold,
+we output the codes below.
+(With ":reverse:`␛`" representing the ASCII escape character.)
+
+
+.. note::
 
     Did you know that thirty years before
     `f.lux <https://en.wikipedia.org/wiki/F.lux>`_

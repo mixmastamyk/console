@@ -2,6 +2,7 @@
 body, div.body{
     background: #181818;
     color: #c8c8c8;
+    font-family: Georgia, serif;
 }
 pre {
     background: #080808;
@@ -116,4 +117,16 @@ syntax highlighting
 }
 .highlight .se {
     color: IndianRed;
+}
+
+.reverse {
+    font-size: .9em;
+    background: #c8c8c8;
+    border-radius: .2em;
+    color: #181818;
+    display: inline-block;
+}
+.bi {
+  font-weight: bold;
+  font-style: italic;
 }

@@ -1,4 +1,10 @@
 
+.. role:: reverse
+   :class: reverse
+
+.. role:: bi
+   :class: bi
+
 .. raw:: html
 
     <pre id='logo' class='center'>
@@ -16,57 +22,50 @@
 Console
 ============
 
-*Yet another easy-to-use console helper and ANSI-sequence library.
-More comprehensive than most.*
-
-This package makes it easy to generate the inline codes used to display colors
-and character styles in ANSI-compatible terminals and emulators,
+Yet another package that makes it easy to generate the inline codes used to
+display colors and character styles in ANSI-compatible terminals and emulators,
 as well as other functionality such clearing screens,
 moving cursors,
 and setting title bars.
-What's that, you say?
-See the links below for background information:
+A bit more comprehensive than most,
+however.
 
-    - `Terminal Emulator <https://en.wikipedia.org/wiki/Terminal_emulator>`_
-    - `ANSI Escape Codes <http://en.wikipedia.org/wiki/ANSI_escape_code>`_
-    - `XTerm Control Sequences
-      <http://invisible-island.net/xterm/ctlseqs/ctlseqs.html>`_
-      (`PDF <https://www.x.org/docs/xterm/ctlseqs.pdf>`_)
 
-In short, the characters seen below are translated into commands for the
-terminal to execute,
-in this case to render the text "Hello World" with the attributes of italic and
-bold.
+:reverse:`␛`\ [1;3m\ :bi:`Hello World` :reverse:`␛`\ [0m
+--------------------------------------------------------------
 
-␛[1;3m \ *Hello World* ␛[0m
---------------------------------------
-
-Coding with console looks like this::
+Coding with console styles might look like this::
 
     >>> from console import fg, bg, fx
 
     >>> fg.green + 'Hello World!' + fg.default
     '\x1b[32mHello World!\x1b[39m'
 
-The "escaped" string ``'\x1b'`` represents the ASCII Escape character,
-number 27 in decimal, or ``1b`` in hexadecimal,
-while command ``32`` turns the text green…
+The "escaped" string ``'\x1b'`` represents the ASCII Escape character
+(27 in decimal, ``1b`` hex).
+Command ``32`` turns the text green
+and 39 back to the default color,
 but you don't need to know all of that.
 
 Printing to a supporting terminal from Python might look like this:
 
-
 .. raw:: html
 
     <pre>
-    &gt;&gt;&gt; print(fg.purple, fx.italic,
-              '⛈ PURPLE RAIN ⛈', fx.end)
-    <span style="color:purple; font-style: italic">⛈ PURPLE&nbsp;RAIN ⛈</span>
+    &gt;&gt;&gt; print(fg.red, fx.italic,
+              'Heart', fx.end, 'of Glass…')
+    <span style="color:red; font-style: italic">Heart</span> of Glass…
     </pre>
+
+.. ~ &gt;&gt;&gt; print(fg.purple, fx.italic,
+          .. ~ '⛈ PURPLE RAIN ⛈', fx.end)
+.. ~ <span style="color:purple; font-style: italic">⛈ PURPLE&nbsp;RAIN ⛈</span>
+.. ~ </pre>
+.. ~ 🔔
 
 
 ``fx.end`` is an convenient object to note---\
-it ends all styles and fore/background colors,
+it ends all styles and fore/background colors at once,
 where as ``bg.default`` for example,
 resets only the background to its default color.
 
@@ -82,22 +81,25 @@ resets only the background to its default color.
 
 Installen-Sie, Bitte
 ~~~~~~~~~~~~~~~~~~~~~
-::
+
+.. code-block:: shell
 
     ⏵ pip3 install --user console
 
+    # console[colorama]   # for colorama support
     # console[webcolors]  # for webcolor support
 
-Console is cross-platform however
+Console is cross-platform,
+however
 `colorama <https://pypi.python.org/pypi/colorama>`_
-will also need to be installed to view these examples under lame versions of
+will need to be installed to view these examples under lame versions of
 Windows.
 
 
 Overview
 ------------------
 
-``console.utils`` has a number of nifty functions::
+``console.utils`` also has a number of nifty functions::
 
     >>> from console.utils import cls, set_title
 
@@ -106,43 +108,52 @@ Overview
     '\x1b]2;Console FTW! 🤣\x07'
 
 - You can move the cursor around in ``console.screen``.
-- Detect the environment with ``console.detection``.
+- Detect the environment with ``console.detection`` :
 
-    - Is it a tty or redirected?
-    - Detect palettes
-    - Check ``NO_COLOR``, ``CLICOLOR`` environment variables
-    - Light or dark background?
+    - Tty or redirected?
+    - Query palette support
+    - Check environment variables, such as ``NO_COLOR``, ``CLICOLOR``.
+    - Is background light or dark?
     - and more.
 
-Console does its best to figure out if your terminal supports ANSI sequences
-and various color palettes on startup.
+Console does its best to figure out what your terminal supports on startup.
 It will also deactivate itself when output is redirected into a pipe for
 example.
-Detection can be bypassed and handled manually if performance is a concern.
-Just create your own objects from the classes in the style and screen modules.
+Detection can be bypassed and handled manually when needed.
+Simply create your own objects from the classes in the ``style`` and ``screen``
+modules.
 
 
 Palettes
 ~~~~~~~~~~~~~~~
 
-The standard palette is accessed by name,
-but the others typically have a prefix letter and digits to specify the color.
-Shortcut access to the various palettes may be accomplished like so::
+While the standard palette of 16 colors is accessed by name,
+the others have a prefix letter and a number of digits or name to specify the
+color.
+Shortcut access to the various palettes may be accomplished like so:
 
-    # Examples    Format    Palette
-    fg.red        NAME      8-color
-    fg.lightred   NAME      16-color w/o bold
+.. code-block:: sh
 
-    fg.i22        iDDD      256-color indexed/extended
-    fg.nf0f       nHHH      Nearest to indexed
-    fg.tff00bb    tHHH      Truecolor, 3 or 6 digits
-    fg.x_navyblue x_N       X11 color name
-    fg.w_bisque   w_N       Webcolors, if installed
+    # Examples      Format  Palette
 
-Background works the same.
+.. code-block:: text
 
-I'm still deciding on these, let me know in the bug section if you'd prefer
-underscores or not.
+    fg.red          NAME    8-color
+    fg.lightred     NAME    16-color w/o bold
+
+    fg.i22          iDDD    256-color indexed/extended
+    fg.nf0f         nHHH    Nearest to indexed
+    fg.tff00bb      tHHH    Truecolor, 3 | 6 digits
+    fg.x_navyblue   x_NM    X11 color name
+    fg.w_bisque     w_NM    Webcolors, if installed
+
+Background works the same of course.
+
+X11 colors only available where its ``rgb.txt`` file is,
+however if demand were high enough they could be copied into the package.
+
+I'm still deciding on the format of these attributes,
+let me know in the bug section if you'd prefer underscores or not.
 
 Composability
 ~~~~~~~~~~~~~~~

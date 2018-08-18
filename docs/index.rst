@@ -23,7 +23,8 @@ Contents
     :maxdepth: 2
 
     Introduction <readme.rst>
-    advanced
+    why
+    additional
     Modules <source/modules>
 
 
