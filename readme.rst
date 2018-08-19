@@ -26,10 +26,11 @@ Yet another package that makes it easy to generate the inline codes used to
 display colors and character styles in ANSI-compatible terminals and emulators,
 as well as other functionality such clearing screens,
 moving cursors,
-and setting title bars.
-A bit more comprehensive than most,
-however.
+setting title bars,
+and detecting capabilities.
+A bit more comprehensive than most.
 
+How do they work?
 
 :reverse:`␛`\ [1;3m\ :bi:`Hello World` :reverse:`␛`\ [0m
 --------------------------------------------------------------
@@ -41,30 +42,23 @@ Coding with console styles might look like this::
     >>> fg.green + 'Hello World!' + fg.default
     '\x1b[32mHello World!\x1b[39m'
 
-The "escaped" string ``'\x1b'`` represents the ASCII Escape character
+The string  ``'\x1b'`` represents the ASCII Escape character
 (27 in decimal, ``1b`` hex).
-Command ``32`` turns the text green
+Command 32 turns the text green
 and 39 back to the default color,
-but you don't need to know all of that.
-
+but you don't need to care about all of that.
 Printing to a supporting terminal from Python might look like this:
 
 .. raw:: html
 
     <pre>
-    &gt;&gt;&gt; print(fg.red, fx.italic,
-              'Heart', fx.end, 'of Glass…')
+    &gt;&gt;&gt; print(fg.red, fx.italic, 'Heart', fx.end,
+              'of Glass…')
     <span style="color:red; font-style: italic">Heart</span> of Glass…
     </pre>
 
-.. ~ &gt;&gt;&gt; print(fg.purple, fx.italic,
-          .. ~ '⛈ PURPLE RAIN ⛈', fx.end)
-.. ~ <span style="color:purple; font-style: italic">⛈ PURPLE&nbsp;RAIN ⛈</span>
-.. ~ </pre>
-.. ~ 🔔
 
-
-``fx.end`` is an convenient object to note---\
+Above, ``fx.end`` is a convenient object to note---\
 it ends all styles and fore/background colors at once,
 where as ``bg.default`` for example,
 resets only the background to its default color.
@@ -89,48 +83,93 @@ Installen-Sie, Bitte
     # console[colorama]   # for colorama support
     # console[webcolors]  # for webcolor support
 
-Console is cross-platform,
-however
+Jah!
+While console is cross-platform,
 `colorama <https://pypi.python.org/pypi/colorama>`_
-will need to be installed to view these examples under lame versions of
-Windows.
+will need to be installed to view these examples under the many lame versions of
+Windows < 10.
 
 
 Overview
 ------------------
 
-``console.utils`` also has a number of nifty functions::
+As mentioned,
+console handles more than color and styles.
+A number of useful constants are provided in
+:mod:`console.constants`,
+such as
+`CSI <https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences>`_
+and
+`OSC <https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences>`_
+for building your own apps.
+
+
+Utils, Screen
+~~~~~~~~~~~~~~~~
+
+:mod:`console.utils`
+has a number of nifty functions::
 
     >>> from console.utils import cls, set_title
 
-    >>> cls()  # whammo!  clear screen and scrollback
-    >>> set_title('Console FTW! 🤣')
-    '\x1b]2;Console FTW! 🤣\x07'
+    >>> cls()  # whammo! a.k.a. reset terminal
+    >>> set_title('Le Freak')
+    '\x1b]2;Le Freak\x07'
 
-- You can move the cursor around in ``console.screen``.
-- Detect the environment with ``console.detection`` :
+It can also ``strip_ansi`` from strings,
+wait for keypresses,
+clear the screen with or without scrollback,
+and easily pause a script,
+like the old DOS commands.
 
-    - Tty or redirected?
-    - Query palette support
-    - Check environment variables, such as ``NO_COLOR``, ``CLICOLOR``.
-    - Is background light or dark?
+You can move the cursor around with :mod:`console.screen`,
+get its position,
+save/restore the screen,
+and enable
+`bracketed paste <https://cirw.in/blog/bracketed-paste>`_
+in your app,
+among other things.
+
+
+Detection
+~~~~~~~~~~~
+
+Detect the terminal environment with :mod:`console.detection`:
+
+    - Redirection---is this an interactive "``tty``" or not?
+    - Determine palette support
+    - Check relevant environment variables, such as
+      `NO_COLOR <http://no-color.org/>`_,
+      `CLICOLOR <https://bixense.com/clicolors/>`_,
+      etc.
+    - Query terminal colors and themes---light or dark?
     - and more.
 
-Console does its best to figure out what your terminal supports on startup.
-It will also deactivate itself when output is redirected into a pipe for
-example.
+Console does its best to figure out what your terminal supports on startup
+and will configure the convenience objects we imported above to do typically
+the right thing.
+They will deactivate themselves at startup when output is redirected into a
+pipe, for example.
+
 Detection can be bypassed and handled manually when needed.
-Simply create your own objects from the classes in the ``style`` and ``screen``
+Simply use the detection functions in the module or write your own as desired,
+then create your own objects from the classes in the
+:mod:`console.style` and :mod:`console.screen`
 modules.
 
+There's also logging done---\
+enable debug level and you'll see the results of the queries from the module.
 
-Palettes
+
+Color Palettes
 ~~~~~~~~~~~~~~~
 
-While the standard palette of 16 colors is accessed by name,
-the others have a prefix letter and a number of digits or name to specify the
+While the original palette of 8/16 colors is accessed by name,
+the others have a prefix letter then a name or number of digits to specify the
 color.
-Shortcut access to the various palettes may be accomplished like so:
+Access to the color entries of various palettes are accomplished like so.
+Unleash your inner
+`Britto <https://www.art.com/gallery/id--a266/romero-britto-posters.htm>`_.
 
 .. code-block:: sh
 
@@ -138,31 +177,28 @@ Shortcut access to the various palettes may be accomplished like so:
 
 .. code-block:: text
 
-    fg.red          NAME    8-color
-    fg.lightred     NAME    16-color w/o bold
+    fg.red          NAME    8 colors
+    fg.lightred     NAME    Another 8 colors w/o bold
 
-    fg.i22          iDDD    256-color indexed/extended
-    fg.nf0f         nHHH    Nearest to indexed
-    fg.tff00bb      tHHH    Truecolor, 3 | 6 digits
-    fg.x_navyblue   x_NM    X11 color name
+    fg.i_22         iDDD    extended/indexed 256-color
+    fg.n_f0f        nHHH    Nearest hex to indexed
+
+    fg.t_ff00bb     tHHH    Truecolor, 3 or 6 digits
+    fg.x_navyblue   x_NM    X11 color name, if avail
     fg.w_bisque     w_NM    Webcolors, if installed
 
-Background works the same of course.
+The underscores are optional,
+choose depending whether brevity or readability are more important to you.
+Background palettes work the same of course.
 
-X11 colors only available where its ``rgb.txt`` file is,
-however if demand were high enough they could be copied into the package.
-
-I'm still deciding on the format of these attributes,
-let me know in the bug section if you'd prefer underscores or not.
-
-Composability
-~~~~~~~~~~~~~~~
+Composability++
+~~~~~~~~~~~~~~~~
 
 Console's convenience objects are meant to be highly composable and can be used
 in many ways.
 For example,
 you might like to create your own styles to use over and over and over.
-You can call them and add "mixins" as well:
+They can be called and have "mixins" added in as well:
 
 .. raw:: html
 
@@ -177,14 +213,24 @@ When console objects are combined together as we did above,
 a list of codes to be rendered to is kept on ice until final output as a
 string.
 Meaning, there won't be redundant escape sequences in the output.
+It can be done on the fly as well:
+
+.. raw:: html
+
+    <pre>
+    &gt;&gt;&gt; print(f'{fg.i202 + fx.reverse}Tangerine Dream{fx.end}')
+    <span style="color: #222; background-color:#ff5f00">Tangerine Dream</span>
+    </pre>
+
 
 Perhaps you'd prefer a pre-rendered template for performance reasons.
-Call the object with a placeholder string::
+Call the entry object with a placeholder string,
+with or instead of text::
 
     >>> template = bg.i22('{}') # dark green
 
-    >>> template.format('No I do not like…')
-    '\x1b[48;5;22mNo I do not like…\x1b[49m'
+    >>> template.format('No, I do not like…')
+    '\x1b[48;5;22mNo, I do not like…\x1b[49m'
 
 .. raw:: html
 
@@ -194,25 +240,28 @@ Call the object with a placeholder string::
     </pre>
 
 
-Other formats work also, e.g. ``%s``.
+Other template formats work also, e.g. ``%s`` and ``${}``.
 
-As a context-manager::
+Palette entries work as context-managers as well::
 
     with bg.blue:
-        print('\tThis text here,\n'
-              '\twill be on a blue background.')
+        print('The following text,'
+              'shall be on a blue background.')
+
 
 
 Demos and Tests
 ------------------
+
+*Outta Sight!*
 
 A series of positively *jaw-dropping* demos (haha, ok maybe not) may be run at
 the command-line with::
 
     ⏵ python3 -m console.demos
 
-
-If you have pytest installed, tests can be run in the install folder?
+If you have pytest installed,
+tests can be run from the install folder.
 
 ::
 
@@ -220,23 +269,15 @@ If you have pytest installed, tests can be run in the install folder?
 
 
 
-
-TODOs
------------
-
-- detect colorama
-
-
-
 Legalese
 ----------------
 
-    - © 2018, Mike Miller
-    - Released under the LGPL, version 3+.
-    - Enterprise Pricing:
+- Copyright 2018, Mike Miller
+- Released under the LGPL, version 3+.
+- Enterprise Pricing:
 
-      - 1 MEEllion dollars!
-        (only have to sell *one* copy!)
-        *Bwah-haha-ha!*
+  | 1 MEEllion dollars!
+  | *Bwah-haha-ha!*
+  | (only have to sell *one* copy!)
 
 

@@ -7,6 +7,7 @@ body, div.body{
 pre {
     background: #080808;
     color: #c0c0c0;
+    border-radius: .8em;
 }
 
 h1, h2, h3, h4, h5 {
@@ -18,30 +19,30 @@ h1, h2, h3, h4, h5 {
 
 a, div.sphinxsidebar a {
 /*
-    color: #0c0;
-    color: #d0964b;
-*/
     color: #d70;
+*/
+    color: #eca218;  /* Amber */
     font-family: "Source Code Pro", monospace, monospace !important;
+    font-size: .9em;
     padding: 0 .2em;
+    text-decoration: none !important;
+}
+code.xref {
+    border-bottom: 0;  /* alabaster adding border :-( */
 }
 a:hover, div.sphinxsidebar a:hover {
 /*
-    background: #0c0;
-    background: #d0964b;
-*/
     background: #d70;
+*/
+    background: #eca218;
     color: #222 !important;
 }
-/*
-a:visited, div.sphinxsidebar a:visited {
-    color: #090;
-    color: #b50;
-}
-*/
 a:active, div.sphinxsidebar a:active {
     background: #e80;
     color: #222 !important;
+}
+a:visited, div.sphinxsidebar a:visited {
+    opacity: .9
 }
 
 div.sphinxsidebar a {
@@ -55,6 +56,13 @@ div.sphinxsidebar input {
     font-family: "Source Code Pro", monospace, monospace !important;
     font-size: 1em;
 }
+div.sidebar{
+    background-color: #222;
+    border-color: #444;
+    border-radius: .5em;
+    opacity: .8;
+}
+
 
 .admonition, .seealso {
     background-color: #111 !important;
@@ -72,7 +80,6 @@ code, span.pre  {
     text-align: center;
 }
 #logo {
-    border-radius: .3em;
     font-family: 'source code pro', monospace;
     font-weight: bold;
     padding: 1rem;
@@ -90,9 +97,8 @@ code, span.pre  {
 }
 
 
-/*
-syntax highlighting
-*/
+/* syntax highlighting */
+div.highlight { background: inherit; }
 .highlight .kn, .highlight .k {
 /*
     color: #4080f0;
@@ -121,12 +127,29 @@ syntax highlighting
 
 .reverse {
     font-size: .9em;
+    opacity: .9;
     background: #c8c8c8;
     border-radius: .2em;
     color: #181818;
     display: inline-block;
 }
+a .reverse {
+    background: #eca218 !important;
+}
 .bi {
   font-weight: bold;
   font-style: italic;
+}
+
+/*
+pac man
+*/
+#pac { color: yellow; }
+#sha { color: red; }
+#spe { color: pink; }
+#bas { color: cyan; }
+#pok { color: SandyBrown; }
+
+p.caption {
+    margin: 0;
 }

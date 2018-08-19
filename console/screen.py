@@ -63,6 +63,7 @@ class Screen:
     save        = CSI + '?47h'                  # whole screen
     restore     = CSI + '?47l'                  # whole screen
 
+    # https://cirw.in/blog/bracketed-paste
     bracketedpaste = bp = CSI + '?2004h'
     bracketedpaste = bp = CSI + '?2004l'
 

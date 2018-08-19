@@ -25,6 +25,7 @@ if __name__ == '__main__':
 
     # try some stuff out
     from . import fg, bg, fx, defx
+    from .constants import BEL
     from .detection import is_a_tty, query_terminal_color, get_theme
     from .screen import screen
     from .utils import set_title, strip_ansi, cls
@@ -61,7 +62,7 @@ if __name__ == '__main__':
             f'Cursor right → : [{screen.right}] (<-- one space between brackets)',
             f'Cursor down ↓ 2: {screen.down(2)}',
 
-            'Text wrap: ' + fg.purple('This is how we do…ooo… it!',
+            'Text wrap: ' + fg.purple('You can ring my bell!' + BEL,
                                 fx.underline, fx.italic, fx.overline),
         ]
 
