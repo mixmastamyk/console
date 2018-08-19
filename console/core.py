@@ -87,74 +87,73 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             once per palette entry attribute.  #BDSM
         '''
         # route on first letter - must have length one to be here:
-        first_letter, index = name[0], name[1:]
-        idx_len = len(index)
+        first_letter, key = name[0], name[1:].lstrip('_')
+        key_len = len(key)
 
         if first_letter == 'i':     # INDEXED aka EXTENDED
-            if not index or idx_len > 3:
+            if not key or key_len > 3:
                 raise AttributeError('index %r not found. Check length of '
                                      'numeric portion, must be from 1 to 3 '
                                      'index only.' % name)
-            if not index.isdigit():
+            if not key.isdigit():
                 raise AttributeError('index %r not found. i+digits, holmes.' %
                                      name)
 
             if 'extended' in self._palette_support:  # build entry
-                return self._get_extended_palette_entry(name, index)
+                return self._get_extended_palette_entry(name, key)
             else:
                 return empty
 
         elif first_letter == 'n':   # NEAREST
-            if not idx_len == 3:
+            if not key_len == 3:
                 raise AttributeError('%r not found. Check length, hex portion '
                                      'must be 3 characters only.' % name)
 
             if 'extended' in self._palette_support:  # build entry
                 from .proximity import find_nearest_color_hexstr
-                nearest_idx = find_nearest_color_hexstr(index)
+                nearest_idx = find_nearest_color_hexstr(key)
 
                 return self._get_extended_palette_entry(name, str(nearest_idx))
             else:
                 return empty
 
         elif first_letter == 't':   # TRUE
-            if idx_len == 6:
+            if key_len == 6:
                 pass
-            elif idx_len == 3:  # double chars:  b0b -> bb00bb
-                index = ''.join([ch*2 for ch in index])
+            elif key_len == 3:  # double chars:  b0b -> bb00bb
+                key = ''.join([ch*2 for ch in key])
             else:
                 raise AttributeError('%r not found. Check length, hex portion '
                                      'must be 3 or 6 characters only.' % name)
             try:
-                int(index, 16)  # poor-man's ishexdigit()
+                int(key, 16)  # poor-man's ishexdigit()
             except ValueError:
                 raise AttributeError('%r not found---not hex digits.' % name)
 
             if 'truecolor' in self._palette_support:  # build entry
-                return self._get_true_palette_entry(name, index)
+                return self._get_true_palette_entry(name, key)
             else:
                 return empty
 
         elif first_letter == 'x':   # X11
-            if idx_len < 3:  # red is shortest name
+            if key_len < 3:  # red is shortest name
                 raise AttributeError('%r not found. Check length, name portion '
                                      'must be at least 3 characters.' % name)
 
             if 'truecolor' in self._palette_support:
-                return self._get_x11_palette_entry(name, index[1:])  # chop _
+                return self._get_x11_palette_entry(name, key)
             else:
                 return empty
 
         elif first_letter == 'w':   # WEBCOLORS
-            if idx_len < 3:  # red may be shortest name
+            if key_len < 3:  # red may be shortest name
                 raise AttributeError('%r not found. Check length, name portion '
                                      'must be at least 3 characters.' % name)
 
             if 'truecolor' in self._palette_support:
                 try:  # need to make import-ant decision here:-D
                     import webcolors
-                    return self._get_web_palette_entry(webcolors, name,
-                                                       index[1:])  # chop _
+                    return self._get_web_palette_entry(webcolors, name, key)
                 except ImportError:
                     return empty
             else:
@@ -296,17 +295,20 @@ def load_x11_color_map(filename=X11_RGB_FILE):
     ''' Load and parse X11's rgb.txt '''
     x11_color_map = {}
 
-    with open(filename) as infile:
+    try:
+        with open(filename) as infile:
 
-        for line in infile:
-            if line.startswith('!') or line.isspace():
-                continue
+            for line in infile:
+                if line.startswith('!') or line.isspace():
+                    continue
 
-            tokens = line.rstrip().split(maxsplit=3)
-            key = tokens[3]
-            if ' ' in key:  # skip names with spaces to match webcolors
-                continue
+                tokens = line.rstrip().split(maxsplit=3)
+                key = tokens[3]
+                if ' ' in key:  # skip names with spaces to match webcolors
+                    continue
 
-            x11_color_map[key.lower()] = tuple( token for token in tokens[:3] )
+                x11_color_map[key.lower()] = tuple(token for token in tokens[:3])
+    except IOError as err:
+        log.debug('error: X11 palette not found. %s', err)
 
     return x11_color_map
