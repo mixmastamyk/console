@@ -12,28 +12,21 @@
     <span style="color:#b4b8b0">&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span><span style="color:#555">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;</span>
     </pre>
 
-    <div class=center>
-    ·····•·····
-    <span id=pac>ᗤ</span>&nbsp;
-    <span id=sha>ᗣ</span><span id=spe>ᗣ</span>
-    <span id=bas>ᗣ</span><span id=pok>ᗣ</span><br>
+.. container:: center
 
-    <i style="opacity: .7">waka waka waka</i>
-    </div>
+    *Gimme! Gimme! Gimme! (A Man After Midnight)*
 
-    <div class=center style="padding: .6em">
-        <i>Can You Dig It?</i><br><br>
-    </div>
-
+|
 
 Additional Topics
 =======================
 
-.. rubric:: How does it work?
+.. rubric:: How do the styles work?
 
 Behind the scenes in
 :mod:`console.core`
-you've been working with two main parent classes:
+you've been working with two main parent classes of those in
+:mod:`console.style`:
 
 .. rubric:: Palette Builders:
 
@@ -50,7 +43,8 @@ builders direct attribute access to the appropriate code to initialize them.
 
 Once created,
 attributes are cached and available for future use.
-The cache may also be cleared in uncommon scenarios using huge palettes.
+The namespace cache may also be cleared in uncommon scenarios using huge
+palettes.
 
 .. rubric:: Palette Entries:
 
@@ -61,15 +55,16 @@ accessed as attributes of a Palette collection, e.g.:
     - ``.i22``
     - ``.w_cornflowerblue``
 
-are objects that provide much of the functionality in
-:mod:`console.style`:
+…are objects that provide much of the functionality from
+:mod:`console.style`.
+The entries:
 
-    - They keep track of their own ANSI codes and those they've been added to.
-    - They can be called and "mixed in" with other attributes to render
-      themselves.
-    - They can be used as a context-manager.
+    - Keep track of their ANSI codes and those they've been added to.
+    - Can be called, "mixed in" with other attributes to render
+      themselves and end the style.
+    - Can be used as a context-manager.
     - Last but not least,
-      they can be rendered as an escape sequence string on any form of output.
+      can be rendered as an escape sequence string on any form of output.
 
 Similar functionality is available from
 :mod:`console.screen`.
@@ -83,8 +78,21 @@ nothing.
 Well, more specifically empty strings.
 
 
+.. raw:: html
+
+    <div class=center>
+    ·····•·····
+    <span id=pac>ᗤ</span>&nbsp;
+    <span id=sha>ᗣ</span><span id=spe>ᗣ</span>
+    <span id=bas>ᗣ</span><span id=pok>ᗣ</span>&nbsp;&nbsp;&nbsp;&nbsp;<br>
+
+    <i style="opacity: .7">waka waka waka</i>&nbsp;&nbsp;&nbsp;&nbsp;
+    </div>
+
+
 Initializing your Own
 ------------------------
+
 
 To control the palette support of an object you can create them yourself::
 
@@ -102,72 +110,69 @@ To control the palette support of an object you can create them yourself::
     such as ``CLICOLOR_FORCE`` if desired.
 
 
+*Can You Dig It?*
+
+::
+
+    ¸,ø¤º°`°º¤ø,¸¸,ø¤º°`°º¤ø,¸,ø¤°º¤ø,¸¸,ø¤º°`°º¤ø,¸
+
+
 
 Context Managers
 -------------------
 
-Console's Palette Entry objects can be used as context managers as well.
-We saw this in the readme previously::
-
-    with bg.w_dodgerblue:
-        print('Infield: Garvey, Lopes, Russel, Cey, Yeager')
-        print('Outfield: Baker, Monday, Smith')
-
-I've not quite gotten around to figure the best way to pass arguments.
+    *What's Happening, "Raj" !!*
 
 .. rubric:: Configuring Output
 
-On init, you can use an ``out`` param that will be saved to ``._out``
-and is used by the context manager.
-Defaults to printing to stdout.
+Console's Entry objects can be used as context managers as well.
+We saw this in the readme previously.
+An output file can be set if it needs to be changed from stdout::
+
+    dodgers = bg.w_dodgerblue
+    dodgers.set_output(sys.stderr)
+
+    with dodgers:
+        print('Infield: Garvey, Lopes, Russel, Cey, Yeager')
+        print('Outfield: Baker, Monday, Smith')
+
+There may be a way to streamline this in the future.
+(So, don't get too dependent on the set_output function.)
+
 
 .. rubric:: TermStack
 
 TermStack is a content-manager for making temporary modifications to the
 terminal via termios,
-that will copy the original settings then restore then when finished.
+that copies the original settings and restores them when finished.
 
 For example::
 
     with TermStack() as fd:
-
-        tty.setcbreak(fd, termios.TCSANOW)  # shut off echo
+        # shut off echo
+        tty.setcbreak(fd, termios.TCSANOW)
         sys.stdout.write(f'{CSI}6n')
         sys.stdout.flush()
 
 
+It's in the detection module because that's where its used,
+but might their might be a better home.
 
 
+Deeper Dive
+------------
 
+    *Get down, boogie oogie oogie…*
 
+Still interested?
+More than you wanted to know on the subject or terminals and escape codes can
+be found below:
 
-
-
-
-
-
-
-
-
-
-::
-
-    °º¤ø,¸¸,ø¤º°`°º¤ø,¸,ø¤°º¤ø,¸¸,ø¤º°`°º¤ø,¸
-
-
-
-    ¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸
-
-
-
-*Get down, boogie oogie oogie*
-- outta sight!
-
-- Jive Turkey
-
-- What's happenin'
-
-- Dynomite!
+    - `Terminal Emulator <https://en.wikipedia.org/wiki/Terminal_emulator>`_
+    - `ANSI Escape Codes <http://en.wikipedia.org/wiki/ANSI_escape_code>`_
+    - `XTerm Control Sequences
+      <http://invisible-island.net/xterm/ctlseqs/ctlseqs.html>`_
+      (`PDF <https://www.x.org/docs/xterm/ctlseqs.pdf>`_)
 
 
 .. rubric:: Warm Colors
@@ -178,24 +183,9 @@ and
 `redshift <https://en.wikipedia.org/wiki/Redshift_(software)>`_
 debuted that Amber Monochrome monitors where known as the "ergonomic"
 choice?
-Easier on the eyes for extended periods (late nights) they said.
+Easier on the eyes for extended periods (i.e. late nights) they said.
 
-Perhaps knowledge rediscovered.
-
-
-
-
-Deeper Dive
-------------
-
-More than you wanted to know on the subject or terminals and escape codes can
-be found below:
-
-    - `Terminal Emulator <https://en.wikipedia.org/wiki/Terminal_emulator>`_
-    - `ANSI Escape Codes <http://en.wikipedia.org/wiki/ANSI_escape_code>`_
-    - `XTerm Control Sequences
-      <http://invisible-island.net/xterm/ctlseqs/ctlseqs.html>`_
-      (`PDF <https://www.x.org/docs/xterm/ctlseqs.pdf>`_)
+Knowledge rediscovered?
 
 
 .. raw:: html
@@ -210,23 +200,19 @@ be found below:
 
     *"I'm B. J. McKay and this is my best friend Bear."*
 
+
 10-7, Signing Off…
 --------------------
 
+|
 
-..
-
-asdf
-
-    - *Catch you on the flip-side*
     - *Keep On Truckin'*
+    - *Catch you on the flip-side*
     - *Good night, John-boy*
-    - *Any other good seventies expressions?*
-
-
-asdf
 
 
 
 - http://www.lyricsondemand.com/tvthemes/bjandthebearlyrics.html
 - https://www.memorabletv.com/tv/b-j-bear-nbc-1979-1981-greg-evigan-claude-akins/
+
+|

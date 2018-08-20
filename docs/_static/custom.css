@@ -16,11 +16,17 @@ h1, h2, h3, h4, h5 {
 
     font-family: "Source Code Pro", monospace, monospace !important;
 }
+div.body h1 { font-size: 200% }
+div.body h2 { font-size: 170% }
+div.body h3 { font-size: 140% }
+div.body h4 { font-size: 120% }
+div.body h5 { font-size: 100% }
+div.body h6 { font-size:  90% }
 
-a, div.sphinxsidebar a {
 /*
-    color: #d70;
+sphinxsidebar
 */
+a, div.sphinxsidebar a {
     color: #eca218;  /* Amber */
     font-family: "Source Code Pro", monospace, monospace !important;
     font-size: .9em;
@@ -31,9 +37,6 @@ code.xref {
     border-bottom: 0;  /* alabaster adding border :-( */
 }
 a:hover, div.sphinxsidebar a:hover {
-/*
-    background: #d70;
-*/
     background: #eca218;
     color: #222 !important;
 }
@@ -56,13 +59,18 @@ div.sphinxsidebar input {
     font-family: "Source Code Pro", monospace, monospace !important;
     font-size: 1em;
 }
-div.sidebar{
+div.sphinxsidebar h3 {
+    font-size: .8rem !important;
+    color: #555;
+    background: inherit;
+}
+
+div.sidebar {
     background-color: #222;
     border-color: #444;
     border-radius: .5em;
     opacity: .8;
 }
-
 
 .admonition, .seealso {
     background-color: #111 !important;
@@ -79,6 +87,7 @@ code, span.pre  {
 .center {
     text-align: center;
 }
+
 #logo {
     font-family: 'source code pro', monospace;
     font-weight: bold;
@@ -87,15 +96,16 @@ code, span.pre  {
 
 #subtitle {
     text-align: center;
-    padding: .6em
-      margin-bottom: 1rem
+    padding: .6em;
+    margin-bottom: 1rem;
 }
 #subtitle i {
     text-align: center;
     padding: .6em
-
 }
-
+.mt {
+    margin-top: 1.3em;
+}
 
 /* syntax highlighting */
 div.highlight { background: inherit; }
@@ -152,4 +162,7 @@ pac man
 
 p.caption {
     margin: 0;
+}
+p.rubric {
+    font-family: 'source code pro', monospace;
 }

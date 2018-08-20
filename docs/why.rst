@@ -1,46 +1,54 @@
 
-Another One, eh 🤔?
-=======================
+.. ~ <p class=center><i>"First I was afraid, I was petrified…"</i>&nbsp; &nbsp;
 
 .. raw:: html
+
 
     <pre class=center>
 
      ▏
     ,<><><>,
-    <><><><><><>
+    <>✶><><><><>
     <><><><><><✦<>
     (<><><><><><><>)
     <><><><><><><>
     .  <>✶><><><><> .
     : .   `<><><>`    .:
-     ::             :     ⭒:
-    .⭒.       .      :     .:.
-    .:.       .        :     : .
-    .: :       :        :      ::.
-    .:  :      .         :.      :⭒ :
-    :⭒. :       :          :      :   ..
-    . :                     :             :
+     ::            :      ⭒:
+    .⭒.      .       :     .:.
+    .:.      .         :     : .
+    .: :     :          :      ::.
+    .:  :     .          .:      :⭒ :
+    :⭒. :      :             :       : ..
+    . .                        .          .
     </pre>
 
-    <p class=center><i>"First I was afraid, I was petrified."</i></p>
+
+Another One, eh 🤔?
+=======================
+
+
+.. container:: center
+
+    *"First I was afraid, I was petrified…"*
 
 
 Background
 ---------------
 
-ANSI escape codes have been standard on UNIX
+So ANSI escape codes have been standard on UNIX
 with the belt-and-suspenders crowd for several decades,
-and even saw use on DOS and BBS back in the day.
-With the advent of macOS (née X),
+and even saw use on DOS and BBSs back in the day.
+With the advent of macOS (X),
 a whole new generation of lumber-sexuals have exposed themselves(?)
-to the command-line and terminal environment *and liked it*.
+to the terminal environment and command-line
+*and liked it*.
 
 "I'm a PC"
 ~~~~~~~~~~~~~~
 
 With Windows 10──\
-the  Ballmer-barrier has finally been breached,
+the  Ballmer-lameo-barrier has finally been breached,
 allowing *multi-decade-late*
 `improvements
 <http://www.nivot.org/blog/post/2016/02/04/Windows-10-TH2-(v1511)-Console-Host-Enhancements>`_
@@ -53,9 +61,11 @@ But now it's supercharged.
 So, the three major platforms now support ANSI escape sequences.
 Again!
 What's old is new again.
+We need great command-line tools and that's where ``console`` fits in.
 
-We need great command-line tools and that's where "console" fits in.
-*That's the way, uhh huh, I like it…*
+.. container:: center
+
+    *That's the way, uhh huh, uhh huh, I like it…*
 
 .. figure:: _static/kc3.png
     :align: center
@@ -73,6 +83,8 @@ We need great command-line tools and that's where "console" fits in.
 Batteries Not Included
 ------------------------
 
+    *Jive Turkey…*
+
 In the Python world,
 there hasn't been much direct support for terminal sequences in the standard
 library,
@@ -80,8 +92,8 @@ beyond curses and termios
 (which mildly overlap in functionality with this package and themselves).
 They are low-level interfaces however,
 focused on "full screen" terminal apps and tty control respectively,
-while abstracting hardware that no longer really exists except in museums.
-ANSI codes won,
+while continuing to abstract hardware that rarely exists except in museums.
+ANSI codes may have won,
 but styling a text snippet here and there or setting a title was thought too…
 trivial perhaps.
 
@@ -89,15 +101,13 @@ trivial perhaps.
 Meanwhile, over at the Cheeseshop…
 ------------------------------------
 
+    *"Not much of a cheese shop really, is it?"*
+
 And so, now there are ad-hoc ANSI codes being generated in every command-line
-app and eleventy million micro-libs on the PyPI Cheeseshop doing the same.
+app and eleventy micro-libs on the PyPI doing the same.
 Looks to be a fun exercise and somewhat of a rite of passage to create one.
 
-Good luck finding an appropriate name on PyPI for yours.
-
-
-Often Missing
-~~~~~~~~~~~~~~~
+(Good luck finding an appropriate name on PyPI for yours.)
 
 .. raw:: html
 
@@ -106,13 +116,17 @@ Often Missing
     <span id=bas>ᗣ</span><span id=pok>ᗣ</span>
     <span id=sha>ᗣ</span><span id=spe>ᗣ</span>&nbsp;
     <span id=pac>ᗧ</span></i>
-    ·····•·····<br>
+    ·····•·····&nbsp;&nbsp;&nbsp;<br>
 
-    <i style="opacity: .7">waka waka waka</i>
+    <i style="opacity: .7">waka waka waka</i>&nbsp;&nbsp;&nbsp;
     </div>
 
 
-While most of the modules on the cheeseshop have plenty going for them in their
+
+Often Missing
+~~~~~~~~~~~~~~~
+
+While most of the ANSI modules in the cheeseshop have plenty going for them in
 areas of focus,
 they generally aren't very comprehensive──\
 usually providing 8 colors
@@ -120,10 +134,8 @@ and a few styles/effects like bold and underline.
 Unfortunately,
 one or more important items are often missing:
 
-    - Python3 support
-
-      *(currently 3.6 is required for string interpolation but back-porting
-      under consideration)*
+    - Styles, cursor movements, clearing the screen,
+      setting titles, querying the terminal, etc.
 
     - Multiple Palettes:
 
@@ -135,10 +147,14 @@ one or more important items are often missing:
       - Standard color names
 
         - X11, Webcolors - rarest
-    - Palette auto-detection, support and deactivation:
 
-    - Styles, cursor movements, clearing the screen,
-      setting titles, etc.
+    - Auto-detection, support and deactivation:
+
+    - Python3 support
+
+      *(currently console requires Python 3.6 for string interpolation but
+      back-porting is under consideration)*
+
     - Still maintained
     - Has tests
 
@@ -151,24 +167,23 @@ but may still miss one of these nice to haves:
 
     - Composable objects
     - Concise names
-    - Avoidance of capital, mixed, or camel-case names on instances.
-    - Avoidance excessive punctuation, parens, brackets, quotes, etc.
+
+        - Avoidance of capital, mixed, or camel-case names on instances.
+        - Avoidance of punctuation requirements, parens, brackets, quotes, etc.
 
 
-Resulting Design
-~~~~~~~~~~~~~~~~~
+.. rubric:: Result
 
-Had been looking over at PyPI with the criteria above and found some
+Looking over at PyPI with the criteria above finds many
 interesting parts but not the whole.
 So, had some fun building my own.
-
-Picked a few design cues from several of these:
+Looked at and picked a few design cues from several of these:
 
     - ansi
     - ansicolors
     - blessed (terminfo?)
     - blessings
-    - click.style and utilities
+    - click.style and utilities (remembered pause)
     - colorama.ansi (palette collection objects)
     - colorize
     - escape

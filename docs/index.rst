@@ -1,13 +1,17 @@
 
-.. figure:: _static/console.jpg
+.. image:: _static/console.jpg
     :align: center
 
-    *Gimme! Gimme! Gimme! (A Man After Midnight)*
+
+.. container:: center mt
+
+    *"Gentlemen…  We have the technology."*
 
 |
 
+
 Contents
-----------------------
+===============
 
 .. toctree::
     :maxdepth: 2
@@ -19,9 +23,4 @@ Contents
 
 
 
-Indices
----------
-
 * :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

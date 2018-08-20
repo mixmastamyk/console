@@ -29,8 +29,8 @@ moving cursors,
 setting title bars,
 and detecting capabilities.
 A bit more comprehensive than most.
+How does it work?
 
-How do they work?
 
 :reverse:`␛`\ [1;3m\ :bi:`Hello World` :reverse:`␛`\ [0m
 --------------------------------------------------------------
@@ -53,7 +53,7 @@ Printing to a supporting terminal from Python might look like this:
 
     <pre>
     &gt;&gt;&gt; print(fg.red, fx.italic, 'Heart', fx.end,
-              'of Glass…')
+              ' of Glass…', sep='')
     <span style="color:red; font-style: italic">Heart</span> of Glass…
     </pre>
 
@@ -80,14 +80,18 @@ Installen-Sie, Bitte
 
     ⏵ pip3 install --user console
 
-    # console[colorama]   # for colorama support
-    # console[webcolors]  # for webcolor support
+    # console[colorama]   # for colorama support
+    # console[webcolors]  # for webcolor support
 
 Jah!
 While console is cross-platform,
 `colorama <https://pypi.python.org/pypi/colorama>`_
-will need to be installed to view these examples under the many lame versions of
-Windows < 10.
+will need to be installed to view these examples under lame versions of Windows
+< 10.
+
+::
+
+    ¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸¸.·´¯`·.¸¸
 
 
 Overview
@@ -95,20 +99,11 @@ Overview
 
 As mentioned,
 console handles more than color and styles.
-A number of useful constants are provided in
-:mod:`console.constants`,
-such as
-`CSI <https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences>`_
-and
-`OSC <https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences>`_
-for building your own apps.
 
-
-Utils, Screen
-~~~~~~~~~~~~~~~~
+.. rubric:: Utils
 
 :mod:`console.utils`
-has a number of nifty functions::
+includes a number of nifty functions::
 
     >>> from console.utils import cls, set_title
 
@@ -118,119 +113,144 @@ has a number of nifty functions::
 
 It can also ``strip_ansi`` from strings,
 wait for keypresses,
-clear the screen with or without scrollback,
-and easily pause a script,
-like the old DOS commands.
+clear a line or the screen (with or without scrollback),
+and easily ``pause`` a script like the old DOS command.
 
-You can move the cursor around with :mod:`console.screen`,
+.. rubric:: Screen
+
+With :mod:`console.screen` you can
+save or restore it,
+move the cursor around,
 get its position,
-save/restore the screen,
 and enable
 `bracketed paste <https://cirw.in/blog/bracketed-paste>`_
-in your app,
-among other things.
+if any of that floats your boat.
 
 
-Detection
-~~~~~~~~~~~
+.. rubric:: Detection
 
 Detect the terminal environment with :mod:`console.detection`:
 
-    - Redirection---is this an interactive "``tty``" or not?
     - Determine palette support
     - Check relevant environment variables, such as
       `NO_COLOR <http://no-color.org/>`_,
       `CLICOLOR <https://bixense.com/clicolors/>`_,
       etc.
     - Query terminal colors and themes---light or dark?
+    - Redirection---is this an interactive "``tty``" or not?
     - and more.
 
 Console does its best to figure out what your terminal supports on startup
-and will configure the convenience objects we imported above to do typically
-the right thing.
+and will configure its convenience objects
+(we imported above)
+to do the right thing.
 They will deactivate themselves at startup when output is redirected into a
 pipe, for example.
 
-Detection can be bypassed and handled manually when needed.
+Detection can be bypassed and handled manually when needed however.
 Simply use the detection functions in the module or write your own as desired,
 then create your own objects from the classes in the
 :mod:`console.style` and :mod:`console.screen`
 modules.
 
 There's also logging done---\
-enable debug level and you'll see the results of the queries from the module.
+enable the debug level and you'll see the results of the queries from the
+detection module.
+
+.. rubric:: Constants
+
+A number of useful constants are provided in
+:mod:`console.constants`,
+such as
+`CSI <https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences>`_
+and
+`OSC <https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences>`_
+for building your own apps.
+You can::
+
+    from console.constants import BEL
+    print('Ring my ', BEL)  # ring-a-ling-a-ling…
 
 
-Color Palettes
+Extended Color
 ~~~~~~~~~~~~~~~
 
-While the original palette of 8/16 colors is accessed by name,
-the others have a prefix letter then a name or number of digits to specify the
-color.
-Access to the color entries of various palettes are accomplished like so.
+While the original palette of 8/16 colors is accessed directly by name,
+others have a prefix letter and a name or digits to specify the color.
 Unleash your inner
-`Britto <https://www.art.com/gallery/id--a266/romero-britto-posters.htm>`_.
+`Britto <https://www.art.com/gallery/id--a266/romero-britto-posters.htm>`_
+below:
 
 .. code-block:: sh
 
-    # Examples      Format  Palette
 
-.. code-block:: text
+    # Basic        Format  Comment
+    fg.red         NAME   # 8 colors
+    fg.lightred    NAME   # Another 8 colors w/o bold
 
-    fg.red          NAME    8 colors
-    fg.lightred     NAME    Another 8 colors w/o bold
+    # Extended
+    fg.i_123       iDDD   # Extended/indexed 256-color
+    fg.n_f0f       nHHH   # Hex to nearest indexed
 
-    fg.i_22         iDDD    extended/indexed 256-color
-    fg.n_f0f        nHHH    Nearest hex to indexed
-
-    fg.t_ff00bb     tHHH    Truecolor, 3 or 6 digits
-    fg.x_navyblue   x_NM    X11 color name, if avail
-    fg.w_bisque     w_NM    Webcolors, if installed
+    # True
+    fg.t_ff00bb    tHHH   # Truecolor, 3 or 6 digits
+    fg.x_navyblue  x_NM   # X11 color name, if avail
+    fg.w_bisque    w_NM   # Webcolors, if avail
 
 The underscores are optional,
 choose depending whether brevity or readability are more important to you.
-Background palettes work the same of course.
+Typically
+Backgrounds have the same access.
+
 
 Composability++
 ~~~~~~~~~~~~~~~~
 
-Console's convenience objects are meant to be highly composable and can be used
-in many ways.
+*Dy-no-mite!! — J.J.*
+
+Console's convenience objects are meant to be highly composable and useful in
+multiple ways.
 For example,
-you might like to create your own styles to use over and over and over.
-They can be called and have "mixins" added in as well:
+you might like to create your own styles to use over and over again.
+They can be called like functions if desired and have "mixins" added in as well.
+The callable form ends itself,
+so that no longer needs to be managed:
 
 .. raw:: html
 
     <pre>
     &gt;&gt;&gt; muy_importante = fg.white + fx.bold + bg.red
 
-    &gt;&gt;&gt; print(muy_importante('AHORITA!', fx.underline))
+    &gt;&gt;&gt; print(muy_importante('AHORITA!', fx.u))
     <div style="display: inline-block; background: #d00; color: white; font-weight: bold; text-decoration: underline">AHORITA!</div>
     </pre>
 
-When console objects are combined together as we did above,
+When palette objects are combined together as we did above,
 a list of codes to be rendered to is kept on ice until final output as a
 string.
-Meaning, there won't be redundant escape sequences in the output.
-It can be done on the fly as well:
+Meaning, there won't be redundant escape sequences in the output::
+
+    '\x1b[37;1;41;4mAHORITA!\x1b[0m'
+
+Styles can be built on the fly as well:
 
 .. raw:: html
 
     <pre>
-    &gt;&gt;&gt; print(f'{fg.i202 + fx.reverse}Tangerine Dream{fx.end}')
-    <span style="color: #222; background-color:#ff5f00">Tangerine Dream</span>
+    &gt;&gt;&gt; print(
+        f'{fg.i208 + fx.reverse}Tangerine Dream{fx.end}'
+    )
+    <span style="color: #222; background-color:#ff8700">Tangerine Dream</span>
     </pre>
 
 
-Perhaps you'd prefer a pre-rendered template for performance reasons.
-Call the entry object with a placeholder string,
+.. rubric:: Templating
+
+To build templates,
+call the entry object with a placeholder string,
 with or instead of text::
 
-    >>> template = bg.i22('{}') # dark green
-
-    >>> template.format('No, I do not like…')
-    '\x1b[48;5;22mNo, I do not like…\x1b[49m'
+    >>> template = bg.i22('{}')  # dark green
 
 .. raw:: html
 
@@ -239,15 +259,19 @@ with or instead of text::
     <div style="display: inline-block; background: #040;"> GREEN Eggs… </div>
     </pre>
 
+Other template formats are not a problem either, e.g. ``%s`` and ``${}``.
 
-Other template formats work also, e.g. ``%s`` and ``${}``.
+Perhaps you'd like a pre-rendered string in a tight loop for performance
+reasons.
+Simply use ``str()`` on the final output and use it in the loop.
+
 
 Palette entries work as context-managers as well::
 
-    with bg.blue:
-        print('The following text,'
-              'shall be on a blue background.')
-
+    with bg.w_dodgerblue:  # or .x_
+        print('Infield: Garvey, Lopes, Russel, Cey, Yeager')
+        print('Outfield: Baker, Monday, Smith')
+        print('Coach: Lasorda')
 
 
 Demos and Tests
@@ -272,6 +296,8 @@ tests can be run from the install folder.
 Legalese
 ----------------
 
+*"Stickin' it to the Man"*
+
 - Copyright 2018, Mike Miller
 - Released under the LGPL, version 3+.
 - Enterprise Pricing:
@@ -279,5 +305,3 @@ Legalese
   | 1 MEEllion dollars!
   | *Bwah-haha-ha!*
   | (only have to sell *one* copy!)
-
-
