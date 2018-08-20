@@ -146,17 +146,39 @@ TermStack is a content-manager for making temporary modifications to the
 terminal via termios,
 that copies the original settings and restores them when finished.
 
+It's in the detection module because that's where it's used,
+but is copied to the package namespace.
 For example::
+
+    from console import TermStack
 
     with TermStack() as fd:
         # shut off echo
         tty.setcbreak(fd, termios.TCSANOW)
-        sys.stdout.write(f'{CSI}6n')
+        sys.stdout.write(f'{CSI}6n')  # fire!
         sys.stdout.flush()
 
+And off you go.
 
-It's in the detection module because that's where its used,
-but might their might be a better home.
+
+Screen Stuff
+-------------------
+
+blah_blah_blah
+
+
+
+
+Tips
+------------
+
+Don't have many to list yet,
+but there's at least one.
+
+- Styles bold, italic, and underline have one-letter shortcuts as does HTML,
+  if you're into that sort of thing::
+
+    XTREME_STYLING = fx.b + fx.i + fx.u
 
 
 Deeper Dive

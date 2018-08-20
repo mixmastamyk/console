@@ -24,7 +24,7 @@ div.body h5 { font-size: 100% }
 div.body h6 { font-size:  90% }
 
 /*
-sphinxsidebar
+    sphinxsidebar
 */
 a, div.sphinxsidebar a {
     color: #eca218;  /* Amber */
@@ -107,12 +107,11 @@ code, span.pre  {
     margin-top: 1.3em;
 }
 
-/* syntax highlighting */
+/*
+    syntax highlighting
+*/
 div.highlight { background: inherit; }
 .highlight .kn, .highlight .k {
-/*
-    color: #4080f0;
-*/
     color: #3894e8;
     font-weight: bold;
 }
@@ -152,7 +151,7 @@ a .reverse {
 }
 
 /*
-pac man
+    pac man
 */
 #pac { color: yellow; }
 #sha { color: red; }

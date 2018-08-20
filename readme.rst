@@ -52,9 +52,9 @@ Printing to a supporting terminal from Python might look like this:
 .. raw:: html
 
     <pre>
-    &gt;&gt;&gt; print(fg.red, fx.italic, 'Heart', fx.end,
+    &gt;&gt;&gt; print(fg.red, fx.italic, '♥ Heart', fx.end,
               ' of Glass…', sep='')
-    <span style="color:red; font-style: italic">Heart</span> of Glass…
+    <span style="color:red; font-style: italic">♥ Heart</span> of Glass…
     </pre>
 
 
@@ -208,12 +208,12 @@ Composability++
 
 *Dy-no-mite!! — J.J.*
 
-Console's convenience objects are meant to be highly composable and useful in
+Console's palette entry objects are meant to be highly composable and useful in
 multiple ways.
 For example,
-you might like to create your own styles to use over and over again.
+you might like to create your own compound styles to use over and over again.
 They can be called like functions if desired and have "mixins" added in as well.
-The callable form ends itself,
+The callable form resets styles to their defaults at the end of the string,
 so that no longer needs to be managed:
 
 .. raw:: html
@@ -221,7 +221,7 @@ so that no longer needs to be managed:
     <pre>
     &gt;&gt;&gt; muy_importante = fg.white + fx.bold + bg.red
 
-    &gt;&gt;&gt; print(muy_importante('AHORITA!', fx.u))
+    &gt;&gt;&gt; print(muy_importante('AHORITA!', fx.underline))
     <div style="display: inline-block; background: #d00; color: white; font-weight: bold; text-decoration: underline">AHORITA!</div>
     </pre>
 
