@@ -185,7 +185,7 @@ debuted that Amber Monochrome monitors where known as the "ergonomic"
 choice?
 Easier on the eyes for extended periods (i.e. late nights) they said.
 
-Knowledge rediscovered?
+Interesting, knowledge rediscovered?
 
 
 .. raw:: html
@@ -194,25 +194,26 @@ Knowledge rediscovered?
        ♫♪ .ılılıll|̲̅̅●̲̅̅|̲̅̅=̲̅̅|̲̅̅●̲̅̅|llılılı. ♫♪&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     </pre>
 
-.. figure:: _static/bjandbear.jpg
-    :align: right
-    :figwidth: 30%
-
-    *"I'm B. J. McKay and this is my best friend Bear."*
 
 
 10-7, Signing Off…
 --------------------
+
+.. figure:: _static/bjandbear.jpg
+    :align: right
+    :figwidth: 33%
+
+    *"I'm B. J. McKay and this is my best friend Bear."*
+    `🖺 <https://www.memorabletv.com/tv/b-j-bear-nbc-1979-1981-greg-evigan-claude-akins/>`_
+    `🖹 <http://www.lyricsondemand.com/tvthemes/bjandthebearlyrics.html>`_
 
 |
 
     - *Keep On Truckin'*
     - *Catch you on the flip-side*
     - *Good night, John-boy*
+    - *Goodbye Seventies*
 
+.. raw:: html
 
-
-- http://www.lyricsondemand.com/tvthemes/bjandthebearlyrics.html
-- https://www.memorabletv.com/tv/b-j-bear-nbc-1979-1981-greg-evigan-claude-akins/
-
-|
+    <br clear=all>
