@@ -260,12 +260,18 @@ if True:  # fold
         muy_importante = fg.white + fx.bold + bg.red
         # use
         text = muy_importante + ' ARRIBA! ' + fx.end
-        assert text == CSI + '37;1;41m ARRIBA! \x1b[0m'
+        assert text == '\x1b[37;1;41m ARRIBA! \x1b[0m'
 
         # important check:
-        # fg.white should not be affected, since we returned a new obj on add
+        # fg.white should not be affected, since we returned a new copy on add
         text = fg.white + 'FOO' + fx.end
         assert text == CSI + '37mFOO\x1b[0m'
+
+    def test_attribute_multiple():
+
+        XTREME_STYLING = fx.b + fx.i + fx.u
+        text = XTREME_STYLING(' COWABUNGA!! ')
+        assert text == '\x1b[1;3;4m COWABUNGA!! \x1b[0m'
 
 
 # Call
@@ -274,21 +280,17 @@ if True:  # fold
 
     def test_attribute_call():
         text = bg.purple('⛈ PURPLE RAIN ⛈')
-
-        assert text == CSI + '45m⛈ PURPLE\xa0RAIN ⛈\x1b[49m'
-        # does better check now:
-        #~ assert text == CSI + '45m⛈ PURPLE\xa0RAIN ⛈\x1b[0m'
+        assert text == '\x1b[45m⛈ PURPLE\xa0RAIN ⛈\x1b[49m'
 
     def test_attribute_call_plus_styles():
         linkstyle = fg.blue + fx.underline
         text = linkstyle('http://expertsexchange.com/', fx.blink)
-        assert text == CSI + '34;4;5mhttp://expertsexchange.com/\x1b[0m'
+        assert text == '\x1b[34;4;5mhttp://expertsexchange.com/\x1b[0m'
 
-# todo: problem
     def test_attribute_call_plus_styles2():
-        # make style with addition
-        muy_importante = fg.white + fx.bold + bg.red
-        text = muy_importante('ARRIBA!')
-        assert text == CSI + '37;1;41mARRIBA!\x1b[0m'
+        ''' call style with mix-in. '''
+        muy_importante = fg.white + fx.b + bg.red
+        text = muy_importante('ARRIBA!', fx.u)
+        assert text == '\x1b[37;1;41;4mARRIBA!\x1b[0m'
 
 
