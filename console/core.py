@@ -223,13 +223,13 @@ class _PaletteEntry:
             code    - Associated ANSI code number.
             out     - Stream to print to, when using a context manager.
     '''
-    def __init__(self, parent, name, code, out=sys.stdout):
+    def __init__(self, parent, name, code):
         self.parent = parent
         self.default = (parent.default if hasattr(parent, 'default')
                                        else parent.end)  # style
         self.name = name
         self._codes = [str(code)]           # the initial code
-        self._out = out                     # for redirection
+        self._out = sys.stdout              # for redirection
 
     def __add__(self, other):
         ''' Add: self + other '''
@@ -289,6 +289,14 @@ class _PaletteEntry:
             needs.
         '''
         return f'{self}{placeholder}{self.default}'
+
+    def set_output(self, outfile):
+        ''' Set's the output file, currently only useful with context-managers.
+
+            Note:
+                This function may be deleted.
+        '''
+        self._out = outfile
 
 
 def load_x11_color_map(filename=X11_RGB_FILE):

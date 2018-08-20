@@ -84,9 +84,12 @@ class EffectsPalette(_BasicPaletteBuilder):
     end = default   = 0  # reset all
 
     bold            = 1
+    b               = 1  # short
     dim             = 2
     italic          = 3
+    i               = 3  # short
     underline       = 4
+    u               = 4  # short
     blink           = 5
     slowblink       = blink
     fastblink       = 6
