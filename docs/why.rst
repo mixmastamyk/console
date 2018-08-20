@@ -26,20 +26,20 @@ Another One, eh 🤔?
     <pre class=center>
 
      ▏
-    ,<><><>,
+    ⸝<><><>⸜
     <>✶><><><><>
     <><><><><><✦<>
     (<><><><><><><>)
     <><><><><><><>
     .  <>✶><><><><> .
-    : .   `<><><>`    .:
-     ::            :      ⭒:
-    .⭒.      .       :     .:.
-    .:.      .         :     : .
-    .: :     :          :      ::.
-    .:  :     .          .:      :⭒ :
-    :⭒. :      :             :       : ..
-    . .                        .          .
+    : .   `<><><>´    .:
+     ::            .      ⭒:
+    .⭒.      .       .     .:.
+    .:.      .         ⭒     : .
+    .: :     :          .      ::.
+    .:  :     ⭒           .:     .⭒ :
+    :⭒. :      .              :      : ..
+    . .                         .      .  .
     </pre>
 
 
@@ -61,19 +61,21 @@ to the terminal environment and command-line
 ~~~~~~~~~~~~~~
 
 With Windows 10──\
-the  Ballmer-lameo-barrier has finally been breached,
+the Ballmer/Suit barrier has finally been breached,
 allowing *multi-decade-late*
 `improvements
 <http://www.nivot.org/blog/post/2016/02/04/Windows-10-TH2-(v1511)-Console-Host-Enhancements>`_
 to be made to its until-now pathetic "console."
 Often still known as the "DOS Prompt" because it hadn't changed since then.
 Vaguely analogous to a virtual terminal,
-as a Yugo would compare to a BMW.
+as a Yugo might compare to a classic BMW.
 But now it's supercharged.
 
 So, the three major platforms now support ANSI escape sequences.
 Again!
 What's old is new again.
+Add Unicode and millions of colors and it's better than ever.
+
 We need great command-line tools and that's where ``console`` fits in.
 
 .. container:: center

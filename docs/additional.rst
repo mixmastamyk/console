@@ -164,8 +164,17 @@ And off you go.
 Screen Stuff
 -------------------
 
-blah_blah_blah
+The :mod:`console.screen` module is the one you're looking for,
+although there is a convenience instance in the root of the package as well::
 
+    >>> from console import sc
+
+    >>> sc.eraseline(1)  # mode 1, clear to left
+    '\x1b[1K'
+
+    >>> print('already deleted!', sc.eraseline(1))
+
+    >>>  # this space intentionally left blank ;-)
 
 
 
@@ -210,6 +219,9 @@ Easier on the eyes for extended periods (i.e. late nights) they said.
 Interesting, knowledge rediscovered?
 
 
+10-7, Signing Off…
+--------------------
+
 .. raw:: html
 
     <pre class=center>
@@ -217,16 +229,12 @@ Interesting, knowledge rediscovered?
     </pre>
 
 
-
-10-7, Signing Off…
---------------------
-
 .. figure:: _static/bjandbear.jpg
     :align: right
     :figwidth: 33%
 
-    *"I'm B. J. McKay and this is my best friend Bear."*
-    `🖺 <https://www.memorabletv.com/tv/b-j-bear-nbc-1979-1981-greg-evigan-claude-akins/>`_
+    *"I'm B. J. McKay and this is my best friend Bear."*\
+    `🖺 <https://www.memorabletv.com/tv/b-j-bear-nbc-1979-1981-greg-evigan-claude-akins/>`_\
     `🖹 <http://www.lyricsondemand.com/tvthemes/bjandthebearlyrics.html>`_
 
 |
@@ -234,7 +242,11 @@ Interesting, knowledge rediscovered?
     - *Keep On Truckin'*
     - *Catch you on the flip-side*
     - *Good night, John-boy*
+
+and…
+
     - *Goodbye Seventies*
+
 
 .. raw:: html
 

@@ -10,7 +10,7 @@ pre {
     border-radius: .8em;
 }
 
-h1, h2, h3, h4, h5 {
+h1, h2, h3, h4, h5, p.admonition-title{
     background: #181818;
     color: #c8c8c8;
 
@@ -141,6 +141,9 @@ div.highlight { background: inherit; }
     border-radius: .2em;
     color: #181818;
     display: inline-block;
+
+    height: 1.1em;
+    vertical-align: middle;
 }
 a .reverse {
     background: #eca218 !important;
