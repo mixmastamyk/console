@@ -190,20 +190,20 @@ if True:  # fold
             fg.tbb00
         assert 'length' in err.value.args[0]
 
-    def test_fgext_three_digits():
+    def test_fgtrue_three_digits():
 
         assert str(fg.tb0b) ==  CSI + '38;2;187;0;187m'
 
-    def test_fgext_six_digits():
+    def test_fgtrue_six_digits():
 
         assert str(fg.tff00bb) ==  CSI + '38;2;255;0;187m'
 
-    def test_fgext_wrong_format():
+    def test_fgtrue_wrong_format():
         with pytest.raises(AttributeError) as err:
             fg.tbob
         assert 'hex digits' in err.value.args[0]
 
-    def test_fgext_too_long():
+    def test_fgtrue_too_long():
         with pytest.raises(AttributeError) as err:
             fg.tDEADBEEFCAFE
         assert 'length' in err.value.args[0]
@@ -214,20 +214,20 @@ if True:  # fold
             bg.tbb00
         assert 'length' in err.value.args[0]
 
-    def test_bgext_three_digits():
+    def test_bgtrue_three_digits():
 
         assert str(bg.tb0b) ==  CSI + '48;2;187;0;187m'
 
-    def test_bgext_six_digits():
+    def test_bgtrue_six_digits():
 
         assert str(bg.tff00bb) ==  CSI + '48;2;255;0;187m'
 
-    def test_bgext_wrong_format():
+    def test_bgtrue_wrong_format():
         with pytest.raises(AttributeError) as err:
             bg.tbob
         assert 'hex digits' in err.value.args[0]
 
-    def test_bgext_too_long():
+    def test_bgtrue_too_long():
         with pytest.raises(AttributeError) as err:
             bg.tDEADBEEFCAFE
         assert 'length' in err.value.args[0]
@@ -285,7 +285,7 @@ if True:  # fold
         assert text == CSI + '34;4;5mhttp://expertsexchange.com/\x1b[0m'
 
 # todo: problem
-    def test_attribute_call_plus_styles():
+    def test_attribute_call_plus_styles2():
         # make style with addition
         muy_importante = fg.white + fx.bold + bg.red
         text = muy_importante('ARRIBA!')

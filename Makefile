@@ -11,17 +11,19 @@ clean:
 
 test:
 	clear
-	pyflakes **.py
+	pyflakes *.py console/*.py
 	tput reset  # clear screen, scrollback
 	pytest --capture=no --color=no
 
+tests: test
 
 demos:
 
-	env CLICOLOR_FORCE=1 python3 -m console.demos
+	CLICOLOR_FORCE=1 python3 -m console.demos
 
 docs:
 	make -C docs html
 	refresh.sh Console
 
-.PHONY: docs
+
+.PHONY: clean demos docs test

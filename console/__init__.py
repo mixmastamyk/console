@@ -4,7 +4,7 @@
 '''
 
 # detect palette before anything else, other modules dependent
-from .detection import choose_palette as _choose_palette
+from .detection import TermStack, choose_palette as _choose_palette
 
 _CHOSEN_PALETTE = _choose_palette()
 
@@ -12,8 +12,7 @@ _CHOSEN_PALETTE = _choose_palette()
 from .style import fg, bg, fx, defx
 from .screen import screen as sc
 
-
-fg, bg, fx, defx, sc    # quiet pyflakes
+fg, bg, fx, defx, sc, TermStack  # quiet pyflakes
 _DEBUG = False
 
 
