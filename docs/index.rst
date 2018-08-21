@@ -5,7 +5,7 @@
 
 .. container:: center mt
 
-    *"Gentlemen…  We have the technology…"*
+    *"Gentlemen…  we have the technology…"*
 
 |
 

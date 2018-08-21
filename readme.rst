@@ -268,7 +268,7 @@ Simply use ``str()`` on the final output and use it in the loop.
 
 Palette entries work as context-managers as well::
 
-    with bg.w_dodgerblue:  # or .x_
+    with bg.w_dodgerblue:  # or .x_…
         print('Infield: Garvey, Lopes, Russel, Cey, Yeager')
         print('Outfield: Baker, Monday, Smith')
         print('Coach: Lasorda')

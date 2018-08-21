@@ -127,11 +127,12 @@ Looks to be a fun exercise and somewhat of a rite of passage to create one.
 .. raw:: html
 
     <div class=center>
+    <span class=dots>·····•·····</span>&nbsp;&nbsp;
     <i>
     <span id=bas>ᗣ</span><span id=pok>ᗣ</span>
     <span id=sha>ᗣ</span><span id=spe>ᗣ</span>&nbsp;
-    <span id=pac>ᗧ</span></i>
-    ·····•·····&nbsp;&nbsp;&nbsp;<br>
+    <span id=pac>ᗧ</span></i>&nbsp;&nbsp;
+    <span class=dots>·····•·····</span>&nbsp;&nbsp;&nbsp;<br>
 
     <i style="opacity: .7">waka waka waka</i>&nbsp;&nbsp;&nbsp;
     </div>

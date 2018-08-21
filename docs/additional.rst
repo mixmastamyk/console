@@ -81,18 +81,25 @@ Well, more specifically empty strings.
 .. raw:: html
 
     <div class=center>
-    ·····•·····
-    <span id=pac>ᗤ</span>&nbsp;
-    <span id=sha>ᗣ</span><span id=spe>ᗣ</span>
-    <span id=bas>ᗣ</span><span id=pok>ᗣ</span>&nbsp;&nbsp;&nbsp;&nbsp;<br>
-
-    <i style="opacity: .7">waka waka waka</i>&nbsp;&nbsp;&nbsp;&nbsp;
+        <div class=pacman>
+            <span class=pline>╭────────────────────────╮&nbsp;&nbsp;<br>
+            │
+            </span>
+            <span class=dots>·····•·····</span>
+            <span id=pac>ᗤ</span>&nbsp;
+            <span id=sha>ᗣ</span><span id=spe>ᗣ</span>
+            <span id=bas>ᗣ</span><span id=pok>ᗣ</span>
+            <span class=pline>│&nbsp;&nbsp;<br>
+            </span>
+            <i style="opacity: .7">…waka waka waka…</i>&nbsp;&nbsp;
+        </div>
     </div>
 
 
-Initializing your Own
+Initializing Your Own
 ------------------------
 
+    *Can You Dig It?*
 
 To control the palette support of an object you can create them yourself::
 
@@ -110,7 +117,6 @@ To control the palette support of an object you can create them yourself::
     such as ``CLICOLOR_FORCE`` if desired.
 
 
-*Can You Dig It?*
 
 ::
 
@@ -121,7 +127,7 @@ To control the palette support of an object you can create them yourself::
 Context Managers
 -------------------
 
-    *What's Happening, "Raj" !!*
+    *What's Happening, "Raj" !?!*
 
 .. rubric:: Configuring Output
 

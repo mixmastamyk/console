@@ -156,11 +156,18 @@ a .reverse {
 /*
     pac man
 */
+div.pacman {
+    text-align: center;
+    display: inline-block;
+    font-family: 'Source Code Pro', monospace;
+}
 #pac { color: yellow; }
 #sha { color: red; }
 #spe { color: pink; }
 #bas { color: cyan; }
 #pok { color: SandyBrown; }
+.pline { color: #2222E8; }
+.dots { color: #ffb897; }
 
 p.caption {
     margin: 0;
