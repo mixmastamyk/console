@@ -60,6 +60,7 @@ to the terminal environment and command-line
 "I'm a PC"
 ~~~~~~~~~~~~~~
 
+
 With Windows 10──\
 the Ballmer/Suit barrier has finally been breached,
 allowing *multi-decade-late*
@@ -141,6 +142,8 @@ Looks to be a fun exercise and somewhat of a rite of passage to create one.
 
 Often Missing
 ~~~~~~~~~~~~~~~
+
+    *"You've got to know when to hold 'em, know when to fold 'em…"*
 
 While most of the ANSI modules in the cheeseshop have plenty going for them in
 areas of focus,

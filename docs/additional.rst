@@ -127,7 +127,7 @@ To control the palette support of an object you can create them yourself::
 Context Managers
 -------------------
 
-    *What's Happening, "Raj" !?!*
+    *"I hope you know this violates my warranty!" — Twiki*
 
 .. rubric:: Configuring Output
 
@@ -169,6 +169,8 @@ And off you go.
 
 Screen Stuff
 -------------------
+
+    *What's Happening, "Raj" !?!*
 
 The :mod:`console.screen` module is the one you're looking for,
 although there is a convenience instance in the root of the package as well::

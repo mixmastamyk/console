@@ -35,6 +35,8 @@ How does it work?
 :reverse:`␛`\ [1;3m\ :bi:`Hello World` :reverse:`␛`\ [0m
 --------------------------------------------------------------
 
+*"Piece of cake? Oh, I wish somebody would tell me what that means." — Dr. Huer*
+
 Coding with console styles might look like this::
 
     >>> from console import fg, bg, fx
@@ -199,7 +201,6 @@ below:
 
 The underscores are optional,
 choose depending whether brevity or readability are more important to you.
-Typically
 Backgrounds have the same access.
 
 
