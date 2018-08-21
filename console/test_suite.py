@@ -6,7 +6,7 @@
 '''
 import pytest
 
-from . import screen, style, _set_debug_mode
+from . import screen, style, utils, _set_debug_mode
 
 # configure our own - force all palettes on
 args = dict(autodetect=False, palettes=('basic', 'extended', 'truecolor'))
@@ -356,6 +356,24 @@ if True:  # fold
                 assert repr(text) == "'\\x1b[%s%s'" % (val, attr.code)
 
 
+
+# Utils
+# ----------------------------------------------------------------------------
+if True:  # fold
+    pass  # TODO - needs to be more testable
+
+    def test_utiles_clear_line():
+        utils.screen = sc
+
+        text = utils.clear_line(3)
+        assert text == CSI + '3K'
+
+
+
+# Detection
+# ----------------------------------------------------------------------------
+if True:  # fold
+    pass  # TODO
 
 
 

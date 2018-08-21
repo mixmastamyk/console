@@ -22,7 +22,7 @@ ansi_seq_finder = re.compile(r'(\x9b|\x1b\[)[0-?]*[ -/]*[@-~]')
 log = logging.getLogger(__name__)
 
 
-if _DEBUG:  # TODO not getting set from demos, main?
+if _DEBUG:  # TODO not getting set early enough
     def write(message):
         log.debug('%r', message)
         print(message, end='', flush=True)
@@ -43,7 +43,9 @@ def clear_line(mode=2):
         Note:
             Cursor position does not change.
     '''
-    write(screen.eraseline(mode))
+    text = screen.eraseline(mode)
+    write(text)
+    return text # for testing
 
 
 def clear_screen(mode=2):
