@@ -6,7 +6,7 @@
 '''
 import pytest
 
-from . import style, _set_debug_mode
+from . import screen, style, _set_debug_mode
 
 # configure our own - force all palettes on
 args = dict(autodetect=False, palettes=('basic', 'extended', 'truecolor'))
@@ -15,6 +15,7 @@ fg = style.ForegroundPalette(**args)
 bg = style.BackgroundPalette(**args)
 fx = style.EffectsPalette(**args)
 defx = style.EffectsTerminator(**args)
+sc = screen.Screen(autodetect=False)
 
 fg, bg, fx, pytest  # pyflakes
 
@@ -24,7 +25,7 @@ CSI = '\x1b['           # sanity check
 
 
 
-# Basic palette - fg
+# Basic palette - fg, bg, fx
 # ----------------------------------------------------------------------------
 if True:  # fold
 
@@ -78,9 +79,12 @@ if True:  # fold
 
         assert str(fx.end)          ==  CSI + '0m'
         assert str(fx.bold)         ==  CSI + '1m'
+        assert str(fx.b)            ==  CSI + '1m'
         assert str(fx.dim)          ==  CSI + '2m'
         assert str(fx.italic)       ==  CSI + '3m'
+        assert str(fx.i)            ==  CSI + '3m'
         assert str(fx.underline)    ==  CSI + '4m'
+        assert str(fx.u)            ==  CSI + '4m'
         assert str(fx.slowblink)    ==  CSI + '5m'
         assert str(fx.fastblink)    ==  CSI + '6m'
         assert str(fx.reverse)      ==  CSI + '7m'
@@ -97,7 +101,7 @@ if True:  # fold
             fg.KERBLOOWIE
 
 
-# Extended palette - fg.i
+# Extended palette - fg.i_, bg.i_
 # ----------------------------------------------------------------------------
 if True:  # fold
 
@@ -147,7 +151,7 @@ if True:  # fold
         assert 'length' in err.value.args[0]
 
 
-# Extended palette - fg.n - nearest
+# Extended palette - fg.n_, bg._ - nearest
 # ----------------------------------------------------------------------------
 if True:  # fold
 
@@ -255,24 +259,27 @@ if True:  # fold
 if True:  # fold
         #~ print(f'{text!r} → {text}')
 
+    def test_attribute_multiple_shorthand():
+        # create style with addition, use
+        XTREME_STYLING = fx.b + fx.i + fx.u
+        arg = ' COWABUNGA, DUDE!! '
+        text = XTREME_STYLING + arg + fx.end
+        assert text == '%s1;3;4m%s%s0m' % (CSI, arg, CSI)
+        #~ assert text == f'{CSI}1;3;4m{arg}{CSI}0m'
+
     def test_attribute_multiple_addition_no_accumulation():
-        # make style with addition
+        ''' Verify addition does not affect left-most addend. '''
+        # create style with addition, use
         muy_importante = fg.white + fx.bold + bg.red
-        # use
-        text = muy_importante + ' ARRIBA! ' + fx.end
-        assert text == '\x1b[37;1;41m ARRIBA! \x1b[0m'
+        arg = ' ARRIBA! '
+        text = muy_importante + arg + fx.end
+        assert text == '%s37;1;41m%s%s0m' % (CSI, arg, CSI)
+        #~ assert text == f'{CSI}37;1;41m{arg}{CSI}0m'
 
         # important check:
         # fg.white should not be affected, since we returned a new copy on add
         text = fg.white + 'FOO' + fx.end
         assert text == CSI + '37mFOO\x1b[0m'
-
-    def test_attribute_multiple():
-
-        XTREME_STYLING = fx.b + fx.i + fx.u
-        text = XTREME_STYLING(' COWABUNGA!! ')
-        assert text == '\x1b[1;3;4m COWABUNGA!! \x1b[0m'
-
 
 # Call
 # ----------------------------------------------------------------------------
@@ -290,7 +297,104 @@ if True:  # fold
     def test_attribute_call_plus_styles2():
         ''' call style with mix-in. '''
         muy_importante = fg.white + fx.b + bg.red
-        text = muy_importante('ARRIBA!', fx.u)
-        assert text == '\x1b[37;1;41;4mARRIBA!\x1b[0m'
+        arg = ' ARRIBA! '
+        text = muy_importante(arg, fx.u)
+        assert text == '%s37;1;41;4m%s%s0m' % (CSI, arg, CSI)
+
+
+# Screen
+# ----------------------------------------------------------------------------
+if True:  # fold
+
+    def test_screen_eraseline():
+        text = sc.eraseline(1)
+        assert text == CSI + '1K'
+
+    def test_screen_pos():
+        text = sc.mv(20, 11)  # y, x
+        assert text == CSI + '20;11H'
+
+    def test_screen_save_restore():
+        text = sc.save
+        assert repr(text) == "'\\x1b[?47h'"
+
+        text = sc.restore
+        assert repr(text) == "'\\x1b[?47l'"
+
+    def test_screen_save_restore_pos():
+        text = sc.savepos
+        assert repr(text) == "'\\x1b[s'"
+
+        text = sc.restpos
+        assert repr(text) == "'\\x1b[u'"
+
+    def test_screen_reset():
+        text = sc.reset
+        assert repr(text) == "'\\x1bc'"
+
+    def test_screen_bp_enable():
+        bpon = "'\\x1b[?2004h'"
+        bpoff = "'\\x1b[?2004l'"
+
+        text = sc.bracketedpaste_enable
+        assert repr(text) == bpon
+
+        text = sc.bpon
+        assert repr(text) == bpon
+
+        text = sc.bracketedpaste_disable
+        assert repr(text) == bpoff
+
+        text = sc.bpoff
+        assert repr(text) == bpoff
+
+    def test_screen_cursor():
+        for val in (2,3,5):
+            for name in ('up', 'down', 'left', 'right'):
+                attr = getattr(sc, name)
+                text = attr(val)
+                assert repr(text) == "'\\x1b[%s%s'" % (val, attr.code)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

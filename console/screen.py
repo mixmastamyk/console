@@ -17,7 +17,9 @@ class _TemplateString(str):
         TODO: reconcile with core classes.
     '''
     def __new__(cls, code, arg='%d'):
-        return str.__new__(cls, CSI + arg + code)
+        self = str.__new__(cls, CSI + arg + code)
+        self.code = code
+        return self
 
     def __call__(self, *args):
         return self % args
@@ -44,8 +46,8 @@ class Screen:
 
     horizabs    = cha = 'G'
 
-    pos         = ('H', '%d;%d')  # double trouble
-    hvp         = ('f', '%d;%d')
+    cup         = mv = ('H', '%d;%d')       # double trouble - move to pos
+    hvp         = ('f', '%d;%d')            # ""
 
     erase       = ed = 'J'
     eraseline   = el = 'K'
@@ -56,18 +58,18 @@ class Screen:
     # These don't need wrapping, all start with ESC
     auxoff      = CSI + '4i'
     auxon       = CSI + '5i'
-    dsr         = CSI + '6i'
-    savepos     = scp = CSI + 's'
+    dsr         = loc = CSI + '6n'          # device status report,
+    savepos     = scp = CSI + 's'           # ↑ i.e. cursor location
     restpos     = rcp = CSI + 'u'
 
     save        = CSI + '?47h'                  # whole screen
-    restore     = CSI + '?47l'                  # whole screen
+    restore     = CSI + '?47l'                  # ""
+    reset       = ESC + 'c'                     # ""
 
     # https://cirw.in/blog/bracketed-paste
-    bracketedpaste = bp = CSI + '?2004h'
-    bracketedpaste = bp = CSI + '?2004l'
+    bracketedpaste_enable = bpon = CSI + '?2004h'
+    bracketedpaste_disable = bpoff = CSI + '?2004l'
 
-    reset       = ESC + 'c'
 
     def __new__(cls, autodetect=True, force=False):
         ''' Override new() to replace the class entirely on deactivation.
