@@ -20,7 +20,14 @@ from . import _DEBUG, _CHOSEN_PALETTE
 
 ansi_seq_finder = re.compile(r'(\x9b|\x1b\[)[0-?]*[ -/]*[@-~]')
 log = logging.getLogger(__name__)
-
+_mode_map = dict(
+    forward=0,
+    backward=1,
+    right=0,
+    left=1,
+    full=2,
+    history=3,
+)
 
 if _DEBUG:  # TODO not getting set early enough
     def write(message):
@@ -36,28 +43,31 @@ def clear_line(mode=2):
     ''' Clear the current line.
 
         Arguments:
-            mode:  0 - Clear cursor to right/end of line.
-                   1 - Clear cursor to left/beginning of line.
-                   2 - Clear entire line.
+            mode:  0 | 'forward'  | 'right' - Clear cursor to end of line.
+                   1 | 'backward' | 'left'  - Clear cursor to beginning of line.
+                   2 | 'full'               - Clear entire line.
 
         Note:
             Cursor position does not change.
     '''
-    text = screen.eraseline(mode)
+    text = screen.eraseline(_mode_map.get(mode, mode))
     write(text)
-    return text # for testing
+    return text  # for testing
 
 
 def clear_screen(mode=2):
     ''' Clear the terminal screen. (Aliased to clear also)
 
         Arguments:
-            mode:  0 - Clear cursor to end of screen, cursor stays.
-                   1 - Clear cursor to beginning of screen, cursor stays.
-                   2 - Clear entire visible screen, move cursor to 1, 1.
-                   3 - Clear entire visible screen and scrollback buffer (xterm).
+            mode:  0 | 'forward'   - Clear cursor to end of screen, cursor stays.
+                   1 | 'backward'  - Clear cursor to beginning of screen, ""
+                   2 | 'full'      - Clear entire visible screen, cursor to 1,1.
+                   3 | 'history'   - Clear entire visible screen and scrollback
+                                     buffer (xterm).
     '''
-    write(screen.erase(mode))
+    text = screen.erase(_mode_map.get(mode, mode))
+    write(text)
+    return text  # for testing
 
 clear = clear_screen
 
@@ -70,7 +80,9 @@ def reset_terminal():
 
         TODO: add windows support.
     '''
-    write(screen.reset)
+    text = screen.reset
+    write(text)
+    return text  # for testing
 
 
 def set_title(title):
@@ -89,7 +101,7 @@ def strip_ansi(line):
     return ansi_seq_finder.sub('', line)
 
 
-def ansi_len(line):
+def len_stripped(line):
     ''' Return the length of a string minus its ANSI escape sequences.
 
         Useful to find if a string will fit inside a given length on screen.
@@ -109,6 +121,7 @@ except ImportError:                     # UNIX
 
 def wait_key():
     ''' Waits for a keypress at the console and returns it.
+        "Where's the any key?"
 
         Returns:
             char or ESC - depending on key hit.

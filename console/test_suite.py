@@ -6,7 +6,7 @@
 '''
 import pytest
 
-from . import screen, style, utils, _set_debug_mode
+from . import detection, screen, style, utils, _set_debug_mode
 
 # configure our own - force all palettes on
 args = dict(autodetect=False, palettes=('basic', 'extended', 'truecolor'))
@@ -120,7 +120,7 @@ if True:  # fold
 
     def test_fgext_three_digits():
 
-        assert str(fg.i111) == CSI + '38;5;111m'
+        assert str(fg.i_111) == CSI + '38;5;111m'
 
     def test_fgext_four_digits():
         with pytest.raises(AttributeError) as err:
@@ -172,7 +172,7 @@ if True:  # fold
     # bg
     def test_bgextn_one_digit():
         with pytest.raises(AttributeError) as err:
-            bg.n1
+            bg.n_1
         assert 'length' in err.value.args[0]
 
     def test_bgextn_three_digits():
@@ -200,7 +200,7 @@ if True:  # fold
 
     def test_fgtrue_six_digits():
 
-        assert str(fg.tff00bb) ==  CSI + '38;2;255;0;187m'
+        assert str(fg.t_ff00bb) ==  CSI + '38;2;255;0;187m'
 
     def test_fgtrue_wrong_format():
         with pytest.raises(AttributeError) as err:
@@ -295,7 +295,7 @@ if True:  # fold
         assert text == '\x1b[34;4;5mhttp://expertsexchange.com/\x1b[0m'
 
     def test_attribute_call_plus_styles2():
-        ''' call style with mix-in. '''
+        ''' Call style with mix-in. '''
         muy_importante = fg.white + fx.b + bg.red
         arg = ' ARRIBA! '
         text = muy_importante(arg, fx.u)
@@ -360,59 +360,114 @@ if True:  # fold
 # Utils
 # ----------------------------------------------------------------------------
 if True:  # fold
-    pass  # TODO - needs to be more testable
 
     def test_utiles_clear_line():
         utils.screen = sc
+        end = 'K'
+        for i in range(3):
+            text = utils.clear_line(i)
+            assert text == CSI + str(i) + end
 
-        text = utils.clear_line(3)
-        assert text == CSI + '3K'
+        for i, mode in enumerate(('forward', 'backward', 'full', 'history')):
+            text = utils.clear_line(mode)
+            assert text == CSI + str(i) + end
 
+    def test_utiles_clear_screen():
+        end = 'J'
+        for i in range(3):
+            text = utils.clear_screen(i)
+            assert text == CSI + str(i) + end
+
+        for i, mode in enumerate(('forward', 'backward', 'full', 'history')):
+            text = utils.clear_screen(mode)
+            assert text == CSI + str(i) + end
+
+    def test_strip_ansi():
+        text = 'Hang \x1b[34;4;5mLoose\x1b[0m, Hawaii'
+        assert 'Hang Loose, Hawaii' == utils.strip_ansi(text)
+
+    def test_strip_ansi_len():
+        text = 'Hang \x1b[34;4;5mLoose\x1b[0m, Hawaii'
+        assert utils.len_stripped(text) == 18
+
+    # wait_key
+    # pause
 
 
 # Detection
 # ----------------------------------------------------------------------------
 if True:  # fold
-    pass  # TODO
+    from env import Environment
 
+    def test_color_disabled_none():
+        detection.env = Environment(environ={})
+        assert detection.color_is_disabled() == None
 
+        detection.env = Environment(environ=dict(CLICOLOR=''))
+        assert detection.color_is_disabled() == None
 
+        detection.env = Environment(environ=dict(CLICOLOR='1'))
+        assert detection.color_is_disabled() == None
 
+    def test_color_disabled_true():
+        detection.env = Environment(environ=dict(NO_COLOR='1'))
+        assert detection.color_is_disabled() == True
 
+        detection.env = Environment(environ=dict(CLICOLOR='0'))
+        assert detection.color_is_disabled() == True
 
+    def test_color_allowed():
+        detection.env = Environment(environ={})
+        assert detection.color_is_allowed() == True
 
+        detection.env = Environment(environ=dict(CLICOLOR='0'))
+        assert detection.color_is_allowed() == False
 
+        detection.env = Environment(environ=dict(NO_COLOR=''))
+        assert detection.color_is_allowed() == False
 
+    def test_color_forced():
+        detection.env = Environment(environ={})
+        assert detection.color_is_forced() == None
 
+        detection.env = Environment(environ=dict(CLICOLOR_FORCE='0'))
+        assert detection.color_is_forced() == False
 
+        detection.env = Environment(environ=dict(CLICOLOR_FORCE='foo'))
+        assert detection.color_is_forced() == True
 
+        detection.env = Environment(environ=dict(CLICOLOR_FORCE='1'))
+        assert detection.color_is_forced() == True
 
+    def test_palette_support():
+        terms = (
+            ('dumb', None),
+            ('linux', 'basic'),
+            ('xterm-color', 'basic'),
+            ('xterm-256color', 'extended'),
+        )
+        for name, result in terms:
+            detection.env = Environment(environ=dict(TERM=name))
+            assert detection.detect_palette_support() == result
 
+        detection.env = Environment(environ=dict(ANSICON='1'))
+        assert detection.detect_palette_support() == 'extended'
 
+        detection.env = Environment(environ=dict(COLORTERM='24bit'))
+        assert detection.detect_palette_support() == 'truecolor'
 
+    def test_is_a_tty():
+        from io import StringIO
+        f = StringIO()
+        class YesMan:
+            def isatty(self):
+                return True
 
+        assert detection.is_a_tty(outfile=None) == None
+        assert detection.is_a_tty(outfile=f) == False
+        assert detection.is_a_tty(outfile=YesMan()) == True
 
+    def test_choose_palette():
+        pass # TODO
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    # not sure we can test term query functions :-/

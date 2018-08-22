@@ -90,7 +90,7 @@ def color_is_disabled():
         - http://no-color.org/
     '''
     result = None
-    if env.NO_COLOR:
+    if 'NO_COLOR' in env:
         result = True
     elif env.CLICOLOR == '0':
         result = True
@@ -118,7 +118,7 @@ def detect_palette_support():
         TODO: needs work - could we use terminfo or curses for this?
     '''
     result = None
-    TERM = env.TERM
+    TERM = env.TERM or ''
 
     if ('color' in TERM) or ('linux' in TERM):
         result = 'basic'
@@ -158,7 +158,7 @@ def _getch():
 
 
 def _read_until(infile=sys.stdin, maxchars=20, end=RS):
-    ''' Read a terminal response of a few characters from stdin.  '''
+    ''' Read a terminal response of up to a few characters from stdin.  '''
     chars = []
     read = infile.read
 
@@ -180,6 +180,10 @@ def get_cursor_pos():
         Returns:
             (x, y) - as tuple of integers
             (,)    - empty tuple, if an error occurred.
+
+        Note:
+            Checks is_a_tty() first, since function would block if i/o were
+            redirected through a pipe.
     '''
     values = ()
     if is_a_tty():
@@ -188,9 +192,8 @@ def get_cursor_pos():
         with TermStack() as fd:
 
             tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
-            sys.stdout.write(f'{CSI}6n')
+            sys.stdout.write(CSI + '6n')            # screen.dsr, avoid import
             sys.stdout.flush()
-
             resp = _read_until(maxchars=10, end='R')
 
         # parse response
@@ -246,13 +249,13 @@ def query_terminal_color(name):
             the list will be empty.
 
         Note:
-            Function will block if i/o is redirected or in a pipeline,
-            check is_a_tty() first.
+            Checks is_a_tty() first, since function would block if i/o were
+            redirected through a pipe.
     '''
     import tty, termios
 
     colors = []
-    if sys.stdout.isatty():
+    if is_a_tty():
         color_code = dict(foreground='10', fg='10',
                           background='11', bg='11').get(name)
         if color_code:
@@ -262,11 +265,10 @@ def query_terminal_color(name):
                 tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
                 sys.stdout.write(query_sequence)
                 sys.stdout.flush()
-
                 resp = _read_until(maxchars=24, end=BEL)
 
             # parse response
-            colors = resp.partition(':')[2].split('/')  # parse response
+            colors = resp.partition(':')[2].split('/')
             if colors == ['']:
                 colors = []                             # empty on failure
 
