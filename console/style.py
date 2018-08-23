@@ -1,6 +1,6 @@
 '''
-    console - Comprehensive escape sequence utility library for terminals.
-    © 2018, Mike Miller - Released under the LGPL, version 3+.
+    .. console - Comprehensive escape sequence utility library for terminals.
+    .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
         Module inspired by: colorama.ansi.py © Jonathan Hartley 2013.
 
@@ -8,11 +8,13 @@
     and colors interpreted by terminals, sometimes called
     "SGR (Select Graphic Rendition) parameters."
 
-    There are a number of classes to facilitate using them.
+    There are a number of classes to facilitate using them.  See:
 
-    See: http://en.wikipedia.org/wiki/_escape_code
-         and section 5:
-         #SGR_(Select_Graphic_Rendition)_parameters
+        - `ANSI escape codes
+          <https://en.wikipedia.org/wiki/ANSI_escape_code>`_
+          and section 5:
+        - `Select Graphic Rendition params
+          <https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters>`_
 '''
 from .core import _BasicPaletteBuilder, _HighColorPaletteBuilder
 

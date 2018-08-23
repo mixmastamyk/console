@@ -1,13 +1,14 @@
 '''
-    | console - Comprehensive escape sequence utility library for terminals.
-    | © 2018, Mike Miller - Released under the LGPL, version 3+.
+    .. console - Comprehensive escape sequence utility library for terminals.
+    .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     This module contains capability detection routines for use under ANSI
     compatible terminals.
 
     See also:
 
-        - os & shutil.get_terminal_size
+        - os & `shutil.get_terminal_size
+          <https://docs.python.org/3/library/shutil.html#shutil.get_terminal_size>`_
 '''
 import sys
 import logging
@@ -23,6 +24,16 @@ log = logging.getLogger(__name__)
 class TermStack:
     ''' Context Manager to save, temporarily modify, then restore terminal
         attributes.
+
+        Example:
+            ::
+
+                # POSIX implementation of get char/key
+                import tty
+
+                with TermStack() as fd:
+                    tty.setraw(fd)
+                    return sys.stdin.read(1)
     '''
     def __init__(self, infile=sys.stdin):
         import termios
@@ -40,9 +51,9 @@ class TermStack:
                                self.orig_attrs)
 
 
-def choose_palette(force_to='basic'):
+def choose_palette():
     ''' Make a best effort to automatically determine whether to enable
-        ANSI color sequences, and if so, which palette to use.
+        ANSI sequences, and if so, which color palettes are available.
 
         This is the main function of the module—meant to be used unless
         something more specific is needed.
@@ -50,16 +61,16 @@ def choose_palette(force_to='basic'):
         Takes the following factors into account:
 
         - Whether output stream is a TTY.
-        - TERM, ANSICON environment variables
-        - CLICOLOR, NO_COLOR environment variables
+        - ``TERM``, ``ANSICON`` environment variables
+        - ``CLICOLOR``, ``NO_COLOR`` environment variables
 
         Returns:
-            None, 'basic', 'extended', or 'true'
+            None, str: 'basic', 'extended', or 'true'
     '''
     result = None
 
     if color_is_forced():
-        result = detect_palette_support() or force_to
+        result = detect_palette_support() or 'basic'
 
     elif is_a_tty() and color_is_allowed():
         result = detect_palette_support()
@@ -69,10 +80,13 @@ def choose_palette(force_to='basic'):
 
 
 def color_is_allowed():
-    ''' Look for clues, e.g.:
+    ''' Look for clues in environment, e.g.:
 
         - https://bixense.com/clicolors/
         - http://no-color.org/
+
+        Returns:
+            Bool:  Allowed
     '''
     result = True  # generally yes - env.CLICOLOR != '0'
 
@@ -84,10 +98,13 @@ def color_is_allowed():
 
 
 def color_is_disabled():
-    ''' Look for clues, e.g.:
+    ''' Look for clues in environment, e.g.:
 
         - https://bixense.com/clicolors/
         - http://no-color.org/
+
+        Returns:
+            None, Bool:  Disabled
     '''
     result = None
     if 'NO_COLOR' in env:
@@ -103,8 +120,12 @@ def color_is_disabled():
 
 
 def color_is_forced():
-    ''' Look for clues, e.g.:
-            - https://bixense.com/clicolors/
+    ''' Look for clues in environment, e.g.:
+
+        - https://bixense.com/clicolors/
+
+        Returns:
+            Bool:  Forced
     '''
     result = env.CLICOLOR_FORCE and env.CLICOLOR_FORCE != '0'
     log.debug('%s (CLICOLOR_FORCE=%s)', result, env.CLICOLOR_FORCE or '')
@@ -115,7 +136,10 @@ def detect_palette_support():
     ''' Returns whether we think the terminal supports basic, extended, or
         truecolor.  None if not able to tell.
 
-        TODO: needs work - could we use terminfo or curses for this?
+        TODO: curses might be able to help.
+
+        Returns:
+            None, str: 'basic', 'extended', 'truecolor'
     '''
     result = None
     TERM = env.TERM or ''
@@ -138,7 +162,8 @@ def detect_palette_support():
 def is_a_tty(outfile=sys.stdout):
     ''' Detect terminal or something else, such as output redirection.
 
-        Returns: Boolean or None if not found.
+        Returns:
+            Boolean, None: is tty or None if not found.
     '''
     result = outfile.isatty() if hasattr(outfile, 'isatty') else None
     log.debug(result)
@@ -152,7 +177,6 @@ def _getch():
     import tty
 
     with TermStack() as fd:
-
         tty.setraw(fd)
         return sys.stdin.read(1)
 
@@ -178,8 +202,7 @@ def get_cursor_pos():
         Used to figure out if we need to print an extra newline.
 
         Returns:
-            (x, y) - as tuple of integers
-            (,)    - empty tuple, if an error occurred.
+            tuple(int): (x, y), (,)  - empty, if an error occurred.
 
         Note:
             Checks is_a_tty() first, since function would block if i/o were
@@ -210,6 +233,9 @@ def get_theme():
     ''' Supported on xterm, perhaps others.
 
         See notes on query_terminal_color().
+
+        Returns:
+            str: 'dark' or 'light'
     '''
     theme = 'dark'
     for component in query_terminal_color('background'):
@@ -222,31 +248,32 @@ def get_theme():
 def query_terminal_color(name):
     ''' Query the default terminal, for colors, etc.
         Supported on xterm, perhaps others, not Windows.
+
         TODO: check xterm env variable.
 
         Arguments:
-            name - str - one of ('foreground', 'fg', 'background', 'bg')
-                         or a "dynamic color number (10-19)," see link below.
+            str:  name,  one of ('foreground', 'fg', 'background', 'bg')
+            int:  or a "dynamic color number (10-19)," see links below.
 
-        Queries terminal using OSC # ? BEL sequence documented below:
-            http://invisible-island.net/xterm/ctlseqs/ctlseqs.html⏎
-                #h2-Operating-System-Commands
+        Queries terminal using ``OSC # ? BEL`` sequence,
+        call responds with a color in this X Window format syntax:
 
-        Call responds with a color in this X Window format syntax:
-            rgb:DEAD/BEEF/CAFE
-
-            https://www.x.org/releases/X11R7.7/doc/libX11/libX11/libX11.html
-                #RGB_Device_String_Specification
+            - ``rgb:DEAD/BEEF/CAFE``
+            - `Control sequences
+              <http://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Operating-System-Commands>`_
+            - `X11 colors
+              <https://www.x.org/releases/X11R7.7/doc/libX11/libX11/libX11.html#RGB_Device_String_Specification>`_
 
         Returns:
-            A list of four-digit hex strings after parsing,
-            the fourth digit is the least significant and can be chopped if
-            needed:
+            list[str]: 
+                A list of four-digit hex strings after parsing,
+                the fourth digit is the least significant and can be chopped if
+                needed:
 
-            ``['DEAD', 'BEEF', 'CAFE']``
+                ``['DEAD', 'BEEF', 'CAFE']``
 
-            If an error occurs during retrieval or parsing,
-            the list will be empty.
+                If an error occurs during retrieval or parsing,
+                the list will be empty.
 
         Note:
             Checks is_a_tty() first, since function would block if i/o were

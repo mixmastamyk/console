@@ -1,9 +1,14 @@
 '''
-    console - Comprehensive escape sequence utility library for terminals.
-    © 2018, Mike Miller - Released under the LGPL, version 3+.
+    .. console - Comprehensive escape sequence utility library for terminals.
+    .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     This module generates ANSI character codes to move the cursor around,
     and terminal windows.
+
+    TODO::
+
+        with term.fullscreen():
+            # Print some stuff.
 '''
 from . import _CHOSEN_PALETTE
 from .constants import CSI, ESC

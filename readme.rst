@@ -1,4 +1,7 @@
 
+.. role:: mod
+   :class: mod
+
 .. role:: reverse
    :class: reverse
 

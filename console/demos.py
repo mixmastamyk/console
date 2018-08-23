@@ -1,6 +1,6 @@
 '''
-    console - Comprehensive escape sequence utility library for terminals.
-    © 2018, Mike Miller - Released under the LGPL, version 3+.
+    .. console - Comprehensive escape sequence utility library for terminals.
+    .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     Demos showing what the library and terminal combo can do.
 '''

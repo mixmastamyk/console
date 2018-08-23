@@ -204,6 +204,7 @@ Looked at and picked a few design cues from several of these:
     - blessings
     - click.style and utilities (remembered pause)
     - colorama.ansi (palette collection objects)
+    - `colorful <https://tuxtimo.me/posts/colorful-python>`_
     - colorize
     - escape
     - fabric.colors

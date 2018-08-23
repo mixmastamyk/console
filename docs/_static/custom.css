@@ -47,6 +47,13 @@ a:active, div.sphinxsidebar a:active {
 a:visited, div.sphinxsidebar a:visited {
     opacity: .9
 }
+.mod {               /* shuttup readme issues, emulate links */
+    color: #eca218;  /* Amber */
+    font-family: "Source Code Pro", monospace, monospace !important;
+    font-size: .9em;
+    padding: 0 .2em;
+    text-decoration: none !important;
+}
 
 div.sphinxsidebar a {
     color: #aaa;
@@ -174,4 +181,11 @@ p.caption {
 }
 p.rubric {
     font-family: 'source code pro', monospace;
+}
+
+/*
+autodoc
+*/
+dl.function, dl.class {
+    margin-top: 2em;
 }

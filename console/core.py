@@ -1,8 +1,8 @@
 '''
-    console - Comprehensive escape sequence utility library for terminals.
-    © 2018, Mike Miller - Released under the LGPL, version 3+.
+    .. console - Comprehensive escape sequence utility library for terminals.
+    .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
-    Complicated Gobbyldegook providing a simple interface located here.
+    Complicated Gobbyldegook providing simple interfaces located here.
 
     Classes below not meant to be instantiated by client code.
 '''
@@ -265,9 +265,13 @@ class _PaletteEntry:
         print(self, file=self._out, end='')
 
     def __exit__(self, type, value, traceback):
-        # self.default is not ready yet:
-        log.debug(repr(str(self.parent.default)))
-        print(self.parent.default, file=self._out, end='')
+        try:
+            log.debug(repr(str(self.default)))
+            print(self.default, file=self._out, end='')
+        except AttributeError as err:
+            # self.default is not ready yet:
+            log.debug(repr(str(self.parent.default)))
+            print(self.parent.default, file=self._out, end='')
 
     def __call__(self, text, *styles):
         # if category different, copy uses end instead of default, see addition

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-    console - Comprehensive escape sequence utility library for terminals.
-    Minor portions © 2018, Mike Miller - Released under BSD License
+    .. console - Comprehensive escape sequence utility library for terminals.
+    .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     console.proximity
     ~~~~~~~~~~~~~~~~~~
@@ -9,7 +9,9 @@
     Given an 8-bit RGB color,
     find the closest extended 8-bit terminal color index.
 
-    Heavily derived from::
+    Heavily derived from:
+
+    .. code-block:: text
 
         pygments.formatters.terminal256
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -68,10 +70,12 @@ def find_nearest_color_index(r, g, b):
         return the nearest color index.
 
         Arguments:
-            r, g, b - int - of range 0…255
+            r:    int - of range 0…255
+            g:    int - of range 0…255
+            b:    int - of range 0…255
 
         Returns:
-            Integer index, or None on error.
+            int, None: index, or None on error.
     '''
     distance = 257*257*3  # "infinity" (max distance from #000000 to #ffffff)
     match = 0
@@ -97,10 +101,10 @@ def find_nearest_color_hexstr(hexdigits):
         index.
 
         Arguments:
-            hexdigits - str - a three digit hex string, e.g. 'f0f'
+            hexdigits:  a three digit hex string, e.g. 'f0f'
 
         Returns:
-            Integer index, or None on error.
+            int, None: index, or None on error.
     '''
     try:
         triplet = []

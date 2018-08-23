@@ -1,9 +1,10 @@
 '''
-    console - An easy to use ANSI escape sequence library.
-    © 2018, Mike Miller - Released under the LGPL, version 3+.
+    .. console - Comprehensive escape sequence utility library for terminals.
+    .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     Testen-Sie, bitte.
 '''
+from io import StringIO
 import pytest
 
 from . import detection, screen, style, utils, _set_debug_mode
@@ -356,7 +357,6 @@ if True:  # fold
                 assert repr(text) == "'\\x1b[%s%s'" % (val, attr.code)
 
 
-
 # Utils
 # ----------------------------------------------------------------------------
 if True:  # fold
@@ -386,10 +386,16 @@ if True:  # fold
         text = 'Hang \x1b[34;4;5mLoose\x1b[0m, Hawaii'
         assert 'Hang Loose, Hawaii' == utils.strip_ansi(text)
 
+    def test_strip_ansi_osc():
+        text = '\x1b]0;Le Freak\x07, C\'est chic.'
+        assert "Le Freak, C'est chic." == utils.strip_ansi(text, osc=True)
+
     def test_strip_ansi_len():
         text = 'Hang \x1b[34;4;5mLoose\x1b[0m, Hawaii'
         assert utils.len_stripped(text) == 18
 
+    # TODO:
+    # set_title
     # wait_key
     # pause
 
@@ -445,6 +451,7 @@ if True:  # fold
             ('linux', 'basic'),
             ('xterm-color', 'basic'),
             ('xterm-256color', 'extended'),
+            # ?
         )
         for name, result in terms:
             detection.env = Environment(environ=dict(TERM=name))
@@ -457,7 +464,6 @@ if True:  # fold
         assert detection.detect_palette_support() == 'truecolor'
 
     def test_is_a_tty():
-        from io import StringIO
         f = StringIO()
         class YesMan:
             def isatty(self):
@@ -470,4 +476,27 @@ if True:  # fold
     def test_choose_palette():
         pass # TODO
 
-    # not sure we can test term query functions :-/
+    # not sure we can test term query functions, need to be more testable :-/
+    def test_get_term_color():
+        assert detection.query_terminal_color('bg') == []
+
+    def test_get_cursor_pos():
+        assert detection.get_cursor_pos() == ()
+
+
+# Misc
+# ----------------------------------------------------------------------------
+if True:  # fold
+    def test_context_mgr():
+        f = StringIO()
+        forestgreen = bg.wforestgreen + fx.bold
+        forestgreen.set_output(f)
+
+        with forestgreen:
+            print('Testing, testing…', file=f)
+            print('1, 2, 3.', file=f)
+
+        result = '\x1b[48;2;34;139;34;1mTesting, testing…\n1, 2, 3.\n\x1b[0m'
+        assert result == f.getvalue()
+
+

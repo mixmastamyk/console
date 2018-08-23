@@ -1,6 +1,14 @@
 console package
 ===============
 
+Module contents
+---------------
+
+.. automodule:: console
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Submodules
 ----------
 
@@ -35,6 +43,9 @@ console.detection module
     :members:
     :undoc-members:
     :show-inheritance:
+    :exclude-members: is_a_tty
+
+    .. autofunction:: is_a_tty(outfile=sys.stdout)
 
 console.disabled module
 -----------------------
@@ -72,9 +83,7 @@ console.test\_suite module
 --------------------------
 
 .. automodule:: console.test_suite
-    :members:
-    :undoc-members:
-    :show-inheritance:
+
 
 console.utils module
 --------------------
@@ -84,11 +93,3 @@ console.utils module
     :undoc-members:
     :show-inheritance:
 
-
-Module contents
----------------
-
-.. automodule:: console
-    :members:
-    :undoc-members:
-    :show-inheritance:
