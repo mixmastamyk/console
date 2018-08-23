@@ -38,9 +38,9 @@ class _DummyCollection:
     def __getattr__(self, name):
         ''' Called only when an attribute is missing. '''
         attr = self.empty
-        setattr(self, name, attr)  # ready next time
+        setattr(self, name, attr)   # ready next time
         return attr
 
 
-empty = _EmptyAttribute()
+empty = _EmptyAttribute()           # TODO: this doesn't show in Sphinx
 dummy = _DummyCollection(empty)
