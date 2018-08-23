@@ -499,4 +499,44 @@ if True:  # fold
         result = '\x1b[48;2;34;139;34;1mTesting, testing…\n1, 2, 3.\n\x1b[0m'
         assert result == f.getvalue()
 
+    def test_find_nearest_color_index():
+        from .proximity import find_nearest_color_index
+        values = (
+            (0, 0, 0, 0),
+            (16, 16, 16, 233),
+            (256, 0, 0, 9),
+            (0, 256, 0, 10),
+            (176, 0, 176, 127),
+            (256, 256, 256, 15),
+        )
+        for val in values:
+            assert find_nearest_color_index(*val[:3]) == val[3]
+
+    def test_find_nearest_color_hexstr():
+        from .proximity import find_nearest_color_hexstr
+        # test hex strings
+        values = (
+            ('000',   0),
+            ('111', 233),  # grayscale
+            ('222', 235),
+            ('333', 236),
+            ('444', 238),
+            ('555', 240),
+            ('666', 241),
+            ('777', 243),
+            ('888', 102),
+            ('999', 246),
+            ('aaa', 248),
+            ('bbb', 250),
+            ('ccc', 252),
+            ('ddd', 253),
+            ('eee',   7),
+            ('fff',  15),
+
+            ('f00',   9),
+            ('0f0',  10),
+            ('b0b', 127),
+        )
+        for val in values:
+            assert find_nearest_color_hexstr(val[0]) == val[1]
 

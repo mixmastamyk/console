@@ -8,7 +8,7 @@
     and colors interpreted by terminals, sometimes called
     "SGR (Select Graphic Rendition) parameters."
 
-    There are a number of classes to facilitate using them.  See:
+    A number of classes below facilitate using them.  See:
 
         - `ANSI escape codes
           <https://en.wikipedia.org/wiki/ANSI_escape_code>`_

@@ -2,7 +2,7 @@
     .. console - Comprehensive escape sequence utility library for terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
-    Complicated Gobbyldegook providing simple interfaces located here.
+    Complicated Gobbyldegook to support simple interfaces is located here.
 
     Classes below not meant to be instantiated by client code.
 '''
@@ -70,7 +70,7 @@ class _BasicPaletteBuilder:
                         attr = empty
                     setattr(self, name, attr)
 
-    def __repr__(self):  # TODO
+    def __repr__(self):
         return f'{self.__class__.__name__}(palettes={self._palette_support})'
 
 
@@ -84,7 +84,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
 
     def __getattr__(self, name):
         ''' Traffic cop - called only when an attribute is missing,
-            once per palette entry attribute.  #BDSM
+            once per palette entry attribute.
         '''
         # route on first letter - must have length one to be here:
         first_letter, key = name[0], name[1:].lstrip('_')
@@ -98,7 +98,6 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             if not key.isdigit():
                 raise AttributeError('index %r not found. i+digits, holmes.' %
                                      name)
-
             if 'extended' in self._palette_support:  # build entry
                 return self._get_extended_palette_entry(name, key)
             else:
@@ -139,7 +138,6 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             if key_len < 3:  # red is shortest name
                 raise AttributeError('%r not found. Check length, name portion '
                                      'must be at least 3 characters.' % name)
-
             if 'truecolor' in self._palette_support:
                 return self._get_x11_palette_entry(name, key)
             else:
@@ -149,7 +147,6 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             if key_len < 3:  # red may be shortest name
                 raise AttributeError('%r not found. Check length, name portion '
                                      'must be at least 3 characters.' % name)
-
             if 'truecolor' in self._palette_support:
                 try:  # need to make import-ant decision here:-D
                     import webcolors
@@ -180,21 +177,21 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         ''' Find X11 entry, once on the fly. '''
         values = [self._start_codes_true]
         if not self._x11_color_map:
-            self._x11_color_map = load_x11_color_map(self._x11_rgb_filename)
+            self._x11_color_map = _load_x11_color_map(self._x11_rgb_filename)
         # convert name to 'R', 'G', 'B':    - below:  empty tuple
         values.extend(self._x11_color_map[color_name.lower()])
 
         return self._create_entry(name, values)
 
     def _get_web_palette_entry(self, webcolors, name, color_name):
-        ''' Find X11 entry, once on the fly. '''
+        ''' Find webcolor entry, once on the fly. '''
         values = [self._start_codes_true]
         values.extend(str(i) for i in webcolors.name_to_rgb(color_name.lower()))
         return self._create_entry(name, values)  # TODO:
 
     def _create_entry(self, name, values):
         ''' Render first values as string and place as first code,
-            save, and return attr
+            save, and return attr.
         '''
         attr = _PaletteEntry(self, name.upper(), ';'.join(values))
         setattr(self, name, attr)  # now cached
@@ -298,12 +295,12 @@ class _PaletteEntry:
         ''' Set's the output file, currently only useful with context-managers.
 
             Note:
-                This function may be deleted.
+                This function is experimental and may not last.
         '''
         self._out = outfile
 
 
-def load_x11_color_map(filename=X11_RGB_FILE):
+def _load_x11_color_map(filename=X11_RGB_FILE):
     ''' Load and parse X11's rgb.txt '''
     x11_color_map = {}
 

@@ -7,7 +7,7 @@
 
     TODO::
 
-        with term.fullscreen():
+        with term.fullscreen():  # or location
             # Print some stuff.
 '''
 from . import _CHOSEN_PALETTE
@@ -74,7 +74,6 @@ class Screen:
     # https://cirw.in/blog/bracketed-paste
     bracketedpaste_enable = bpon = CSI + '?2004h'
     bracketedpaste_disable = bpoff = CSI + '?2004l'
-
 
     def __new__(cls, autodetect=True, force=False):
         ''' Override new() to replace the class entirely on deactivation.

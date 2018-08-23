@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
+'''
     .. console - Comprehensive escape sequence utility library for terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
@@ -24,7 +23,7 @@
 
         :copyright: Copyright 2006-2017 by the Pygments team, see AUTHORS.
         :license: BSD, see LICENSE for details.
-"""
+'''
 
 _color_table = []
 
@@ -118,50 +117,3 @@ def find_nearest_color_hexstr(hexdigits):
 
 
 _build_color_table()
-
-
-if __name__ == '__main__':
-
-    # test ints
-    triplets = (
-        (0, 0, 0),
-        (16, 16, 16),
-        (256, 0, 0),
-        (0, 256, 0),
-        (176, 0, 176),
-        (256, 256, 256),
-    )
-    for trip in triplets:
-        print('int closest color: %-15s--> %4d' %
-            (trip, find_nearest_color_index(*trip))
-        )
-
-    print()
-
-    # test hex strings
-    triplets = (
-        '000',
-        '111',
-        '222',
-        '333',
-        '444',
-        '555',
-        '666',
-        '777',
-        '888',
-        '999',
-        'aaa',
-        'bbb',
-        'ccc',
-        'ddd',
-        'eee',
-        'fff',
-
-        'f00',
-        '0f0',
-        'b0b',
-    )
-    for trip in triplets:
-        print('hex closest color:          %r --> %4d' %
-            (trip, find_nearest_color_hexstr(trip))
-        )

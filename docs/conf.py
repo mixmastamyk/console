@@ -106,7 +106,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'ansilibdoc'
+htmlhelp_basename = project + 'doc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -132,10 +132,10 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-    (master_doc, 'ansilib.tex', 'ansilib Documentation',
-     'Mike Miller', 'manual'),
-]
+#~ latex_documents = [
+    #~ (master_doc, project + '.tex', project + ' Documentation',
+     #~ 'Mike Miller', 'manual'),
+#~ ]
 
 
 # -- Options for manual page output ------------------------------------------
@@ -143,7 +143,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'ansilib', 'ansilib Documentation',
+    (master_doc, project, project + ' Documentation',
      [author], 1)
 ]
 
@@ -153,11 +153,11 @@ man_pages = [
 # Grouping the document tree into Texinfo files. List of tuples
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
-texinfo_documents = [
-    (master_doc, 'ansilib', 'ansilib Documentation',
-     author, 'ansilib', 'One line description of project.',
-     'Miscellaneous'),
-]
+#~ texinfo_documents = [
+    #~ (master_doc, project, project + ' Documentation',
+     #~ author, project, 'One line description of project.',
+     #~ 'Miscellaneous'),
+#~ ]
 
 
 # -- Extension configuration -------------------------------------------------
