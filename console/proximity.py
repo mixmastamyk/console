@@ -110,7 +110,7 @@ def find_nearest_color_hexstr(hexdigits):
         for digit in hexdigits:
             digit = int(digit, 16)
             triplet.append((digit * 16) + digit)
-    except ValueError as err:
+    except ValueError:
         return None
 
     return find_nearest_color_index(*triplet)

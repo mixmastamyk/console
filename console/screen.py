@@ -32,7 +32,7 @@ class _TemplateString(str):
     def __str__(self):
         try:
             return self % 1  # default move 1 cell
-        except TypeError as err:
+        except TypeError:
             return self
 
 
