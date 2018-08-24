@@ -21,9 +21,11 @@ tests_require = ('pyflakes', 'pytest', 'readme_renderer'),
 
 
 def slurp(filename):
-    with open(join(dirname(__file__), filename)) as infile:
-        return infile.read()
-
+    try:
+        with open(join(dirname(__file__), filename)) as infile:
+            return infile.read()
+    except FileNotFoundError:
+        pass  # needed at upload time, not install time
 
 setup(
     name                = 'console',

@@ -78,14 +78,13 @@ Installen-Sie, Bitte
 
     ⏵ pip3 install --user console
 
-    # console[colorama]   # for colorama support
-    # console[webcolors]  # for webcolor support
+    # console[colorama,webcolors]   # for support
 
 Jah!
 While console is cross-platform,
 `colorama <https://pypi.python.org/pypi/colorama>`_
-will need to be installed to view these examples under lame versions of Windows
-< 10.
+will need to be installed and .init() run before hand to view these examples
+under lame versions of Windows < 10.
 
 ::
 

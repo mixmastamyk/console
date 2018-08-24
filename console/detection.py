@@ -10,7 +10,7 @@
         - os & `shutil.get_terminal_size
           <https://docs.python.org/3/library/shutil.html#shutil.get_terminal_size>`_
 '''
-import sys
+import sys, os
 import logging
 
 import env
@@ -141,10 +141,11 @@ def detect_palette_support():
         Returns:
             None, str: 'basic', 'extended', 'truecolor'
     '''
-    result = None
+    result, col_init = None, None
     TERM = env.TERM or ''
+    col_init = _is_colorama_initialized()
 
-    if ('color' in TERM) or ('linux' in TERM):
+    if ('color' in TERM) or ('linux' in TERM) or col_init:
         result = 'basic'
 
     if ('256color' in TERM) or env.ANSICON:  # xterm, Windows
@@ -154,8 +155,8 @@ def detect_palette_support():
     if env.COLORTERM in ('truecolor', '24bit'):
         result = 'truecolor'
 
-    log.debug('%r (TERM=%s, COLORTERM=%s)', result, env.TERM or '',
-                                            env.COLORTERM or '')
+    log.debug('%r (TERM=%s, COLORTERM=%s, colorama-init=%s)',
+              result, env.TERM or '', env.COLORTERM or '', col_init)
     return result
 
 
@@ -167,6 +168,18 @@ def is_a_tty(outfile=sys.stdout):
     '''
     result = outfile.isatty() if hasattr(outfile, 'isatty') else None
     log.debug(result)
+    return result
+
+
+def _is_colorama_initialized():
+    result = None
+    if os.name == 'nt':
+        try:
+            import colorama
+            if isinstance(sys.stdout, colorama.ansitowin32.StreamWrapper):
+                result  = True
+        except ImportError:
+            pass
     return result
 
 

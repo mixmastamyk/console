@@ -7,11 +7,24 @@
 
 if __name__ == '__main__':
 
-    import sys
+    import sys, os
     import logging
+    import env
 
     log = logging.getLogger(__name__)
     _DEBUG = '-d' in sys.argv
+    if os.name == 'nt':
+        try:
+            if not env.ANSICON:  # and detect Win10 support
+                import colorama
+                colorama.init()
+        except ImportError:
+            pass
+
+    # this sucks, what needs to be done to get demos to run:
+    import console
+    from importlib import reload
+    reload(console)
 
     if _DEBUG:
         from . import _set_debug_mode
@@ -142,9 +155,12 @@ if __name__ == '__main__':
         print('      ☛ Done, should be normal text. ☚  ')
 
         if is_a_tty():
-            print('       color scheme:', query_terminal_color('fg'), 'on',
-                                          query_terminal_color('bg'), end=' ')
-            print(get_theme(), '\n')
+            try:
+                print('       color scheme:', query_terminal_color('fg'), 'on',
+                                              query_terminal_color('bg'), end=' ')
+                print(get_theme(), '\n')
+            except ModuleNotFoundError:
+                pass  # termios - Windows
             import time
             try:
                 print('       About to clear terminal, check title above. ☝  '
@@ -153,6 +169,5 @@ if __name__ == '__main__':
                 cls()
             except KeyboardInterrupt:
                 pass
-
 
     run()
