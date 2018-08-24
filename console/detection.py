@@ -19,6 +19,7 @@ from .constants import BEL, CSI, OSC, RS
 
 
 log = logging.getLogger(__name__)
+plat = sys.platform[:3]
 
 
 class TermStack:
@@ -243,26 +244,35 @@ def get_cursor_pos():
 
 
 def get_theme():
-    ''' Supported on xterm, perhaps others.
+    ''' Checks system for theme information.
 
+        First checks for the environment variable COLORFGBG.
+        Next, queries terminal, supported on xterm, perhaps others.
         See notes on query_terminal_color().
 
         Returns:
-            str: 'dark' or 'light'
+            str, None: 'dark', 'light', None if no information.
     '''
-    theme = 'dark'
-    for component in query_terminal_color('background'):
-        if component and component[0] > '7':
-            theme = 'light'
-            break
+    theme = None
+    log.debug('COLORFGBG: %s', env.COLORFGBG)
+    if env.COLORFGBG:
+        FG, _, BG = env.COLORFGBG.partition(';')
+        theme = 'dark' if BG < '8' else 'light'  # background wins
+    else:
+        # try xterm
+        for component in query_terminal_color('background'):
+            if component and component[0] > '7':
+                theme = 'light'
+                break
+
+    log.debug('%r', theme)
     return theme
 
 
 def query_terminal_color(name):
     ''' Query the default terminal, for colors, etc.
-        Supported on xterm, perhaps others, not Windows.
 
-        TODO: check xterm env variable.
+        Direct queries supported on xterm, perhaps others, not Windows.
 
         Arguments:
             str:  name,  one of ('foreground', 'fg', 'background', 'bg')
@@ -280,8 +290,8 @@ def query_terminal_color(name):
         Returns:
             list[str]: 
                 A list of four-digit hex strings after parsing,
-                the fourth digit is the least significant and can be chopped if
-                needed:
+                the last two digits are the least significant and can be
+                chopped if needed:
 
                 ``['DEAD', 'BEEF', 'CAFE']``
 
@@ -292,15 +302,27 @@ def query_terminal_color(name):
             Checks is_a_tty() first, since function would block if i/o were
             redirected through a pipe.
     '''
-    import tty, termios
-
     colors = []
     if is_a_tty():
+        if plat == 'win':
+            return colors
+        elif plat == 'dar':
+            if env.TERM_PROGRAM and env.TERM_PROGRAM != 'iTerm.app':
+                return colors
+        elif os.name == 'posix':  # more general than plat == 'linux'
+            if env.TERM and env.TERM.startswith('xterm'):
+                pass
+            else:
+                return colors
+
+        # xterm only support
+        import tty, termios
         color_code = dict(foreground='10', fg='10',
                           background='11', bg='11').get(name)
         if color_code:
             query_sequence = f'{OSC}{color_code};?{BEL}'
             with TermStack() as fd:
+                termios.tcflush(fd, termios.TCIFLUSH)   # needed by xterm osx
 
                 tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
                 sys.stdout.write(query_sequence)

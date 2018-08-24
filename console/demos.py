@@ -156,11 +156,12 @@ if __name__ == '__main__':
 
         if is_a_tty():
             try:
+                print('       theme:', get_theme(), '\n')
                 print('       color scheme:', query_terminal_color('fg'), 'on',
                                               query_terminal_color('bg'), end=' ')
-                print(get_theme(), '\n')
             except ModuleNotFoundError:
                 pass  # termios - Windows
+
             import time
             try:
                 print('       About to clear terminal, check title above. ☝  '
