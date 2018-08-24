@@ -34,13 +34,13 @@ and detecting capabilities.
 A bit more comprehensive than most.
 How does it work?
 
+*"Piece of cake? Oh, I wish somebody would tell me what that means." — Dr. Huer*
+
 
 :reverse:`␛`\ [1;3m\ :bi:`Hello World` :reverse:`␛`\ [0m
 --------------------------------------------------------------
 
-*"Piece of cake? Oh, I wish somebody would tell me what that means." — Dr. Huer*
-
-Coding with console styles might look like this::
+Adding a little color with console might look like this::
 
     >>> from console import fg, bg, fx
 
@@ -51,9 +51,16 @@ The string  ``'\x1b'`` represents the ASCII Escape character
 (27 in decimal, ``1b`` hex).
 Command 32 turns the text green
 and 39 back to the default color,
-but you don't need to care about all of that.
+but no need to worry about that.
 Printing to a supporting terminal from Python might look like this:
 
+{% if mode == 'pypi' %}
+::
+
+    >>> print(fg.red, fx.italic, '♥ Heart', fx.end,
+        ' of Glass…', sep='')
+    ♥ Heart of Glass…
+{% else %}
 .. raw:: html
 
     <pre>
@@ -61,7 +68,7 @@ Printing to a supporting terminal from Python might look like this:
               ' of Glass…', sep='')
     <span style="color:red; font-style: italic">♥ Heart</span> of Glass…
     </pre>
-
+{% endif %}
 
 Above, ``fx.end`` is a convenient object to note---\
 it ends all styles and fore/background colors at once,
