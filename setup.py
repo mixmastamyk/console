@@ -15,8 +15,9 @@ extras_require = dict(
     colorama=('colorama',),
 )
 install_requires = ('ezenv',)
-keywords = 'ansi terminal escape sequence color cursor style screen detection'
-tests_require = ('pyflakes', 'pytest'),
+keywords = ('ansi color detection escape terminal console sequence cursor '
+            'style screen shell')
+tests_require = ('pyflakes', 'pytest', 'readme_renderer'),
 
 
 def slurp(filename):
@@ -26,15 +27,14 @@ def slurp(filename):
 
 setup(
     name                = 'console',
-    description         = 'Comprehensive escape sequence utility library for '
-                          'terminals.',
+    description         = 'Comprehensive utility library for terminals.',
     author_email        = 'mixmastamyk@github.com',
     author              = 'Mike Miller',
     extras_require      = extras_require,
     install_requires    = install_requires,
     keywords            = keywords,
     license             = 'LGPL 3',
-    long_description    = slurp('readme_pypi.rst'),
+    long_description    = slurp('readme.rst'),
     packages            = ('console',),
     python_requires     = '>=3.6',
     tests_require       = tests_require,

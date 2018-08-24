@@ -1,22 +1,14 @@
 
-.. role:: mod
-   :class: mod
+::
 
-.. role:: reverse
-   :class: reverse
-
-.. raw:: html
-
-    <pre id='logo' class='center'>
     ┌───────────────────────────┐
     │   ┏━╸┏━┓┏┓╻┏━┓┏━┓╻  ┏━╸   │
     │   ┃  ┃ ┃┃┗┫┗━┓┃ ┃┃  ┣╸    │
     │   ┗━╸┗━┛╹ ╹┗━┛┗━┛┗━╸┗━╸   │
     └───────────────────────────┘
-    </pre>
+    *Tonight we're gonna party like it's 1979…*
 
-    <p class='center'><i>Tonight we're gonna party like it's 1979…</i></p>
-    <p class='center'>╰─(˙𝀓˙)─╮  ╭─(＾0＾)─╯</p>
+    ╰─(˙𝀓˙)─╮  ╭─(＾0＾)─╯
 
 
 
@@ -36,7 +28,7 @@ How does it work?
     Oh, I wish somebody would tell me what that means." — Dr. Huer*
 
 
-:reverse:`␛`\ [1;3m\ *Hello World* :reverse:`␛`\ [0m
+␛\ [1;3m\ *Hello World* ␛\ [0m
 ----------------------------------------------------------
 
 Adding a little color with console might look like this::
@@ -53,25 +45,26 @@ and 39 back to the default color,
 but no need to worry about that.
 Printing to a supporting terminal from Python might look like this:
 
-.. raw:: html
+.. note::
+    *Apologies, text below can't be styled due to PyPI limitations.
+    Try the*
+    `Sphinx docs <https://mixmastamyk.bitbucket.io/console/>`_
+    *instead.*
 
-    <pre>
-    &gt;&gt;&gt; print(fg.red, fx.italic, '♥ Heart', fx.end,
-              ' of Glass…', sep='')
-    <span style="color:red; font-style: italic">♥ Heart</span> of Glass…
-    </pre>
+::
+
+    >>> print(fg.red, fx.italic, '♥ Heart', fx.end,
+        ' of Glass…', sep='')
+    ♥ Heart of Glass…  # ← not styled due to PyPI limits
 
 Above, ``fx.end`` is a convenient object to note---\
 it ends all styles and fore/background colors at once,
 where as ``bg.default`` for example,
 resets only the background to its default color.
 
-.. raw:: html
-    <p>But wait!&nbsp;  There's a
-    <s><span style="opacity: .9">shitload,</span></s>
-    <s><span style="opacity: .9">crapton,</span></s>
-    err…
-    <i>lot</i> more!</p>
+But wait!  There's a shitload,^H^H^H^H^H, crapton,^H^H^H^H^H
+err…
+*lot* more!
 
 
 Installen-Sie, Bitte
@@ -103,7 +96,7 @@ console handles more than color and styles.
 
 .. rubric:: Utils
 
-:mod:`console.utils`
+`console.utils`
 includes a number of nifty functions::
 
     >>> from console.utils import cls, set_title
@@ -119,7 +112,7 @@ and easily ``pause`` a script like the old DOS command.
 
 .. rubric:: Screen
 
-With :mod:`console.screen` you can
+With `console.screen` you can
 save or restore it,
 move the cursor around,
 get its position,
@@ -131,7 +124,7 @@ if any of that floats your boat.
 .. rubric:: Detection
 
 Detect the terminal environment with
-:mod:`console.detection`:
+`console.detection`:
 
     - Determine palette support
     - Check relevant environment variables, such as
@@ -152,8 +145,8 @@ pipe, for example.
 Detection can be bypassed and handled manually when needed however.
 Simply use the detection functions in the module or write your own as desired,
 then create your own objects from the classes in the
-:mod:`console.style` and
-:mod:`console.screen`
+`console.style` and
+`console.screen`
 modules.
 
 There's also logging done---\
@@ -163,7 +156,7 @@ detection module.
 .. rubric:: Constants
 
 A number of useful constants are provided in
-:mod:`console.constants`,
+`console.constants`,
 such as
 `CSI <https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences>`_
 and
@@ -217,14 +210,12 @@ They can be called like functions if desired and have "mixins" added in as well.
 The callable form resets styles to their defaults at the end of the string,
 so that no longer needs to be managed:
 
-.. raw:: html
+::
 
-    <pre>
-    &gt;&gt;&gt; muy_importante = fg.white + fx.bold + bg.red
+    >>> muy_importante = fg.white + fx.bold + bg.red
 
-    &gt;&gt;&gt; print(muy_importante('AHORITA!', fx.underline))
-    <div style="display: inline-block; background: #d00; color: white; font-weight: bold; text-decoration: underline">AHORITA!</div>
-    </pre>
+    >>> print(muy_importante('AHORITA!', fx.underline))
+    AHORITA!  # ← not styled due to PyPI limits
 
 When palette objects are combined together as we did above,
 a list of codes to be rendered to is kept on ice until final output as a
@@ -235,14 +226,12 @@ Meaning, there won't be redundant escape sequences in the output::
 
 Styles can be built on the fly as well:
 
-.. raw:: html
+::
 
-    <pre>
-    &gt;&gt;&gt; print(
+    >>> print(
         f'{fg.i208 + fx.reverse}Tangerine Dream{fx.end}'
     )
-    <span style="color: #222; background-color:#ff8700">Tangerine Dream</span>
-    </pre>
+    Tangerine Dream  # 😉
 
 .. rubric:: Templating
 
@@ -252,12 +241,10 @@ with or instead of text::
 
     >>> template = bg.i22('{}')  # dark green
 
-.. raw:: html
+::
 
-    <pre>
-    &gt;&gt;&gt; print(template.format(' GREEN Eggs… '))
-    <div style="display: inline-block; background: #040;"> GREEN Eggs… </div>
-    </pre>
+    >>> print(template.format(' GREEN Eggs… '))
+     GREEN Eggs…   # 😉
 
 Other template formats are no problem either, ``%s`` or ``${}``.
 

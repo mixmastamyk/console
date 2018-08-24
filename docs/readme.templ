@@ -1,25 +1,35 @@
 
+{% if mode == 'sphx' %}
 .. role:: mod
    :class: mod
 
 .. role:: reverse
    :class: reverse
 
-.. role:: bi
-   :class: bi
-
 .. raw:: html
 
     <pre id='logo' class='center'>
+{% else %}
+::
+
+{% endif %}
     ┌───────────────────────────┐
     │   ┏━╸┏━┓┏┓╻┏━┓┏━┓╻  ┏━╸   │
     │   ┃  ┃ ┃┃┗┫┗━┓┃ ┃┃  ┣╸    │
     │   ┗━╸┗━┛╹ ╹┗━┛┗━┛┗━╸┗━╸   │
     └───────────────────────────┘
+{% if mode == 'sphx' %}
     </pre>
 
     <p class='center'><i>Tonight we're gonna party like it's 1979…</i></p>
     <p class='center'>╰─(˙𝀓˙)─╮  ╭─(＾0＾)─╯</p>
+
+{% else %}
+    *Tonight we're gonna party like it's 1979…*
+
+    ╰─(˙𝀓˙)─╮  ╭─(＾0＾)─╯
+
+{% endif %}
 
 
 Console
@@ -34,11 +44,12 @@ and detecting capabilities.
 A bit more comprehensive than most.
 How does it work?
 
-*"Piece of cake? Oh, I wish somebody would tell me what that means." — Dr. Huer*
+    *"Piece of cake?
+    Oh, I wish somebody would tell me what that means." — Dr. Huer*
 
 
-:reverse:`␛`\ [1;3m\ :bi:`Hello World` :reverse:`␛`\ [0m
---------------------------------------------------------------
+{% if mode == 'sphx' %}:reverse:`{% endif %}␛{% if mode == 'sphx' %}`{% endif %}\ [1;3m\ *Hello World* {% if mode == 'sphx' %}:reverse:`{% endif %}␛{% if mode == 'sphx' %}`{% endif %}\ [0m
+----------------------------------------------------------
 
 Adding a little color with console might look like this::
 
@@ -55,11 +66,17 @@ but no need to worry about that.
 Printing to a supporting terminal from Python might look like this:
 
 {% if mode == 'pypi' %}
+.. note::
+    *Apologies, text below can't be styled due to PyPI limitations.
+    Try the*
+    `Sphinx docs <https://mixmastamyk.bitbucket.io/console/>`_
+    *instead.*
+
 ::
 
     >>> print(fg.red, fx.italic, '♥ Heart', fx.end,
         ' of Glass…', sep='')
-    ♥ Heart of Glass…
+    ♥ Heart of Glass…  # ← not styled due to PyPI limits
 {% else %}
 .. raw:: html
 
@@ -75,14 +92,18 @@ it ends all styles and fore/background colors at once,
 where as ``bg.default`` for example,
 resets only the background to its default color.
 
-
+{% if mode == 'pypi' %}
+But wait!  There's a shitload,^H^H^H^H^H, crapton,^H^H^H^H^H
+err…
+*lot* more!
+{% else %}
 .. raw:: html
-
     <p>But wait!&nbsp;  There's a
     <s><span style="opacity: .9">shitload,</span></s>
     <s><span style="opacity: .9">crapton,</span></s>
     err…
     <i>lot</i> more!</p>
+{% endif %}
 
 
 Installen-Sie, Bitte
@@ -114,7 +135,7 @@ console handles more than color and styles.
 
 .. rubric:: Utils
 
-:mod:`console.utils`
+{% if mode == 'sphx' %}:mod:{% endif %}`console.utils`
 includes a number of nifty functions::
 
     >>> from console.utils import cls, set_title
@@ -130,7 +151,7 @@ and easily ``pause`` a script like the old DOS command.
 
 .. rubric:: Screen
 
-With :mod:`console.screen` you can
+With {% if mode == 'sphx' %}:mod:{% endif %}`console.screen` you can
 save or restore it,
 move the cursor around,
 get its position,
@@ -141,7 +162,8 @@ if any of that floats your boat.
 
 .. rubric:: Detection
 
-Detect the terminal environment with :mod:`console.detection`:
+Detect the terminal environment with
+{% if mode == 'sphx' %}:mod:{% endif %}`console.detection`:
 
     - Determine palette support
     - Check relevant environment variables, such as
@@ -162,7 +184,8 @@ pipe, for example.
 Detection can be bypassed and handled manually when needed however.
 Simply use the detection functions in the module or write your own as desired,
 then create your own objects from the classes in the
-:mod:`console.style` and :mod:`console.screen`
+{% if mode == 'sphx' %}:mod:{% endif %}`console.style` and
+{% if mode == 'sphx' %}:mod:{% endif %}`console.screen`
 modules.
 
 There's also logging done---\
@@ -172,7 +195,7 @@ detection module.
 .. rubric:: Constants
 
 A number of useful constants are provided in
-:mod:`console.constants`,
+{% if mode == 'sphx' %}:mod:{% endif %}`console.constants`,
 such as
 `CSI <https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences>`_
 and
@@ -195,7 +218,6 @@ below:
 
 .. code-block:: sh
 
-
     # Basic        Format  Comment
     fg.red         NAME   # 8 colors
     fg.lightred    NAME   # Another 8 colors w/o bold
@@ -217,7 +239,7 @@ Backgrounds have the same access.
 Composability++
 ~~~~~~~~~~~~~~~~
 
-*Dy-no-mite!! — J.J.*
+    *Dy-no-mite!! — J.J.*
 
 Console's palette entry objects are meant to be highly composable and useful in
 multiple ways.
@@ -227,6 +249,7 @@ They can be called like functions if desired and have "mixins" added in as well.
 The callable form resets styles to their defaults at the end of the string,
 so that no longer needs to be managed:
 
+{% if mode == 'sphx' %}
 .. raw:: html
 
     <pre>
@@ -235,6 +258,14 @@ so that no longer needs to be managed:
     &gt;&gt;&gt; print(muy_importante('AHORITA!', fx.underline))
     <div style="display: inline-block; background: #d00; color: white; font-weight: bold; text-decoration: underline">AHORITA!</div>
     </pre>
+{% else %}
+::
+
+    >>> muy_importante = fg.white + fx.bold + bg.red
+
+    >>> print(muy_importante('AHORITA!', fx.underline))
+    AHORITA!  # ← not styled due to PyPI limits
+{% endif %}
 
 When palette objects are combined together as we did above,
 a list of codes to be rendered to is kept on ice until final output as a
@@ -245,6 +276,7 @@ Meaning, there won't be redundant escape sequences in the output::
 
 Styles can be built on the fly as well:
 
+{% if mode == 'sphx' %}
 .. raw:: html
 
     <pre>
@@ -253,7 +285,14 @@ Styles can be built on the fly as well:
     )
     <span style="color: #222; background-color:#ff8700">Tangerine Dream</span>
     </pre>
+{% else %}
+::
 
+    >>> print(
+        f'{fg.i208 + fx.reverse}Tangerine Dream{fx.end}'
+    )
+    Tangerine Dream  # 😉
+{% endif %}
 
 .. rubric:: Templating
 
@@ -263,19 +302,25 @@ with or instead of text::
 
     >>> template = bg.i22('{}')  # dark green
 
+{% if mode == 'sphx' %}
 .. raw:: html
 
     <pre>
     &gt;&gt;&gt; print(template.format(' GREEN Eggs… '))
     <div style="display: inline-block; background: #040;"> GREEN Eggs… </div>
     </pre>
+{% else %}
+::
 
-Other template formats are not a problem either, e.g. ``%s`` and ``${}``.
+    >>> print(template.format(' GREEN Eggs… '))
+     GREEN Eggs…   # 😉
+{% endif %}
+
+Other template formats are no problem either, ``%s`` or ``${}``.
 
 Perhaps you'd like a pre-rendered string in a tight loop for performance
 reasons.
 Simply use ``str()`` on the final output and use it in the loop.
-
 
 Palette entries work as context-managers as well::
 
@@ -283,12 +328,18 @@ Palette entries work as context-managers as well::
         print('Infield: Garvey, Lopes, Russel, Cey, Yeager')
         print('Outfield: Baker, Monday, Smith')
         print('Coach: Lasorda')
+        print('⚞⚾')
+
+
+::
+
+    ¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸¸.·´¯`·.¸¸
 
 
 Demos and Tests
 ------------------
 
-*Outta Sight!*
+    *Outta Sight!*
 
 A series of positively *jaw-dropping* demos (haha, ok maybe not) may be run at
 the command-line with::
@@ -307,7 +358,7 @@ tests can be run from the install folder.
 Legalese
 ----------------
 
-*"Stickin' it to the Man"*
+    *"Stickin' it to the Man"*
 
 - Copyright 2018, Mike Miller
 - Released under the LGPL, version 3+.
