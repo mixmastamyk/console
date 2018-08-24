@@ -47,6 +47,7 @@ demos:
 docs: docs/readme.rst readme.rst
 	make -C docs html
 	refresh.sh Console
+	rsync --recursive --human-readable --delete-before  --update docs/_build/html/ ../../mixmastamyk.bitbucket.org/console/
 
 
 publish: test check_readme

@@ -6,9 +6,10 @@
     │   ┃  ┃ ┃┃┗┫┗━┓┃ ┃┃  ┣╸    │
     │   ┗━╸┗━┛╹ ╹┗━┛┗━┛┗━╸┗━╸   │
     └───────────────────────────┘
-    *Tonight we're gonna party like it's 1979…*
 
-    ╰─(˙𝀓˙)─╮  ╭─(＾0＾)─╯
+*Tonight we're gonna party like it's 1979…*
+
+╰─(˙𝀓˙)─╮  ╭─(＾0＾)─╯
 
 
 
@@ -31,14 +32,16 @@ How does it work?
 ␛\ [1;3m\ *Hello World* ␛\ [0m
 ----------------------------------------------------------
 
-Adding a little color with console might look like this::
+Adding a little color with console might look like this:
+
+.. code-block:: python
 
     >>> from console import fg, bg, fx
 
     >>> fg.green + 'Hello World!' + fg.default
     '\x1b[32mHello World!\x1b[39m'
 
-The string  ``'\x1b'`` represents the ASCII Escape character
+FYI, the string  ``'\x1b'`` represents the ASCII Escape character
 (27 in decimal, ``1b`` hex).
 Command 32 turns the text green
 and 39 back to the default color,
@@ -49,13 +52,14 @@ Printing to a supporting terminal from Python might look like this:
     *Apologies, text below can't be styled due to PyPI limitations.
     Try the*
     `Sphinx docs <https://mixmastamyk.bitbucket.io/console/>`_
-    *instead.*
+    *instead.
+    When you see "😉" that's your reminder.*
 
-::
+.. code-block:: python
 
     >>> print(fg.red, fx.italic, '♥ Heart', fx.end,
         ' of Glass…', sep='')
-    ♥ Heart of Glass…  # ← not styled due to PyPI limits
+    ♥ Heart of Glass…  # ← not styled due to PyPI limits 😉
 
 Above, ``fx.end`` is a convenient object to note---\
 it ends all styles and fore/background colors at once,
@@ -94,10 +98,12 @@ Overview
 As mentioned,
 console handles more than color and styles.
 
-.. rubric:: Utils
+.. rubric:: **Utils**
 
 `console.utils`
-includes a number of nifty functions::
+includes a number of nifty functions:
+
+.. code-block:: python
 
     >>> from console.utils import cls, set_title
 
@@ -110,7 +116,7 @@ wait for keypresses,
 clear a line or the screen (with or without scrollback),
 and easily ``pause`` a script like the old DOS command.
 
-.. rubric:: Screen
+.. rubric:: **Screen**
 
 With `console.screen` you can
 save or restore it,
@@ -121,7 +127,7 @@ and enable
 if any of that floats your boat.
 
 
-.. rubric:: Detection
+.. rubric:: **Detection**
 
 Detect the terminal environment with
 `console.detection`:
@@ -153,7 +159,7 @@ There's also logging done---\
 enable the debug level and you'll see the results of the queries from the
 detection module.
 
-.. rubric:: Constants
+.. rubric:: **Constants**
 
 A number of useful constants are provided in
 `console.constants`,
@@ -162,7 +168,9 @@ such as
 and
 `OSC <https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences>`_
 for building your own apps.
-You can::
+You can:
+
+.. code-block:: python
 
     from console.constants import BEL
     print('Ring my ', BEL)  # ring-a-ling-a-ling…
@@ -177,7 +185,7 @@ Unleash your inner
 `Britto <https://www.art.com/gallery/id--a266/romero-britto-posters.htm>`_
 below:
 
-.. code-block:: sh
+.. code-block:: python
 
     # Basic        Format  Comment
     fg.red         NAME   # 8 colors
@@ -192,7 +200,7 @@ below:
     fg.x_navyblue  x_NM   # X11 color name, if avail
     fg.w_bisque    w_NM   # Webcolors, if avail
 
-The underscores are optional,
+**The underscores are optional,**
 choose depending whether brevity or readability are more important to you.
 Backgrounds have the same access.
 
@@ -210,41 +218,45 @@ They can be called like functions if desired and have "mixins" added in as well.
 The callable form resets styles to their defaults at the end of the string,
 so that no longer needs to be managed:
 
-::
+.. code-block:: python
 
     >>> muy_importante = fg.white + fx.bold + bg.red
 
     >>> print(muy_importante('AHORITA!', fx.underline))
-    AHORITA!  # ← not styled due to PyPI limits
+    AHORITA!  # ← not styled due to PyPI limits 😉
 
 When palette objects are combined together as we did above,
 a list of codes to be rendered to is kept on ice until final output as a
 string.
-Meaning, there won't be redundant escape sequences in the output::
+Meaning, there won't be redundant escape sequences in the output:
+
+.. code-block:: python
 
     '\x1b[37;1;41;4mAHORITA!\x1b[0m'
 
 Styles can be built on the fly as well:
 
-::
+.. code-block:: python
 
     >>> print(
         f'{fg.i208 + fx.reverse}Tangerine Dream{fx.end}'
     )
     Tangerine Dream  # 😉
 
-.. rubric:: Templating
+.. rubric:: **Templating**
 
 To build templates,
 call the entry object with a placeholder string,
-with or instead of text::
+with or instead of text:
+
+.. code-block:: python
 
     >>> template = bg.i22('{}')  # dark green
 
-::
+.. code-block:: python
 
     >>> print(template.format(' GREEN Eggs… '))
-     GREEN Eggs…   # 😉
+     GREEN Eggs…   # No, I do not like… 😉
 
 Other template formats are no problem either, ``%s`` or ``${}``.
 
@@ -252,18 +264,21 @@ Perhaps you'd like a pre-rendered string in a tight loop for performance
 reasons.
 Simply use ``str()`` on the final output and use it in the loop.
 
-Palette entries work as context-managers as well::
+Palette entries work as context-managers as well:
+
+.. code-block:: python
 
     with bg.w_dodgerblue:  # or .x_…
         print('Infield: Garvey, Lopes, Russel, Cey, Yeager')
         print('Outfield: Baker, Monday, Smith')
         print('Coach: Lasorda')
-        print('⚞⚾')
 
 
 ::
 
-    ¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸¸.·´¯`·.¸¸
+                               ⚾
+    ¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.⫽⫽¸¸.·´¯`·.¸¸¸.·´¯`·.¸¸
+                             ⫻⫻
 
 
 Demos and Tests
@@ -279,7 +294,7 @@ the command-line with::
 If you have pytest installed,
 tests can be run from the install folder.
 
-::
+.. code-block:: shell
 
     ⏵ pytest -s
 
