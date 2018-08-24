@@ -21,7 +21,6 @@ from .core import _BasicPaletteBuilder, _HighColorPaletteBuilder
 
 class ForegroundPalette(_HighColorPaletteBuilder):
     ''' Container for ANSI foreground color codes. '''
-
     default         = 39    # must be first :-D
 
     black           = 30
@@ -130,14 +129,14 @@ class EffectsPalette(_BasicPaletteBuilder):
 
 
 class EffectsTerminator(_BasicPaletteBuilder):
-    ''' "I'll be baahhck."
+    ''' "I'll be baaahhhck."
 
         Rarely used codes to turn off specific style features, not supported at
         times.  Generally, use of EffectsPalette.end is simpler and more
         reliable.
     '''
     # convenience:
-    end             = 0
+    default = end   = 0
     fg              = ForegroundPalette.default
     bg              = BackgroundPalette.default
 

@@ -16,8 +16,11 @@ from .disabled import dummy, empty
 
 ALL_PALETTES = ('basic', 'extended', 'truecolor')  # variants 'x11', 'web'
 _END = CSI + '0m'
-X11_RGB_FILE = '/etc/X11/rgb.txt'
 log = logging.getLogger(__name__)
+if sys.platform == 'linux':
+    X11_RGB_FILE = '/etc/X11/rgb.txt'
+elif sys.platform == 'darwin':
+    X11_RGB_FILE = '/opt/X11/share/X11/rgb.txt'
 
 
 class _BasicPaletteBuilder:
@@ -60,7 +63,7 @@ class _BasicPaletteBuilder:
 
     def __init__(self, **kwargs):
         # look for integer attributes to wrap in a basic palette:
-        for name in dir(self):
+        for name in ['default'] + dir(self):        # default needs to go 1st!
             if not name.startswith('_'):
                 value = getattr(self, name)
                 if type(value) is int:
@@ -262,13 +265,7 @@ class _PaletteEntry:
         print(self, file=self._out, end='')
 
     def __exit__(self, type, value, traceback):
-        try:
-            log.debug(repr(str(self.default)))
-            print(self.default, file=self._out, end='')
-        except AttributeError as err:
-            # self.default is not ready yet:
-            log.debug(repr(str(self.parent.default)))
-            print(self.parent.default, file=self._out, end='')
+        print(self.default, file=self._out, end='')
 
     def __call__(self, text, *styles):
         # if category different, copy uses end instead of default, see addition
