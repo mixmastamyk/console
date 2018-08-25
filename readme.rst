@@ -49,7 +49,9 @@ but no need to worry about that.
 Printing to a supporting terminal from Python might look like this:
 
 .. note::
-    *Apologies, text below can't be styled due to PyPI limitations.
+
+    *Apologies, text below can't be styled due to PyPI/github readme
+    limitations.
     Try the*
     `Sphinx docs <https://mixmastamyk.bitbucket.io/console/>`_
     *instead.
