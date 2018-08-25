@@ -491,7 +491,7 @@ if True:  # fold
 if True:  # fold
     def test_context_mgr():
         try:
-            import webcolors
+            import webcolors; webcolors # pyflakes
 
             f = StringIO()
             forestgreen = bg.wforestgreen + fx.bold
