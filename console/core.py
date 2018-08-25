@@ -17,6 +17,9 @@ from .disabled import dummy, empty
 ALL_PALETTES = ('basic', 'extended', 'truecolor')  # variants 'x11', 'web'
 _END = CSI + '0m'
 log = logging.getLogger(__name__)
+
+# X11 colors support
+_x11_color_map = {}
 if sys.platform == 'linux':
     X11_RGB_FILE = '/etc/X11/rgb.txt'
 elif sys.platform == 'darwin':
@@ -82,7 +85,6 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
 
     def __init__(self, x11_rgb_filename=X11_RGB_FILE, **kwargs):
         super().__init__(**kwargs)
-        self._x11_color_map = {}
         self._x11_rgb_filename = x11_rgb_filename
 
     def __getattr__(self, name):
@@ -179,10 +181,10 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
     def _get_x11_palette_entry(self, name, color_name):
         ''' Find X11 entry, once on the fly. '''
         values = [self._start_codes_true]
-        if not self._x11_color_map:
-            self._x11_color_map = _load_x11_color_map(self._x11_rgb_filename)
+        if not _x11_color_map:
+            _x11_color_map.update(_load_x11_color_map(self._x11_rgb_filename))
         # convert name to 'R', 'G', 'B':    - below:  empty tuple
-        values.extend(self._x11_color_map[color_name.lower()])
+        values.extend(_x11_color_map[color_name.lower()])
 
         return self._create_entry(name, values)
 
