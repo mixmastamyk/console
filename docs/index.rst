@@ -9,6 +9,27 @@
 
 |
 
+.. raw:: html
+
+    <iframe allow="autoplay; encrypted-media"
+            allowfullscreen
+            frameborder="0"
+            src="https://www.youtube-nocookie.com/embed/0CPJ-AbCsT8?start=22"
+            style="
+                width: 100%;
+                height: auto;
+                min-height: 480px;
+                background: #000;
+            "
+    ></iframe>
+
+
+.. container:: center mt
+
+    *"Better, stronger, faster…"*
+
+|
+
 
 Contents
 ===============
