@@ -26,7 +26,7 @@ CSI = ESC + '['     #: Control Sequence Introducer
 OSC = ESC + ']'     #: Operating System Command
 RIS = ESC + 'c'     #: Reset to Initial State, aka clear screen (see utils)
 
-__version__ = '0.81'
+__version__ = '0.82'
 
 
 if __name__ == '__main__':
