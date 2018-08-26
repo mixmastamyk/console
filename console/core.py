@@ -25,11 +25,12 @@ log = logging.getLogger(__name__)
 
 # Palette attribute name finders, now we've got two problems.
 # Not a huge fan of regex but here they nicely enforce the naming rules:
-_index_finder = re.compile(r'^i_?\d{1,3}$', re.A)                      # i_###
-_nearest_finder = re.compile(r'^n_?[0-9A-Fa-f]{3}$', re.A)             # n_HHH
-_true_finder = re.compile(r'^t_?([\da-f]{3}|[\da-f]{6})$', re.A|re.I)  # t_HHH
-_x11_finder = re.compile(r'^x\w{4,64}$', re.A)                         # x_name
-_web_finder = re.compile(r'^w\w{4,64}$', re.A)                         # x_name
+_hd = r'[0-9A-Fa-f]'  # hex digits
+_index_finder = re.compile(r'^i_?\d{1,3}$', re.A)                   # i_DDD
+_nearest_finder = re.compile(f'^n_?{_hd}{{3}}$', re.A)              # n_HHH
+_true_finder = re.compile(f'^t_?({_hd}{{3}}|{_hd}{{6}})$', re.A)    # t_HHH
+_x11_finder = re.compile(r'^x\w{4,64}$', re.A)                      # x_NAME
+_web_finder = re.compile(r'^w\w{4,64}$', re.A)                      # x_NAME
 
 # X11 colors support
 _x11_color_map = {}
