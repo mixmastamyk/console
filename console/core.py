@@ -8,18 +8,31 @@
 '''
 import sys
 import logging
+import re
 
 from . import _CHOSEN_PALETTE
 from .constants import CSI
 from .disabled import dummy, empty
+try:
+    import webcolors
+except ImportError:
+    webcolors = None
 
-
-ALL_PALETTES = ('basic', 'extended', 'truecolor')  # variants 'x11', 'web'
 _END = CSI + '0m'
+ALL_PALETTES = ('basic', 'extended', 'truecolor')  # variants 'x11', 'web'
 log = logging.getLogger(__name__)
+
+# Palette attribute name finders, now we've got two problems.
+# Not a huge fan of regex but here they nicely enforce the naming rules:
+_index_finder = re.compile(r'^i_?\d{1,3}$', re.A)                      # i_###
+_nearest_finder = re.compile(r'^n_?[0-9A-Fa-f]{3}$', re.A)             # n_HHH
+_true_finder = re.compile(r'^t_?([\da-f]{3}|[\da-f]{6})$', re.A|re.I)  # t_HHH
+_x11_finder = re.compile(r'^x\w{4,64}$', re.A)                         # x_name
+_web_finder = re.compile(r'^w\w{4,64}$', re.A)                         # x_name
 
 # X11 colors support
 _x11_color_map = {}
+X11_RGB_FILE = None  # Windows
 if sys.platform == 'linux':
     X11_RGB_FILE = '/etc/X11/rgb.txt'
 elif sys.platform == 'darwin':
@@ -90,29 +103,19 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
     def __getattr__(self, name):
         ''' Traffic cop - called only when an attribute is missing,
             once per palette entry attribute.
-        '''
-        # route on first letter - must have length one to be here:
-        first_letter, key = name[0], name[1:].lstrip('_')
-        key_len = len(key)
 
-        if first_letter == 'i':     # INDEXED aka EXTENDED
-            if not key or key_len > 3:
-                raise AttributeError('index %r not found. Check length of '
-                                     'numeric portion, must be from 1 to 3 '
-                                     'index only.' % name)
-            if not key.isdigit():
-                raise AttributeError('index %r not found. i+digits, holmes.' %
-                                     name)
+            The "basic" palette will never get here, as it is already defined.
+        '''
+        key = name[1:].lstrip('_')  # rm potential prefix
+
+        # follow the yellow brick road…
+        if _index_finder.match(name):       # INDEXED aka EXTENDED
             if 'extended' in self._palette_support:  # build entry
                 return self._get_extended_palette_entry(name, key)
             else:
                 return empty
 
-        elif first_letter == 'n':   # NEAREST
-            if not key_len == 3:
-                raise AttributeError('%r not found. Check length, hex portion '
-                                     'must be 3 characters only.' % name)
-
+        elif _nearest_finder.match(name):   # NEAREST
             if 'extended' in self._palette_support:  # build entry
                 from .proximity import find_nearest_color_hexstr
                 nearest_idx = find_nearest_color_hexstr(key)
@@ -121,49 +124,45 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             else:
                 return empty
 
-        elif first_letter == 't':   # TRUE
-            if key_len == 6:
-                pass
-            elif key_len == 3:  # double chars:  b0b -> bb00bb
+        elif _true_finder.match(name):      # TRUE
+            if len(key) == 3:  # double chars:  b0b -> bb00bb
                 key = ''.join([ch*2 for ch in key])
-            else:
-                raise AttributeError('%r not found. Check length, hex portion '
-                                     'must be 3 or 6 characters only.' % name)
-            try:
-                int(key, 16)  # poor-man's ishexdigit()
-            except ValueError:
-                raise AttributeError('%r not found---not hex digits.' % name)
-
             if 'truecolor' in self._palette_support:  # build entry
                 return self._get_true_palette_entry(name, key)
             else:
                 return empty
 
-        elif first_letter == 'x':   # X11
-            if key_len < 3:  # red is shortest name
-                raise AttributeError('%r not found. Check length, name portion '
-                                     'must be at least 3 characters.' % name)
+        elif _x11_finder.match(name):       # X11
             if 'truecolor' in self._palette_support:
                 return self._get_x11_palette_entry(name, key)
             else:
                 return empty
 
-        elif first_letter == 'w':   # WEBCOLORS
-            if key_len < 3:  # red may be shortest name
-                raise AttributeError('%r not found. Check length, name portion '
-                                     'must be at least 3 characters.' % name)
+        elif _web_finder.match(name):       # WEBCOLORS
             if 'truecolor' in self._palette_support:
-                try:  # need to make import-ant decision here:-D
-                    import webcolors
-                    return self._get_web_palette_entry(webcolors, name, key)
-                except ImportError:
+                if webcolors:
+                    return self._get_web_palette_entry(name, key)
+                else:
                     return empty
             else:
                 return empty
 
-        else:
-            raise AttributeError('%r is not a recognized attribute name or '
-                                 'format.' % name)
+        else:  # look for names
+            if webcolors:
+                try:
+                    log.debug('attempting webcolor lookup for %r.', name)
+                    return self._get_web_palette_entry(name, name)  # whole
+                except ValueError:
+                    pass
+            # try X11
+            if X11_RGB_FILE:
+                try:
+                    return self._get_x11_palette_entry(name, name)  # whole name
+                except KeyError:
+                    pass
+            # Emerald city
+            raise AttributeError('%r is not a recognized attribute name.'
+                                 % name)
 
     def _get_extended_palette_entry(self, name, index):
         ''' Compute extended entry, once on the fly. '''
@@ -188,7 +187,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
 
         return self._create_entry(name, values)
 
-    def _get_web_palette_entry(self, webcolors, name, color_name):
+    def _get_web_palette_entry(self, name, color_name):
         ''' Find webcolor entry, once on the fly. '''
         values = [self._start_codes_true]
         values.extend(str(i) for i in webcolors.name_to_rgb(color_name.lower()))

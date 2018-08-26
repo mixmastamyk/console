@@ -22,7 +22,7 @@ tests_require = ('pyflakes', 'pytest', 'readme_renderer'),
 
 def slurp(filename):
     try:
-        with open(join(dirname(__file__), filename)) as infile:
+        with open(join(dirname(__file__), filename), encoding='utf8') as infile:
             return infile.read()
     except FileNotFoundError:
         pass  # needed at upload time, not install time
@@ -30,7 +30,7 @@ def slurp(filename):
 setup(
     name                = 'console',
     description         = 'Comprehensive utility library for terminals. '
-                          'Better, stronger, faster',
+                          'Better, stronger, faster.',
     author_email        = 'mixmastamyk@github.com',
     author              = 'Mike Miller',
     extras_require      = extras_require,

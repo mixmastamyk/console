@@ -177,33 +177,60 @@ You can:
     print('Ring my ', BEL)  # ring-a-ling-a-ling…
 
 
-Extended Color
-~~~~~~~~~~~~~~~
+Extended Palettes
+~~~~~~~~~~~~~~~~~~~
 
-While the original palette of 8/16 colors is accessed directly by name,
-others have a prefix letter and a name or digits to specify the color.
+The palettes break down into three main categories.
 Unleash your inner
 `Britto <https://www.art.com/gallery/id--a266/romero-britto-posters.htm>`_
 below:
 
+- Basic, the original 8/16 colors
+- Extended, 256 indexed colors
+- "True", 16 million colors, consisting of:
+
+  - RGB specified colors
+  - X11, named colors
+  - Webcolors, named colors
+
+Helpfully,
+the original palette,
+the X11,
+and Webcolor palettes
+may be accessed directly by name:
+
 .. code-block:: python
 
-    # Basic        Format  Comment
-    fg.red         NAME   # 8 colors
-    fg.lightred    NAME   # Another 8 colors w/o bold
+    # Basic                Comment
+    fg.red                # Original 8 colors
+    fg.lightred           # Another 8 brighter colors w/o bold
 
-    # Extended
-    fg.i_123       iDDD   # Extended/indexed 256-color
-    fg.n_f0f       nHHH   # Hex to nearest indexed
+    # Truecolor
+    fg.bisque             # Webcolors takes precedence, if installed
+    fg.navyblue           # X11 color name, if avail
+
+
+Additional indexed palettes are accessed by a prefix letter and a number of
+digits to specify the color:
+
+.. code-block:: python
+
+    # Extended     Format  Comment
+    bg.i_123       iDDD   # Extended/indexed 256-color palette
+    bg.n_f0f       nHHH   # Hex to nearest indexed
 
     # True
-    fg.t_ff00bb    tHHH   # Truecolor, 3 or 6 digits
-    fg.x_navyblue  x_NM   # X11 color name, if avail
-    fg.w_bisque    w_NM   # Webcolors, if avail
+    bg.t_ff00bb    tHHH   # Truecolor, 3 or 6 digits
+    bg.x_navyblue  x_NM   # force X11 color name, if avail
+    bg.w_bisque    w_NM   # force Webcolors, if installed
 
-**The underscores are optional,**
-choose depending whether brevity or readability are more important to you.
-Backgrounds have the same access.
+**The underscores are optional.**
+Choose depending whether brevity or readability are more important to you.
+The assorted true color forms are useful to choose one directly without
+ambiguity.
+(X11 and Webcolors
+`differ <https://en.wikipedia.org/wiki/X11_color_names#Clashes_between_web_and_X11_colors_in_the_CSS_color_scheme>`_
+on a few colors.)
 
 
 Composability++
@@ -299,6 +326,11 @@ tests can be run from the install folder.
 
     ⏵ pytest -s
 
+
+Contributions
+------------------
+
+Could use some help on Windows and MacOS as my daily driver is a Tux racer.
 
 
 Legalese

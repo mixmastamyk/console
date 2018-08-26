@@ -7,6 +7,11 @@
 from io import StringIO
 import pytest
 
+try:
+    import webcolors
+except Exception as err:
+    webcolors = None
+
 from . import detection, screen, style, utils, _set_debug_mode
 
 # configure our own - force all palettes on
@@ -109,7 +114,7 @@ if True:  # fold
     def test_fgext_too_short():
         with pytest.raises(AttributeError) as err:
             fg.i
-        assert 'length' in err.value.args[0]
+        assert 'recognized' in err.value.args[0]
 
     def test_fgext_one_digit():
 
@@ -126,13 +131,13 @@ if True:  # fold
     def test_fgext_four_digits():
         with pytest.raises(AttributeError) as err:
             fg.i1111
-        assert 'length' in err.value.args[0]
+        assert 'recognized' in err.value.args[0]
 
     # bg
     def test_bgext_too_short():
         with pytest.raises(AttributeError) as err:
             bg.i
-        assert 'length' in err.value.args[0]
+        assert 'recognized' in err.value.args[0]
 
     def test_bgext_one_digit():
 
@@ -149,7 +154,7 @@ if True:  # fold
     def test_bgext_too_long():
         with pytest.raises(AttributeError) as err:
             bg.i1111
-        assert 'length' in err.value.args[0]
+        assert 'recognized' in err.value.args[0]
 
 
 # Extended palette - fg.n_, bg._ - nearest
@@ -159,7 +164,7 @@ if True:  # fold
     def test_fgextn_too_short():
         with pytest.raises(AttributeError) as err:
             fg.n
-        assert 'length' in err.value.args[0]
+        assert 'recognized' in err.value.args[0]
 
     def test_fgextn_three_digits():
 
@@ -168,13 +173,13 @@ if True:  # fold
     def test_fgextn_four_digits():
         with pytest.raises(AttributeError) as err:
             fg.n1111
-        assert 'length' in err.value.args[0]
+        assert 'recognized' in err.value.args[0]
 
     # bg
     def test_bgextn_one_digit():
         with pytest.raises(AttributeError) as err:
             bg.n_1
-        assert 'length' in err.value.args[0]
+        assert 'recognized' in err.value.args[0]
 
     def test_bgextn_three_digits():
 
@@ -183,7 +188,7 @@ if True:  # fold
     def test_bgextn_too_long():
         with pytest.raises(AttributeError) as err:
             bg.nffff
-        assert 'length' in err.value.args[0]
+        assert 'recognized' in err.value.args[0]
 
 
 # True color palette - fg
@@ -193,7 +198,7 @@ if True:  # fold
     def test_fgtrue_too_short():
         with pytest.raises(AttributeError) as err:
             fg.tbb00
-        assert 'length' in err.value.args[0]
+        assert 'recognized' in err.value.args[0]
 
     def test_fgtrue_three_digits():
 
@@ -206,18 +211,18 @@ if True:  # fold
     def test_fgtrue_wrong_format():
         with pytest.raises(AttributeError) as err:
             fg.tbob
-        assert 'hex digits' in err.value.args[0]
+        assert 'recognized' in err.value.args[0]
 
     def test_fgtrue_too_long():
         with pytest.raises(AttributeError) as err:
             fg.tDEADBEEFCAFE
-        assert 'length' in err.value.args[0]
+        assert 'recognized' in err.value.args[0]
 
     # bg
     def test_bgtrue_too_short():
         with pytest.raises(AttributeError) as err:
             bg.tbb00
-        assert 'length' in err.value.args[0]
+        assert 'recognized' in err.value.args[0]
 
     def test_bgtrue_three_digits():
 
@@ -230,12 +235,27 @@ if True:  # fold
     def test_bgtrue_wrong_format():
         with pytest.raises(AttributeError) as err:
             bg.tbob
-        assert 'hex digits' in err.value.args[0]
+        assert 'recognized' in err.value.args[0]
 
     def test_bgtrue_too_long():
         with pytest.raises(AttributeError) as err:
             bg.tDEADBEEFCAFE
-        assert 'length' in err.value.args[0]
+        assert 'recognized' in err.value.args[0]
+
+
+# Web color palette
+# ----------------------------------------------------------------------------
+if True:  # fold
+
+    def test_webcolors_foo():
+        if webcolors:
+            assert str(fg.bisque) == CSI + '38;2;255;228;196m'
+            assert str(bg.w_bisque) == CSI + '48;2;255;228;196m'
+
+
+# X11 color palette
+# ----------------------------------------------------------------------------
+#~ if True:  # fold
 
 
 # Concat + str

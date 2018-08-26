@@ -259,11 +259,12 @@ def get_theme():
         FG, _, BG = env.COLORFGBG.partition(';')
         theme = 'dark' if BG < '8' else 'light'  # background wins
     else:
-        # try xterm
-        for component in query_terminal_color('background'):
-            if component and component[0] > '7':
-                theme = 'light'
-                break
+        # try xterm - find average across three colors
+        colors = query_terminal_color('background')  # background wins
+        if colors:
+            colors = tuple(int(cm[:1], 16) for cm in colors)  # first hex char
+            avg = sum(colors) / len(colors)
+            theme = 'dark' if avg < 8 else 'light'
 
     log.debug('%r', theme)
     return theme
