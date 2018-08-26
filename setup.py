@@ -29,7 +29,7 @@ def slurp(filename):
 
 setup(
     name                = 'console',
-    description         = 'Comprehensive utility library for terminals. '
+    description         = 'Comprehensive utility library for ANSI terminals. '
                           'Better, stronger, faster.',
     author_email        = 'mixmastamyk@github.com',
     author              = 'Mike Miller',

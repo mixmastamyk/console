@@ -1,5 +1,5 @@
 '''
-    .. console - Comprehensive escape sequence utility library for terminals.
+    .. console - Comprehensive ANSI sequence utility library for terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     Testen-Sie, bitte.

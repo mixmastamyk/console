@@ -1,8 +1,8 @@
 '''
-    .. console - Comprehensive escape sequence utility library for terminals.
+    .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
-    A class to mimic ANSI Style container classes so they do not print when the
+    A class to mimic style container classes so they do not print when the
     terminal doesn't support it.
 '''
 

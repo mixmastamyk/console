@@ -1,5 +1,5 @@
 '''
-    .. console - Comprehensive escape sequence utility library for terminals.
+    .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - ADDITIONAL PORTIONS released under the LGPL 3+.
 
     console.proximity
