@@ -14,18 +14,18 @@ def _set_debug_mode(value):
     _DEBUG = bool(value)
 
 
-# detect running as a script, e.g. demos, constants
-if sys.argv and sys.argv[0] == '-m':  # try __loader__
+# detect running as a script, e.g. demos, constants.  Better way?
+if '-m' in sys.argv:
     pass  # do nothing
 
 else:
 
-    # detect palette, other modules dependent
+    # detect palette, other modules are dependent
     from .detection import TermStack, choose_palette as _choose_palette
 
     _CHOSEN_PALETTE = _choose_palette()
 
-    # now we can import other modules
+    # may now import other modules
     from .style import fg, bg, fx, defx
     from .screen import screen as sc
 
