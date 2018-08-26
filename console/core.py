@@ -18,6 +18,7 @@ try:
 except ImportError:
     webcolors = None
 
+
 _END = CSI + '0m'
 ALL_PALETTES = ('basic', 'extended', 'truecolor')  # variants 'x11', 'web'
 log = logging.getLogger(__name__)
@@ -119,7 +120,6 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             if 'extended' in self._palette_support:  # build entry
                 from .proximity import find_nearest_color_hexstr
                 nearest_idx = find_nearest_color_hexstr(key)
-
                 return self._get_extended_palette_entry(name, str(nearest_idx))
             else:
                 return empty
@@ -151,7 +151,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             if webcolors:
                 try:
                     log.debug('attempting webcolor lookup for %r.', name)
-                    return self._get_web_palette_entry(name, name)  # whole
+                    return self._get_web_palette_entry(name, name)  # whole name
                 except ValueError:
                     pass
             # try X11
@@ -181,7 +181,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         ''' Find X11 entry, once on the fly. '''
         values = [self._start_codes_true]
         if not _x11_color_map:
-            _x11_color_map.update(_load_x11_color_map(self._x11_rgb_filename))
+            _load_x11_color_map(self._x11_rgb_filename)
         # convert name to 'R', 'G', 'B':    - below:  empty tuple
         values.extend(_x11_color_map[color_name.lower()])
 
@@ -300,8 +300,6 @@ class _PaletteEntry:
 
 def _load_x11_color_map(filename=X11_RGB_FILE):
     ''' Load and parse X11's rgb.txt '''
-    x11_color_map = {}
-
     try:
         with open(filename) as infile:
 
@@ -314,8 +312,6 @@ def _load_x11_color_map(filename=X11_RGB_FILE):
                 if ' ' in key:  # skip names with spaces to match webcolors
                     continue
 
-                x11_color_map[key.lower()] = tuple(token for token in tokens[:3])
+                _x11_color_map[key.lower()] = tuple(token for token in tokens[:3])
     except IOError as err:
         log.debug('error: X11 palette not found. %s', err)
-
-    return x11_color_map
