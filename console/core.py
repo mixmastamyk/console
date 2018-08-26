@@ -2,7 +2,7 @@
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
-    Complicated Gobbyldegook to support simple interfaces is located here.
+    Complicated Gobbyldegook supporting simpler interfaces is located here.
 
     Classes below not meant to be instantiated by client code.
 '''
