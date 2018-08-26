@@ -1,6 +1,6 @@
 '''
     .. console - Comprehensive escape sequence utility library for terminals.
-    .. © 2018, Mike Miller - Released under the LGPL, version 3+.
+    .. © 2018, Mike Miller - ADDITIONAL PORTIONS released under the LGPL 3+.
 
     console.proximity
     ~~~~~~~~~~~~~~~~~~

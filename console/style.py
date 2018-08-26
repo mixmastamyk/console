@@ -20,7 +20,15 @@ from .core import _BasicPaletteBuilder, _HighColorPaletteBuilder
 
 
 class ForegroundPalette(_HighColorPaletteBuilder):
-    ''' Container for ANSI foreground color codes. '''
+    ''' Container for foreground color codes.
+
+        Arguments:
+            autodetect          - Attempt to detect palette support.
+            palettes            - If autodetect disabled, set palette support
+                                  explicitly.  str, seq, or None
+            x11_rgb_filename    - '/path/to/X11/rgb.txt',
+                                  defaults to a platform dependent value.
+    '''
     default         = 39    # must be first :-D
 
     black           = 30
@@ -49,7 +57,15 @@ class ForegroundPalette(_HighColorPaletteBuilder):
 
 
 class BackgroundPalette(_HighColorPaletteBuilder):
-    ''' Container for ANSI background color codes. '''
+    ''' Container for background color codes.
+
+        Arguments:
+            autodetect          - Attempt to detect palette support.
+            palettes            - If autodetect disabled, set palette support
+                                  explicitly.  str, seq, or None
+            x11_rgb_filename    - '/path/to/X11/rgb.txt',
+                                  defaults to a platform dependent value.
+    '''
     default         = 49
 
     black           = 40
@@ -78,9 +94,14 @@ class BackgroundPalette(_HighColorPaletteBuilder):
 
 
 class EffectsPalette(_BasicPaletteBuilder):
-    ''' Container for ANSI for text style codes.
+    ''' Container for text style codes.
 
         Bold, italic, underline, blink, reverse, strike, fonts, etc.
+
+        Arguments:
+            autodetect          - Attempt to detect palette support.
+            palettes            - If autodetect disabled, set palette support
+                                  explicitly.  str, seq, or None
     '''
     end = default   = 0  # reset all
 
@@ -134,6 +155,11 @@ class EffectsTerminator(_BasicPaletteBuilder):
         Rarely used codes to turn off specific style features, not supported at
         times.  Generally, use of EffectsPalette.end is simpler and more
         reliable.
+
+        Arguments:
+            autodetect          - Attempt to detect palette support.
+            palettes            - If autodetect disabled, set palette support
+                                  explicitly.  str, seq, or None
     '''
     # convenience:
     default = end   = 0

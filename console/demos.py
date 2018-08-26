@@ -15,7 +15,7 @@ if __name__ == '__main__':
     _DEBUG = '-d' in sys.argv
     if os.name == 'nt':
         try:
-            if not env.ANSICON:  # and detect Win10 support
+            if not env.ANSICON:  # TODO: detect Win10 support
                 import colorama
                 colorama.init()
         except ImportError:
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     def run():
         ''' Run the demos. '''
         print('\nConsole - ANSI lib demos, here we go:\n')
-        hello_world = f'''Hello: {fx.bold + fg.blue}Hello {fx.reverse +
+        hello_world = f'''Greetings: {fx.bold + fg.blue}Hello {fx.reverse +
                         fg.yellow}World{fg.default + defx.reverse}!{fx.end}'''
 
         demos = [

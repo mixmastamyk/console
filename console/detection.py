@@ -26,10 +26,12 @@ class TermStack:
     ''' Context Manager to save, temporarily modify, then restore terminal
         attributes.
 
-        Example:
-            ::
+        Arguments::
+            infile      - The file object to operate on, defaulting to stdin.
 
-                # POSIX implementation of get char/key
+        Example:
+            A POSIX implementation of get char/key::
+
                 import tty
 
                 with TermStack() as fd:
@@ -178,7 +180,7 @@ def _is_colorama_initialized():
         try:
             import colorama
             if isinstance(sys.stdout, colorama.ansitowin32.StreamWrapper):
-                result  = True
+                result = True
         except ImportError:
             pass
     return result
@@ -259,7 +261,7 @@ def get_theme():
         FG, _, BG = env.COLORFGBG.partition(';')
         theme = 'dark' if BG < '8' else 'light'  # background wins
     else:
-        # try xterm - find average across three colors
+        # try xterm - find average across rgb
         colors = query_terminal_color('background')  # background wins
         if colors:
             colors = tuple(int(cm[:1], 16) for cm in colors)  # first hex char

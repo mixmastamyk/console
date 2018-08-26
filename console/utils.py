@@ -18,9 +18,11 @@ from .detection import is_a_tty
 from . import _DEBUG, _CHOSEN_PALETTE
 
 
+log = logging.getLogger(__name__)
+# might be useful for these to be public:
 ansi_csi_finder = re.compile(r'\x1b\[[0-?]*[ -/]*[@-~]')   # no C1
 ansi_osc_finder = re.compile(r'(\x1b\][0-?]*\007?|\007)')  # leave title
-log = logging.getLogger(__name__)
+
 _mode_map = dict(
     forward=0,
     backward=1,
@@ -116,7 +118,7 @@ def strip_ansi(line, osc=False):
             osc: bool  - include OSC commands in the strippage.
 
         Notes:
-            Does not support the so-called C1 8-bit sequences,
+            Does not currently support the so-called C1 8-bit sequences,
             but could be improved:
 
                 - ESC [   - Control Sequence Introducer (CSI  is 0x9b).

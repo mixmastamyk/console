@@ -342,6 +342,6 @@ Legalese
 - Released under the LGPL, version 3+.
 - Enterprise Pricing:
 
-  | 1 MEEllion dollars!
+  | 6 MEEllion dollars!
   | *Bwah-haha-ha!*
   | (only have to sell *one* copy!)
