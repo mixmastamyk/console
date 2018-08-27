@@ -65,7 +65,7 @@ FYI, the string  ``'\x1b'`` represents the ASCII Escape character
 (27 in decimal, ``1b`` hex).
 Command 32 turns the text green
 and 39 back to the default color,
-but no need to worry about that.
+but there's no need to worry about that.
 Printing to a supporting terminal from Python might look like this:
 
 {% if mode == 'pypi' %}
@@ -119,7 +119,7 @@ Installen-Sie, Bitte
 
     ⏵ pip3 install --user console
 
-    # console[colorama,webcolors]   # for support
+    # console[colorama,webcolors]   # optional pkgs
 
 Jah!
 While console is cross-platform,
@@ -136,7 +136,7 @@ Overview
 ------------------
 
 As mentioned,
-console handles more than color and styles.
+console handles lots more than color and styles.
 
 .. rubric:: **Utils**
 
@@ -224,17 +224,17 @@ Unleash your inner
 `Britto <https://www.art.com/gallery/id--a266/romero-britto-posters.htm>`_
 below:
 
-- Basic, the original 8/16 colors
+- Basic, the original 8/16 named colors
 - Extended, 256 indexed colors
-- "True", 16 million colors, consisting of:
+- "True", a.k.a. 16 million colors, consisting of:
 
   - RGB specified colors
-  - X11, named colors
-  - Webcolors, named colors
+  - X11 named colors
+  - Webcolors named colors
 
-Helpfully,
+As mentioned
 the original palette,
-the X11,
+X11,
 and Webcolor palettes
 may be accessed directly by name:
 
@@ -265,7 +265,7 @@ digits to specify the color:
 
 **The underscores are optional.**
 Choose depending whether brevity or readability are more important to you.
-The assorted true color forms are useful to choose one directly without
+The assorted true color forms are useful to choose one explicitly without
 ambiguity.
 (X11 and Webcolors
 `differ <https://en.wikipedia.org/wiki/X11_color_names#Clashes_between_web_and_X11_colors_in_the_CSS_color_scheme>`_
@@ -281,8 +281,10 @@ Console's palette entry objects are meant to be highly composable and useful in
 multiple ways.
 For example,
 you might like to create your own compound styles to use over and over again.
-They can be called like functions if desired and have "mixins" added in as well.
-The callable form resets styles to their defaults at the end of the string,
+They can also be called as functions if desired and have "mixins" added in as
+well.
+The callable form automatically resets styles to their defaults at the end of
+the string,
 so that no longer needs to be managed:
 
 {% if mode == 'sphx' %}
@@ -303,7 +305,7 @@ so that no longer needs to be managed:
     AHORITA!  # ← not styled due to PyPI limits 😉
 {% endif %}
 
-When palette objects are combined together as we did above,
+When palette objects are combined together as done above,
 a list of codes to be rendered to is kept on ice until final output as a
 string.
 Meaning, there won't be redundant escape sequences in the output:
@@ -335,7 +337,7 @@ Styles can be built on the fly as well:
 .. rubric:: **Templating**
 
 To build templates,
-call the entry object with a placeholder string,
+call a palette entry with placeholder strings,
 with or instead of text:
 
 .. code-block:: python
@@ -358,7 +360,8 @@ with or instead of text:
 
 Other template formats are no problem either, ``%s`` or ``${}``.
 
-Perhaps you'd like a pre-rendered string in a tight loop for performance
+Console is lightweight,
+but perhaps you'd like a pre-rendered string in a tight loop for performance
 reasons.
 Simply use ``str()`` on the final output and use it in the loop.
 
@@ -366,7 +369,7 @@ Palette entries work as context-managers as well:
 
 .. code-block:: python
 
-    with bg.w_dodgerblue:  # or .x_…
+    with bg.dodgerblue:
         print('Infield: Garvey, Lopes, Russel, Cey, Yeager')
         print('Outfield: Baker, Monday, Smith')
         print('Coach: Lasorda')
@@ -395,6 +398,8 @@ tests can be run from the install folder.
 .. code-block:: shell
 
     ⏵ pytest -s
+
+The Makefile has good information on such topics.
 
 
 Contributions

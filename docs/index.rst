@@ -26,6 +26,8 @@
 
 .. container:: center mt
 
+    *Comprehensive utility library for ANSI terminals.*
+
     *"Better, stronger, faster…"*
 
 |

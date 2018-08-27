@@ -92,8 +92,9 @@ if __name__ == '__main__':
 
         print()
         print(make_header(i+1), 'with bg:')
-        with bg.blue:
-            print('\tThis text here,\n\tshould be on a blue background.')
+        with bg.cornflowerblue:
+            print('\tCan I get the icon in Cornflower Blue?\n\t'
+                  'Absolutely. :-D')
         print('\n')
 
         print(make_header(i+2), 'Foreground - 256 colors:\n      ', end='')

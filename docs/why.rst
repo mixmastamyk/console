@@ -24,7 +24,6 @@ Another One, eh 🤔?
 
 
     <pre class=center>
-
      ▏
     ⸝<><><>⸜
     <>✶><><><><>
@@ -43,9 +42,6 @@ Another One, eh 🤔?
     </pre>
 
 
-.. ~ <p class=center><i>"First I was afraid, I was petrified…"</i>&nbsp; &nbsp;
-
-
 Background
 ---------------
 
@@ -53,7 +49,7 @@ So ANSI escape codes have been standard on UNIX
 with the belt-and-suspenders crowd for several decades,
 and even saw use on DOS and BBSs back in the day.
 With the advent of macOS (X),
-a whole new generation of lumber-sexuals have exposed themselves(?)
+a whole new generation of lumber-sexuals have exposed themselves(huh?)
 to the terminal environment and command-line
 *and liked it*.
 
@@ -72,10 +68,10 @@ Vaguely analogous to a virtual terminal,
 as a Yugo might compare to a classic BMW.
 But now it's supercharged.
 
-So, the three major platforms now support ANSI escape sequences.
+So, all the top platforms support ANSI escape sequences.
 Again!
 What's old is new again.
-Add Unicode and millions of colors and it's better than ever.
+Add Unicode and millions of colors and it's now better than ever.
 
 We need great command-line tools and that's where ``console`` fits in.
 
@@ -102,16 +98,24 @@ Batteries Not Included
     *Jive Turkey…*
 
 In the Python world,
-there hasn't been much direct support for terminal sequences in the standard
+there hasn't been easy-to-use support for terminal sequences in the standard
 library,
 beyond curses and termios
 (which mildly overlap in functionality with this package and themselves).
-They are low-level interfaces however,
+
+Those are low-level interfaces however,
 focused on "full screen" terminal apps and tty control respectively,
-while continuing to abstract hardware that rarely exists except in museums.
-ANSI codes may have won,
-but styling a text snippet here and there or setting a title was thought too…
+while continuing to abstract hardware that now exists in museums.
+The ANSI standard may have won,
+but styling a text snippet here and there or setting a title without a bunch
+of ugly C-style function calls was thought too…
 trivial perhaps.
+
+.. rubric:: Terminfo?
+
+Besides the difficulty factor mentioned,
+this classic answer to this problem also suffers in that it doesn't support
+"true" color palettes.
 
 
 Meanwhile, over at the Cheeseshop…
@@ -120,14 +124,14 @@ Meanwhile, over at the Cheeseshop…
     *"Not much of a cheese shop really, is it?"*
 
 And so, now there are ad-hoc ANSI codes being generated in every command-line
-app and eleventy micro-libs on the PyPI doing the same.
+app and eleventy micro-libs on "the" PyPI doing the same.
 Looks to be a fun exercise and somewhat of a rite of passage to create one.
 
-(Good luck finding an appropriate name on PyPI for yours.)
+(Good luck finding an appropriate name on PyPI for yours—Taken!)
 
 .. raw:: html
 
-    <div class=center>
+    <div class="center rounded p1 dark">
     <span class=dots>·····•·····</span>&nbsp;&nbsp;
     <i>
     <span id=bas>ᗣ</span><span id=pok>ᗣ</span>
@@ -139,13 +143,10 @@ Looks to be a fun exercise and somewhat of a rite of passage to create one.
     </div>
 
 
-
 Often Missing
 ~~~~~~~~~~~~~~~
 
-    *"You've got to know when to hold 'em, know when to fold 'em…"*
-
-While most of the ANSI modules in the cheeseshop have plenty going for them in
+While many of the ANSI modules in the cheeseshop have plenty going for them in
 areas of focus,
 they generally aren't very comprehensive──\
 usually providing 8 colors
@@ -181,6 +182,9 @@ one or more important items are often missing:
 Nice to haves
 ~~~~~~~~~~~~~~~~~
 
+    | *"You've got to, know when to hold 'em,*
+    | *know when to fold 'em…"*
+
 Most have an easy to use design,
 but may still miss one of these nice to haves:
 
@@ -200,15 +204,15 @@ Looked at and picked a few design cues from several of these:
 
     - ansi
     - ansicolors
-    - blessed (terminfo?)
+    - blessed
     - blessings
-    - click.style and utilities (remembered pause)
+    - click.style and utilities (reminded of pause)
     - colorama.ansi (palette collection objects)
     - `colorful <https://tuxtimo.me/posts/colorful-python>`_
     - colorize
     - escape
     - fabric.colors
-    - kolors (terminfo)
+    - kolors
     - pycolor
     - pygments (nearest indexed color)
     - style

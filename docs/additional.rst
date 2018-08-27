@@ -25,7 +25,7 @@ Additional Topics
 
 Behind the scenes in
 :mod:`console.core`
-you've been working with two main parent classes of those in
+you've been working with the two main parent classes of those in
 :mod:`console.style`:
 
 .. rubric:: Palette Builders:
@@ -36,43 +36,46 @@ Entries, e.g.:
     - ``fg``, ``bg``, ``fx``
     - ``defx`` (for deactivating styles)
 
-While the simplest entries are created up front,
-the rest are built on demand.
+While the simplest palettes
+(original and effects)
+are created up front,
+the rest are built up as needed,
+on demand.
 Like a traffic cop,
 builders direct attribute access to the appropriate code to initialize them.
 
 Once created,
 attributes are cached and available for future use.
-The namespace cache may also be cleared in uncommon scenarios using huge
-palettes.
+This namespace cache may also be cleared in uncommon scenarios using huge
+palettes,
+with the ``clear()`` function.
 
 .. rubric:: Palette Entries:
 
-These entries,
-accessed as attributes of a Palette collection, e.g.:
+Entries objects are what actually produce the escape sequences---\
+they are accessed as attributes of a palette collection, e.g.:
 
     - ``.red``
     - ``.i22``
-    - ``.w_cornflowerblue``
+    - ``.cornflowerblue``
 
-…are objects that provide much of the functionality from
-:mod:`console.style`.
-The entries:
+Entries provide much of the functionality from
+:mod:`console.style`:
 
     - Keep track of their ANSI codes and those they've been added to.
-    - Can be called, "mixed in" with other attributes to render
-      themselves and end the style.
+    - Can be called and "mixed in" with other attributes to render
+      themselves, then end the style when finished.
     - Can be used as a context-manager.
     - Last but not least,
       can be rendered as an escape sequence string on any form of output.
 
 Similar functionality is available from
-:mod:`console.screen`.
+:mod:`console.screen`'s screen object.
 
 
 .. rubric:: Automatic Detection
 
-When automatic detection is used and palettes are found to not be supported,
+When automatic detection is used and palettes are found not to be supported,
 palette entries are replaced instead with "dummy" blank objects that render to
 nothing.
 Well, more specifically empty strings.
@@ -80,7 +83,7 @@ Well, more specifically empty strings.
 
 .. raw:: html
 
-    <div class=center>
+    <div class="center rounded dark p1">
         <div class=pacman>
             <span class=pline>╭────────────────────────╮&nbsp;&nbsp;<br>
             │
@@ -101,7 +104,8 @@ Initializing Your Own
 
     *Can You Dig It?*
 
-To control the palette support of an object you can create them yourself::
+To configure auto-detection and palette support
+of an builder object you can create them yourself::
 
     from console.style import (BackgroundPalette,
                                ALL_PALETTES)
@@ -133,7 +137,8 @@ Context Managers
 
 Console's Entry objects can be used as context managers as well.
 We saw this in the readme previously.
-An output file can be set if it needs to be changed from stdout::
+An output file can be set if it needs to be changed from stdout and
+not able to be redirected outside the process::
 
     dodgers = bg.w_dodgerblue
     dodgers.set_output(sys.stderr)
@@ -142,8 +147,8 @@ An output file can be set if it needs to be changed from stdout::
         print('Infield: Garvey, Lopes, Russel, Cey, Yeager')
         print('Outfield: Baker, Monday, Smith')
 
-There may be a way to streamline this in the future.
-(So, don't get too dependent on the set_output function.)
+(There may be a way to streamline this in the future.
+So, don't get too dependent on the set_output function. ;-)
 
 
 .. rubric:: TermStack
@@ -192,19 +197,21 @@ Tips
 Don't have many to list yet,
 but there's at least one.
 
-- Styles bold, italic, and underline have one-letter shortcuts as does HTML,
+- The styles bold, italic, and underline have one-letter shortcuts as they do
+  in HTML,
   if you're into that sort of thing::
 
+    # COWABUNGA !
     XTREME_STYLING = fx.b + fx.i + fx.u
 
 
 Deeper Dive
 ------------
 
-    *Get down, boogie oogie oogie…*
+    *Get down, boogie oogie oogie…---A Taste of Honey*
 
 Still interested?
-More than you wanted to know on the subject or terminals and escape codes can
+More than you wanted to know on the subject of terminals and escape codes can
 be found below:
 
     - `Terminal Emulator <https://en.wikipedia.org/wiki/Terminal_emulator>`_
@@ -223,8 +230,15 @@ and
 debuted that Amber Monochrome monitors where known as the "ergonomic"
 choice?
 Easier on the eyes for extended periods (i.e. late nights) they said.
+Interesting knowledge rediscovered, perhaps.
 
-Interesting, knowledge rediscovered?
+.. container:: center
+
+    *"Believe it…*
+
+    *or not!"*
+
+    *---Jack Palance*
 
 
 10-7, Signing Off…

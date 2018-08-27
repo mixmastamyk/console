@@ -113,7 +113,15 @@ code, span.pre  {
 .mt {
     margin-top: 1.3em;
 }
-
+.rounded {
+    border-radius: .8em;
+}
+.p1 {
+    padding: .8em 0;
+}
+.dark {
+    background: #080808;
+}
 /*
     syntax highlighting
 */
@@ -130,7 +138,7 @@ div.highlight { background: inherit; }
     color: #c8964b;
     font-weight: normal;
 }
-.highlight .n, .highlight .nn {
+.highlight .n, .highlight .nn, .highlight .bp {  /* reset-ski */
     color: #c8c8c8;
     font-weight: normal;
 }
