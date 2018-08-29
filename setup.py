@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import sys
 from os.path import dirname, join
 try:
     from setuptools import setup
@@ -14,10 +14,17 @@ extras_require = dict(
     webcolors=('webcolors',),
     colorama=('colorama',),
 )
-install_requires = ('ezenv',)
+install_requires = ['ezenv',]
 keywords = ('ansi color detection escape terminal console sequence cursor '
             'style screen shell')
 tests_require = ('pyflakes', 'pytest', 'readme_renderer'),
+
+
+if sys.version_info.major < 3:
+    raise NotImplementedError('Sorry, Python 2.x is not supported.')
+
+if sys.version_info.minor < 6:
+    install_requires.append('future_fstrings')
 
 
 def slurp(filename):
@@ -39,7 +46,7 @@ setup(
     license             = 'LGPL 3',
     long_description    = slurp('readme.rst'),
     packages            = ('console',),
-    python_requires     = '>=3.6',
+    python_requires     = '>=3.2',
     tests_require       = tests_require,
     url                 = 'https://github.com/mixmastamyk/console',
     version             = __version__,

@@ -91,6 +91,14 @@ While console is cross-platform,
 will need to be installed and .init() run before hand to view these examples
 under lame versions of Windows < 10.
 
+.. note::
+
+    ``console`` supports Python 3.6 and over by default.
+    However!  Is trying out
+    `"future-fstrings" <https://github.com/asottile/future-fstrings>`_
+    for experimental support under Python versions 3.5 down to 3.2.
+    No, 2.X is not supported.
+
 ::
 
     ¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸¸.·´¯`·.¸¸
@@ -344,7 +352,7 @@ The Makefile has good information on such topics.
 Contributions
 ------------------
 
-Could use some help on Windows and MacOS as my daily driver is a Tux racer.
+Could use some help on Windows and MacOS as my daily driver is a 🐧 Tux racer.
 
 
 Legalese

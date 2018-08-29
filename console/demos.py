@@ -1,3 +1,4 @@
+# -*- coding: future_fstrings -*-
 '''
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.

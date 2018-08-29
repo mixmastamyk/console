@@ -67,7 +67,7 @@ tag:
 
 test:
 	clear
-	pyflakes *.py console/*.py
+#~ 	pyflakes *.py console/*.py
 	tput reset  # clear screen, scrollback
 	pytest --capture=no --color=no
 
