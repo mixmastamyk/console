@@ -24,9 +24,9 @@ if sys.version_info >= (3, 6):
     codecs.register(_codec_map.get)
 
 
-# detect running as a script, e.g. demos, constants.
+# detect running as a script or at install-time, e.g. demos, constants.
 if '-m' in sys.argv or '--egg-info' in sys.argv:
-    pass  # run from command-line or during install - do nothing
+    pass
 
 else:
 

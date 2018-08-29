@@ -69,6 +69,7 @@ where as ``bg.default`` for example,
 resets only the background to its default color.
 
 .. raw:: html
+
     <p>But wait!&nbsp;  There's a
     <s><span style="opacity: .9">shitload,</span></s>
     <s><span style="opacity: .9">crapton,</span></s>
@@ -88,18 +89,18 @@ Installen-Sie, Bitte
 Jah!
 While console is cross-platform,
 `colorama <https://pypi.python.org/pypi/colorama>`_
-will need to be installed and .init() run before hand to view these examples
+will need to be installed and .init() run beforehand to view these examples
 under lame versions of Windows < 10.
 
 .. note::
 
     ``console`` supports Python 3.6 and over by default.
-    However!  Is trying out
+    However!  Now trying
     `"future-fstrings" <https://github.com/asottile/future-fstrings>`_
     for experimental support under Python versions 3.5 down to 3.2.
     It is installed automatically when needed.
     Keep an eye peeled for oddities under older Pythons.
-    No, 2.X is not supported.
+    Sorry, 2.X is not supported.
 
 ::
 
@@ -123,7 +124,7 @@ includes a number of nifty functions:
 
     >>> cls()  # whammo! a.k.a. reset terminal
     >>> set_title('Le Freak')
-    '\x1b]2;Le Freak\x07'
+    '\x1b]2;Le Freak\x07'  # c'est chic
 
 It can also ``strip_ansi`` from strings,
 wait for keypresses,
@@ -239,9 +240,9 @@ digits to specify the color:
 
 **The underscores are optional.**
 Choose depending whether brevity or readability are more important to you.
-The assorted true color forms are useful to choose one explicitly without
+The assorted true color forms are useful to choose colors explicitly without
 ambiguity.
-(X11 and Webcolors
+(Basic, X11 and Webcolors
 `differ <https://en.wikipedia.org/wiki/X11_color_names#Clashes_between_web_and_X11_colors_in_the_CSS_color_scheme>`_
 on a few colors.)
 

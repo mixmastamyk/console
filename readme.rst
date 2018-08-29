@@ -85,7 +85,7 @@ Installen-Sie, Bitte
 Jah!
 While console is cross-platform,
 `colorama <https://pypi.python.org/pypi/colorama>`_
-will need to be installed and .init() run before hand to view these examples
+will need to be installed and .init() run beforehand to view these examples
 under lame versions of Windows < 10.
 
 .. note::
@@ -96,7 +96,7 @@ under lame versions of Windows < 10.
     for experimental support under Python versions 3.5 down to 3.2.
     It is installed automatically when needed.
     Keep an eye peeled for oddities under older Pythons.
-    No, 2.X is not supported.
+    Sorry, 2.X is not supported.
 
 ::
 
@@ -120,7 +120,7 @@ includes a number of nifty functions:
 
     >>> cls()  # whammo! a.k.a. reset terminal
     >>> set_title('Le Freak')
-    '\x1b]2;Le Freak\x07'
+    '\x1b]2;Le Freak\x07'  # c'est chic
 
 It can also ``strip_ansi`` from strings,
 wait for keypresses,

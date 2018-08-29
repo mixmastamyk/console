@@ -60,7 +60,7 @@ publish: test check_readme
 
 tag:
 	# backslash at end of line very important:
-	VERSION=`python3 -c 'from console.constants import __version__ as v; print(v)'`;\
+#~ 	VERSION=`python3 -c 'from console.constants import __version__ as v; print(v)'`;\
 	git tag -a $$VERSION -m "version $$VERSION"
 	git push --tags
 
