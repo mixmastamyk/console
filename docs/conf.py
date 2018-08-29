@@ -101,6 +101,8 @@ html_static_path = ['_static']
 # 'searchbox.html']``.
 #
 # html_sidebars = {}
+html_show_sourcelink = False
+html_copy_source = False
 
 
 # -- Options for HTMLHelp output ---------------------------------------------
