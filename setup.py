@@ -1,30 +1,18 @@
 #!/usr/bin/env python3
 import sys
 from os.path import dirname, join
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
-
-from console.constants import __version__
+from setuptools import setup
 
 
-# additional metadata
+# additional metadata, requirements
+keywords = ('ansi color detection escape terminal console sequence cursor '
+            'style screen shell')
+install_requires = ['ezenv',]
+tests_require = ('pyflakes', 'pytest', 'readme_renderer'),
 extras_require = dict(
     webcolors=('webcolors',),
     colorama=('colorama',),
 )
-install_requires = ['ezenv',]
-keywords = ('ansi color detection escape terminal console sequence cursor '
-            'style screen shell')
-tests_require = ('pyflakes', 'pytest', 'readme_renderer'),
-
-
-if sys.version_info.major < 3:
-    raise NotImplementedError('Sorry, Python 2.x is not supported.')
-
-if sys.version_info.minor < 6:
-    install_requires.append('future_fstrings')
 
 
 def slurp(filename):
@@ -34,22 +22,32 @@ def slurp(filename):
     except FileNotFoundError:
         pass  # needed at upload time, not install time
 
+
+if sys.version_info.major < 3:
+    raise NotImplementedError('Sorry, Python 2.x is not supported.')
+
+if sys.version_info.minor < 6:
+    install_requires.append('future_fstrings')
+
+
 setup(
     name                = 'console',
     description         = 'Comprehensive utility library for ANSI terminals. '
                           'Better, stronger, faster.',
     author_email        = 'mixmastamyk@github.com',
     author              = 'Mike Miller',
-    extras_require      = extras_require,
-    install_requires    = install_requires,
     keywords            = keywords,
     license             = 'LGPL 3',
     long_description    = slurp('readme.rst'),
     packages            = ('console',),
-    python_requires     = '>=3.2',
-    tests_require       = tests_require,
     url                 = 'https://github.com/mixmastamyk/console',
-    version             = __version__,
+    version             = '0.84',
+
+    extras_require      = extras_require,
+    install_requires    = install_requires,
+    python_requires     = '>=3.2',
+    setup_requires      = install_requires,
+    tests_require       = tests_require,
 
     classifiers         = [
         'Development Status :: 4 - Beta',

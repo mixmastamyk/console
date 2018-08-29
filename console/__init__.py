@@ -8,8 +8,14 @@ import sys
 _DEBUG = False
 
 
+def _set_debug_mode(value):
+    ''' Provides for more detailed output via logging functionality. '''
+    global _DEBUG
+    _DEBUG = bool(value)
+
+
+# Py3.6+ - set up dummy future encoding that is really utf8
 if sys.version_info >= (3, 6):
-    # Py3.6+ - set up dummy encoding tha mimics utf8
     import codecs
     import encodings
 
@@ -18,15 +24,9 @@ if sys.version_info >= (3, 6):
     codecs.register(_codec_map.get)
 
 
-def _set_debug_mode(value):
-    ''' Provides for more detailed output via logging functionality. '''
-    global _DEBUG
-    _DEBUG = bool(value)
-
-
 # detect running as a script, e.g. demos, constants.
-if '-m' in sys.argv:
-    pass  # do nothing
+if '-m' in sys.argv or '--egg-info' in sys.argv:
+    pass  # run from command-line or during install - do nothing
 
 else:
 
