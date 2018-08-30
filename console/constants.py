@@ -6,7 +6,7 @@
     Placing in a separate module avoids circular imports.
     Do not import anything into this module to avoid dependencies.
 '''
-                    # DEC   OCT    HEX   CTL    DESC
+                    #  DEC   OCT    HEX   CTL    DESC
 BEL = '\a'          #:   7   007   0x07    ^G    Terminal bell - Ding!
 BS  = '\b'          #:   8   010   0x08    ^H    Backspace
 HT  = '\t'          #:   9   011   0x09    ^I    Horizontal TAB

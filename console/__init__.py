@@ -14,7 +14,7 @@ def _set_debug_mode(value):
     _DEBUG = bool(value)
 
 
-# Py3.6+ - set up dummy future encoding that is really utf8
+# Py3.6+ - set up a dummy future encoding that is really utf8
 if sys.version_info >= (3, 6):
     import codecs
     import encodings

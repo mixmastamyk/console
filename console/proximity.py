@@ -100,7 +100,7 @@ def find_nearest_color_hexstr(hexdigits):
         index.
 
         Arguments:
-            hexdigits:  a three digit hex string, e.g. 'f0f'
+            hexdigits:  a three digit hex string, e.g. 'b0b'
 
         Returns:
             int, None: index, or None on error.

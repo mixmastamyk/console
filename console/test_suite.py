@@ -265,15 +265,15 @@ if True:  # fold
 
     def test_string_concat_fg():
         text = fg.red + 'RED ' + fg.green + 'GRN ' + fg.blue + 'BLU' + fg.default
-        assert text == CSI + '31mRED \x1b[32mGRN \x1b[34mBLU\x1b[39m'
+        assert text == f'{CSI}31mRED {CSI}32mGRN {CSI}34mBLU{CSI}39m'
 
     def test_string_concat_bg():
         text = bg.yellow + 'YEL ' + bg.magenta + 'MAG ' + bg.cyan + 'CYN' + bg.default
-        assert text == CSI + '43mYEL \x1b[45mMAG \x1b[46mCYN\x1b[49m'
+        assert text == f'{CSI}43mYEL {CSI}45mMAG {CSI}46mCYN{CSI}49m'
 
     def test_string_concat_fx():
         text = fx.bold + 'BLD ' + fx.underline + 'UND ' + fx.reverse + 'REV' + fx.end
-        assert text == CSI + '1mBLD \x1b[4mUND \x1b[7mREV\x1b[0m'
+        assert text == f'{CSI}1mBLD {CSI}4mUND {CSI}7mREV{CSI}0m'
 
 
 # Concat + objects
@@ -284,24 +284,22 @@ if True:  # fold
     def test_attribute_multiple_shorthand():
         # create style with addition, use
         XTREME_STYLING = fx.b + fx.i + fx.u
-        arg = ' COWABUNGA, DUDE!! '
-        text = XTREME_STYLING + arg + fx.end
-        assert text == '%s1;3;4m%s%s0m' % (CSI, arg, CSI)
-        #~ assert text == f'{CSI}1;3;4m{arg}{CSI}0m'
+        msg = ' COWABUNGA, DUDE!! '
+        text = XTREME_STYLING + msg + fx.end
+        assert text == f'{CSI}1;3;4m{msg}{CSI}0m'
 
     def test_attribute_multiple_addition_no_accumulation():
         ''' Verify addition does not affect left-most addend. '''
         # create style with addition, use
         muy_importante = fg.white + fx.bold + bg.red
-        arg = ' ARRIBA! '
-        text = muy_importante + arg + fx.end
-        assert text == '%s37;1;41m%s%s0m' % (CSI, arg, CSI)
-        #~ assert text == f'{CSI}37;1;41m{arg}{CSI}0m'
+        msg = ' ARRIBA! '
+        text = muy_importante + msg + fx.end
+        assert text == f'{CSI}37;1;41m{msg}{CSI}0m'
 
         # important check:
         # fg.white should not be affected, since we returned a new copy on add
-        text = fg.white + 'FOO' + fx.end
-        assert text == CSI + '37mFOO\x1b[0m'
+        text = fg.white + msg + fx.end
+        assert text == f'{CSI}37m{msg}{CSI}0m'
 
 # Call
 # ----------------------------------------------------------------------------
@@ -309,19 +307,20 @@ if True:  # fold
 
     def test_attribute_call():
         text = bg.purple('⛈ PURPLE RAIN ⛈')
-        assert text == '\x1b[45m⛈ PURPLE\xa0RAIN ⛈\x1b[49m'
+        assert text == f'{CSI}45m⛈ PURPLE\xa0RAIN ⛈{CSI}49m'
 
     def test_attribute_call_plus_styles():
         linkstyle = fg.blue + fx.underline
-        text = linkstyle('http://expertsexchange.com/', fx.blink)
-        assert text == '\x1b[34;4;5mhttp://expertsexchange.com/\x1b[0m'
+        msg = 'http://expertsexchange.com/'
+        text = linkstyle(msg, fx.blink)
+        assert text == f'{CSI}34;4;5m{msg}{CSI}0m'
 
     def test_attribute_call_plus_styles2():
         ''' Call style with mix-in. '''
         muy_importante = fg.white + fx.b + bg.red
-        arg = ' ARRIBA! '
-        text = muy_importante(arg, fx.u)
-        assert text == '%s37;1;41;4m%s%s0m' % (CSI, arg, CSI)
+        msg = ' ARRIBA! '
+        text = muy_importante(msg, fx.u)
+        assert text == f'{CSI}37;1;41;4m{msg}{CSI}0m'
 
 
 # Screen

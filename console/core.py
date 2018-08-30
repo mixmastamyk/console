@@ -75,7 +75,7 @@ class _BasicPaletteBuilder:
                 self = dummy
                 palettes = ()                       # skipen-Sie
             else:
-                raise TypeError('%r not in type (str, list, tuple)' % palettes)
+                raise TypeError(f'{palettes!r} not in type (str, list, tuple)')
 
         self._palette_support = palettes
         return self
@@ -254,7 +254,7 @@ class _PaletteEntry:
 
             return attr
         else:
-            raise TypeError('Addition to type %r not supported.' % type(other))
+            raise TypeError(f'Addition to type {type(other)} not supported.')
 
     def __radd__(self, other):
         ''' Reverse add: other + self '''

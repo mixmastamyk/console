@@ -88,7 +88,6 @@ class Screen:
             if not _CHOSEN_PALETTE:
                 self = dummy        # None, deactivate completely
         # else: continue on unabated
-
         return self
 
     def __init__(self, **kwargs):
