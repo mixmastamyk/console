@@ -43,9 +43,12 @@ console.detection module
     :members:
     :undoc-members:
     :show-inheritance:
-    :exclude-members: is_a_tty
+    :exclude-members: is_a_tty, TermStack
 
     .. autofunction:: is_a_tty(outfile=sys.stdout)
+
+    .. autoclass:: TermStack(infile=sys.stdin, encoding='utf8')
+
 
 console.disabled module
 -----------------------
