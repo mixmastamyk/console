@@ -489,9 +489,9 @@ if True:  # fold
             def isatty(self):
                 return True
 
-        assert detection.is_a_tty(outfile=None) == None
-        assert detection.is_a_tty(outfile=f) == False
-        assert detection.is_a_tty(outfile=YesMan()) == True
+        assert detection.is_a_tty(stream=None) == None
+        assert detection.is_a_tty(stream=f) == False
+        assert detection.is_a_tty(stream=YesMan()) == True
 
     def test_choose_palette():
         pass # TODO

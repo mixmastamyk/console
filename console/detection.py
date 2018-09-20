@@ -69,7 +69,7 @@ def choose_palette():
         - ``CLICOLOR``, ``NO_COLOR`` environment variables
 
         Returns:
-            None, str: 'basic', 'extended', or 'true'
+            None, str: 'basic', 'extended', or 'truecolor'
     '''
     result = None
 
@@ -164,13 +164,13 @@ def detect_palette_support():
     return result
 
 
-def is_a_tty(outfile=sys.stdout):
+def is_a_tty(stream=sys.stdout):
     ''' Detect terminal or something else, such as output redirection.
 
         Returns:
             Boolean, None: is tty or None if not found.
     '''
-    result = outfile.isatty() if hasattr(outfile, 'isatty') else None
+    result = stream.isatty() if hasattr(stream, 'isatty') else None
     log.debug(result)
     return result
 
