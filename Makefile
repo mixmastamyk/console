@@ -27,17 +27,17 @@ readme.html:
 
 
 check_readme:
-	# required: readme_renderer
+	# requires readme_renderer
 	python3 setup.py check --restructuredtext --strict
 
 
 clean:
 	git gc
 	rm -f readme.html
-	rm -rf .pytest_cache/
+	rm -rf .pytest_cache build dist
 	make -C docs clean
 
-	find -type d -name __pycache__ -exec rm -rf '{}' \;
+	-find -type d -name __pycache__ -exec rm -rf '{}' \;
 
 
 demos:
@@ -51,7 +51,8 @@ docs: docs/readme.rst readme.rst
 
 
 publish: test check_readme
-	python3 setup.py sdist upload
+	rm -rf build  # possible wheel bug
+	python3 setup.py sdist bdist_wheel --universal upload
 	# backslash at end of line very important:
 #~ 	VERSION=`python3 -c 'from console.constants import __version__ as v; print(v)'`;\
 #~ 	git tag -a $$VERSION -m "version $$VERSION"
@@ -67,7 +68,7 @@ tag:
 
 test:
 	clear
-#~ 	pyflakes *.py console/*.py
+	pyflakes *.py console/*.py
 	tput reset  # clear screen, scrollback
 	pytest --capture=no --color=no
 
