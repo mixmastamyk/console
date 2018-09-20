@@ -48,6 +48,7 @@ class ForegroundPalette(_HighColorPaletteBuilder):
     lightyellow     = 93
     lightblue       = 94
     lightmagenta    = 95
+    lightpurple     = lightmagenta
     lightcyan       = 96
     lightwhite      = 97
 

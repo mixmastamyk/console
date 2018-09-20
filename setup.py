@@ -24,7 +24,7 @@ def slurp(filename):
 
 
 if sys.version_info.major < 3:
-    raise NotImplementedError('Sorry, Python 2.x is not supported.')
+    raise NotImplementedError('Sorry, only Python 3 and above is supported.')
 
 if sys.version_info.minor < 6:
     install_requires.append('future_fstrings')

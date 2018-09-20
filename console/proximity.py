@@ -77,7 +77,7 @@ def find_nearest_color_index(r, g, b):
             int, None: index, or None on error.
     '''
     distance = 257*257*3  # "infinity" (max distance from #000000 to #ffffff)
-    match = 0
+    index = 0
 
     for i in range(0, 254):
         values = _color_table[i]
@@ -86,13 +86,13 @@ def find_nearest_color_index(r, g, b):
         gd = g - values[1]
         bd = b - values[2]
 
-        d = rd*rd + gd*gd + bd*bd
+        this_distance = (rd * rd) + (gd * gd) + (bd * bd)
 
-        if d < distance:
-            match = i
-            distance = d
+        if this_distance < distance:  # closer
+            index = i
+            distance = this_distance
 
-    return match
+    return index
 
 
 def find_nearest_color_hexstr(hexdigits):
