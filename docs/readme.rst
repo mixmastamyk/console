@@ -67,6 +67,8 @@ Above, ``fx.end`` is a convenient object to note---\
 it ends all styles and fore/background colors at once,
 where as ``bg.default`` for example,
 resets only the background to its default color.
+This need not be your responsibility however,
+use the call form instead: ``fg.yellow('Woot!')``
 
 .. raw:: html
 
@@ -90,21 +92,21 @@ Jah!
 While console is cross-platform,
 `colorama <https://pypi.python.org/pypi/colorama>`_
 will need to be installed and .init() run beforehand to view these examples
-under lame versions of Windows < 10.
+under the lame versions of Windows < 10.
 
 .. note::
 
     ``console`` supports Python 3.6 and over by default.
-    However!  Now trying
+    However!  Is trying out
     `"future-fstrings" <https://github.com/asottile/future-fstrings>`_
     for experimental support under Python versions 3.5 down to 3.2.
     It is installed automatically when needed.
     Keep an eye peeled for oddities under older Pythons.
-    Sorry, 2.X is not supported.
+    Sorry, neither 2.X, nor 1.X is not supported. ``:-P``
 
 ::
 
-    ¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸¸.·´¯`·.¸¸
+    ¸¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸¸.·´¯`·.¸¸¸
 
 
 Overview
@@ -188,7 +190,7 @@ You can:
 .. code-block:: python
 
     from console.constants import BEL
-    print('Ring my ', BEL)  # ring-a-ling-a-ling…
+    print(f'Ring my {BEL}… Ring my {BEL}')  # ring-a-ling-a-ling…
 
 
 Extended Palettes
@@ -240,9 +242,9 @@ digits to specify the color:
 
 **The underscores are optional.**
 Choose depending whether brevity or readability are more important to you.
-The assorted true color forms are useful to choose colors explicitly without
+The assorted true color forms are useful to choose one explicitly without
 ambiguity.
-(Basic, X11 and Webcolors
+(X11 and Webcolors
 `differ <https://en.wikipedia.org/wiki/X11_color_names#Clashes_between_web_and_X11_colors_in_the_CSS_color_scheme>`_
 on a few colors.)
 
@@ -260,7 +262,8 @@ They can also be called as functions if desired and have "mixins" added in as
 well.
 The callable form automatically resets styles to their defaults at the end of
 the string,
-so that no longer needs to be managed:
+so again,
+that no longer needs to be managed:
 
 .. raw:: html
 
@@ -272,7 +275,7 @@ so that no longer needs to be managed:
     </pre>
 
 When palette objects are combined together as done above,
-a list of codes to be rendered to is kept on ice until final output as a
+the list of codes to be rendered to is kept on ice until final output as a
 string.
 Meaning, there won't be redundant escape sequences in the output:
 
@@ -327,9 +330,9 @@ Palette entries work as context-managers as well:
 
 ::
 
-                               ⚾
-    ¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.⫽⫽¸¸.·´¯`·.¸¸¸.·´¯`·.¸¸
-                             ⫻⫻
+                                ⚾
+    ¸¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.⫽⫽¸¸.·´¯`·.¸¸¸.·´¯`·.¸¸¸
+                              ⫻⫻
 
 
 Demos and Tests

@@ -67,6 +67,8 @@ Above, ``fx.end`` is a convenient object to note---\
 it ends all styles and fore/background colors at once,
 where as ``bg.default`` for example,
 resets only the background to its default color.
+This need not be your responsibility however,
+use the call form instead: ``fg.yellow('Woot!')``
 
 But wait!  There's a shitload,^H^H^H^H^H, crapton,^H^H^H^H^H
 err…
@@ -86,7 +88,7 @@ Jah!
 While console is cross-platform,
 `colorama <https://pypi.python.org/pypi/colorama>`_
 will need to be installed and .init() run beforehand to view these examples
-under lame versions of Windows < 10.
+under the lame versions of Windows < 10.
 
 .. note::
 
@@ -96,11 +98,11 @@ under lame versions of Windows < 10.
     for experimental support under Python versions 3.5 down to 3.2.
     It is installed automatically when needed.
     Keep an eye peeled for oddities under older Pythons.
-    Sorry, 2.X is not supported.
+    Sorry, neither 2.X, nor 1.X is not supported. ``:-P``
 
 ::
 
-    ¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸¸.·´¯`·.¸¸
+    ¸¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸¸.·´¯`·.¸¸¸
 
 
 Overview
@@ -184,7 +186,7 @@ You can:
 .. code-block:: python
 
     from console.constants import BEL
-    print('Ring my ', BEL)  # ring-a-ling-a-ling…
+    print(f'Ring my {BEL}… Ring my {BEL}')  # ring-a-ling-a-ling…
 
 
 Extended Palettes
@@ -256,7 +258,8 @@ They can also be called as functions if desired and have "mixins" added in as
 well.
 The callable form automatically resets styles to their defaults at the end of
 the string,
-so that no longer needs to be managed:
+so again,
+that no longer needs to be managed:
 
 .. code-block:: python
 
@@ -266,7 +269,7 @@ so that no longer needs to be managed:
     AHORITA!  # ← not styled due to PyPI limits 😉
 
 When palette objects are combined together as done above,
-a list of codes to be rendered to is kept on ice until final output as a
+the list of codes to be rendered to is kept on ice until final output as a
 string.
 Meaning, there won't be redundant escape sequences in the output:
 
@@ -317,9 +320,9 @@ Palette entries work as context-managers as well:
 
 ::
 
-                               ⚾
-    ¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.⫽⫽¸¸.·´¯`·.¸¸¸.·´¯`·.¸¸
-                             ⫻⫻
+                                ⚾
+    ¸¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.⫽⫽¸¸.·´¯`·.¸¸¸.·´¯`·.¸¸¸
+                              ⫻⫻
 
 
 Demos and Tests
