@@ -112,8 +112,8 @@ one may create palette builder objects yourself::
     from console.style import BackgroundPalette
 
     # e.g. force all palettes on:
-    fullbg = BackgroundPalette(autodetect=False,
-                               palettes=ALL_PALETTES)
+    fullbg = BackgroundPalette(palettes=ALL_PALETTES)
+
 
 .. note::
 
@@ -125,7 +125,7 @@ one may create palette builder objects yourself::
 
 ::
 
-    ¸,ø¤º°`°º¤ø,¸¸,ø¤º°`°º¤ø,¸,ø¤°º¤ø,¸¸,ø¤º°`°º¤ø,¸
+    ¸¸,ø¤º°`°º¤ø,¸¸,ø¤º°`°º¤ø,¸,ø¤°º¤ø,¸¸,ø¤º°`°º¤ø,¸¸
 
 
 

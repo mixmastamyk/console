@@ -75,16 +75,17 @@ class Screen:
     bracketedpaste_enable = bpon = CSI + '?2004h'
     bracketedpaste_disable = bpoff = CSI + '?2004l'
 
-    def __new__(cls, autodetect=True, force=False):
+    def __new__(cls, force=False):
         ''' Override new() to replace the class entirely on deactivation.
 
+            Attempts to detect palette support, unless force is on:
+
             Arguments:
-                autodetect      - Attempt to detect palette support.
                 force           - Force on.
         '''
         self = super().__new__(cls)
 
-        if autodetect and not force:
+        if not force:
             if not _CHOSEN_PALETTE:
                 self = dummy        # None, deactivate completely
         # else: continue on unabated

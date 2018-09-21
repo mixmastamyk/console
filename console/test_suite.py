@@ -14,15 +14,14 @@ except Exception as err:
     webcolors = None
 
 from . import detection, screen, style, utils, _set_debug_mode
+from .constants import ALL_PALETTES
 
 # configure our own - force all palettes on
-args = dict(autodetect=False, palettes=('basic', 'extended', 'truecolor'))
-
-fg = style.ForegroundPalette(**args)
-bg = style.BackgroundPalette(**args)
-fx = style.EffectsPalette(**args)
-defx = style.EffectsTerminator(**args)
-sc = screen.Screen(autodetect=False)
+fg = style.ForegroundPalette(palettes=ALL_PALETTES)
+bg = style.BackgroundPalette(palettes=ALL_PALETTES)
+fx = style.EffectsPalette(palettes=ALL_PALETTES)
+defx = style.EffectsTerminator(palettes=ALL_PALETTES)
+sc = screen.Screen(force=True)
 
 fg, bg, fx, pytest  # pyflakes
 

@@ -50,33 +50,33 @@ class _BasicPaletteBuilder:
         wrapped with a manager object to provide mucho additional
         functionality.  Useful for the basic 8/16 color/fx palettes.
     '''
-    def __new__(cls, autodetect=True, palettes=None):
+    def __new__(cls, palettes=Ellipsis):
         ''' Override new() to replace the class entirely on deactivation.
 
             Arguments:
-                autodetect  - Attempt to detect palette support.
-                palettes    - If autodetect disabled, set palette support
-                              explicitly.  str, seq, or None
+                palettes    - The palette(s) to support, e.g. from:
+                              ('basic', 'extended', 'truecolor').
+
+                              - Set explicitly with: str or sequence,
+                              - Disable with: None
+                              - Ellipsis - Autodetect environment.
         '''
         self = super().__new__(cls)
-        # TODO: look at removing autodetect when palettes=None
-        if autodetect:
+        if palettes is Ellipsis:                # autodetecten-Sie
             if _CHOSEN_PALETTE:  # enable "up to" the chosen palette level:
                 palettes = get_available_palettes(_CHOSEN_PALETTE)
             else:
-                self = dummy                        # None, deactivate
-                palettes = ()                       # skipen-Sie
-
-        else:  # set palette manually
-            if type(palettes) in (list, tuple):     # carry on
-                pass
-            elif type(palettes) is str:             # make iterable
-                palettes = (palettes,)
-            elif palettes is None:                  # Ah, Shaddap-a ya face
-                self = dummy
-                palettes = ()                       # skipen-Sie
-            else:
-                raise TypeError(f'{palettes!r} not in type (str, list, tuple)')
+                self = dummy                    # None, deactivate
+                palettes = ()                   # skipen-Sie bitte
+        elif type(palettes) in (list, tuple):   # carry on fine sir
+            pass
+        elif type(palettes) is str:             # make iterable
+            palettes = (palettes,)
+        elif palettes is None:                  # Ah, Shaddap-a ya face
+            self = dummy
+            palettes = ()                       # skipen-Sie
+        else:
+            raise TypeError(f'{palettes!r} not in type (str, list, tuple)')
 
         self._palette_support = palettes
         return self
