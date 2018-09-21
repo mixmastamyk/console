@@ -4,6 +4,8 @@
 
     A class to mimic style container classes so they do not print when the
     terminal doesn't support it.
+
+    Do not import modules here, needs to be available early.
 '''
 
 

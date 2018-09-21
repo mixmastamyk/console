@@ -14,6 +14,7 @@ import re
 from . import _CHOSEN_PALETTE
 from .constants import CSI
 from .disabled import dummy, empty
+from .detection import get_available_palettes
 try:
     import webcolors
 except ImportError:
@@ -21,7 +22,6 @@ except ImportError:
 
 
 _END = CSI + '0m'
-ALL_PALETTES = ('basic', 'extended', 'truecolor')  # variants 'x11', 'web'
 log = logging.getLogger(__name__)
 
 # Palette attribute name finders, now we've got two problems.
@@ -59,9 +59,10 @@ class _BasicPaletteBuilder:
                               explicitly.  str, seq, or None
         '''
         self = super().__new__(cls)
+        # TODO: look at removing autodetect when palettes=None
         if autodetect:
             if _CHOSEN_PALETTE:  # enable "up to" the chosen palette level:
-                palettes = ALL_PALETTES[:ALL_PALETTES.index(_CHOSEN_PALETTE)+1]
+                palettes = get_available_palettes(_CHOSEN_PALETTE)
             else:
                 self = dummy                        # None, deactivate
                 palettes = ()                       # skipen-Sie
@@ -71,7 +72,7 @@ class _BasicPaletteBuilder:
                 pass
             elif type(palettes) is str:             # make iterable
                 palettes = (palettes,)
-            elif type(palettes) is None:            # Ah, Shaddap-a ya face
+            elif palettes is None:                  # Ah, Shaddap-a ya face
                 self = dummy
                 palettes = ()                       # skipen-Sie
             else:

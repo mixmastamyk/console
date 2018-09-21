@@ -104,15 +104,16 @@ Initializing Your Own
 
     *Can You Dig It?*
 
-To configure auto-detection and palette support
-of an builder object you can create them yourself::
+To configure auto-detection, palette support,
+or detect other output streams besides stdout,
+one may create palette builder objects yourself::
 
-    from console.style import (BackgroundPalette,
-                               ALL_PALETTES)
-    # force all palettes on
+    from console.constants import ALL_PALETTES
+    from console.style import BackgroundPalette
+
+    # e.g. force all palettes on:
     fullbg = BackgroundPalette(autodetect=False,
                                palettes=ALL_PALETTES)
-
 
 .. note::
 

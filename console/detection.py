@@ -16,7 +16,7 @@ import logging
 
 import env
 
-from .constants import BEL, CSI, OSC, RS
+from .constants import BEL, CSI, OSC, RS, ALL_PALETTES
 
 
 log = logging.getLogger(__name__)
@@ -55,7 +55,7 @@ class TermStack:
                                self.orig_attrs)
 
 
-def choose_palette():
+def choose_palette(stream=sys.stdout):
     ''' Make a best effort to automatically determine whether to enable
         ANSI sequences, and if so, which color palettes are available.
 
@@ -76,7 +76,7 @@ def choose_palette():
     if color_is_forced():
         result = detect_palette_support() or 'basic'
 
-    elif is_a_tty() and color_is_allowed():
+    elif is_a_tty(stream=stream) and color_is_allowed():
         result = detect_palette_support()
 
     log.debug('%r', result)
@@ -161,6 +161,24 @@ def detect_palette_support():
 
     log.debug('%r (TERM=%s, COLORTERM=%s, colorama-init=%s)',
               result, env.TERM or '', env.COLORTERM or '', col_init)
+    return result
+
+
+def get_available_palettes(chosen_palette):
+    ''' Given a chosen palette, returns tuple of those available,
+        or None when not found.
+
+        Because palette support of a particular level is almost always a
+        superset of lower levels, this should return all available palettes.
+
+        Returns:
+            Boolean, None: is tty or None if not found.
+    '''
+    result = None
+    try:
+        result = ALL_PALETTES[:ALL_PALETTES.index(chosen_palette)+1]
+    except ValueError:
+        pass
     return result
 
 

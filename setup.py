@@ -41,7 +41,7 @@ setup(
     long_description    = slurp('readme.rst'),
     packages            = ('console',),
     url                 = 'https://github.com/mixmastamyk/console',
-    version             = '0.84',
+    version             = '0.85',
 
     extras_require      = extras_require,
     install_requires    = install_requires,

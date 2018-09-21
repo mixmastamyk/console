@@ -27,6 +27,9 @@ OSC = ESC + ']'     #: Operating System Command
 RIS = ESC + 'c'     #: Reset to Initial State, aka clear screen (see utils)
 
 
+ALL_PALETTES = ('basic', 'extended', 'truecolor')  # variants 'x11', 'web'
+
+
 if __name__ == '__main__':
 
     # print constants for convenience
