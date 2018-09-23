@@ -8,7 +8,7 @@
     Given an 8-bit RGB color,
     find the closest extended 8-bit terminal color index.
 
-    Heavily derived from:
+    Nearest-color algorithm derived from:
 
     .. code-block:: text
 
@@ -24,47 +24,33 @@
         :copyright: Copyright 2006-2017 by the Pygments team, see AUTHORS.
         :license: BSD, see LICENSE for details.
 '''
-
-_color_table = []
-
-
-def _build_color_table():
-
-    # colors 0..15: 16 basic colors, xterm palette
-    _color_table.append((0x00, 0x00, 0x00))  # 0
-    _color_table.append((0xcd, 0x00, 0x00))  # 1
-    _color_table.append((0x00, 0xcd, 0x00))  # 2
-    _color_table.append((0xcd, 0xcd, 0x00))  # 3
-    _color_table.append((0x00, 0x00, 0xee))  # 4
-    _color_table.append((0xcd, 0x00, 0xcd))  # 5
-    _color_table.append((0x00, 0xcd, 0xcd))  # 6
-    _color_table.append((0xe5, 0xe5, 0xe5))  # 7
-    _color_table.append((0x7f, 0x7f, 0x7f))  # 8
-    _color_table.append((0xff, 0x00, 0x00))  # 9
-    _color_table.append((0x00, 0xff, 0x00))  # 10
-    _color_table.append((0xff, 0xff, 0x00))  # 11
-    _color_table.append((0x5c, 0x5c, 0xff))  # 12
-    _color_table.append((0xff, 0x00, 0xff))  # 13
-    _color_table.append((0x00, 0xff, 0xff))  # 14
-    _color_table.append((0xff, 0xff, 0xff))  # 15
-
-    # colors 16..232: the 6x6x6 color cube
-    valuerange = (0x00, 0x5f, 0x87, 0xaf, 0xd7, 0xff)
-
-    for i in range(217):
-        r = valuerange[(i // 36) % 6]
-        g = valuerange[(i // 6) % 6]
-        b = valuerange[i % 6]
-        _color_table.append((r, g, b))
-
-    # colors 233..253: grayscale
-
-    for i in range(1, 22):
-        v = 8 + i * 10
-        _color_table.append((v, v, v))
+from . import color_tables
 
 
-def find_nearest_color_index(r, g, b):
+def _build_color_table(mode='xterm', extended=True):
+
+    color_table = getattr(color_tables, mode + '_palette4', []).copy()
+
+    if extended:
+        # colors 16..232: the 6x6x6 color cube
+        valuerange = (0x00, 0x5f, 0x87, 0xaf, 0xd7, 0xff)
+
+        for i in range(217):
+            r = valuerange[(i // 36) % 6]
+            g = valuerange[(i // 6) % 6]
+            b = valuerange[i % 6]
+            color_table.append((r, g, b))
+
+        # colors 233..253: grayscale  # to 255!
+
+        for i in range(1, 24):  # odd, this should go to 255, added 2 to range
+            v = 8 + i * 10
+            color_table.append((v, v, v))
+
+    return color_table
+
+
+def find_nearest_color_index(r, g, b, color_table=None):
     ''' Given three integers representing R, G, and B,
         return the nearest color index.
 
@@ -78,9 +64,11 @@ def find_nearest_color_index(r, g, b):
     '''
     distance = 257*257*3  # "infinity" (max distance from #000000 to #ffffff)
     index = 0
+    if not color_table:
+        color_table = color_table8
 
-    for i in range(0, 254):
-        values = _color_table[i]
+    for i in range(len(color_table)):  # fixed from range(0, 254):
+        values = color_table[i]
 
         rd = r - values[0]
         gd = g - values[1]
@@ -95,25 +83,31 @@ def find_nearest_color_index(r, g, b):
     return index
 
 
-def find_nearest_color_hexstr(hexdigits):
-    ''' Given a three-character hex digit string, return the nearest color
-        index.
+def find_nearest_color_hexstr(hexdigits, color_table=None):
+    ''' Given a three or six-character hex digit string, return the nearest
+        color index.
 
         Arguments:
-            hexdigits:  a three digit hex string, e.g. 'b0b'
+            hexdigits:  a three/6 digit hex string, e.g. 'b0b'
 
         Returns:
             int, None: index, or None on error.
     '''
+    triplet = []
     try:
-        triplet = []
-        for digit in hexdigits:
-            digit = int(digit, 16)
-            triplet.append((digit * 16) + digit)
+        if len(hexdigits) == 3:
+            for digit in hexdigits:
+                digit = int(digit, 16)
+                triplet.append((digit * 16) + digit)
+        elif len(hexdigits) == 6:
+            triplet.extend(int(hexdigits[i:i+2], 16) for i in (0, 2 ,4))
+        else:
+            raise ValueError('wrong length: %r' % hexdigits)
     except ValueError:
         return None
 
-    return find_nearest_color_index(*triplet)
+    return find_nearest_color_index(*triplet, color_table=color_table)
 
 
-_build_color_table()
+color_table4 = _build_color_table(extended=False)
+color_table8 = _build_color_table()

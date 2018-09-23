@@ -6,6 +6,7 @@
 
         .. ~ console:
             .. ~ downgrade to each level
+
         .. ~ syntax highlight
             .. ~ tabs/vertical tabs? removal?
             .. ~ pformat

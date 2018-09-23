@@ -504,6 +504,50 @@ if True:  # fold
         #~ assert detection.get_cursor_pos() == ()
         pass  # gets correct results on osx (81, 40)
 
+# downgrade support:
+
+    def test_downgrade():
+        bgall = style.BackgroundPalette(palettes=ALL_PALETTES);
+        bge = style.BackgroundPalette(palettes=('basic', 'extended'));
+        bgb = style.BackgroundPalette(palettes='basic');
+        print()
+
+        colors = (
+            't_222',            # grey
+            't_808080',         # grey
+            't_ccc',            # grey
+            't_ddd',            # grey
+            't_eee',            # grey
+            't_e95420',         # ubuntu orange
+            'coral',            # wc
+            't_ff00ff',         # grey
+            't_bb00bb',         # magenta
+            'x_bisque',
+            'x_dodgerblue',     # lighter blue
+            'w_cornflowerblue', # lighter blue
+            'w_navy',           # dark blue
+            'w_forestgreen',    # dark/medium green
+            'i_28',
+            'i_202',
+            'n_a08',
+            'n_f0f',
+        )
+
+        for color_key in colors:
+            full = getattr(bgall, color_key)
+            dwne = getattr(bge, color_key)
+            dwnb = getattr(bgb, color_key)
+
+            print(
+                '  ', '%-18.18s' % color_key, ' ',
+                full, ' t  ', bgall.default,
+                dwne, ' i  ', bgall.default,
+                dwnb, ' b  ', bgall.default, ' ',
+                '%-25.25r' % full,
+                '%-17.17r' % dwne, ' ', repr(dwnb),
+            sep='', end=' ')
+            print()
+
 
 # Misc
 # ----------------------------------------------------------------------------
@@ -528,7 +572,7 @@ if True:  # fold
     def test_find_nearest_color_index():
         from .proximity import find_nearest_color_index
         values = (
-            (0, 0, 0, 0),
+            (0, 0, 0, 0),       # r, g, b, index
             (16, 16, 16, 233),
             (256, 0, 0, 9),
             (0, 256, 0, 10),
@@ -540,10 +584,10 @@ if True:  # fold
 
     def test_find_nearest_color_hexstr():
         from .proximity import find_nearest_color_hexstr
-        # test hex strings
+
         values = (
-            ('000',   0),
-            ('111', 233),  # grayscale
+            ('000',   0),   # hex strings, index
+            ('111', 233),   # grayscale
             ('222', 235),
             ('333', 236),
             ('444', 238),
@@ -556,7 +600,7 @@ if True:  # fold
             ('bbb', 250),
             ('ccc', 252),
             ('ddd', 253),
-            ('eee',   7),
+            ('eee', 255),
             ('fff',  15),
 
             ('f00',   9),
