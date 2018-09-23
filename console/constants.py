@@ -26,6 +26,8 @@ CSI = ESC + '['     #: Control Sequence Introducer
 OSC = ESC + ']'     #: Operating System Command
 RIS = ESC + 'c'     #: Reset to Initial State, aka clear screen (see utils)
 
+ANSI_RESET = CSI + '0m'
+
 # ansi codes
 ANSI_FG_LO_BASE = 30
 ANSI_BG_LO_BASE = 40

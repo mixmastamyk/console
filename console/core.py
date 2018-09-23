@@ -12,8 +12,8 @@ import logging
 import re
 
 from . import _CHOSEN_PALETTE
-from .constants import (CSI, ANSI_FG_LO_BASE, ANSI_BG_LO_BASE, ANSI_FG_HI_BASE,
-                        ANSI_BG_HI_BASE)
+from .constants import (CSI, ANSI_BG_LO_BASE, ANSI_BG_HI_BASE, ANSI_FG_LO_BASE,
+                        ANSI_FG_HI_BASE, ANSI_RESET)
 from .disabled import dummy, empty
 from .detection import get_available_palettes
 from .proximity import (color_table4, find_nearest_color_hexstr,
@@ -24,7 +24,6 @@ except ImportError:
     webcolors = None
 
 
-_END = CSI + '0m'
 log = logging.getLogger(__name__)
 
 # Palette attribute name finders, now we've got two problems.
@@ -322,7 +321,7 @@ class _PaletteEntry:
             #~ log.debug('palette entries match: %s', same_category)  # noisy
 
             if not same_category:  # different, use end instead of default
-                attr.default = _END
+                attr.default = ANSI_RESET
 
             return attr
         else:
