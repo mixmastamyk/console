@@ -5,15 +5,12 @@
     .. TODO:
 
         .. ~ console:
-            .. ~ downgrade to each level
+            .. ~ on start/detect, should pick a 16 color palette,
+            .. ~ not default to xterm.
 
-        .. ~ syntax highlight
+        .. ~ out: syntax highlight
             .. ~ tabs/vertical tabs? removal?
             .. ~ pformat
-
-    .. ~ Format tokens with ANSI color sequences, for output in a text console.
-    .. ~ Color sequences are terminated at newlines, so that paging the output
-    .. ~ works correctly.
 '''
 import sys
 from .disabled import dummy as _dummy

@@ -254,18 +254,18 @@ Console's palette entry objects are meant to be highly composable and useful in
 multiple ways.
 For example,
 you might like to create your own compound styles to use over and over again.
-They can also be called as functions if desired and have "mixins" added in as
-well.
-The callable form automatically resets styles to their defaults at the end of
-the string,
-so again,
-that no longer needs to be managed:
+
+They can also be called as functions if desired and have "mixin" styles added
+in as well.
+The callable form also automatically resets styles to their defaults at the end
+of each line in the string (to avoid breaking pagers),
+so those tasks no longer need to be managed manually:
 
 .. code-block:: python
 
     >>> muy_importante = fg.white + fx.bold + bg.red
 
-    >>> print(muy_importante('AHORITA!', fx.underline))
+    >>> print(muy_importante('AHORITA!', fx.underline))  # ← mixin
     AHORITA!  # ← not styled due to PyPI limits 😉
 
 When palette objects are combined together as done above,

@@ -342,11 +342,25 @@ class _PaletteEntry:
         print(self.default, file=self._out, end='')
 
     def __call__(self, text, *styles):
-        # if category different, copy uses end instead of default, see addition
+        ''' Formats text.
+
+            Tip from Pygments:
+                Color sequences are terminated at newlines,
+                so that paging the output works correctly.
+        '''
+        # if the category of styles is different,
+        # copy uses fx.end instead of palette.default, see addition:
         for attr in styles:
             self += attr
 
-        return f'{self}{text}{self.default}'
+        if '\n' in text:
+            lines = text.splitlines()
+            for i, line in enumerate(lines):
+                lines[i] = f'{self}{line}{self.default}'  # add styles, see tip
+            result = '\n'.join(lines)
+        else:
+            result = f'{self}{text}{self.default}'
+        return result
 
     def __str__(self):
         return f'{CSI}{";".join(self._codes)}m'
