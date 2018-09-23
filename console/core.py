@@ -12,7 +12,8 @@ import logging
 import re
 
 from . import _CHOSEN_PALETTE
-from .constants import CSI
+from .constants import (CSI, ANSI_FG_LO_BASE, ANSI_BG_LO_BASE, ANSI_FG_HI_BASE,
+                        ANSI_BG_HI_BASE)
 from .disabled import dummy, empty
 from .detection import get_available_palettes
 from .proximity import (color_table4, find_nearest_color_hexstr,
@@ -84,7 +85,7 @@ class _BasicPaletteBuilder:
         return self
 
     def __init__(self, **kwargs):
-        # look for integer attributes to wrap in a basic palette:
+        # look for integer attributes to wrap as a basic palette:
         for name in ['default'] + dir(self):        # default needs to go 1st!
             if not name.startswith('_'):
                 value = getattr(self, name)
@@ -100,7 +101,7 @@ class _BasicPaletteBuilder:
 
 
 class _HighColorPaletteBuilder(_BasicPaletteBuilder):
-    ''' Container/Router for ANSI extended & truecolor palettes. '''
+    ''' Container/Router for ANSI Extended & Truecolor palettes. '''
 
     def __init__(self, x11_rgb_filename=X11_RGB_FILE, **kwargs):
         super().__init__(**kwargs)
@@ -108,22 +109,21 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
 
     def __getattr__(self, name):
         ''' Traffic cop - called only when an attribute is missing,
-            once per palette entry attribute.
+            i.e. once per palette entry attribute.
 
             The "basic" palette will never get here, as it is already defined.
-
             Data flow:
 
-            Input:                                  Examples:
+            Input/lookup:                           Examples:
 
-                - t_ hexstring:                     'bb00bb'
+                - t_ hex-string:                    'bb00bb'
                 - x_  tuple of dec-int strings:     ('1', '2', '3')
                 - w_  tuple of "decimal" int:       (1, 2, 3)
 
             On downgrade, find nearest:
 
                  - Prefer tuple of int8:            (1, 2, 3)
-                 - May handle 3 digit hexstring:    'b0b'
+                 - May handle 3 digit hex-string:   'b0b'
 
                 - returns: integer index
                     * 0-15 or
@@ -136,19 +136,19 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                     - joined with ';' to string:        Prefix + '1;2;3'
 
             Final Output:
-                - _PaletteEntry(output)
+                - wrap in _PaletteEntry(output)
         '''
         key = name[1:].lstrip('_')  # rm potential prefix
-        result = empty
+        result = None
 
         # follow the yellow brick road…
-        if _index_finder.match(name):       # INDEXED aka EXTENDED
+        if _index_finder.match(name):       # Indexed aka Extended
             result = self._get_extended_palette_entry(name, key)
 
-        elif _nearest_finder.match(name):   # NEAREST
+        elif _nearest_finder.match(name):   # Nearest
             result = self._get_extended_palette_entry(name, key, ishex=True)
 
-        elif _true_finder.match(name):      # TRUE
+        elif _true_finder.match(name):      # Truecolor
             result = self._get_true_palette_entry(name, key)
 
         elif _x11_finder.match(name):       # X11, forced via prefix
@@ -158,36 +158,36 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             result = self._get_true_palette_entry(name,
                                                   _x11_color_map[key.lower()])
 
-        elif _web_finder.match(name):       # WEBCOLORS, forced via prefix
+        elif _web_finder.match(name):       # Webcolors, forced via prefix
             # wc: returns tuple of "decimal" int: (1, 2, 3)
             rgbs = webcolors.name_to_rgb(key)
             result = self._get_true_palette_entry(name, rgbs)
 
-        else:  # look for bare names
+        else:  # look for bare names (without prefix)
             if webcolors:
                 try:
                     rgbs = webcolors.name_to_rgb(name)
                     return self._get_true_palette_entry(name, rgbs)
                 except ValueError:
-                    pass  # didn't find
+                    pass  # didn't find…
 
-            # try X11
-            if X11_RGB_FILE:
+            if X11_RGB_FILE:  # try X11
                 try:
                     if not _x11_color_map:
                         _load_x11_color_map(self._x11_rgb_filename)
-                    return self._get_true_palette_entry(name,
-                                                  _x11_color_map[key.lower()])
+                    return self._get_true_palette_entry(
+                                            name, _x11_color_map[key.lower()])
                 except KeyError:
-                    pass  # Nope
+                    pass  # nope
 
             # Emerald city
-            raise AttributeError('%r is not a recognized attribute name.'
-                                 % name)
+            raise AttributeError(f'{name!r} is not a recognized attribute name'
+                                 'or format.')
         return result
 
     def _get_extended_palette_entry(self, name, index, ishex=False):
         ''' Compute extended entry, once on the fly. '''
+        values = None
 
         if 'extended' in self._palette_support:  # build entry
             if ishex:
@@ -195,23 +195,23 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             values = [self._start_codes_extended, index]
 
         # downgrade section
-        elif 'basic' in self._palette_support and ishex:
-            nearest_idx = find_nearest_color_hexstr(index, color_table4)
-            values = self._index_to_ansi_values(nearest_idx)
-
         elif 'basic' in self._palette_support:
-            from .color_tables import index_to_rgb8
-            nearest_idx = find_nearest_color_index(*index_to_rgb8[index],
-                                                   color_table4)
+            if ishex:
+                nearest_idx = find_nearest_color_hexstr(index, color_table4)
+            else:
+                from .color_tables import index_to_rgb8  # find rgb for idx
+                nearest_idx = find_nearest_color_index(*index_to_rgb8[index],
+                                                       color_table4)
             values = self._index_to_ansi_values(nearest_idx)
 
-        return self._create_entry(name, values)
+        return self._create_entry(name, values) if values else empty
 
     def _get_true_palette_entry(self, name, digits):
         ''' Compute truecolor entry, once on the fly.
 
             values must become sequence of decimal int strings: ('1', '2', '3')
         '''
+        values = None
         type_digits = type(digits)
 
         if 'truecolor' in self._palette_support:  # build entry
@@ -245,10 +245,10 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
 
             values = self._index_to_ansi_values(nearest_idx)
 
-        return self._create_entry(name, values)
+        return self._create_entry(name, values) if values else empty
 
     def _index_to_ansi_values(self, index):
-        ''' Converts an index to the corresponding ANSI color.
+        ''' Converts an palette index to the corresponding ANSI color.
 
             Arguments:
                 index   - an int (from 0-15)
@@ -257,14 +257,14 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         '''
         if self.__class__.__name__[0] == 'F':   # Foreground
             if index < 8:
-                index += 30
+                index += ANSI_FG_LO_BASE
             else:
-                index += 82
+                index += (ANSI_FG_HI_BASE - 8)  # 82
         else:                                   # Background
             if index < 8:
-                index += 40
+                index += ANSI_BG_LO_BASE
             else:
-                index += 92
+                index += (ANSI_BG_HI_BASE - 8)  # 92
         return [str(index)]
 
     def _create_entry(self, name, values):

@@ -508,45 +508,39 @@ if True:  # fold
 
     def test_downgrade():
         bgall = style.BackgroundPalette(palettes=ALL_PALETTES);
-        bge = style.BackgroundPalette(palettes=('basic', 'extended'));
-        bgb = style.BackgroundPalette(palettes='basic');
-        print()
+        bge = style.BackgroundPalette(palettes=('basic', 'extended'))
+        bgb = style.BackgroundPalette(palettes='basic')
+        E = CSI
 
-        colors = (
-            't_222',            # grey
-            't_808080',         # grey
-            't_ccc',            # grey
-            't_ddd',            # grey
-            't_eee',            # grey
-            't_e95420',         # ubuntu orange
-            'coral',            # wc
-            't_ff00ff',         # grey
-            't_bb00bb',         # magenta
-            'x_bisque',
-            'x_dodgerblue',     # lighter blue
-            'w_cornflowerblue', # lighter blue
-            'w_navy',           # dark blue
-            'w_forestgreen',    # dark/medium green
-            'i_28',
-            'i_202',
-            'n_a08',
-            'n_f0f',
+        results = (
+          ('t_222'           , E+'48;2;34;34;34m'   , E+'48;5;235m', E+'40m'),
+          ('t_808080'        , E+'48;2;128;128;128m', E+'48;5;244m', E+'100m'),
+          ('t_ccc'           , E+'48;2;204;204;204m', E+'48;5;252m', E+'47m'),
+          ('t_ddd'           , E+'48;2;221;221;221m', E+'48;5;253m', E+'47m'),
+          ('t_eee'           , E+'48;2;238;238;238m', E+'48;5;255m', E+'47m'),
+          ('t_e95420'        , E+'48;2;233;84;32m'  , E+'48;5;166m', E+'101m'),
+          ('coral'           , E+'48;2;255;127;80m' , E+'48;5;209m', E+'43m'),
+          ('t_ff00ff'        , E+'48;2;255;0;255m'  , E+'48;5;13m' , E+'105m'),
+          ('t_bb00bb'        , E+'48;2;187;0;187m'  , E+'48;5;127m', E+'45m'),
+          ('x_bisque'        , E+'48;2;255;228;196m', E+'48;5;224m', E+'47m'),
+          ('x_dodgerblue'    , E+'48;2;30;144;255m' , E+'48;5;33m' , E+'104m'),
+          ('w_cornflowerblue', E+'48;2;100;149;237m', E+'48;5;69m' , E+'104m'),
+          ('w_navy'          , E+'48;2;0;0;128m'    , E+'48;5;18m' , E+'44m'),
+          ('w_forestgreen'   , E+'48;2;34;139;34m'  , E+'48;5;28m' , E+'42m'),
+          ('i_28'            , E+'48;5;28m'         , E+'48;5;28m' , E+'42m'),
+          ('i_160'           , E+'48;5;160m'        , E+'48;5;160m', E+'41m'),
+          ('n_a08'           , E+'48;5;126m'        , E+'48;5;126m', E+'45m'),
+          ('n_f0f'           , E+'48;5;13m'         , E+'48;5;13m' , E+'105m'),
         )
 
-        for color_key in colors:
-            full = getattr(bgall, color_key)
-            dwne = getattr(bge, color_key)
-            dwnb = getattr(bgb, color_key)
+        for result in results:
+            full = getattr(bgall, result[0])
+            dwne = getattr(bge, result[0])
+            dwnb = getattr(bgb, result[0])
 
-            print(
-                '  ', '%-18.18s' % color_key, ' ',
-                full, ' t  ', bgall.default,
-                dwne, ' i  ', bgall.default,
-                dwnb, ' b  ', bgall.default, ' ',
-                '%-25.25r' % full,
-                '%-17.17r' % dwne, ' ', repr(dwnb),
-            sep='', end=' ')
-            print()
+            assert str(full) == result[1]
+            assert str(dwne) == result[2]
+            assert str(dwnb) == result[3]
 
 
 # Misc
@@ -610,3 +604,12 @@ if True:  # fold
         for val in values:
             assert find_nearest_color_hexstr(val[0]) == val[1]
 
+    def test_compute_attr_created_once():
+        ''' Attributes should only be created once. '''
+        attrid1 = id(fg.t_ff00ff)
+        attrid2 = id(fg.t_ff00ff)
+        attrid3 = id(bg.red)
+        attrid4 = id(bg.red)
+
+        assert attrid1 == attrid2
+        assert attrid3 == attrid4

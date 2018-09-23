@@ -39,7 +39,8 @@ if __name__ == '__main__':
 
     # try some stuff out
     from . import fg, bg, fx, defx
-    from .constants import BEL
+    from . import style
+    from .constants import BEL, ALL_PALETTES
     from .detection import is_a_tty, query_terminal_color, get_theme
     from .screen import screen
     from .utils import set_title, strip_ansi, cls
@@ -152,9 +153,59 @@ if __name__ == '__main__':
             print(getattr(bg, 't0000%s' % code), fx.end, end='')
         print('│')
         print('      ╰' + '─' * 86, '╯\n', sep='', end='')
-
         print()
-        print('      ☛ Done, should be normal text. ☚  ')
+
+        print(make_header(i+5), 'Test color downgrade support '
+                                '(True ⏵ Indexed ⏵ Basic):')
+        bgall = style.BackgroundPalette(palettes=ALL_PALETTES);
+        bge =   style.BackgroundPalette(palettes=('basic', 'extended'))
+        bgb =   style.BackgroundPalette(palettes='basic')
+        print()
+
+        colors = (
+            't_222',            # grey
+            't_808080',         # grey
+            't_ccc',            # grey
+            't_ddd',            # grey
+            't_eee',            # grey
+            't_e95420',         # ubuntu orange
+            'coral',            # wc
+            't_ff00ff',         # grey
+            't_bb00bb',         # magenta
+            'x_bisque',
+            'x_dodgerblue',     # lighter blue
+            'w_cornflowerblue', # lighter blue
+            'w_navy',           # dark blue
+            'w_forestgreen',    # dark/medium green
+            'i_28',
+            'i_160',
+            'n_a08',
+            'n_f0f',
+            't_deadbf',
+        )
+
+        for i, color_key in enumerate(colors):
+            full = getattr(bgall, color_key)
+            dwne = getattr(bge, color_key)
+            dwnb = getattr(bgb, color_key)
+
+            print('      ', '%-18.18s' % (color_key + ':'),
+                  full, ' t   ', bgall.default,
+                  dwne, ' i   ', bgall.default,
+                  dwnb, ' b   ', bgall.default,
+            sep='', end=' ')
+            if i % 2 == 1:
+                print()
+
+        fgall = style.ForegroundPalette(palettes=ALL_PALETTES);
+        fge =   style.ForegroundPalette(palettes=('basic', 'extended'))
+        fgb =   style.ForegroundPalette(palettes='basic')
+        print('      FG t_deadbf:     ',
+            fgall.t_deadbf('▉▉▉▉'),
+            fge.t_deadbf('▉▉▉▉'),
+            fgb.t_deadbf('▉▉▉▉'),
+        )
+        print()
 
         if is_a_tty():
             try:
@@ -172,5 +223,10 @@ if __name__ == '__main__':
                 cls()
             except KeyboardInterrupt:
                 pass
+
+        print()
+        print()
+        print('      ☛ Done, should be normal text. ☚  ')
+        print()
 
     run()

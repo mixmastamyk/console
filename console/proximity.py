@@ -67,14 +67,13 @@ def find_nearest_color_index(r, g, b, color_table=None):
     if not color_table:
         color_table = color_table8
 
-    for i in range(len(color_table)):  # fixed from range(0, 254):
-        values = color_table[i]
+    for i, values in enumerate(color_table):  # fixed from range(0, 254):
 
         rd = r - values[0]
         gd = g - values[1]
         bd = b - values[2]
 
-        this_distance = (rd * rd) + (gd * gd) + (bd * bd)
+        this_distance = (rd * rd) + (gd * gd) + (bd * bd)  # sum of squares
 
         if this_distance < distance:  # closer
             index = i

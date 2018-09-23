@@ -26,6 +26,12 @@ CSI = ESC + '['     #: Control Sequence Introducer
 OSC = ESC + ']'     #: Operating System Command
 RIS = ESC + 'c'     #: Reset to Initial State, aka clear screen (see utils)
 
+# ansi codes
+ANSI_FG_LO_BASE = 30
+ANSI_BG_LO_BASE = 40
+ANSI_FG_HI_BASE = 90
+ANSI_BG_HI_BASE = 100
+
 
 ALL_PALETTES = ('basic', 'extended', 'truecolor')  # variants 'x11', 'web'
 
