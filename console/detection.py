@@ -16,11 +16,11 @@ import logging
 
 import env
 
-from . import color_tables
+from . import color_tables, proximity
 from .constants import BEL, CSI, OSC, RS, ALL_PALETTES
 
 log = logging.getLogger(__name__)
-plat = sys.platform[:3]
+os_name = os.name
 
 
 class TermStack:
@@ -84,25 +84,25 @@ def choose_palette(stream=sys.stdout, current_palette4=None):
         result = detect_palette_support()
 
     # find the platform-dependent 16-color basic palette, set it as current:
-    if current_palette4:
-        color_tables.current_palette4 = current_palette4
-    else:
-        if os.name == 'nt':
-            color_tables.current_palette4 = color_tables.cmd_palette4
-        elif os.name == 'darwin':
+    if not current_palette4:
+        if os_name == 'nt':
+            current_palette4 = color_tables.cmd_palette4
+        elif os_name == 'darwin':
             if env.TERM_PROGRAM == 'Apple_Terminal':
-                color_tables.current_palette4 = color_tables.termapp_palette4
+                current_palette4 = color_tables.termapp_palette4
             elif env.TERM_PROGRAM == 'iTerm.app':
                 pass  # TODO: configure, defaults to vga
-        elif os.name == 'posix':
+        elif os_name == 'posix':
             if env.TERM == 'linux':
-                color_tables.current_palette4 = parse_etc_vtrgb()
+                current_palette4 = parse_etc_vtrgb()
             elif env.TERM.startswith('xterm-'):
-                color_tables.current_palette4 = color_tables.xterm_palette4
+                current_palette4 = color_tables.xterm_palette4
             # TODO: gnome, tango?
         else:  # Amiga/Atari
-            log.warn('Unexpected OS: os.name: %s', os.name)
-        log.debug('os: %s, palette4 = %r', os.name, color_tables.current_palette4)
+            log.warn('Unexpected OS: os.name: %s', os_name)
+
+        proximity.build_color_tables(current_palette4)
+        log.debug('os: %s, palette4 = %r', os_name, current_palette4)
 
     log.debug('%r', result)
     return result
@@ -371,12 +371,12 @@ def query_terminal_color(name):
     '''
     colors = []
     if is_a_tty():
-        if plat == 'win':
+        if os_name == 'nt':
             return colors
-        elif plat == 'dar':
+        elif os_name == 'darwin':
             if env.TERM_PROGRAM and env.TERM_PROGRAM != 'iTerm.app':
                 return colors
-        elif os.name == 'posix':  # more general than plat == 'linux'
+        elif os_name == 'posix':
             if env.TERM and env.TERM.startswith('xterm'):
                 pass
             else:

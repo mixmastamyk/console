@@ -104,7 +104,7 @@ def set_title(title, mode=0):
                    | 1 | 'icon'   - Set icon/taskbar title
                    | 2 | 'title'  - Set window/tab title
     '''
-    if _CHOSEN_PALETTE:  # TODO: all overridable
+    if _CHOSEN_PALETTE:
         text = f'{OSC}{_title_mode_map.get(mode, mode)};{title}{BEL}'
         _write(text)
         return text  # for testing

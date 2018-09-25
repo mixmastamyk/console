@@ -99,7 +99,8 @@ if __name__ == '__main__':
                   'Absolutely. :-D')
         print('\n')
 
-        print(make_header(i+2), 'Foreground - 256 colors:\n      ', end='')
+        print(make_header(i+2), 'Foreground - 256 indexed colors:\n      ',
+              end='')
         for j in range(256):
             attr = getattr(fg, f'i{j}')
             print(attr, '%4.4s' % attr.name, fx.end, end=' ')
@@ -109,7 +110,8 @@ if __name__ == '__main__':
                 print('\n      ', end='')
         print()
 
-        print(make_header(i+3), 'Background - 256 colors:\n      ', end='')
+        print(make_header(i+3), 'Background - 256 indexed colors:\n      ',
+              end='')
         for j in range(256):
 
             attr = getattr(bg, f'i{j}')

@@ -27,9 +27,9 @@
 from . import color_tables
 
 
-def build_color_table(extended=True):
+def _build_color_table(base, extended=True):
     # start with first 16 colors
-    color_table = color_tables.current_palette4.copy()
+    color_table = base.copy()
 
     if extended:
         # colors 16..232: the 6x6x6 color cube
@@ -50,6 +50,18 @@ def build_color_table(extended=True):
     return color_table
 
 
+def build_color_tables(base=color_tables.vga_palette4):
+    '''
+        Create the color tables for palette downgrade support,
+        starting with the platform-specific 16 from the color tables module.
+        Save as global state.
+    '''
+    global color_table4, color_table8
+
+    color_table4 = _build_color_table(base, extended=False)
+    color_table8 = _build_color_table(base)
+
+
 def find_nearest_color_index(r, g, b, color_table=None):
     ''' Given three integers representing R, G, and B,
         return the nearest color index.
@@ -65,6 +77,8 @@ def find_nearest_color_index(r, g, b, color_table=None):
     distance = 257*257*3  # "infinity" (max distance from #000000 to #ffffff)
     index = 0
     if not color_table:
+        if not color_table8:
+             build_color_tables()
         color_table = color_table8
 
     for i, values in enumerate(color_table):  # fixed from range(0, 254):
@@ -108,5 +122,5 @@ def find_nearest_color_hexstr(hexdigits, color_table=None):
     return find_nearest_color_index(*triplet, color_table=color_table)
 
 
-color_table4 = build_color_table(extended=False)
-color_table8 = build_color_table()
+color_table4 = []
+color_table8 = []

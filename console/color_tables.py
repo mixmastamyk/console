@@ -409,5 +409,3 @@ _new_palette4 = [
     (),   # 14    bright cyan
     (),   # 15    bright white
 ]
-
-current_palette4 = vga_palette4  # reset by detection.choose_palette()

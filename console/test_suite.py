@@ -13,15 +13,11 @@ try:
 except Exception as err:
     webcolors = None
 
-from . import color_tables, detection, screen, style, utils, _set_debug_mode
+from . import detection, screen, style, utils, _set_debug_mode
 from .constants import ALL_PALETTES
 
-
-# fix proximity, color downgrades.  TODO: untangle this:
-from . import proximity
-color_tables.current_palette4 = color_tables.xterm_palette4  # needs xterm pal
-proximity.color_table4 = proximity.build_color_table(extended=False)
-proximity.color_table8 = proximity.build_color_table()
+from . import proximity, color_tables
+proximity.build_color_tables(base=color_tables.xterm_palette4)
 
 # configure our own - force all palettes on
 fg = style.ForegroundPalette(palettes=ALL_PALETTES)
