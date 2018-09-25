@@ -157,28 +157,22 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             result = self._get_X11_palette_entry(key)
 
         elif _web_finder.match(name):       # Webcolors, forced via prefix
-            if webcolors:
-                try:  # wc: returns tuple of "decimal" int: (1, 2, 3)
-                    color = webcolors.name_to_rgb(key)
-                    result = self._get_true_palette_entry(name, color)
-                except ValueError as err:
-                    raise AttributeError(f'{key!r} not found in webcolors palette.')
-            else:
-                result = empty
+            result = self._get_web_palette_entry(key)
+
         else:  # look for bare names (without prefix)
-            if webcolors:
-                try:
-                    color = webcolors.name_to_rgb(name)
-                    return self._get_true_palette_entry(name, color)
-                except ValueError:
-                    pass  # didn't find…
+            try:
+                result = self._get_web_palette_entry(name)
+                if result:
+                    return result
+            except AttributeError:
+                pass  # nope, didn't find…
 
             try:  # try X11
                 result = self._get_X11_palette_entry(name)
                 if result:
                     return result
             except AttributeError:
-                pass  # nope
+                pass  # nada
 
             # Emerald city
             raise AttributeError(f'{name!r} is not a recognized attribute name'
@@ -248,7 +242,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         return self._create_entry(name, values) if values else empty
 
     def _get_X11_palette_entry(self, name):
-        result = None
+        result = empty
         if self._x11_rgb_path:
             if not _x11_color_map:
                 _load_x11_color_map(self._x11_rgb_path)
@@ -256,11 +250,21 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             if _x11_color_map:
                 try:  # x11 map: returns tuple of decimal int strings: ('1', '2', '3')
                     color = _x11_color_map[name.lower()]
-                except KeyError as err:
+                except KeyError as err:  # convert to AttributeError
                     raise AttributeError(
                         f'{name.lower()!r} not found in X11 palette.')
                 result = self._get_true_palette_entry(name, color)
+        return result
 
+    def _get_web_palette_entry(self, name):
+        result = empty
+        if webcolors:
+            try:  # wc: returns tuple of "decimal" int: (1, 2, 3)
+                color = webcolors.name_to_rgb(name)
+                result = self._get_true_palette_entry(name, color)
+            except ValueError as err:  # convert to AttributeError
+                raise AttributeError(
+                    f'{name!r} not found in webcolors palette.')
         return result
 
     def _index_to_ansi_values(self, index):
