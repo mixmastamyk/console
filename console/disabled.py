@@ -2,10 +2,8 @@
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
-    A class to mimic style container classes so they do not print when the
-    terminal doesn't support it.
-
-    Do not import modules here, needs to be available early.
+    A class to mimic style/palette containers so they do not print control
+    sequences when the terminal doesn't support them.
 '''
 
 
@@ -44,5 +42,5 @@ class _DummyCollection:
         return attr
 
 
-empty = _EmptyAttribute()           # TODO: this doesn't show in Sphinx
+empty = _EmptyAttribute()           # TODO: these don't show in Sphinx
 dummy = _DummyCollection(empty)

@@ -1,16 +1,6 @@
 '''
     | console - Comprehensive utility library for ANSI terminals.
     | © 2018, Mike Miller - Released under the LGPL, version 3+.
-
-    .. TODO:
-
-        .. ~ console:
-            .. ~ on start/detect, should pick a 16 color palette,
-            .. ~ not default to xterm.
-
-        .. ~ out: syntax highlight
-            .. ~ tabs/vertical tabs? removal?
-            .. ~ pformat
 '''
 import sys
 from .disabled import dummy as _dummy

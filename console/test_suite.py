@@ -250,10 +250,17 @@ if True:  # fold
 # ----------------------------------------------------------------------------
 if True:  # fold
 
-    def test_webcolors_foo():
+    def test_webcolors_bisque():
         if webcolors:
             assert str(fg.bisque) == CSI + '38;2;255;228;196m'
             assert str(bg.w_bisque) == CSI + '48;2;255;228;196m'
+
+    def test_webcolors_xyzzyx():
+        if webcolors:
+            with pytest.raises(AttributeError): # as err:
+            #~ assert 'recognized' in err.value.args[0]
+
+                bg.w_xyzzyx
 
 
 # X11 color palette

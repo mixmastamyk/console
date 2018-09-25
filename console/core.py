@@ -3,11 +3,11 @@
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
-    Complicated Gobbyldegook supporting simpler interfaces is located here.
+    Complicated Gobbyldegook supporting the simple interfaces located here.
 
     Classes below not meant to be instantiated by client code.
 '''
-import sys
+import sys, os
 import logging
 import re
 
@@ -32,17 +32,18 @@ MAX_NL_SEARCH = 4096
 _hd = r'[0-9A-Fa-f]'  # hex digits
 _index_finder = re.compile(r'^i_?\d{1,3}$', re.A)                   # i_DDD
 _nearest_finder = re.compile(f'^n_?{_hd}{{3}}$', re.A)              # n_HHH
-_true_finder = re.compile(f'^t_?({_hd}{{3}}|{_hd}{{6}})$', re.A)    # t_HHH
+_true_finder = re.compile(f'^t_?({_hd}{{3}}|{_hd}{{6}})$', re.A)    # t_HHH+
 _x11_finder = re.compile(r'^x\w{4,64}$', re.A)                      # x_NAME
 _web_finder = re.compile(r'^w\w{4,64}$', re.A)                      # x_NAME
 
 # X11 colors support
 _x11_color_map = {}
-X11_RGB_FILE = None  # Windows
-if sys.platform == 'linux':
-    X11_RGB_FILE = '/etc/X11/rgb.txt'
-elif sys.platform == 'darwin':
-    X11_RGB_FILE = '/opt/X11/share/X11/rgb.txt'
+X11_RGB_PATHS = ()  # Windows
+if os.name == 'posix':
+    # Ubuntu, FreeBSD
+    X11_RGB_PATHS = ('/etc/X11/rgb.txt', '/usr/local/lib/X11/rgb.txt')
+elif os.name == 'darwin':
+    X11_RGB_PATHS = ('/opt/X11/share/X11/rgb.txt',)
 
 
 class _BasicPaletteBuilder:
@@ -103,9 +104,10 @@ class _BasicPaletteBuilder:
 class _HighColorPaletteBuilder(_BasicPaletteBuilder):
     ''' Container/Router for ANSI Extended & Truecolor palettes. '''
 
-    def __init__(self, x11_rgb_filename=X11_RGB_FILE, **kwargs):
+    def __init__(self, x11_rgb_path=X11_RGB_PATHS, **kwargs):
         super().__init__(**kwargs)
-        self._x11_rgb_filename = x11_rgb_filename
+
+        self._x11_rgb_path = x11_rgb_path
 
     def __getattr__(self, name):
         ''' Traffic cop - called only when an attribute is missing,
@@ -117,13 +119,13 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             Input/lookup:                           Examples:
 
                 - t_ hex-string:                    'bb00bb'
-                - x_  tuple of dec-int strings:     ('1', '2', '3')
-                - w_  tuple of "decimal" int:       (1, 2, 3)
+                - x_ name to tuple of dec-int str:  ('1', '2', '3')
+                - w_ name to tuple of int8:         (1, 2, 3)
 
             On downgrade, find nearest:
 
                  - Prefer tuple of int8:            (1, 2, 3)
-                 - May handle 3 digit hex-string:   'b0b'
+                 - Also handles 3 digit hex-string: 'b0b'
 
                 - returns: integer index
                     * 0-15 or
@@ -153,36 +155,47 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
 
         elif _x11_finder.match(name):       # X11, forced via prefix
             if not _x11_color_map:
-                _load_x11_color_map(self._x11_rgb_filename)
-            # x11 map: returns tuple of decimal int strings: ('1', '2', '3')
-            result = self._get_true_palette_entry(name,
-                                                  _x11_color_map[key.lower()])
+                _load_x11_color_map(self._x11_rgb_path)
+
+            if _x11_color_map:
+                try:  # x11 map: returns tuple of decimal int strings: ('1', '2', '3')
+                    color = _x11_color_map[key.lower()]
+                except KeyError as err:
+                    raise AttributeError(f'{key.lower()!r} not found in X11 palette.')
+                result = self._get_true_palette_entry(name, color)
+            else:  # didn't find
+                result = empty
 
         elif _web_finder.match(name):       # Webcolors, forced via prefix
-            # wc: returns tuple of "decimal" int: (1, 2, 3)
-            rgbs = webcolors.name_to_rgb(key)
-            result = self._get_true_palette_entry(name, rgbs)
+            if webcolors:
+                try:  # wc: returns tuple of "decimal" int: (1, 2, 3)
+                    color = webcolors.name_to_rgb(key)
+                    result = self._get_true_palette_entry(name, color)
+                except ValueError as err:
+                    raise AttributeError(f'{key!r} not found in webcolors palette.')
+            else:
+                result = empty
 
         else:  # look for bare names (without prefix)
             if webcolors:
                 try:
-                    rgbs = webcolors.name_to_rgb(name)
-                    return self._get_true_palette_entry(name, rgbs)
+                    color = webcolors.name_to_rgb(name)
+                    return self._get_true_palette_entry(name, color)
                 except ValueError:
                     pass  # didn't find…
 
-            if X11_RGB_FILE:  # try X11
+            if self._x11_rgb_path:  # try X11
                 try:
                     if not _x11_color_map:
-                        _load_x11_color_map(self._x11_rgb_filename)
-                    return self._get_true_palette_entry(
-                                            name, _x11_color_map[key.lower()])
+                        _load_x11_color_map(self._x11_rgb_path)
+                    color = _x11_color_map[key.lower()]
+                    return self._get_true_palette_entry(name, color)
                 except KeyError:
                     pass  # nope
 
             # Emerald city
             raise AttributeError(f'{name!r} is not a recognized attribute name'
-                                 'or format.')
+                                 ' or format.')
         return result
 
     def _get_extended_palette_entry(self, name, index, ishex=False):
@@ -336,6 +349,13 @@ class _PaletteEntry:
         return bool(self._codes)
 
     def __enter__(self):
+        ''' TODO:
+
+            Tip from Pygments:
+                Color sequences are terminated at newlines,
+                so that paging the output works correctly.
+        '''
+
         log.debug(repr(str(self)))
         print(self, file=self._out, end='')
 
@@ -387,23 +407,28 @@ class _PaletteEntry:
         self._out = outfile
 
 
-def _load_x11_color_map(filename=X11_RGB_FILE):
-    ''' Load and parse X11's rgb.txt
+def _load_x11_color_map(paths=X11_RGB_PATHS):
+    ''' Loaden-Sie and parse X11's rgb.txt, bitte.
 
         Loads:
             _x11_color_map: { name_lower: ('R', 'G', 'B') }
     '''
-    try:
-        with open(filename) as infile:
-            for line in infile:
-                if line.startswith('!') or line.isspace():
-                    continue
+    if type(paths) is str:
+        paths = (paths,)
 
-                tokens = line.rstrip().split(maxsplit=3)
-                key = tokens[3]
-                if ' ' in key:  # skip names with spaces to match webcolors
-                    continue
+    for path in paths:
+        try:
+            with open(path) as infile:
+                for line in infile:
+                    if line.startswith('!') or line.isspace():
+                        continue
 
-                _x11_color_map[key.lower()] = tuple(tokens[:3])
-    except IOError as err:
-        log.debug('error: X11 palette not found. %s', err)
+                    tokens = line.rstrip().split(maxsplit=3)
+                    key = tokens[3]
+                    if ' ' in key:  # skip names with spaces to match webcolors
+                        continue
+
+                    _x11_color_map[key.lower()] = tuple(tokens[:3])
+            break
+        except IOError as err:
+            log.debug('X11 palette file not found: %s', err)

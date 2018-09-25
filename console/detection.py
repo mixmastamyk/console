@@ -113,7 +113,6 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
         proximity.build_color_tables(basic_palette)
         log.debug('os.name: %s, basic_palette: %s = %r', os_name, pal_name,
                                                          basic_palette)
-
     return result
 
 
@@ -182,6 +181,11 @@ def detect_palette_support():
     result, col_init = None, None
     TERM = env.TERM or ''
     col_init = _is_colorama_initialized()
+    try:
+        import webcolors
+    except ImportError:
+        webcolors = None
+
 
     if ('color' in TERM) or ('linux' in TERM) or col_init:
         result = 'basic'
@@ -193,8 +197,9 @@ def detect_palette_support():
     if env.COLORTERM in ('truecolor', '24bit'):
         result = 'truecolor'
 
-    log.debug('%r (TERM=%s, COLORTERM=%s, colorama-init=%s)',
-              result, env.TERM or '', env.COLORTERM or '', col_init)
+    log.debug(f'{result!r} (TERM={env.TERM or ""}, '
+              f'COLORTERM={env.COLORTERM or ""}, webcolors={webcolors}, '
+              f'colorama-init={col_init}')
     return result
 
 

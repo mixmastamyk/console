@@ -41,7 +41,7 @@ setup(
     long_description    = slurp('readme.rst'),
     packages            = ('console',),
     url                 = 'https://github.com/mixmastamyk/console',
-    version             = '0.87a0',
+    version             = '0.87a1',
 
     extras_require      = extras_require,
     install_requires    = install_requires,
@@ -56,6 +56,8 @@ setup(
         'Intended Audience :: System Administrators',
         'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
         'Operating System :: OS Independent',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Topic :: Software Development :: Libraries',
         'Topic :: Terminals',
