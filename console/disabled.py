@@ -2,8 +2,8 @@
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
-    A class to mimic style/palette containers so they do not print control
-    sequences when the terminal doesn't support them.
+    Singletons that mimic the style/palette/entry interface but do not print
+    ANSI control sequences, i.e.: for use when a terminal doesn't support them.
 '''
 
 
@@ -30,17 +30,17 @@ class _EmptyAttribute(str):
         return ''
 
 
-class _DummyCollection:
-    '''  Returns empty strings as attributes. '''
-    def __init__(self, empty):
-        self.empty = empty
+class _EmptyBin:
+    '''  Collection that returns empties as attributes. '''
+    def __init__(self, an_empty):
+        self.an_empty = an_empty
 
     def __getattr__(self, name):
         ''' Called only when an attribute is missing. '''
-        attr = self.empty
+        attr = self.an_empty
         setattr(self, name, attr)   # ready next time
         return attr
 
 
 empty = _EmptyAttribute()           # TODO: these don't show in Sphinx
-dummy = _DummyCollection(empty)
+empty_bin = _EmptyBin(empty)

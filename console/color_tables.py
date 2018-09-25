@@ -2,7 +2,7 @@
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
-    Conversion tables for ANSI color palettes.
+    Tables for ANSI color palettes.
 '''
 
 

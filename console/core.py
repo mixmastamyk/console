@@ -14,7 +14,7 @@ import re
 from . import _CHOSEN_PALETTE
 from .constants import (CSI, ANSI_BG_LO_BASE, ANSI_BG_HI_BASE, ANSI_FG_LO_BASE,
                         ANSI_FG_HI_BASE, ANSI_RESET)
-from .disabled import dummy, empty
+from .disabled import empty_bin, empty
 from .detection import get_available_palettes
 from .proximity import (color_table4, find_nearest_color_hexstr,
                         find_nearest_color_index)
@@ -70,14 +70,14 @@ class _BasicPaletteBuilder:
             if _CHOSEN_PALETTE:  # enable "up to" the chosen palette level:
                 palettes = get_available_palettes(_CHOSEN_PALETTE)
             else:
-                self = dummy                    # None, deactivate
+                self = empty_bin                # None, deactivate
                 palettes = ()                   # skipen-Sie bitte
         elif type(palettes) in (list, tuple):   # carry on fine sir
             pass
         elif type(palettes) is str:             # make iterable
             palettes = (palettes,)
         elif palettes is None:                  # Ah, Shaddap-a ya face
-            self = dummy
+            self = empty_bin
             palettes = ()                       # skipen-Sie
         else:
             raise TypeError(f'{palettes!r} was unrecognized.')

@@ -3,11 +3,11 @@
     | © 2018, Mike Miller - Released under the LGPL, version 3+.
 '''
 import sys
-from .disabled import dummy as _dummy
+from .disabled import empty_bin as _empty_bin
 
 _DEBUG = False
 _CHOSEN_PALETTE = None
-fg = bg = fx = defx = sc = _dummy
+fg = bg = fx = defx = sc = _empty_bin
 
 
 def _set_debug_mode(value):

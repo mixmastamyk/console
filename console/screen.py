@@ -12,7 +12,7 @@
 '''
 from . import _CHOSEN_PALETTE
 from .constants import CSI, ESC
-from .disabled import dummy
+from .disabled import empty_bin
 
 
 class _TemplateString(str):
@@ -87,7 +87,7 @@ class Screen:
 
         if not force:
             if not _CHOSEN_PALETTE:
-                self = dummy        # None, deactivate completely
+                self = empty_bin    # None, deactivate completely
         # else: continue on unabated
         return self
 
