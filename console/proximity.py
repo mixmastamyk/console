@@ -54,12 +54,18 @@ def build_color_tables(base=color_tables.vga_palette4):
     '''
         Create the color tables for palette downgrade support,
         starting with the platform-specific 16 from the color tables module.
-        Save as global state.
+        Save as global state. :-/
     '''
-    global color_table4, color_table8
+    # make sure we have them before clearing
+    table4 = _build_color_table(base, extended=False)
+    if table4:
+        color_table4.clear()
+        color_table4.extend(table4)
 
-    color_table4 = _build_color_table(base, extended=False)
-    color_table8 = _build_color_table(base)
+    table8 = _build_color_table(base)
+    if table8:
+        color_table8.clear()
+        color_table8.extend(table8)
 
 
 def find_nearest_color_index(r, g, b, color_table=None):

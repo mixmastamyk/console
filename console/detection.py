@@ -55,7 +55,7 @@ class TermStack:
                                self.orig_attrs)
 
 
-def choose_palette(stream=sys.stdout, current_palette4=None):
+def choose_palette(stream=sys.stdout, basic_palette=None):
     ''' Make a best effort to automatically determine whether to enable
         ANSI sequences, and if so, which color palettes are available.
 
@@ -70,41 +70,50 @@ def choose_palette(stream=sys.stdout, current_palette4=None):
 
         Arguments:
             stream:             Which output file to check: stdout, stderr
-            current_palette4:   Force the platform-dependent 16 color palette,
-                                for testing.
+            basic_palette:      Force the platform-dependent 16 color palette,
+                                for testing.  List of 16 rgb-tuples.
         Returns:
             None, str: 'basic', 'extended', or 'truecolor'
     '''
     result = None
-
     if color_is_forced():
         result = detect_palette_support() or 'basic'
 
     elif is_a_tty(stream=stream) and color_is_allowed():
         result = detect_palette_support()
 
-    # find the platform-dependent 16-color basic palette, set it as current:
-    if not current_palette4:
-        if os_name == 'nt':
-            current_palette4 = color_tables.cmd_palette4
-        elif os_name == 'darwin':
-            if env.TERM_PROGRAM == 'Apple_Terminal':
-                current_palette4 = color_tables.termapp_palette4
-            elif env.TERM_PROGRAM == 'iTerm.app':
-                pass  # TODO: configure, defaults to vga
-        elif os_name == 'posix':
-            if env.TERM == 'linux':
-                current_palette4 = parse_etc_vtrgb()
-            elif env.TERM.startswith('xterm-'):
-                current_palette4 = color_tables.xterm_palette4
-            # TODO: gnome, tango?
-        else:  # Amiga/Atari
-            log.warn('Unexpected OS: os.name: %s', os_name)
-
-        proximity.build_color_tables(current_palette4)
-        log.debug('os: %s, palette4 = %r', os_name, current_palette4)
-
     log.debug('%r', result)
+
+    # find the platform-dependent 16-color basic palette, set it as current:
+    if result:
+        if not basic_palette:
+            pal_name = ''
+            if os_name == 'nt':
+                pal_name = 'cmd'
+                basic_palette = color_tables.cmd_palette4
+            elif os_name == 'darwin':
+                if env.TERM_PROGRAM == 'Apple_Terminal':
+                    pal_name = 'termapp'
+                    basic_palette = color_tables.termapp_palette4
+                elif env.TERM_PROGRAM == 'iTerm.app':
+                    pal_name = 'iterm'
+                    pass  # TODO: configure, defaults to vga
+            elif os_name == 'posix':
+                if env.TERM == 'linux':
+                    pal_name = 'vtrgb'
+                    basic_palette = parse_etc_vtrgb()
+                elif env.TERM.startswith('xterm'):
+                    pal_name = 'xterm'
+                    basic_palette = color_tables.xterm_palette4
+                # TODO: gnome, tango?
+            else:  # Amiga/Atari :-P
+                pal_name = 'unknown'
+                log.warn('Unexpected OS: os.name: %s', os_name)
+
+        proximity.build_color_tables(basic_palette)
+        log.debug('os.name: %s, basic_palette: %s = %r', os_name, pal_name,
+                                                         basic_palette)
+
     return result
 
 

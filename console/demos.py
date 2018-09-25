@@ -26,6 +26,7 @@ if __name__ == '__main__':
     import console
     from importlib import reload
     reload(console)
+    pal = console._CHOSEN_PALETTE
 
     if _DEBUG:
         from . import _set_debug_mode
@@ -35,7 +36,7 @@ if __name__ == '__main__':
         logging.basicConfig(level=logging.DEBUG, format=fmt)
         # detection already happened - need to run this again to log. :-/
         from .detection import choose_palette
-        choose_palette()
+        pal = choose_palette()
 
     # try some stuff out
     from . import fg, bg, fx, defx
@@ -127,7 +128,7 @@ if __name__ == '__main__':
         print('      fg:', fg.tB0B,    'text_BOB', fx.end)
         print('      fg:', fg.tff00bb, 'text_FF00BB', fx.end)
         try:
-            print('fg:', fg.tFF00B, 'text_FF00B', fx.end)
+            print('      fg:', fg.tFF00B, 'text_FF00B', fx.end)
         except AttributeError as err:
             print('      ', fg.red, fx.reverse, 'Error:', fx.end, ' ', err,
                   '\n', sep='')
@@ -159,54 +160,58 @@ if __name__ == '__main__':
 
         print(make_header(i+5), 'Test color downgrade support '
                                 '(True ⏵ Indexed ⏵ Basic):')
-        bgall = style.BackgroundPalette(palettes=ALL_PALETTES);
-        bge =   style.BackgroundPalette(palettes=('basic', 'extended'))
-        bgb =   style.BackgroundPalette(palettes='basic')
-        print()
 
-        colors = (
-            't_222',            # grey
-            't_808080',         # grey
-            't_ccc',            # grey
-            't_ddd',            # grey
-            't_eee',            # grey
-            't_e95420',         # ubuntu orange
-            'coral',            # wc
-            't_ff00ff',         # grey
-            't_bb00bb',         # magenta
-            'x_bisque',
-            'x_dodgerblue',     # lighter blue
-            'w_cornflowerblue', # lighter blue
-            'w_navy',           # dark blue
-            'w_forestgreen',    # dark/medium green
-            'i_28',
-            'i_160',
-            'n_a08',
-            'n_f0f',
-            't_deadbf',
-        )
+        if 'pal' in globals() and pal:
+            bgall = style.BackgroundPalette(palettes=ALL_PALETTES);
+            bge =   style.BackgroundPalette(palettes=('basic', 'extended'))
+            bgb =   style.BackgroundPalette(palettes='basic')
+            print()
 
-        for i, color_key in enumerate(colors):
-            full = getattr(bgall, color_key)
-            dwne = getattr(bge, color_key)
-            dwnb = getattr(bgb, color_key)
+            colors = (
+                't_222',            # grey
+                't_808080',         # grey
+                't_ccc',            # grey
+                't_ddd',            # grey
+                't_eee',            # grey
+                't_e95420',         # ubuntu orange
+                'coral',            # wc
+                't_ff00ff',         # grey
+                't_bb00bb',         # magenta
+                'x_bisque',
+                'x_dodgerblue',     # lighter blue
+                'w_cornflowerblue', # lighter blue
+                'w_navy',           # dark blue
+                'w_forestgreen',    # dark/medium green
+                'i_28',
+                'i_160',
+                'n_a08',
+                'n_f0f',
+                't_deadbf',
+            )
 
-            print('      ', '%-18.18s' % (color_key + ':'),
-                  full, ' t   ', bgall.default,
-                  dwne, ' i   ', bgall.default,
-                  dwnb, ' b   ', bgall.default,
-            sep='', end=' ')
-            if i % 2 == 1:
-                print()
+            for i, color_key in enumerate(colors):
+                full = getattr(bgall, color_key)
+                dwne = getattr(bge, color_key)
+                dwnb = getattr(bgb, color_key)
 
-        fgall = style.ForegroundPalette(palettes=ALL_PALETTES);
-        fge =   style.ForegroundPalette(palettes=('basic', 'extended'))
-        fgb =   style.ForegroundPalette(palettes='basic')
-        print('      FG t_deadbf:     ',
-            fgall.t_deadbf('▉▉▉▉'),
-            fge.t_deadbf('▉▉▉▉'),
-            fgb.t_deadbf('▉▉▉▉'),
-        )
+                print('      ', '%-18.18s' % (color_key + ':'),
+                      full, ' t   ', bgall.default,
+                      dwne, ' i   ', bgall.default,
+                      dwnb, ' b   ', bgall.default,
+                sep='', end=' ')
+                if i % 2 == 1:
+                    print()
+
+            fgall = style.ForegroundPalette(palettes=ALL_PALETTES);
+            fge =   style.ForegroundPalette(palettes=('basic', 'extended'))
+            fgb =   style.ForegroundPalette(palettes='basic')
+            print('      FG t_deadbf:     ',
+                fgall.t_deadbf('▉▉▉▉'),
+                fge.t_deadbf('▉▉▉▉'),
+                fgb.t_deadbf('▉▉▉▉'),
+            )
+        else:
+            print('      Term support not available.')
         print()
 
         if is_a_tty():
