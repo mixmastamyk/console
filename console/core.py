@@ -25,6 +25,7 @@ except ImportError:
 
 
 log = logging.getLogger(__name__)
+MAX_NL_SEARCH = 4096
 
 # Palette attribute name finders, now we've got two problems.
 # Not a huge fan of regex but here they nicely enforce the naming rules:
@@ -78,7 +79,7 @@ class _BasicPaletteBuilder:
             self = dummy
             palettes = ()                       # skipen-Sie
         else:
-            raise TypeError(f'{palettes!r} not in type (str, list, tuple)')
+            raise TypeError(f'{palettes!r} was unrecognized.')
 
         self._palette_support = palettes
         return self
@@ -342,7 +343,7 @@ class _PaletteEntry:
         print(self.default, file=self._out, end='')
 
     def __call__(self, text, *styles):
-        ''' Formats text.
+        ''' Formats text.  Not appropriate for huge input strings.
 
             Tip from Pygments:
                 Color sequences are terminated at newlines,
@@ -353,7 +354,8 @@ class _PaletteEntry:
         for attr in styles:
             self += attr
 
-        if '\n' in text:
+        pos = text.find('\n', 0, MAX_NL_SEARCH)  # if '\n' in text, w/limit
+        if pos != -1:  # found
             lines = text.splitlines()
             for i, line in enumerate(lines):
                 lines[i] = f'{self}{line}{self.default}'  # add styles, see tip
