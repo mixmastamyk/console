@@ -22,6 +22,15 @@ from .constants import BEL, CSI, OSC, RS, ALL_PALETTES
 log = logging.getLogger(__name__)
 os_name = os.name
 
+# X11 colors support
+X11_RGB_PATHS = ()  # Windows
+if os_name == 'posix':  # Ubuntu, FreeBSD
+    X11_RGB_PATHS = ('/etc/X11/rgb.txt', '/usr/share/X11/rgb.txt',
+                     '/usr/local/lib/X11/rgb.txt', '/usr/X11R6/lib/X11/rgb.txt')
+elif os_name == 'darwin':
+    X11_RGB_PATHS = ('/opt/X11/share/X11/rgb.txt',)
+log.debug('X11_RGB_PATHS: %r', X11_RGB_PATHS)
+
 
 class TermStack:
     ''' Context Manager to save, temporarily modify, then restore terminal
@@ -101,7 +110,7 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
             elif os_name == 'posix':
                 if env.TERM == 'linux':
                     pal_name = 'vtrgb'
-                    basic_palette = parse_etc_vtrgb()
+                    basic_palette = parse_vtrgb()
                 elif env.TERM.startswith('xterm'):
                     pal_name = 'xterm'
                     basic_palette = color_tables.xterm_palette4
@@ -198,7 +207,7 @@ def detect_palette_support():
         result = 'truecolor'
 
     log.debug(f'{result!r} (TERM={env.TERM or ""}, '
-              f'COLORTERM={env.COLORTERM or ""}, webcolors={webcolors}, '
+              f'COLORTERM={env.COLORTERM or ""}, webcolors={bool(webcolors)}, '
               f'colorama-init={col_init}')
     return result
 
@@ -244,7 +253,38 @@ def _is_colorama_initialized():
     return result
 
 
-def parse_etc_vtrgb(path='/etc/vtrgb'):
+def load_x11_color_map(paths=X11_RGB_PATHS):
+    ''' Load and parse X11's rgb.txt.
+
+        Loads:
+            x11_color_map: { name_lower: ('R', 'G', 'B') }
+    '''
+    if type(paths) is str:
+        paths = (paths,)
+
+    x11_color_map = color_tables.x11_color_map
+    for path in paths:
+        try:
+            with open(path) as infile:
+                for line in infile:
+                    if line.startswith('!') or line.isspace():
+                        continue
+
+                    tokens = line.rstrip().split(maxsplit=3)
+                    key = tokens[3]
+                    if ' ' in key:  # skip names with spaces to match webcolors
+                        continue
+
+                    x11_color_map[key.lower()] = tuple(tokens[:3])
+            log.debug('X11 palette found at %r.', path)
+            break
+        except FileNotFoundError as err:
+            log.debug('X11 palette file not found: %r', path)
+        except IOError as err:
+            log.debug('X11 palette file not read: %s', err)
+
+
+def parse_vtrgb(path='/etc/vtrgb'):
     ''' Parse the color table for the Linux console. '''
     palette = ()
     table = []

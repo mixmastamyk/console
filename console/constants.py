@@ -2,9 +2,7 @@
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
-    Constants needed all over the code.
-    Placing in a separate module avoids circular imports.
-    Do not import anything into this module to avoid dependencies.
+    Constants needed cross-package.
 '''
                     #  DEC   OCT    HEX   CTL    DESC
 BEL = '\a'          #:   7   007   0x07    ^G    Terminal bell - Ding!

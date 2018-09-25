@@ -7,15 +7,16 @@
 
     Classes below not meant to be instantiated by client code.
 '''
-import sys, os
+import sys
 import logging
 import re
 
 from . import _CHOSEN_PALETTE
 from .constants import (CSI, ANSI_BG_LO_BASE, ANSI_BG_HI_BASE, ANSI_FG_LO_BASE,
                         ANSI_FG_HI_BASE, ANSI_RESET)
+from .color_tables import x11_color_map as _x11_color_map
 from .disabled import empty_bin, empty
-from .detection import get_available_palettes
+from .detection import get_available_palettes, load_x11_color_map, X11_RGB_PATHS
 from .proximity import (color_table4, find_nearest_color_hexstr,
                         find_nearest_color_index)
 try:
@@ -35,15 +36,6 @@ _nearest_finder = re.compile(f'^n_?{_hd}{{3}}$', re.A)              # n_HHH
 _true_finder = re.compile(f'^t_?({_hd}{{3}}|{_hd}{{6}})$', re.A)    # t_HHH+
 _x11_finder = re.compile(r'^x\w{4,64}$', re.A)                      # x_NAME
 _web_finder = re.compile(r'^w\w{4,64}$', re.A)                      # x_NAME
-
-# X11 colors support
-_x11_color_map = {}
-X11_RGB_PATHS = ()  # Windows
-if os.name == 'posix':
-    # Ubuntu, FreeBSD
-    X11_RGB_PATHS = ('/etc/X11/rgb.txt', '/usr/local/lib/X11/rgb.txt')
-elif os.name == 'darwin':
-    X11_RGB_PATHS = ('/opt/X11/share/X11/rgb.txt',)
 
 
 class _BasicPaletteBuilder:
@@ -245,7 +237,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         result = empty
         if self._x11_rgb_path:
             if not _x11_color_map:
-                _load_x11_color_map(self._x11_rgb_path)
+                load_x11_color_map(self._x11_rgb_path)
 
             if _x11_color_map:
                 try:  # x11 map: returns tuple of decimal int strings: ('1', '2', '3')
@@ -412,33 +404,3 @@ class _PaletteEntry:
                 This function is experimental and may not last.
         '''
         self._out = outfile
-
-
-def _load_x11_color_map(paths=X11_RGB_PATHS):
-    ''' Loaden-Sie and parse X11's rgb.txt, bitte.
-
-        Loads:
-            _x11_color_map: { name_lower: ('R', 'G', 'B') }
-    '''
-    if type(paths) is str:
-        paths = (paths,)
-
-    for path in paths:
-        try:
-            with open(path) as infile:
-                for line in infile:
-                    if line.startswith('!') or line.isspace():
-                        continue
-
-                    tokens = line.rstrip().split(maxsplit=3)
-                    key = tokens[3]
-                    if ' ' in key:  # skip names with spaces to match webcolors
-                        continue
-
-                    _x11_color_map[key.lower()] = tuple(tokens[:3])
-            log.debug('X11 palette found at %r.', path)
-            break
-        except FileNotFoundError as err:
-            log.debug('X11 palette file not found: %r', path)
-        except IOError as err:
-            log.debug('X11 palette file not read: %s', err)

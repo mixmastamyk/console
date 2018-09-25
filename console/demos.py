@@ -205,11 +205,11 @@ if __name__ == '__main__':
             fgall = style.ForegroundPalette(palettes=ALL_PALETTES);
             fge =   style.ForegroundPalette(palettes=('basic', 'extended'))
             fgb =   style.ForegroundPalette(palettes='basic')
-            print('      FG t_deadbf:     ',
-                fgall.t_deadbf('▉▉▉▉'),
-                fge.t_deadbf('▉▉▉▉'),
-                fgb.t_deadbf('▉▉▉▉'),
-            )
+            print('      FG t_deadbf:      ',
+                fgall.t_deadbf('▉▉▉▉▉'),
+                fge.t_deadbf('▉▉▉▉▉'),
+                fgb.t_deadbf('▉▉▉▉▉'),
+            sep='')
         else:
             print('      Term support not available.')
         print()
