@@ -148,23 +148,13 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             result = self._get_extended_palette_entry(name, key)
 
         elif _nearest_finder.match(name):   # Nearest
-            result = self._get_extended_palette_entry(name, key, ishex=True)
+            result = self._get_extended_palette_entry(name, key, is_hex=True)
 
         elif _true_finder.match(name):      # Truecolor
             result = self._get_true_palette_entry(name, key)
 
         elif _x11_finder.match(name):       # X11, forced via prefix
-            if not _x11_color_map:
-                _load_x11_color_map(self._x11_rgb_path)
-
-            if _x11_color_map:
-                try:  # x11 map: returns tuple of decimal int strings: ('1', '2', '3')
-                    color = _x11_color_map[key.lower()]
-                except KeyError as err:
-                    raise AttributeError(f'{key.lower()!r} not found in X11 palette.')
-                result = self._get_true_palette_entry(name, color)
-            else:  # didn't find
-                result = empty
+            result = self._get_X11_palette_entry(key)
 
         elif _web_finder.match(name):       # Webcolors, forced via prefix
             if webcolors:
@@ -175,7 +165,6 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                     raise AttributeError(f'{key!r} not found in webcolors palette.')
             else:
                 result = empty
-
         else:  # look for bare names (without prefix)
             if webcolors:
                 try:
@@ -184,32 +173,30 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                 except ValueError:
                     pass  # didn't find…
 
-            if self._x11_rgb_path:  # try X11
-                try:
-                    if not _x11_color_map:
-                        _load_x11_color_map(self._x11_rgb_path)
-                    color = _x11_color_map[key.lower()]
-                    return self._get_true_palette_entry(name, color)
-                except KeyError:
-                    pass  # nope
+            try:  # try X11
+                result = self._get_X11_palette_entry(name)
+                if result:
+                    return result
+            except AttributeError:
+                pass  # nope
 
             # Emerald city
             raise AttributeError(f'{name!r} is not a recognized attribute name'
                                  ' or format.')
         return result
 
-    def _get_extended_palette_entry(self, name, index, ishex=False):
+    def _get_extended_palette_entry(self, name, index, is_hex=False):
         ''' Compute extended entry, once on the fly. '''
         values = None
 
         if 'extended' in self._palette_support:  # build entry
-            if ishex:
+            if is_hex:
                 index = str(find_nearest_color_hexstr(index))
             values = [self._start_codes_extended, index]
 
         # downgrade section
         elif 'basic' in self._palette_support:
-            if ishex:
+            if is_hex:
                 nearest_idx = find_nearest_color_hexstr(index, color_table4)
             else:
                 from .color_tables import index_to_rgb8  # find rgb for idx
@@ -259,6 +246,22 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             values = self._index_to_ansi_values(nearest_idx)
 
         return self._create_entry(name, values) if values else empty
+
+    def _get_X11_palette_entry(self, name):
+        result = None
+        if self._x11_rgb_path:
+            if not _x11_color_map:
+                _load_x11_color_map(self._x11_rgb_path)
+
+            if _x11_color_map:
+                try:  # x11 map: returns tuple of decimal int strings: ('1', '2', '3')
+                    color = _x11_color_map[name.lower()]
+                except KeyError as err:
+                    raise AttributeError(
+                        f'{name.lower()!r} not found in X11 palette.')
+                result = self._get_true_palette_entry(name, color)
+
+        return result
 
     def _index_to_ansi_values(self, index):
         ''' Converts an palette index to the corresponding ANSI color.
@@ -429,6 +432,9 @@ def _load_x11_color_map(paths=X11_RGB_PATHS):
                         continue
 
                     _x11_color_map[key.lower()] = tuple(tokens[:3])
+            log.debug('X11 palette found at %r.', path)
             break
+        except FileNotFoundError as err:
+            log.debug('X11 palette file not found: %r', path)
         except IOError as err:
-            log.debug('X11 palette file not found: %s', err)
+            log.debug('X11 palette file not read: %s', err)

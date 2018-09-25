@@ -78,7 +78,7 @@ class Screen:
     def __new__(cls, force=False):
         ''' Override new() to replace the class entirely on deactivation.
 
-            Attempts to detect palette support, unless force is on:
+            Complies with palette detection, unless force is on:
 
             Arguments:
                 force           - Force on.
