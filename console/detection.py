@@ -16,8 +16,8 @@ import logging
 
 import env
 
+from . import color_tables
 from .constants import BEL, CSI, OSC, RS, ALL_PALETTES
-
 
 log = logging.getLogger(__name__)
 plat = sys.platform[:3]
@@ -55,7 +55,7 @@ class TermStack:
                                self.orig_attrs)
 
 
-def choose_palette(stream=sys.stdout):
+def choose_palette(stream=sys.stdout, current_palette4=None):
     ''' Make a best effort to automatically determine whether to enable
         ANSI sequences, and if so, which color palettes are available.
 
@@ -68,6 +68,10 @@ def choose_palette(stream=sys.stdout):
         - ``TERM``, ``ANSICON`` environment variables
         - ``CLICOLOR``, ``NO_COLOR`` environment variables
 
+        Arguments:
+            stream:             Which output file to check: stdout, stderr
+            current_palette4:   Force the platform-dependent 16 color palette,
+                                for testing.
         Returns:
             None, str: 'basic', 'extended', or 'truecolor'
     '''
@@ -78,6 +82,27 @@ def choose_palette(stream=sys.stdout):
 
     elif is_a_tty(stream=stream) and color_is_allowed():
         result = detect_palette_support()
+
+    # find the platform-dependent 16-color basic palette, set it as current:
+    if current_palette4:
+        color_tables.current_palette4 = current_palette4
+    else:
+        if os.name == 'nt':
+            color_tables.current_palette4 = color_tables.cmd_palette4
+        elif os.name == 'darwin':
+            if env.TERM_PROGRAM == 'Apple_Terminal':
+                color_tables.current_palette4 = color_tables.termapp_palette4
+            elif env.TERM_PROGRAM == 'iTerm.app':
+                pass  # TODO: configure, defaults to vga
+        elif os.name == 'posix':
+            if env.TERM == 'linux':
+                color_tables.current_palette4 = parse_etc_vtrgb()
+            elif env.TERM.startswith('xterm-'):
+                color_tables.current_palette4 = color_tables.xterm_palette4
+            # TODO: gnome, tango?
+        else:  # Amiga/Atari
+            log.warn('Unexpected OS: os.name: %s', os.name)
+        log.debug('os: %s, palette4 = %r', os.name, color_tables.current_palette4)
 
     log.debug('%r', result)
     return result
@@ -143,7 +168,7 @@ def detect_palette_support():
         TODO: curses might be able to help.
 
         Returns:
-            None, str: 'basic', 'extended', 'truecolor'
+            None or str: 'basic', 'extended', 'truecolor'
     '''
     result, col_init = None, None
     TERM = env.TERM or ''
@@ -203,6 +228,26 @@ def _is_colorama_initialized():
         except ImportError:
             pass
     return result
+
+
+def parse_etc_vtrgb(path='/etc/vtrgb'):
+    ''' Parse the color table for the Linux console. '''
+    palette = ()
+    table = []
+    try:
+        with open(path) as infile:
+            for i, line in enumerate(infile):
+                row = tuple(int(val) for val in line.split(','))
+                table.append(row)
+                if i == 2:  # failsafe
+                    break
+
+        palette = tuple(zip(*table))  # swap rows to columns
+
+    except IOError as err:
+        palette = color_tables.vga_palette4
+
+    return palette
 
 
 # -- tty, termios ------------------------------------------------------------

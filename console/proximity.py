@@ -27,9 +27,9 @@
 from . import color_tables
 
 
-def _build_color_table(mode='xterm', extended=True):
-
-    color_table = getattr(color_tables, mode + '_palette4', []).copy()
+def build_color_table(extended=True):
+    # start with first 16 colors
+    color_table = color_tables.current_palette4.copy()
 
     if extended:
         # colors 16..232: the 6x6x6 color cube
@@ -108,5 +108,5 @@ def find_nearest_color_hexstr(hexdigits, color_table=None):
     return find_nearest_color_index(*triplet, color_table=color_table)
 
 
-color_table4 = _build_color_table(extended=False)
-color_table8 = _build_color_table()
+color_table4 = build_color_table(extended=False)
+color_table8 = build_color_table()

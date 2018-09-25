@@ -5,6 +5,7 @@
     Conversion tables for ANSI color palettes.
 '''
 
+
 # 256 color table for finding rgb values for indexes, useful for clr downgrade:
 index_to_rgb8 = {
       '0': (0, 0, 0),
@@ -329,7 +330,7 @@ tango_palette4 = (
     (0xee, 0xee, 0xec), # 15    bright white
 )
 
-termapp_palette5 = [
+termapp_palette4 = [
     (0, 0, 0),          # 0     black
     (194, 54, 33),      # 1     red
     (37, 188, 36),      # 2     green
@@ -389,7 +390,7 @@ xterm_palette4 = [
     (0xff, 0xff, 0xff),  # 15    bright white
 ]
 
-_new_palette5 = [
+_new_palette4 = [
     (),   # 0     black
     (),   # 1     red
     (),   # 2     green
@@ -409,23 +410,4 @@ _new_palette5 = [
     (),   # 15    bright white
 ]
 
-
-def parse_etc_vtrgb(path='/etc/vtrgb'):
-    ''' Parse the color table for the Linux console. '''
-    palette = []
-    table = []
-    try:
-        with open(path) as infile:
-            for i, line in enumerate(infile):
-                row = tuple(int(val) for val in line.split(','))
-                print('row:', row)
-                table.append(row)
-                if i == 2:  # failsafe
-                    break
-
-        palette = list(zip(*table))  # swap rows to columns
-
-    except IOError as err:
-        palette = linuxcon_palette4
-
-    return palette
+current_palette4 = vga_palette4  # reset by detection.choose_palette()
