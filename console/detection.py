@@ -96,7 +96,7 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
 
     # find the platform-dependent 16-color basic palette, set it as current:
     if result and not basic_palette:
-        if env.SSH_CLIENT:
+        if env.SSH_CLIENT:  # fall back to xterm over ssh, info often wrong
             pal_name = 'ssh (xterm)'
             basic_palette = color_tables.xterm_palette4
         else:
@@ -437,7 +437,7 @@ def query_terminal_color(name, number=None):
             redirected through a pipe.
     '''
     colors = []
-    if is_a_tty():
+    if is_a_tty() and not env.SSH_CLIENT:
         if os.name == 'nt':
             return colors
         elif sys.platform == 'darwin':
