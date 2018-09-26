@@ -171,7 +171,7 @@ if __name__ == '__main__':
         print(make_header(i+5), 'Test color downgrade support '
                                 '(True ⏵ Indexed ⏵ Basic):')
         try:
-            import webcolors
+            import webcolors; webcolors # pyflakes
         except ImportError as err:
             print('      Test not available without webcolors installed.')
             sys.exit()
