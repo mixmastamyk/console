@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 X11_RGB_PATHS = ()  # Windows
 if sys.platform == 'darwin':
     X11_RGB_PATHS = ('/opt/X11/share/X11/rgb.txt',)
-elif os_name == 'posix':  # Ubuntu, FreeBSD
+elif os.name == 'posix':  # Ubuntu, FreeBSD
     X11_RGB_PATHS = ('/etc/X11/rgb.txt', '/usr/share/X11/rgb.txt',
                      '/usr/local/lib/X11/rgb.txt', '/usr/X11R6/lib/X11/rgb.txt')
 
