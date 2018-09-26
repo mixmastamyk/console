@@ -32,7 +32,6 @@ ANSI_BG_LO_BASE = 40
 ANSI_FG_HI_BASE = 90
 ANSI_BG_HI_BASE = 100
 
-
 ALL_PALETTES = ('basic', 'extended', 'truecolor')  # variants 'x11', 'web'
 
 

@@ -3,7 +3,7 @@
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     This module generates ANSI character codes to move the cursor around,
-    and terminal windows.
+    and manage terminal screens.
 
     TODO::
 

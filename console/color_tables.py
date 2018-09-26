@@ -5,7 +5,7 @@
     Tables for ANSI color palettes.
 '''
 
-x11_color_map = {}  # loaded from disk
+x11_color_map = {}  # loaded from disk, name: (r, g, b)
 
 # 256 color table for finding rgb values for indexes, useful for clr downgrade:
 index_to_rgb8 = {

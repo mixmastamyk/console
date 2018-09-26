@@ -106,7 +106,8 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
                     basic_palette = color_tables.termapp_palette4
                 elif env.TERM_PROGRAM == 'iTerm.app':
                     pal_name = 'iterm'
-                    pass  # TODO: configure, defaults to vga
+                    # TODO: configure, defaults to termapp
+                    basic_palette = color_tables.termapp_palette4
             elif os_name == 'posix':
                 if env.TERM == 'linux':
                     pal_name = 'vtrgb'
