@@ -112,9 +112,15 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
                     pal_name = 'vtrgb'
                     basic_palette = parse_vtrgb()
                 elif env.TERM.startswith('xterm'):
-                    pal_name = 'xterm'
-                    basic_palette = color_tables.xterm_palette4
-                # TODO: gnome, tango?
+                    try:  # check green to identify tango:
+                        if query_terminal_color('index', 2)[0][:2] == '4e':
+                            pal_name = 'tango'
+                            basic_palette = color_tables.tango_palette4
+                        else:
+                            raise RuntimeError('not the color scheme.')
+                    except (IndexError, RuntimeError):
+                        pal_name = 'xterm'
+                        basic_palette = color_tables.xterm_palette4
             else:  # Amiga/Atari :-P
                 pal_name = 'unknown'
                 log.warn('Unexpected OS: os.name: %s', os_name)
@@ -390,14 +396,16 @@ def get_theme():
     return theme
 
 
-def query_terminal_color(name):
+def query_terminal_color(name, number=None):
     ''' Query the default terminal, for colors, etc.
 
         Direct queries supported on xterm, perhaps others, not Windows.
 
         Arguments:
-            str:  name,  one of ('foreground', 'fg', 'background', 'bg')
-            int:  or a "dynamic color number (10-19)," see links below.
+            str:  name,  one of ('foreground', 'fg', 'background', 'bg',
+                                 or 'index')  # index grabs a palette index
+            int:  or a "dynamic color number of (4, 10-19)," see links below.
+            str:  number - if name is index, number should be an int from 0…255
 
         Queries terminal using ``OSC # ? BEL`` sequence,
         call responds with a color in this X Window format syntax:
@@ -439,16 +447,17 @@ def query_terminal_color(name):
         # xterm only support
         import tty, termios
         color_code = dict(foreground='10', fg='10',
-                          background='11', bg='11').get(name)
+                          background='11', bg='11',
+                          index='4;' + str(number or '')).get(name)
         if color_code:
             query_sequence = f'{OSC}{color_code};?{BEL}'
             with TermStack() as fd:
-                termios.tcflush(fd, termios.TCIFLUSH)   # needed by xterm osx
+                termios.tcflush(fd, termios.TCIFLUSH)   # clear input
 
                 tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
                 sys.stdout.write(query_sequence)
                 sys.stdout.flush()
-                resp = _read_until(maxchars=24, end=BEL)
+                resp = _read_until(maxchars=26, end=BEL)
 
             # parse response
             colors = resp.partition(':')[2].split('/')

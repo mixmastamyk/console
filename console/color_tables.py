@@ -311,7 +311,7 @@ linuxcon_palette4 = [   # ubuntu config from: /etc/vtrgb
 
 # https://en.wikipedia.org/wiki/Tango_Desktop_Project#Palette
 # https://blogs.n1zyy.com/andrew/2009/02/02/tango-color-scheme-for-xfce-terminal/
-tango_palette4 = (
+tango_palette4 = [
     (0x2e, 0x34, 0x34), # 0     black
     (0xcc, 0x00, 0x00), # 1     red
     (0x4e, 0x9a, 0x06), # 2     green
@@ -329,7 +329,28 @@ tango_palette4 = (
     (0xad, 0x7f, 0xa8), # 13    bright magenta
     (0x34, 0xe2, 0xe2), # 14    bright cyan
     (0xee, 0xee, 0xec), # 15    bright white
-)
+]
+
+solarized_dark_palette4 = [
+    (0x07, 0x36, 0x42), # 0     black
+    (0xDC, 0x32, 0x2F), # 1     red
+    (0x85, 0x99, 0x00), # 2     green
+    (0xB5, 0x89, 0x00), # 3     yellow
+    (0x26, 0x8B, 0xD2), # 4     blue
+    (0xD3, 0x36, 0x82), # 5     magenta/purple
+    (0x2A, 0xA1, 0x98), # 6     cyan
+    (0xEE, 0xE8, 0xD5), # 7     white/grey
+
+    (0x00, 0x2B, 0x36), # 8     bright black
+    (0xCB, 0x4B, 0x16), # 9     bright red),
+    (0x58, 0x6E, 0x75), # 10    bright green),
+    (0x65, 0x7B, 0x83), # 11    bright yellow),
+    (0x83, 0x94, 0x96), # 12    bright blue),
+    (0x6C, 0x71, 0xC4), # 13    bright magenta),
+    (0x93, 0xA1, 0xA1), # 14    bright cyan),
+    (0xFD, 0xF6, 0xE3), # 15    bright white),
+]
+
 
 termapp_palette4 = [
     (0, 0, 0),          # 0     black
