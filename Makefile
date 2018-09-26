@@ -50,7 +50,7 @@ docs: docs/readme.rst readme.rst
 	rsync --recursive --human-readable --delete-before  --update docs/_build/html/ ../../mixmastamyk.bitbucket.org/console/
 
 
-publish: test check_readme
+publish: test check_readme docs
 	rm -rf build  # possible wheel bug
 	python3 setup.py sdist bdist_wheel --universal upload
 	# backslash at end of line very important:
