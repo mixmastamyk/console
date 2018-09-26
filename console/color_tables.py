@@ -268,7 +268,7 @@ index_to_rgb8 = {
 }
 
 # colors 0..15: 16 basic colors
-#~ https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
+# https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
 cmd_palette4 = [
     (0, 0, 0),          # 0     black
     (128, 0, 0),        # 1     red
@@ -351,7 +351,6 @@ solarized_dark_palette4 = [
     (0xFD, 0xF6, 0xE3), # 15    bright white),
 ]
 
-
 termapp_palette4 = [
     (0, 0, 0),          # 0     black
     (194, 54, 33),      # 1     red
@@ -370,6 +369,26 @@ termapp_palette4 = [
     (249, 53, 248),     # 13    bright magenta
     (20, 240, 240),     # 14    bright cyan
     (233, 235, 235),    # 15    bright white
+]
+
+iterm_palette4 = [
+    (0, 0, 0),          # 0     black
+    (201, 27, 0),       # 1     red
+    (0, 194, 0),        # 2     green
+    (199, 196, 0),      # 3     yellow
+    (2, 37, 199),       # 4     blue
+    (201, 48, 199),     # 5     magenta/purple
+    (0, 197, 199),      # 6     cyan
+    (199, 199, 199),    # 7     white/grey
+
+    (103, 103, 103),    # 8     bright black
+    (255, 109, 103),    # 9     bright red
+    (95, 249, 103),     # 10    bright green
+    (254, 251, 103),    # 11    bright yellow
+    (104, 113, 255),    # 12    bright blue
+    (255, 118, 255),    # 13    bright magenta
+    (95, 253, 255),     # 14    bright cyan
+    (255, 255, 254),    # 15    bright white
 ]
 
 vga_palette4 = [

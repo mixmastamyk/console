@@ -20,15 +20,16 @@ from . import color_tables, proximity
 from .constants import BEL, CSI, OSC, RS, ALL_PALETTES
 
 log = logging.getLogger(__name__)
-os_name = os.name
+
 
 # X11 colors support
 X11_RGB_PATHS = ()  # Windows
-if os_name == 'posix':  # Ubuntu, FreeBSD
+if sys.platform == 'darwin':
+    X11_RGB_PATHS = ('/opt/X11/share/X11/rgb.txt',)
+elif os_name == 'posix':  # Ubuntu, FreeBSD
     X11_RGB_PATHS = ('/etc/X11/rgb.txt', '/usr/share/X11/rgb.txt',
                      '/usr/local/lib/X11/rgb.txt', '/usr/X11R6/lib/X11/rgb.txt')
-elif os_name == 'darwin':
-    X11_RGB_PATHS = ('/opt/X11/share/X11/rgb.txt',)
+
 log.debug('X11_RGB_PATHS: %r', X11_RGB_PATHS)
 
 
@@ -94,21 +95,24 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
     log.debug('%r', result)
 
     # find the platform-dependent 16-color basic palette, set it as current:
-    if result:
-        if not basic_palette:
+    if result and not basic_palette:
+        if env.SSH_CLIENT:
+            pal_name = 'ssh (xterm)'
+            basic_palette = color_tables.xterm_palette4
+        else:
             pal_name = ''
-            if os_name == 'nt':
+            if os.name == 'nt':
                 pal_name = 'cmd'
                 basic_palette = color_tables.cmd_palette4
-            elif os_name == 'darwin':
+            elif sys.platform == 'darwin':
                 if env.TERM_PROGRAM == 'Apple_Terminal':
                     pal_name = 'termapp'
                     basic_palette = color_tables.termapp_palette4
                 elif env.TERM_PROGRAM == 'iTerm.app':
                     pal_name = 'iterm'
                     # TODO: configure, defaults to termapp
-                    basic_palette = color_tables.termapp_palette4
-            elif os_name == 'posix':
+                    basic_palette = color_tables.iterm_palette4
+            elif os.name == 'posix':
                 if env.TERM == 'linux':
                     pal_name = 'vtrgb'
                     basic_palette = parse_vtrgb()
@@ -124,10 +128,10 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
                         basic_palette = color_tables.xterm_palette4
             else:  # Amiga/Atari :-P
                 pal_name = 'unknown'
-                log.warn('Unexpected OS: os.name: %s', os_name)
+                log.warn('Unexpected OS: os.name: %s', os.name)
 
         proximity.build_color_tables(basic_palette)
-        log.debug('os.name: %s, basic_palette: %s = %r', os_name, pal_name,
+        log.debug('os.name: %s, basic_palette: %s = %r', os.name, pal_name,
                                                          basic_palette)
     return result
 
@@ -434,12 +438,12 @@ def query_terminal_color(name, number=None):
     '''
     colors = []
     if is_a_tty():
-        if os_name == 'nt':
+        if os.name == 'nt':
             return colors
-        elif os_name == 'darwin':
+        elif sys.platform == 'darwin':
             if env.TERM_PROGRAM and env.TERM_PROGRAM != 'iTerm.app':
                 return colors
-        elif os_name == 'posix':
+        elif os.name == 'posix':
             if env.TERM and env.TERM.startswith('xterm'):
                 pass
             else:
