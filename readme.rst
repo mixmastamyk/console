@@ -219,21 +219,21 @@ may be accessed directly by name:
 
     # Truecolor
     fg.bisque             # Webcolors takes precedence, if installed
-    fg.navyblue           # X11 color name, if avail
+    fg.navyblue           # X11 color name, if available
 
 
-Additional indexed palettes are accessed by a prefix letter and a number of
-digits to specify the color:
+Additional palettes are accessed via a prefix letter and a number of
+digits (or name) to specify the color:
 
 .. code-block:: python
 
     # Extended     Format  Comment
     bg.i_123       iDDD   # Extended/indexed 256-color palette
-    bg.n_f0f       nHHH   # Hex to nearest indexed
+    bg.n_f0f       nHHH   # Hex to nearest indexed color
 
-    # True
+    # Truecolor
     bg.t_ff00bb    tHHH   # Truecolor, 3 or 6 digits
-    bg.x_navyblue  x_NM   # force X11 color name, if avail
+    bg.x_navyblue  x_NM   # force an X11 color name, if available
     bg.w_bisque    w_NM   # force Webcolors, if installed
 
 **The underscores are optional.**
@@ -243,6 +243,7 @@ ambiguity.
 (X11 and Webcolors
 `differ <https://en.wikipedia.org/wiki/X11_color_names#Clashes_between_web_and_X11_colors_in_the_CSS_color_scheme>`_
 on a few colors.)
+An unrecognized color name or index will result in an ``AttributeError``.
 
 
 Composability++
