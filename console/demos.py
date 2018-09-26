@@ -15,6 +15,11 @@ if __name__ == '__main__':
     log = logging.getLogger(__name__)
     _DEBUG = '-d' in sys.argv
     if os.name == 'nt':
+        try:  # wuc must come before colorama.init() for detection to work.
+            import win_unicode_console as wuc
+            wuc.enable()
+        except ImportError:
+            pass
         try:
             if not env.ANSICON:  # TODO: detect Win10 support
                 import colorama
@@ -95,9 +100,14 @@ if __name__ == '__main__':
 
         print()
         print(make_header(i+1), 'with bg:')
-        with bg.cornflowerblue:
-            print('\tCan I get the icon in Cornflower Blue?\n\t'
-                  'Absolutely. :-D')
+        try:
+            with bg.cornflowerblue:
+                print('\tCan I get the icon in Cornflower Blue?\n\t'
+                      'Absolutely. :-D')
+        except AttributeError as err:
+            with bg.blue:
+                print('\tCan I get the icon in Cornflower Blue?\n\t'
+                      'Absolutely. :-D')
         print('\n')
 
         print(make_header(i+2), 'Foreground - 256 indexed colors:\n      ',
@@ -160,6 +170,11 @@ if __name__ == '__main__':
 
         print(make_header(i+5), 'Test color downgrade support '
                                 '(True ⏵ Indexed ⏵ Basic):')
+        try:
+            import webcolors
+        except ImportError as err:
+            print('      Test not available without webcolors installed.')
+            sys.exit()
 
         if 'pal' in globals() and pal:
             bgall = style.BackgroundPalette(palettes=ALL_PALETTES);

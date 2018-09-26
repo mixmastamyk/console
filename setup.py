@@ -28,6 +28,7 @@ if sys.version_info.major < 3:
 
 if sys.version_info.minor < 6:
     install_requires.append('future_fstrings')
+    install_requires.append('win_unicode_console')
 
 
 setup(

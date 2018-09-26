@@ -187,7 +187,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             else:
                 from .color_tables import index_to_rgb8  # find rgb for idx
                 nearest_idx = find_nearest_color_index(*index_to_rgb8[index],
-                                                       color_table4)
+                                                       color_table=color_table4)
             values = self._index_to_ansi_values(nearest_idx)
 
         return self._create_entry(name, values) if values else empty
@@ -227,8 +227,8 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             else:  # tuple
                 if type(digits[0]) is str:  # convert to ints
                     digits = tuple(int(digit) for digit in digits)
-                nearest_idx = find_nearest_color_index(*digits, color_table4)
-
+                nearest_idx = find_nearest_color_index(*digits,
+                                                       color_table=color_table4)
             values = self._index_to_ansi_values(nearest_idx)
 
         return self._create_entry(name, values) if values else empty
