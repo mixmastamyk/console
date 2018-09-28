@@ -42,4 +42,4 @@ if __name__ == '__main__':
     _locals = locals()      # avoids issues
     for key in dir():
         if not key.startswith('_'):
-            print('%05s = %r' % (key, _locals[key]))
+            print('%16s = %r' % (key, _locals[key]))

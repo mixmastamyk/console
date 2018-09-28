@@ -56,6 +56,8 @@ def build_color_tables(base=color_tables.vga_palette4):
         starting with the platform-specific 16 from the color tables module.
         Save as global state. :-/
     '''
+    base = [] if base is None else base
+
     # make sure we have them before clearing
     table4 = _build_color_table(base, extended=False)
     if table4:

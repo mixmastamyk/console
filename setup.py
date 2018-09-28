@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import sys
+import sys, os
 from os.path import dirname, join
 from setuptools import setup
 
@@ -28,7 +28,8 @@ if sys.version_info.major < 3:
 
 if sys.version_info.minor < 6:
     install_requires.append('future_fstrings')
-    install_requires.append('win_unicode_console')
+    if os.name == 'nt':
+        install_requires.append('win_unicode_console')
 
 
 setup(
@@ -42,7 +43,7 @@ setup(
     long_description    = slurp('readme.rst'),
     packages            = ('console',),
     url                 = 'https://github.com/mixmastamyk/console',
-    version             = '0.87',
+    version             = '0.88',
 
     extras_require      = extras_require,
     install_requires    = install_requires,

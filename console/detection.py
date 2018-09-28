@@ -81,7 +81,7 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
         Arguments:
             stream:             Which output file to check: stdout, stderr
             basic_palette:      Force the platform-dependent 16 color palette,
-                                for testing.  List of 16 rgb-tuples.
+                                for testing.  List of 16 rgb-int tuples.
         Returns:
             None, str: 'basic', 'extended', or 'truecolor'
     '''
@@ -94,13 +94,13 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
 
     log.debug('%r', result)
 
-    # find the platform-dependent 16-color basic palette, set it as current:
+    # find the platform-dependent 16-color basic palette
+    pal_name = 'Unknown'
     if result and not basic_palette:
         if env.SSH_CLIENT:  # fall back to xterm over ssh, info often wrong
             pal_name = 'ssh (xterm)'
             basic_palette = color_tables.xterm_palette4
         else:
-            pal_name = ''
             if os.name == 'nt':
                 pal_name = 'cmd'
                 basic_palette = color_tables.cmd_palette4
@@ -127,12 +127,11 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
                         pal_name = 'xterm'
                         basic_palette = color_tables.xterm_palette4
             else:  # Amiga/Atari :-P
-                pal_name = 'unknown'
                 log.warn('Unexpected OS: os.name: %s', os.name)
 
-        proximity.build_color_tables(basic_palette)
-        log.debug('os.name: %s, basic_palette: %s = %r', os.name, pal_name,
-                                                         basic_palette)
+    proximity.build_color_tables(basic_palette)
+    log.debug('os.name: %s, basic_palette: %s = %r', os.name, pal_name,
+                                                     basic_palette)
     return result
 
 
@@ -435,7 +434,7 @@ def query_terminal_color(name, number=None):
         Note:
             Checks is_a_tty() first, since function would block if i/o were
             redirected through a pipe.
-    '''
+    '''  # TODO: Needs examples
     colors = []
     if is_a_tty() and not env.SSH_CLIENT:
         if os.name == 'nt':

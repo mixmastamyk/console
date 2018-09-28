@@ -20,7 +20,6 @@ from . import _DEBUG, _CHOSEN_PALETTE
 
 
 log = logging.getLogger(__name__)
-# might be useful for these to be public:
 ansi_csi_finder = re.compile(r'\x1b\[[0-?]*[ -/]*[@-~]')   # no C1
 ansi_osc_finder = re.compile(r'(\x1b\][0-?]*\007?|\007)')  # leave title
 

@@ -301,8 +301,8 @@ class _PaletteEntry:
 
         - Rendering to an escape sequence string.
         - Addition of attributes, to create a combined, single sequence.
-        - Allows entry attributes to be called, for use as a text wrapper.
-        - Use as a Context Manager via the "with" statement.
+        - Provides a call interface, for use as a text wrapper.
+        - Provides a Context Manager for use via the "with" statement.
 
         Arguments:
             parent  - Parent palette
