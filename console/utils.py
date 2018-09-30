@@ -100,8 +100,8 @@ def set_title(title, mode=0):
         Arguments:
             title:  str
             mode:  | 0 | 'both'   - Set icon/taskbar and window/tab title
-                   | 1 | 'icon'   - Set icon/taskbar title
-                   | 2 | 'title'  - Set window/tab title
+                   | 1 | 'icon'   - Set only icon/taskbar title
+                   | 2 | 'title'  - Set only window/tab title
     '''
     if _CHOSEN_PALETTE:
         text = f'{OSC}{_title_mode_map.get(mode, mode)};{title}{BEL}'
@@ -173,6 +173,10 @@ def pause(message='Press any key to continue…'):
             str, None:  One character or ESC - depending on key hit.
             None - immediately under i/o redirection, not an interactive tty.
     '''
+    key = None
+    print(message, end=' ', flush=True)
     if is_a_tty():  # not sure if both of these should check
-        print(message, end=' ', flush=True)
-        return wait_key()
+        key = wait_key()
+
+    print()
+    return key

@@ -403,7 +403,7 @@ def get_theme():
 def query_terminal_color(name, number=None):
     ''' Query the default terminal, for colors, etc.
 
-        Direct queries supported on xterm, perhaps others, not Windows.
+        Direct queries supported on xterm, iTerm, perhaps others, not Windows.
 
         Arguments:
             str:  name,  one of ('foreground', 'fg', 'background', 'bg',
@@ -440,7 +440,9 @@ def query_terminal_color(name, number=None):
         if os.name == 'nt':
             return colors
         elif sys.platform == 'darwin':
-            if env.TERM_PROGRAM and env.TERM_PROGRAM != 'iTerm.app':
+            if env.TERM_PROGRAM and env.TERM_PROGRAM == 'iTerm.app':
+                pass
+            else:
                 return colors
         elif os.name == 'posix':
             if env.TERM and env.TERM.startswith('xterm'):
@@ -448,7 +450,6 @@ def query_terminal_color(name, number=None):
             else:
                 return colors
 
-        # xterm only support
         import tty, termios
         color_code = dict(foreground='10', fg='10',
                           background='11', bg='11',
@@ -469,3 +470,52 @@ def query_terminal_color(name, number=None):
                 colors = []                             # empty on failure
 
     return colors
+
+
+def query_terminal_title(mode='title'):
+    ''' Always returns 'Terminal' on gnome/mate terminal
+        xterm works sometimes.  :-/
+
+        Arguments:
+            str:  mode,  one of ('title', 'icon') or int (20-21):
+                  see links below.
+
+        - `Control sequences
+          <http://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Operating-System-Commands>`_
+
+        Note:
+            Experimental, few terms outside xterm support this correctly.
+            MATE Terminal returns "Terminal".
+    '''
+    title = None
+    if is_a_tty() and not env.SSH_CLIENT:
+        if os.name == 'nt':
+            return
+        elif sys.platform == 'darwin':
+            if env.TERM_PROGRAM and env.TERM_PROGRAM == 'iTerm.app':
+                pass  # TODO: test this
+            else:
+                return
+        elif os.name == 'posix':
+            if not env.XTERM_VERSION:
+                return
+
+        # xterm (maybe iterm) only support
+        import tty, termios
+        from .constants import ESC
+
+        mode = dict(icon=20, title=21).get(mode, mode)
+        ST = '\\'  # sequence terminator, (ESC precedes)
+        query_sequence = f'{CSI}{mode}t'
+        with TermStack() as fd:
+            termios.tcflush(fd, termios.TCIFLUSH)   # clear input
+
+            tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
+            sys.stdout.write(query_sequence)
+            sys.stdout.flush()
+            resp = _read_until(maxchars=100, end=ST)
+
+        # parse response
+        title = resp.lstrip(OSC)[1:].rstrip(ESC)
+        print('resp:', repr(resp))
+    return title

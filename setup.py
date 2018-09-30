@@ -6,7 +6,7 @@ from setuptools import setup
 
 # additional metadata, requirements
 keywords = ('ansi color detection escape terminal console sequence cursor '
-            'style screen shell')
+            'style screen shell xterm')
 install_requires = ['ezenv',]
 tests_require = ('pyflakes', 'pytest', 'readme_renderer'),
 extras_require = dict(

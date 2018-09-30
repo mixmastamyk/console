@@ -423,10 +423,27 @@ if True:  # fold
         text = 'Hang \x1b[34;4;5mLoose\x1b[0m, Hawaii'
         assert utils.len_stripped(text) == 18
 
-    # TODO:
-    # set_title
+    # set_title - read title doesn't work to verify
+    def test_set_title():
+        text = 'foo'
+        utils.set_title(text)
+        possible_results = (text, None, 'Terminal')  # xterm, make, mate term
+
+        # best effort test
+        assert detection.query_terminal_title() in possible_results
+
     # wait_key
     # pause
+    def test_wait_pause():
+        ''' weak test, make sure funcs exist. '''
+
+        utils.wait_key
+        utils.pause
+        if not detection.is_a_tty():
+
+            utils.wait_key()
+            utils.pause('Testy McTest')
+
 
 
 # Detection
