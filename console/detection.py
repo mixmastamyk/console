@@ -497,8 +497,9 @@ def query_terminal_title(mode='title'):
             else:
                 return
         elif os.name == 'posix':
-            if not env.XTERM_VERSION:
-                return
+            pass
+            #~ if not env.XTERM_VERSION:  # Mate: always "Terminal"
+                #~ return
 
         # xterm (maybe iterm) only support
         import tty, termios
@@ -517,5 +518,6 @@ def query_terminal_title(mode='title'):
 
         # parse response
         title = resp.lstrip(OSC)[1:].rstrip(ESC)
-        print('resp:', repr(resp))
+
+    log.debug('%r', title)
     return title

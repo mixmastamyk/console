@@ -383,7 +383,7 @@ if True:  # fold
             for name in ('up', 'down', 'left', 'right'):
                 attr = getattr(sc, name)
                 text = attr(val)
-                assert repr(text) == "'\\x1b[%s%s'" % (val, attr.code)
+                assert repr(text) == "'\\x1b[%s%s'" % (val, attr.endcode)
 
 
 # Utils

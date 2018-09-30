@@ -1,3 +1,4 @@
+# -*- coding: future_fstrings -*-
 '''
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
@@ -9,7 +10,13 @@
 
         with term.fullscreen():  # or location
             # Print some stuff.
+
+        Since curses/terminfo is up to date on these,
+        might be worth coverting to use converting that library.
+
 '''
+import sys
+
 from . import _CHOSEN_PALETTE
 from .constants import CSI, ESC
 from .disabled import empty_bin
@@ -21,9 +28,9 @@ class _TemplateString(str):
 
         TODO: reconcile with core classes.
     '''
-    def __new__(cls, code, arg='%d'):
-        self = str.__new__(cls, CSI + arg + code)
-        self.code = code
+    def __new__(cls, endcode, arg='%d'):
+        self = str.__new__(cls, CSI + arg + endcode)
+        self.endcode = endcode
         return self
 
     def __call__(self, *args):
@@ -60,6 +67,9 @@ class Screen:
     scrollup    = su = 'S'
     scrolldown  = sd = 'T'
 
+    save_title = ('t', '22;%d')
+    restore_title = ('t', '23;%d')
+
     # These don't need wrapping, all start with ESC
     auxoff      = CSI + '4i'
     auxon       = CSI + '5i'
@@ -74,6 +84,10 @@ class Screen:
     # https://cirw.in/blog/bracketed-paste
     bracketedpaste_enable = bpon = CSI + '?2004h'
     bracketedpaste_disable = bpoff = CSI + '?2004l'
+
+    alt_screen_enable = ason = CSI + '?1049h'
+    alt_screen_disable = asoff = CSI + '?1049l'
+
 
     def __new__(cls, force=False):
         ''' Override new() to replace the class entirely on deactivation.
@@ -91,7 +105,8 @@ class Screen:
         # else: continue on unabated
         return self
 
-    def __init__(self, **kwargs):
+    def __init__(self, stream=sys.stdout, **kwargs):
+        self._stream = stream
         # look for attributes to wrap in a _TemplateString:
         for name in dir(self):
             if not name.startswith('_'):
@@ -105,5 +120,17 @@ class Screen:
                     attr = _TemplateString(*value)
                     setattr(self, name, attr)
 
+    def __enter__(self):
+        ''' Go full-screen. '''
+        self._stream.write(self.alt_screen_enable)
+        self._stream.write(str(self.save_title(0)))
+        self._stream.flush()
+
+        return self
+
+    def __exit__(self, type_, value, traceback):
+        self._stream.write(self.alt_screen_disable)
+        self._stream.write(str(self.restore_title(0)))
+        self._stream.flush()
 
 screen = Screen()

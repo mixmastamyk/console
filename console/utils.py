@@ -109,8 +109,8 @@ def set_title(title, mode=0):
         return text  # for testing
 
 
-def strip_ansi(line, osc=False):
-    ''' Strip ANSI escape sequences from a line of text.
+def strip_ansi(text, osc=False):
+    ''' Strip ANSI escape sequences from a portion of text.
         https://stackoverflow.com/a/38662876/450917
 
         Arguments:
@@ -125,18 +125,18 @@ def strip_ansi(line, osc=False):
                 - ESC \   - String Terminator (ST  is 0x9c).
                 - ESC ]   - Operating System Command (OSC is 0x9d).
     '''
-    line = ansi_csi_finder.sub('', line)
+    text = ansi_csi_finder.sub('', text)
     if osc:
-        line = ansi_osc_finder.sub('', line)
-    return line
+        text = ansi_osc_finder.sub('', text)
+    return text
 
 
-def len_stripped(line):
+def len_stripped(text):
     ''' Return the length of a string minus its ANSI escape sequences.
 
         Useful to find if a string will fit inside a given length on screen.
     '''
-    return len(strip_ansi(line))
+    return len(strip_ansi(text))
 
 
 cls = reset_terminal
@@ -149,16 +149,24 @@ except ImportError:                     # UNIX
     from .detection import _getch
 
 
-def wait_key():
+def wait_key(keys=None):
     ''' Waits for a keypress at the console and returns it.
         "Where's the any key?"
 
+        Arguments:
+            key - if passed, wait for this specific key, e.g. ESC.
         Returns:
             char or ESC - depending on key hit.
             None - immediately under i/o redirection, not an interactive tty.
     '''
     if is_a_tty():
-        return _getch()
+        if keys:
+            while True:
+                key = _getch()
+                if key in keys:
+                    return key
+        else:
+            return _getch()
 
 
 def pause(message='Press any key to continue…'):

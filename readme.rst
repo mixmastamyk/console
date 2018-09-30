@@ -217,7 +217,7 @@ may be accessed directly by name:
     fg.red                # Original 8 colors
     fg.lightred           # Another 8 brighter colors w/o bold
 
-    # Truecolor
+    # Truecolor variants
     fg.bisque             # Webcolors takes precedence, if installed
     fg.navyblue           # X11 color name, if available
 

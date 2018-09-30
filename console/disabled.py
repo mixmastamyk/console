@@ -41,6 +41,12 @@ class _EmptyBin:
         setattr(self, name, attr)   # ready next time
         return attr
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        pass
+
 
 empty = _EmptyAttribute()           # TODO: these don't show in Sphinx
 empty_bin = _EmptyBin(empty)

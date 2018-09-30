@@ -308,15 +308,15 @@ class _PaletteEntry:
             parent  - Parent palette
             name    - Display name, used in demos.
             code    - Associated ANSI code number.
-            out     - Stream to print to, when using a context manager.
+            stream  - Stream to print to, when using a context manager.
     '''
-    def __init__(self, parent, name, code):
+    def __init__(self, parent, name, code, stream=sys.stdout):
         self.parent = parent
         self.default = (parent.default if hasattr(parent, 'default')
                                        else parent.end)  # style
         self.name = name
         self._codes = [str(code)]           # the initial code
-        self._out = sys.stdout              # for redirection
+        self._stream = stream               # for redirection
 
     def __add__(self, other):
         ''' Add: self + other '''
@@ -354,12 +354,11 @@ class _PaletteEntry:
                 Color sequences are terminated at newlines,
                 so that paging the output works correctly.
         '''
-
         log.debug(repr(str(self)))
-        print(self, file=self._out, end='')
+        self._stream.write(str(self))
 
     def __exit__(self, type, value, traceback):
-        print(self.default, file=self._out, end='')
+        self._stream.write(str(self.default))
 
     def __call__(self, text, *styles):
         ''' Formats text.  Not appropriate for huge input strings.
@@ -403,4 +402,4 @@ class _PaletteEntry:
             Note:
                 This function is experimental and may not last.
         '''
-        self._out = outfile
+        self._stream = outfile

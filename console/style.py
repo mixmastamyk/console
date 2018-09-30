@@ -168,14 +168,19 @@ class EffectsTerminator(_BasicPaletteBuilder):
     bg              = BackgroundPalette.default
 
     bold            = 21
+    b               = 21  # short
     intensity       = 22  # bold, dim (maybe color) ---> norm
     italic = font   = 23
+    i               = 23  # short
     underline       = 24
+    u               = 24  # short
     blink           = 25
     reverse         = 27
     reveal          = 28
     crossed         = 29
     strike          = crossed
+
+
 
     frame           = 54
     encircle        = frame
