@@ -6,16 +6,22 @@
     This module generates ANSI character codes to move the cursor around,
     and manage terminal screens.
 
-    TODO::
+    Context-managers with contextlib derived from:
 
-        with term.fullscreen():  # or location
-            # Print some stuff.
+    .. code-block:: text
 
-        Since curses/terminfo is up to date on these,
-        might be worth coverting to use converting that library.
+        blessings.__init__.py
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        A thin, practical wrapper around terminal coloring, styling, and
+        positioning.
+
+        :copyright: Copyright 2011-2018, Erik Rose
+        :license: MIT License (MIT)
 
 '''
 import sys
+from contextlib import contextmanager
 
 from . import _CHOSEN_PALETTE
 from .constants import CSI, ESC
@@ -53,33 +59,37 @@ class Screen:
     right       = cuf = forward = 'C'
     left        = cub = backward = 'D'
 
-    nextline    = cnl = 'E'
-    prevline    = cpl = 'F'
+    next_line   = cnl = 'E'
+    prev_line   = cpl = 'F'
 
-    horizabs    = cha = 'G'
-
-    cup         = mv = ('H', '%d;%d')       # double trouble - move to pos
-    hvp         = ('f', '%d;%d')            # ""
+    mv_x        = cha = hpa = 'G'
+    mv_y        = cva = vpa = 'd'
+    mv          = cup = ('H', '%d;%d')      # double trouble - move to pos
+    mv2         = hvp = ('f', '%d;%d')      # ""
 
     erase       = ed = 'J'
-    eraseline   = el = 'K'
+    erase_line  = el = 'K'
 
-    scrollup    = su = 'S'
-    scrolldown  = sd = 'T'
+    scroll_up   = su = 'S'
+    scroll_down = sd = 'T'
 
     save_title = ('t', '22;%d')
     restore_title = ('t', '23;%d')
 
-    # These don't need wrapping, all start with ESC
+    # These don't need parameter wrapping.  All start with ESC
     auxoff      = CSI + '4i'
     auxon       = CSI + '5i'
-    dsr         = loc = CSI + '6n'          # device status report,
-    savepos     = scp = CSI + 's'           # ↑ i.e. cursor location
-    restpos     = rcp = CSI + 'u'
+    dsr         = loc = CSI + '6n'          # device status rpt, see detection
 
-    save        = CSI + '?47h'                  # whole screen
-    restore     = CSI + '?47l'                  # ""
-    reset       = ESC + 'c'                     # ""
+    reset       = ESC + 'c'
+
+    # cursor config
+    save_pos    = ESC + '7'                 # position
+    rest_pos    = ESC + '8'
+    save_pos2   = scp = CSI + 's'
+    rest_pos2   = rcp = CSI + 'u'
+    hide_cursor = CSI + '?25l'
+    show_cursor = CSI + '?25h'
 
     # https://cirw.in/blog/bracketed-paste
     bracketedpaste_enable = bpon = CSI + '?2004h'
@@ -123,14 +133,77 @@ class Screen:
     def __enter__(self):
         ''' Go full-screen. '''
         self._stream.write(self.alt_screen_enable)
-        self._stream.write(str(self.save_title(0)))
+        self._stream.write(str(self.save_title(0)))     # 0 = both icon, title
         self._stream.flush()
-
         return self
 
     def __exit__(self, type_, value, traceback):
         self._stream.write(self.alt_screen_disable)
-        self._stream.write(str(self.restore_title(0)))
+        self._stream.write(str(self.restore_title(0)))  # 0 = both icon, title
         self._stream.flush()
+
+    @contextmanager
+    def location(self, x=None, y=None):
+        ''' Temporarily move the cursor, perform work, and return to the
+            previous location.
+
+            ::
+
+                with screen.location(40, 20):
+                    print('Hello, world!')
+        '''
+        self._stream.write(self.save_pos)  # cursor position
+
+        if x is not None and y is not None:
+            self._stream.write(self.mv(y, x))
+        elif x is not None:
+            self._stream.write(self.mv_x(x))
+        elif y is not None:
+            self._stream.write(self.mv_y(y))
+
+        self._stream.flush()
+        try:
+            yield self
+        finally:
+            self._stream.write(self.rest_pos)
+            self._stream.flush()
+
+    @contextmanager
+    def fullscreen(self):
+        ''' Context Manager that enters full-screen mode and restores normal
+            mode on exit.
+
+            ::
+
+                with screen.fullscreen():
+                    print('Hello, world!')
+        '''
+        self._stream.write(self.alt_screen_enable)
+        self._stream.write(str(self.save_title(0)))     # 0 = both icon, title
+        self._stream.flush()
+        try:
+            yield self
+        finally:
+            self._stream.write(self.alt_screen_disable)
+            self._stream.write(str(self.restore_title(0)))  # 0 = icon & title
+            self._stream.flush()
+
+    @contextmanager
+    def hidden_cursor(self):
+        ''' Context Manager that hides the cursor and restores it on exit.
+
+            ::
+
+                with screen.hidden_cursor():
+                    print('Clandestine activity…')
+        '''
+        self._stream.write(self.hide_cursor)
+        self._stream.flush()
+        try:
+            yield self
+        finally:
+            self._stream.write(self.show_cursor)
+            self._stream.flush()
+
 
 screen = Screen()
