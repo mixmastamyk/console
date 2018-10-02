@@ -59,7 +59,7 @@ def clear_line(mode=2):
         Note:
             Cursor position does not change.
     '''
-    text = screen.eraseline(_mode_map.get(mode, mode))
+    text = screen.erase_line(_mode_map.get(mode, mode))
     _write(text)
     return text  # for testing
 

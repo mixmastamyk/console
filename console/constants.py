@@ -5,6 +5,7 @@
     Constants needed cross-package.
 '''
                     #  DEC   OCT    HEX   CTL     DESC
+ENQ = '\x05'        #:   5   005           ^E     Enquiry
 BEL = '\a'          #:   7   007   0x07    ^G     Terminal bell - Ding!
 BS  = '\b'          #:   8   010   0x08    ^H     Backspace
 HT  = '\t'          #:   9   011   0x09    ^I     Horizontal TAB

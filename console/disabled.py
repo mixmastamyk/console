@@ -20,7 +20,7 @@ class _EmptyAttribute(str):
     def __enter__(self):
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, *args):
         pass
 
     def __call__(self, *args, **kwargs):
@@ -44,9 +44,9 @@ class _EmptyBin:
     def __enter__(self):
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, *args):
         pass
 
 
-empty = _EmptyAttribute()           # TODO: these don't show in Sphinx
+empty = _EmptyAttribute()
 empty_bin = _EmptyBin(empty)

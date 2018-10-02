@@ -294,6 +294,34 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         self.__dict__.clear()
 
 
+class _LineWriter(object):
+    ''' Writes each line with escape sequences terminated so paging works
+        correctly, a la Pygments.
+    '''
+    def __init__(self, start, stream, default):
+        self.start = start
+        self.stream = stream
+        self.default = default
+
+    def write(self, data):
+        ''' This could be a bit less clumsy. '''
+        if data == '\n':  # print does this
+            return self.stream.write(data)
+        else:
+            bytes_ = 0
+            for line in data.splitlines(True):
+                nl = ''
+                if line.endswith('\n'):
+                    line = line[:-1]
+                    nl = '\n'
+                bytes_ += self.stream.write(
+                                f'{self.start}{line}{self.default}{nl}')
+            return bytes_
+
+    def __getattr__(self, attr):
+         return getattr(self.stream, attr)
+
+
 class _PaletteEntry:
     ''' Palette Entry Attribute
 
@@ -348,17 +376,17 @@ class _PaletteEntry:
         return bool(self._codes)
 
     def __enter__(self):
-        ''' TODO:
-
-            Tip from Pygments:
-                Color sequences are terminated at newlines,
-                so that paging the output works correctly.
-        '''
+        ''' Wrap output streams. '''
         log.debug(repr(str(self)))
-        self._stream.write(str(self))
+        # wrap originals
+        self._orig_stdout = sys.stdout
+        sys.stdout = _LineWriter(self, self._stream, self.default)
+        return sys.stdout
 
     def __exit__(self, type, value, traceback):
-        self._stream.write(str(self.default))
+        sys.stdout = sys.stdout.stream
+        #~ sys.stderr = sys.stderr.stream
+        self._stream.write(str(self.default))  # just in case
 
     def __call__(self, text, *styles):
         ''' Formats text.  Not appropriate for huge input strings.
@@ -402,4 +430,8 @@ class _PaletteEntry:
             Note:
                 This function is experimental and may not last.
         '''
+        if self._orig_stdout:  # restore Usted
+            sys.stdout = self._orig_stdout
+
         self._stream = outfile
+        sys.stdout = _LineWriter(self, self._stream, self.default)

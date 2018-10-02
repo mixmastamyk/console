@@ -336,31 +336,23 @@ if True:  # fold
 # ----------------------------------------------------------------------------
 if True:  # fold
 
+    # reprs prevent interpretation of sequences
     def test_screen_eraseline():
-        text = sc.eraseline(1)
-        assert text == CSI + '1K'
+        assert sc.erase_line(1) == CSI + '1K'
 
     def test_screen_pos():
-        text = sc.mv(20, 11)  # y, x
-        assert text == CSI + '20;11H'
+        assert sc.mv(20, 11) == CSI + '20;11H'  # y, x
 
     def test_screen_save_restore():
-        text = sc.save
-        assert repr(text) == "'\\x1b[?47h'"
-
-        text = sc.restore
-        assert repr(text) == "'\\x1b[?47l'"
+        assert repr(sc.alt_screen_enable) == "'\\x1b[?1049h'"
+        assert repr(sc.alt_screen_disable) == "'\\x1b[?1049l'"
 
     def test_screen_save_restore_pos():
-        text = sc.savepos
-        assert repr(text) == "'\\x1b[s'"
-
-        text = sc.restpos
-        assert repr(text) == "'\\x1b[u'"
+        assert repr(sc.save_pos) == "'\\x1b7'"
+        assert repr(sc.rest_pos) == "'\\x1b8'"
 
     def test_screen_reset():
-        text = sc.reset
-        assert repr(text) == "'\\x1bc'"
+        assert repr(sc.reset) == "'\\x1bc'"
 
     def test_screen_bp_enable():
         bpon = "'\\x1b[?2004h'"
@@ -442,8 +434,7 @@ if True:  # fold
         if not detection.is_a_tty():
 
             utils.wait_key()
-            utils.pause('Testy McTest')
-
+            utils.pause('')
 
 
 # Detection
@@ -519,17 +510,14 @@ if True:  # fold
         assert detection.is_a_tty(stream=f) == False
         assert detection.is_a_tty(stream=YesMan()) == True
 
-    def test_choose_palette():
-        pass # TODO
-
-    # not sure we can test term query functions, need to be more testable :-/
+    # not sure how we can test term-specific query functions:
     def test_get_term_color():
-        #~ assert detection.query_terminal_color('bg') == []
-        pass  # gets correct results on osx ['ffff', 'ffff', 'ffff']
+        detection.query_terminal_color('bg') #== []
+        pass  # gets correct results on osx/iterm ['ffff', 'ffff', 'ffff']
 
     def test_get_cursor_pos():
-        #~ assert detection.get_cursor_pos() == ()
-        pass  # gets correct results on osx (81, 40)
+        # gets correct results on osx/iterm (81, 40)
+        detection.get_cursor_pos()
 
 # downgrade support:
 
@@ -573,22 +561,21 @@ if True:  # fold
 # Misc
 # ----------------------------------------------------------------------------
 if True:  # fold
+
     def test_context_mgr():
-        try:
-            import webcolors; webcolors # pyflakes
 
-            f = StringIO()
-            forestgreen = bg.wforestgreen + fx.bold
-            forestgreen.set_output(f)
-            with forestgreen:
-                print('Testing, testing…', file=f)
-                print('1, 2, 3.', file=f)
+        from .core import _LineWriter
+        forestgreen = bg.green + fx.bold
+        outf = _LineWriter(str(forestgreen), StringIO(), forestgreen.default)
 
-            result = '\x1b[48;2;34;139;34;1mTesting, testing…\n1, 2, 3.\n\x1b[0m'
-            assert result == f.getvalue()
+        with forestgreen:
+            print(' Testing, \n Testing… ', file=outf)
+            print(' 1, 2, 3. ', file=outf)
 
-        except ImportError:
-            pass  # not able to test
+        result = ('\x1b[42;1m Testing, \x1b[0m\n'
+                  '\x1b[42;1m Testing… \x1b[0m\n'
+                  '\x1b[42;1m 1, 2, 3. \x1b[0m\n')
+        assert result == outf.getvalue()
 
     def test_find_nearest_color_index():
         from .proximity import find_nearest_color_index

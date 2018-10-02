@@ -54,7 +54,7 @@ console.disabled module
 -----------------------
 
 .. automodule:: console.disabled
-    :members:
+    :members: empty, empty_bin
     :undoc-members:
     :show-inheritance:
 

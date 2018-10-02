@@ -86,6 +86,7 @@ class BackgroundPalette(_HighColorPaletteBuilder):
     lightyellow     = 103
     lightblue       = 104
     lightmagenta    = 105
+    lightpurple     = lightmagenta
     lightcyan       = 106
     lightwhite      = 107
 
