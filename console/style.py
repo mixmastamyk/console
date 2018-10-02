@@ -122,6 +122,7 @@ class EffectsPalette(_BasicPaletteBuilder):
     hide            = conceal
     crossed         = 9
     strike          = crossed
+    s               = crossed
 
     frame           = 51
     encircle        = 52
@@ -144,11 +145,11 @@ class EffectsPalette(_BasicPaletteBuilder):
     fraktur         = font20
 
     # should these ideogram codes be enabled?
-    # ideogramurl     = 60
-    # ideogramdrl     = 61
-    # ideogramoll     = 62
-    # ideogramdll     = 63
-    # ideogramst      = 64
+    # ideogram_ul     = 60
+    # ideogram_du     = 61
+    # ideogram_ol     = 62
+    # ideogram_do     = 63
+    # ideogram_sm     = 64
 
 
 class EffectsTerminator(_BasicPaletteBuilder):
@@ -180,8 +181,7 @@ class EffectsTerminator(_BasicPaletteBuilder):
     reveal          = 28
     crossed         = 29
     strike          = crossed
-
-
+    s               = crossed
 
     frame           = 54
     encircle        = frame

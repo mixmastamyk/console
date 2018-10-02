@@ -31,8 +31,6 @@ from .disabled import empty_bin
 class _TemplateString(str):
     ''' A template string that renders itself with default arguments when
         created, and may also be called with another argument.
-
-        TODO: reconcile with core classes.
     '''
     def __new__(cls, endcode, arg='%d'):
         self = str.__new__(cls, CSI + arg + endcode)

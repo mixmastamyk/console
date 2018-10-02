@@ -110,7 +110,6 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
                     basic_palette = color_tables.termapp_palette4
                 elif env.TERM_PROGRAM == 'iTerm.app':
                     pal_name = 'iterm'
-                    # TODO: configure, defaults to termapp
                     basic_palette = color_tables.iterm_palette4
             elif os.name == 'posix':
                 if env.TERM == 'linux':
@@ -191,8 +190,6 @@ def color_is_forced():
 def detect_palette_support():
     ''' Returns whether we think the terminal supports basic, extended, or
         truecolor.  None if not able to tell.
-
-        TODO: curses might be able to help.
 
         Returns:
             None or str: 'basic', 'extended', 'truecolor'
@@ -431,10 +428,17 @@ def query_terminal_color(name, number=None):
                 If an error occurs during retrieval or parsing,
                 the list will be empty.
 
+        Examples:
+            >>> query_terminal_color('bg')
+            ['0000', '0000', '0000']
+
+            >>> query_terminal_color('index', 2)  # second color in indexed
+            ['4e4d', '9a9a', '0605']              # palette, 2 aka 32 in basic
+
         Note:
             Checks is_a_tty() first, since function would block if i/o were
             redirected through a pipe.
-    '''  # TODO: Needs examples
+    '''
     colors = []
     if is_a_tty() and not env.SSH_CLIENT:
         if os.name == 'nt':
@@ -490,10 +494,15 @@ def query_terminal_title(mode='title'):
     title = None
     if is_a_tty() and not env.SSH_CLIENT:
         if os.name == 'nt':
-            return
+            import ctypes
+            MAX_LEN = 256
+            buffer_ = ctypes.create_unicode_buffer(MAX_LEN)
+            ctypes.windll.kernel32.GetConsoleTitleW(buffer_, MAX_LEN)
+            return buffer_.value
+
         elif sys.platform == 'darwin':
             if env.TERM_PROGRAM and env.TERM_PROGRAM == 'iTerm.app':
-                pass  # TODO: test this
+                pass  # TODO: test this with xterm query below:
             else:
                 return
         elif os.name == 'posix':

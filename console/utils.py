@@ -10,6 +10,7 @@
 
         - `getpass <https://docs.python.org/3/library/getpass.html>`_
 '''
+import os
 import logging
 import re
 
@@ -65,7 +66,7 @@ def clear_line(mode=2):
 
 
 def clear_screen(mode=2):
-    ''' Clear the terminal screen. (Aliased to clear also)
+    ''' Clear the terminal/console screen. (Also aliased to clear.)
 
         Arguments:
 
@@ -78,20 +79,24 @@ def clear_screen(mode=2):
     _write(text)
     return text  # for testing
 
-clear = clear_screen
-
 
 def reset_terminal():
-    ''' Reset the terminal window. (Aliased to cls also)
+    ''' Reset the terminal/console screen. (Also aliased to cls.)
 
         Greater than a fullscreen terminal clear, also clears the scrollback
         buffer.  May expose bugs in dumb terminals.
-
-        TODO: add windows support.
     '''
-    text = screen.reset
-    _write(text)
-    return text  # for testing
+    if os.name == 'nt':
+        # Clumsy but works - Win32 API takes 50 lines of code
+        # and manually fills entire screen with spaces :/
+        # https://www.tek-tips.com/viewthread.cfm?qid=277263
+        # https://github.com/tartley/colorama/blob/master/colorama/winterm.py#L111
+        from subprocess import call
+        call('cls', shell=True)
+    else:
+        text = screen.reset
+        _write(text)
+        return text  # for testing
 
 
 def set_title(title, mode=0):
@@ -103,10 +108,14 @@ def set_title(title, mode=0):
                    | 1 | 'icon'   - Set only icon/taskbar title
                    | 2 | 'title'  - Set only window/tab title
     '''
-    if _CHOSEN_PALETTE:
-        text = f'{OSC}{_title_mode_map.get(mode, mode)};{title}{BEL}'
-        _write(text)
-        return text  # for testing
+    if os.name == 'nt':
+        import ctypes
+        ctypes.windll.kernel32.SetConsoleTitleW(title)
+    else:
+        if _CHOSEN_PALETTE:
+            text = f'{OSC}{_title_mode_map.get(mode, mode)};{title}{BEL}'
+            _write(text)
+            return text  # for testing
 
 
 def strip_ansi(text, osc=False):
@@ -139,6 +148,7 @@ def len_stripped(text):
     return len(strip_ansi(text))
 
 
+clear = clear_screen
 cls = reset_terminal
 
 

@@ -311,11 +311,12 @@ class _LineWriter(object):
             bytes_ = 0
             for line in data.splitlines(True):
                 nl = ''
-                if line.endswith('\n'):
+                if line.endswith('\n'):  # mv nl to end:
                     line = line[:-1]
                     nl = '\n'
                 bytes_ += self.stream.write(
-                                f'{self.start}{line}{self.default}{nl}')
+                                f'{self.start}{line}{self.default}{nl}'
+                          ) or 0  # in case None returned (on Windows)
             return bytes_
 
     def __getattr__(self, attr):
