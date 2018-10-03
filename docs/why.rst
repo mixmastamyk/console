@@ -49,7 +49,7 @@ So ANSI escape codes have been standard on UNIX
 with the belt-and-suspenders crowd for several decades,
 and even saw use on DOS and BBSs back in the day.
 With the advent of macOS (X),
-a whole new generation of lumber-sexuals have exposed themselves(huh?)
+a whole new generation of lumber-sexuals have exposed themselves(?)
 to the terminal environment and command-line
 *and liked it*.
 
@@ -63,10 +63,11 @@ allowing *multi-decade-late*
 `improvements
 <http://www.nivot.org/blog/post/2016/02/04/Windows-10-TH2-(v1511)-Console-Host-Enhancements>`_
 to be made to its until-now pathetic "console."
-Often still known as the "DOS Prompt" because it hadn't changed since then.
-Vaguely analogous to a virtual terminal,
+Often still known as the "DOS Prompt" because it has been stuck in time since
+then.
+Vaguely analogous to today's virtual terminals,
 as a Yugo might compare to a classic BMW.
-But now it's supercharged.
+But now, it's supercharged.
 
 So, all the top platforms support ANSI escape sequences.
 Again!
@@ -105,7 +106,7 @@ beyond curses and termios
 
 Those are low-level interfaces however,
 focused on "full screen" terminal apps and tty control respectively,
-while continuing to abstract hardware that now exists in museums.
+while continuing to abstract hardware that now only exists in museums.
 The ANSI standard may have won,
 but styling a text snippet here and there or setting a title without a bunch
 of ugly C-style function calls was thought too…
@@ -115,7 +116,8 @@ trivial perhaps.
 
 Besides the difficulty factor mentioned,
 this classic answer to this problem also suffers in that it doesn't support
-"true" color palettes.
+"true" color palettes,
+and not included by default on Windows.
 
 
 Meanwhile, over at the Cheeseshop…
@@ -127,7 +129,7 @@ And so, now there are ad-hoc ANSI codes being generated in every command-line
 app and eleventy micro-libs on "the" PyPI doing the same.
 Looks to be a fun exercise and somewhat of a rite of passage to create one.
 
-(Good luck finding an appropriate name on PyPI for yours—Taken!)
+(On that note:  Good luck finding an appropriate name on PyPI for yours—Taken!)
 
 .. raw:: html
 
@@ -155,7 +157,7 @@ Unfortunately,
 one or more important items are often missing:
 
     - Styles, cursor movements, clearing the screen,
-      setting titles, querying the terminal, etc.
+      setting titles, full-screen, etc.
 
     - Multiple Palettes:
 
@@ -168,12 +170,9 @@ one or more important items are often missing:
 
         - X11, Webcolors - rarest
 
-    - Auto-detection, support and deactivation:
+    - Querying the terminal, auto-detection, support and deactivation.
 
     - Python3 support
-
-      *(currently console requires Python 3.6 for string interpolation but
-      back-porting is under consideration)*
 
     - Still maintained
     - Has tests
@@ -197,15 +196,15 @@ but may still miss one of these nice to haves:
 
 .. rubric:: Result
 
-Looking over at PyPI with the criteria above finds many
-interesting parts but not the whole.
-So, had some fun building my own.
+Looking over at PyPI with the criteria above finds many interesting pieces but
+far from the full Monty.
+So, had some fun building my own of course.
 Looked at and picked a few design cues from several of these:
 
     - ansi
     - ansicolors
     - blessed
-    - blessings
+    - `blessings <https://pypi.org/project/blessings/>`_ - Context Managers
     - click.style and utilities (reminded of pause)
     - colorama.ansi (palette collection objects)
     - `colorful <https://tuxtimo.me/posts/colorful-python>`_
@@ -217,3 +216,5 @@ Looked at and picked a few design cues from several of these:
     - pygments (nearest indexed color)
     - style
     - termcolor
+
+etc.

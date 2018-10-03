@@ -3,11 +3,12 @@
     :align: center
 
 
-.. container:: center mt
+.. container:: center mt mb
+
+    Comprehensive utility library for ANSI-compatible terminals.
 
     *"Gentlemen…  we have the technology…"*
 
-|
 
 .. raw:: html
 
@@ -24,13 +25,11 @@
     ></iframe>
 
 
-.. container:: center mt
+.. container:: center mt mb
 
-    *Comprehensive utility library for ANSI terminals.*
 
     *"Better, stronger, faster…"*
 
-|
 
 
 Contents

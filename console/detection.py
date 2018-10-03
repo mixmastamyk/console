@@ -374,7 +374,7 @@ def get_theme():
     ''' Checks system for theme information.
 
         First checks for the environment variable COLORFGBG.
-        Next, queries terminal, supported on xterm, perhaps others.
+        Next, queries terminal, supported on Windows and xterm, perhaps others.
         See notes on query_terminal_color().
 
         Returns:
@@ -386,12 +386,17 @@ def get_theme():
         FG, _, BG = env.COLORFGBG.partition(';')
         theme = 'dark' if BG < '8' else 'light'  # background wins
     else:
-        # try xterm - find average across rgb
-        colors = query_terminal_color('background')  # background wins
-        if colors:
-            colors = tuple(int(cm[:1], 16) for cm in colors)  # first hex char
-            avg = sum(colors) / len(colors)
-            theme = 'dark' if avg < 8 else 'light'
+        if os.name == 'nt':
+            from .windows import get_console_color, STD_OUTPUT_HANDLE
+            color_id = get_console_color(STD_OUTPUT_HANDLE, 'background')
+            theme = 'dark' if color_id < 128 else 'light'
+        else:
+            # try xterm - find average across rgb
+            colors = query_terminal_color('background')  # background wins
+            if colors:
+                colors = tuple(int(cm[:1], 16) for cm in colors)  # first hex char
+                avg = sum(colors) / len(colors)
+                theme = 'dark' if avg < 8 else 'light'
 
     log.debug('%r', theme)
     return theme

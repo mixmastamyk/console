@@ -98,7 +98,8 @@ it ends all styles and fore/background colors at once,
 where as ``bg.default`` for example,
 resets only the background to its default color.
 This need not be your responsibility however,
-use the call form instead: ``fg.yellow('Woot!')``
+one may use the call form instead: ``fg.yellow('Woot!')``
+More on that later.
 
 {% if mode == 'pypi' %}
 But wait!  There's a shitload,^H^H^H^H^H, crapton,^H^H^H^H^H
@@ -128,15 +129,16 @@ Jah!
 While console is cross-platform,
 `colorama <https://pypi.python.org/pypi/colorama>`_
 will need to be installed and .init() run beforehand to view these examples
-under the lame versions of Windows < 10.
+under the lame (no-ANSI support) versions of Windows < 10.
 
 .. note::
 
     ``console`` supports Python 3.6 and over by default.
-    However!  Is trying out
+    However!  It is trying out
     `"future-fstrings" <https://github.com/asottile/future-fstrings>`_
-    for experimental support under Python versions 3.5 down to 3.2.
-    It is installed automatically when needed.
+    for experimental support under Python versions 3.5 and 3.4,
+    perhaps earlier.
+    Installed automatically when needed.
     Keep an eye peeled for oddities under older Pythons.
     Sorry, neither 2.X, nor 1.X is not supported. ``:-P``
 
@@ -161,13 +163,13 @@ includes a number of nifty functions:
     >>> from console.utils import cls, set_title
 
     >>> cls()  # whammo! a.k.a. reset terminal
-    >>> set_title('Le Freak')
-    '\x1b]2;Le Freak\x07'  # c'est chic
+    >>> set_title('Le Freak')  # c'est chic
+    '\x1b]2;Le Freak\x07'
 
 It can also ``strip_ansi`` from strings,
 wait for keypresses,
 clear a line or the screen (with or without scrollback),
-and easily ``pause`` a script like the old DOS command.
+and easily ``pause`` a script like the old DOS commands of yesteryear.
 
 .. rubric:: **Screen**
 
@@ -177,7 +179,9 @@ move the cursor around,
 get its position,
 and enable
 `bracketed paste <https://cirw.in/blog/bracketed-paste>`_
-if any of that floats your boat.
+if any of that floats your boat. 
+`Blessings <https://pypi.org/project/blessings/>`_-\
+compatible context managers are also available for full-screen fun.
 
 
 .. rubric:: **Detection**
@@ -185,14 +189,17 @@ if any of that floats your boat.
 Detect the terminal environment with
 {% if mode == 'sphx' %}:mod:{% endif %}`console.detection`:
 
-    - Determine palette support
+    - Determine palette support, load definitions.
     - Check relevant environment variables, such as
+      `TERM <https://www.gnu.org/software/gettext/manual/html_node/The-TERM-variable.html>`_,
       `NO_COLOR <http://no-color.org/>`_,
+      `COLORFGBG <https://unix.stackexchange.com/q/245378/159110>`_,
+      and
       `CLICOLOR <https://bixense.com/clicolors/>`_,
       etc.
     - Query terminal colors and themes---light or dark?
     - Redirection---is this an interactive "``tty``" or not?
-    - and more.
+    - Get titles, and more.
 
 Console does its best to figure out what your terminal supports on startup
 and will configure its convenience objects
@@ -242,10 +249,10 @@ below:
 - "True", a.k.a. 16 million colors, consisting of:
 
   - RGB specified colors
-  - X11 named colors
-  - Webcolors named colors
+  - X11-named colors, or
+  - Webcolors-named colors
 
-As mentioned
+As mentioned,
 the original palette,
 X11,
 and Webcolor palettes
@@ -323,7 +330,8 @@ so those tasks no longer need to be managed manually:
 When palette objects are combined together as done above,
 the list of codes to be rendered to is kept on ice until final output as a
 string.
-Meaning, there won't be redundant escape sequences in the output:
+Meaning, there won't be redundant escape sequences in the output.
+No sirree !
 
 .. code-block:: python
 
@@ -378,7 +386,7 @@ Other template formats are no problem either, ``%s`` or ``${}``.
 Console is lightweight,
 but perhaps you'd like a pre-rendered string in a tight loop for performance
 reasons.
-Simply use ``str()`` on the final output and use it in the loop.
+Simply use ``str()`` to finalize the output then use it in the loop.
 
 Palette entries work as context-managers as well:
 
@@ -402,7 +410,7 @@ Demos and Tests
 
     *Outta Sight!*
 
-A series of positively *jaw-dropping* demos (haha, ok maybe not) may be run at
+A series of positively jaw-dropping demos (haha, ok maybe not) may be run at
 the command-line with::
 
     ⏵ python3 -m console.demos
@@ -414,7 +422,7 @@ tests can be run from the install folder.
 
     ⏵ pytest -s
 
-The Makefile has good information on such topics.
+The Makefile at github has good information on such topics.
 
 
 Contributions

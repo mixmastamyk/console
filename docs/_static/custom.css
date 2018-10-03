@@ -113,6 +113,9 @@ code, span.pre  {
 .mt {
     margin-top: 1.3em;
 }
+.mb {
+    margin-bottom: 1.3em;
+}
 .rounded {
     border-radius: .8em;
 }

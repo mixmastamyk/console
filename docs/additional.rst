@@ -28,7 +28,7 @@ Behind the scenes in
 you've been working with the two main parent classes of those in
 :mod:`console.style`:
 
-.. rubric:: Palette Builders:
+.. rubric:: Palette Collection:
 
 A collection object holding a large number of Palettes and their associated
 Entries, e.g.:
@@ -48,18 +48,18 @@ Once created,
 attributes are cached and available for future use.
 This namespace cache may also be cleared in uncommon scenarios using huge
 palettes,
-with the ``clear()`` function.
+with the ``clear()`` method.
 
 .. rubric:: Palette Entries:
 
-Entries objects are what actually produce the escape sequences---\
+Entrie objects are what actually produce the escape sequences---\
 they are accessed as attributes of a palette collection, e.g.:
 
     - ``.red``
     - ``.i22``
     - ``.cornflowerblue``
 
-Entries provide much of the functionality from
+The Entries provide much of the functionality from
 :mod:`console.style`:
 
     - Keep track of their ANSI codes and those they've been added to.
@@ -117,8 +117,8 @@ one may create palette builder objects yourself::
 
 .. note::
 
-    Forcing the support of all palettes ON can also be done with an environment
-    variable,
+    Forcing the support of all palettes ON can also be done externally with an
+    environment variable,
     such as ``CLICOLOR_FORCE`` if desired.
 
 
@@ -152,6 +152,53 @@ not able to be redirected outside the process::
 So, don't get too dependent on the set_output function. ;-)
 
 
+.. rubric:: Fullscreen Apps, a la Blessings
+
+Here's a short script to show off console's full-screen abilities::
+
+    from console import fg, fx, defx  # shortcut: sc
+    from console.screen import screen
+    from console.utils import wait_key, set_title
+    from console.constants import ESC
+
+    exit_keys = (ESC, 'q', 'Q')
+
+    with screen:  # or screen.fullscreen():
+
+        set_title(' 🤓 Hi, from console!')
+        with screen.location(5, 4):
+            print(
+                fg.lightgreen(f'** Hi, from a {fx.i}fullscreen{defx.i}'
+                               ' app! ** '),
+                screen.mv_x(5),  # back up, then down
+                screen.down(5),
+                fg.yellow(f'(Hit the {fx.reverse}ESC{defx.reverse} '
+                           'key to exit): '),
+                end='', flush=True,
+            )
+        with screen.hidden_cursor():
+
+            wait_key(exit_keys)
+
+The text below should appear.
+After hitting the ESC restore your terminal shall be restored:
+
+.. raw:: html
+
+    <pre>
+
+    <div style="color: green; ">
+     * Hi, from a <i>fullscreen</i> app! **
+    </div>
+
+
+
+    <div style="color: #ba0; ">
+      (Hit the <span style="background: #ba0; color: black">ESC</span> key to exit):
+    </div>
+    </pre>
+
+
 .. rubric:: TermStack
 
 TermStack is a content-manager for making temporary modifications to the
@@ -159,7 +206,7 @@ terminal via termios,
 that copies the original settings and restores them when finished.
 
 It's in the detection module because that's where it's used,
-but is copied to the package namespace.
+but also aliased to the package namespace.
 For example::
 
     from console import TermStack
@@ -179,7 +226,8 @@ Screen Stuff
     *What's Happening, "Raj" !?!*
 
 The :mod:`console.screen` module is the one you're looking for,
-although there is a convenience instance in the root of the package as well::
+although there is a preconfigured convenience instance in the root of the
+package as well::
 
     >>> from console import sc
 
@@ -191,19 +239,18 @@ although there is a convenience instance in the root of the package as well::
     >>>  # this space intentionally left blank ;-)
 
 
-
 Tips
 ------------
 
 Don't have many to list yet,
 but there's at least one.
 
-- The styles bold, italic, and underline have one-letter shortcuts as they do
-  in HTML,
+- The styles bold, italic, underline, and strike have one-letter shortcuts as
+  they do in HTML,
   if you're into that sort of thing::
 
     # COWABUNGA !
-    XTREME_STYLING = fx.b + fx.i + fx.u
+    XTREME_STYLING = fx.b + fx.i + fx.u + fx.s
 
 
 Deeper Dive
@@ -222,7 +269,7 @@ be found below:
       (`PDF <https://www.x.org/docs/xterm/ctlseqs.pdf>`_)
 
 
-.. rubric:: Warm Colors
+.. rubric:: Aside - Warm Colors
 
 Did you know that thirty years before
 `f.lux <https://en.wikipedia.org/wiki/F.lux>`_
@@ -233,7 +280,7 @@ choice?
 Easier on the eyes for extended periods (i.e. late nights) they said.
 Interesting knowledge rediscovered, perhaps.
 
-.. container:: center
+.. container:: center mt mb
 
     *"Believe it…*
 
