@@ -74,7 +74,7 @@ def cls():
     call('cls', shell=True)
 
 
-def enable_virtual_terminal_processing():
+def enable_vt_processing():
     ''' What it says on the tin.
 
         - https://docs.microsoft.com/en-us/windows/console/setconsolemode

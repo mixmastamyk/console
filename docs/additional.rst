@@ -258,7 +258,7 @@ but here's a couple.
 
     >>> import console.windows as cw
 
-    >>> cw.enable_virtual_terminal_processing()
+    >>> cw.enable_vt_processing()
     (0, 0)
 
 
