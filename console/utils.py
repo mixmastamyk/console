@@ -87,12 +87,8 @@ def reset_terminal():
         buffer.  May expose bugs in dumb terminals.
     '''
     if os.name == 'nt':
-        # Clumsy but works - Win32 API takes 50 lines of code
-        # and manually fills entire screen with spaces :/
-        # https://www.tek-tips.com/viewthread.cfm?qid=277263
-        # https://github.com/tartley/colorama/blob/master/colorama/winterm.py#L111
-        from subprocess import call
-        call('cls', shell=True)
+        from windows import cls
+        cls()
     else:
         text = screen.reset
         _write(text)
@@ -109,8 +105,8 @@ def set_title(title, mode=0):
                    | 2 | 'title'  - Set only window/tab title
     '''
     if os.name == 'nt':
-        import ctypes
-        ctypes.windll.kernel32.SetConsoleTitleW(title)
+        from .windows import set_title
+        return set_title(title)
     else:
         if _CHOSEN_PALETTE:
             text = f'{OSC}{_title_mode_map.get(mode, mode)};{title}{BEL}'
@@ -153,9 +149,9 @@ cls = reset_terminal
 
 
 # -- wait key implementations ------------------------------------------------
-try:
-    from msvcrt import getch as _getch  # Win32
-except ImportError:                     # UNIX
+if os.name == 'nt':
+    from msvcrt import getch as _getch
+elif os.name == 'posix':
     from .detection import _getch
 
 

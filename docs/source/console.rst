@@ -96,3 +96,12 @@ console.utils module
     :undoc-members:
     :show-inheritance:
 
+
+console.windows module
+----------------------
+
+.. automodule:: console.windows
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

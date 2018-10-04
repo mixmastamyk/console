@@ -5,11 +5,6 @@
 
     This module contains capability detection routines for use under ANSI
     compatible terminals.
-
-    See also:
-
-        - os & `shutil.get_terminal_size
-          <https://docs.python.org/3/library/shutil.html#shutil.get_terminal_size>`_
 '''
 import sys, os
 import logging
@@ -117,7 +112,7 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
                     basic_palette = parse_vtrgb()
                 elif env.TERM.startswith('xterm'):
                     try:  # check green to identify tango:
-                        if query_terminal_color('index', 2)[0][:2] == '4e':
+                        if get_terminal_color('index', 2)[0][:2] == '4e':
                             pal_name = 'tango'
                             basic_palette = color_tables.tango_palette4
                         else:
@@ -370,39 +365,7 @@ def get_cursor_pos():
     return values
 
 
-def get_theme():
-    ''' Checks system for theme information.
-
-        First checks for the environment variable COLORFGBG.
-        Next, queries terminal, supported on Windows and xterm, perhaps others.
-        See notes on query_terminal_color().
-
-        Returns:
-            str, None: 'dark', 'light', None if no information.
-    '''
-    theme = None
-    log.debug('COLORFGBG: %s', env.COLORFGBG)
-    if env.COLORFGBG:
-        FG, _, BG = env.COLORFGBG.partition(';')
-        theme = 'dark' if BG < '8' else 'light'  # background wins
-    else:
-        if os.name == 'nt':
-            from .windows import get_console_color, STD_OUTPUT_HANDLE
-            color_id = get_console_color(STD_OUTPUT_HANDLE, 'background')
-            theme = 'dark' if color_id < 128 else 'light'
-        else:
-            # try xterm - find average across rgb
-            colors = query_terminal_color('background')  # background wins
-            if colors:
-                colors = tuple(int(cm[:1], 16) for cm in colors)  # first hex char
-                avg = sum(colors) / len(colors)
-                theme = 'dark' if avg < 8 else 'light'
-
-    log.debug('%r', theme)
-    return theme
-
-
-def query_terminal_color(name, number=None):
+def get_terminal_color(name, number=None):
     ''' Query the default terminal, for colors, etc.
 
         Direct queries supported on xterm, iTerm, perhaps others, not Windows.
@@ -481,9 +444,22 @@ def query_terminal_color(name, number=None):
     return colors
 
 
-def query_terminal_title(mode='title'):
-    ''' Always returns 'Terminal' on gnome/mate terminal
-        xterm works sometimes.  :-/
+def get_terminal_size(fallback=(80, 24)):
+    ''' Convenience copy of `shutil.get_terminal_size
+        <https://docs.python.org/3/library/shutil.html#shutil.get_terminal_size>`_.
+
+        ::
+
+            >>> get_terminal_size(fallback=(80, 24))
+            os.terminal_size(columns=120, lines=24)
+    '''
+    from shutil import get_terminal_size
+
+    return get_terminal_size(fallback=fallback)
+
+
+def get_terminal_title(mode='title'):
+    ''' Return the terminal/console title.
 
         Arguments:
             str:  mode,  one of ('title', 'icon') or int (20-21):
@@ -499,11 +475,8 @@ def query_terminal_title(mode='title'):
     title = None
     if is_a_tty() and not env.SSH_CLIENT:
         if os.name == 'nt':
-            import ctypes
-            MAX_LEN = 256
-            buffer_ = ctypes.create_unicode_buffer(MAX_LEN)
-            ctypes.windll.kernel32.GetConsoleTitleW(buffer_, MAX_LEN)
-            return buffer_.value
+            from .windows import get_console_title
+            return get_console_title()
 
         elif sys.platform == 'darwin':
             if env.TERM_PROGRAM and env.TERM_PROGRAM == 'iTerm.app':
@@ -535,3 +508,35 @@ def query_terminal_title(mode='title'):
 
     log.debug('%r', title)
     return title
+
+
+def get_theme():
+    ''' Checks system for theme information.
+
+        First checks for the environment variable COLORFGBG.
+        Next, queries terminal, supported on Windows and xterm, perhaps others.
+        See notes on query_terminal_color().
+
+        Returns:
+            str, None: 'dark', 'light', None if no information.
+    '''
+    theme = None
+    log.debug('COLORFGBG: %s', env.COLORFGBG)
+    if env.COLORFGBG:
+        FG, _, BG = env.COLORFGBG.partition(';')
+        theme = 'dark' if BG < '8' else 'light'  # background wins
+    else:
+        if os.name == 'nt':
+            from .windows import get_console_color, STD_OUTPUT_HANDLE
+            color_id = get_console_color(STD_OUTPUT_HANDLE, 'background')
+            theme = 'dark' if color_id < 128 else 'light'
+        else:
+            # try xterm - find average across rgb
+            colors = get_terminal_color('background')  # background wins
+            if colors:
+                colors = tuple(int(cm[:1], 16) for cm in colors)  # first hex char
+                avg = sum(colors) / len(colors)
+                theme = 'dark' if avg < 8 else 'light'
+
+    log.debug('%r', theme)
+    return theme

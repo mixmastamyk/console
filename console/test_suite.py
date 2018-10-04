@@ -422,7 +422,7 @@ if True:  # fold
         possible_results = (text, None, 'Terminal')  # xterm, make, mate term
 
         # best effort test
-        assert detection.query_terminal_title() in possible_results
+        assert detection.get_terminal_title() in possible_results
 
     # wait_key
     # pause
@@ -512,7 +512,7 @@ if True:  # fold
 
     # not sure how we can test term-specific query functions:
     def test_get_term_color():
-        detection.query_terminal_color('bg') #== []
+        detection.get_terminal_color('bg') #== []
         pass  # gets correct results on osx/iterm ['ffff', 'ffff', 'ffff']
 
     def test_get_cursor_pos():
