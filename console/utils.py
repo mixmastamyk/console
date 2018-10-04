@@ -87,7 +87,7 @@ def reset_terminal():
         buffer.  May expose bugs in dumb terminals.
     '''
     if os.name == 'nt':
-        from windows import cls
+        from .windows import cls
         cls()
     else:
         text = screen.reset

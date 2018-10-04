@@ -7,31 +7,33 @@
     https://docs.microsoft.com/en-us/windows/console/console-reference
 '''
 try:
-    import ctypes
-    from ctypes import byref, c_short, c_ushort, windll, wintypes, Structure
-    SHORT = c_short
-    WORD = c_ushort
-    _GetConsoleScreenBufferInfo = windll.kernel32.GetConsoleScreenBufferInfo
+    from ctypes import (byref, c_short, c_ushort, Structure, windll,
+                        create_unicode_buffer)
+    from ctypes.wintypes import DWORD, HANDLE
 
-except (ValueError, NameError) as err:  # Sphinx import on Linux
-    SHORT = WORD = Structure = _GetConsoleScreenBufferInfo = object
+    kernel32 = windll.kernel32
+    # https://stackoverflow.com/a/17998333/450917
+    kernel32.GetStdHandle.restype = HANDLE
+
+except (ValueError, NameError, ImportError) as err:  # Sphinx import on Linux
+    c_short = c_ushort = Structure = kernel32 = DWORD = windll = object
 
 
 class COORD(Structure):
     ''' Struct from wincon.h. '''
     _fields_ = [
-        ('X', SHORT),
-        ('Y', SHORT),
+        ('X', c_short),
+        ('Y', c_short),
     ]
 
 
 class SMALL_RECT(Structure):
     ''' Struct from wincon.h. '''
     _fields_ = [
-        ('Left', SHORT),
-        ('Top', SHORT),
-        ('Right', SHORT),
-        ('Bottom', SHORT),
+        ('Left', c_short),
+        ('Top', c_short),
+        ('Right', c_short),
+        ('Bottom', c_short),
     ]
 
 
@@ -40,13 +42,14 @@ class CONSOLE_SCREEN_BUFFER_INFO(Structure):
     _fields_ = [
         ('dwSize', COORD),
         ('dwCursorPosition', COORD),
-        ('wAttributes', WORD),
+        ('wAttributes', c_ushort),
         ('srWindow', SMALL_RECT),
         ('dwMaximumWindowSize', COORD),
     ]
 
 
 # winbase.h
+ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
 STD_INPUT_HANDLE = -10
 STD_OUTPUT_HANDLE = -11
 STD_ERROR_HANDLE = -12
@@ -71,17 +74,42 @@ def cls():
     call('cls', shell=True)
 
 
+def enable_virtual_terminal_processing():
+    ''' What it says on the tin.
+
+        - https://docs.microsoft.com/en-us/windows/console/setconsolemode
+          #ENABLE_VIRTUAL_TERMINAL_PROCESSING
+
+        - https://stackoverflow.com/q/36760127/450917
+
+        Returns:
+            Tuple of status codes from SetConsoleMode for (stdout, stderr).
+    '''
+    results = []
+    for stream in (STD_OUTPUT_HANDLE, STD_ERROR_HANDLE):
+        handle = kernel32.GetStdHandle(stream)
+        # get current mode
+        mode = DWORD()
+        if not kernel32.GetConsoleMode(handle, byref(mode)):
+            break
+
+        # check if not set, then set
+        if (mode.value & ENABLE_VIRTUAL_TERMINAL_PROCESSING) == 0:
+            results.append(
+                kernel32.SetConsoleMode(handle,
+                            mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING)
+            )
+    return tuple(results) or None  # last one only
+
+
 def get_console_color(stream=STD_OUTPUT_HANDLE, mask='background'):
     ''' Returns current colors of console.
 
         https://docs.microsoft.com/en-us/windows/console/getconsolescreenbufferinfo
     '''
-    # https://stackoverflow.com/a/17998333/450917
-    windll.kernel32.GetStdHandle.restype = wintypes.HANDLE
-
-    stdout = windll.kernel32.GetStdHandle(stream)
+    stdout = kernel32.GetStdHandle(stream)
     csbi = CONSOLE_SCREEN_BUFFER_INFO()
-    _GetConsoleScreenBufferInfo(stdout, byref(csbi))
+    kernel32.GetConsoleScreenBufferInfo(stdout, byref(csbi))
     color_id = csbi.wAttributes & _mask_map.get(mask, mask)
 
     return color_id
@@ -93,11 +121,11 @@ def get_console_title():
         https://docs.microsoft.com/en-us/windows/console/getconsoletitle
     '''
     MAX_LEN = 256
-    buffer_ = ctypes.create_unicode_buffer(MAX_LEN)
-    windll.kernel32.GetConsoleTitleW(buffer_, MAX_LEN)
+    buffer_ = create_unicode_buffer(MAX_LEN)
+    kernel32.GetConsoleTitleW(buffer_, MAX_LEN)
     return buffer_.value
 
 
 def set_title(title):
     ''' Set the console title. '''
-    return windll.kernel32.SetConsoleTitleW(title)
+    return kernel32.SetConsoleTitleW(title)

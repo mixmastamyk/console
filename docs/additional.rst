@@ -243,7 +243,7 @@ Tips
 ------------
 
 Don't have many to list yet,
-but there's at least one.
+but here's a couple.
 
 - The styles bold, italic, underline, and strike have one-letter shortcuts as
   they do in HTML,
@@ -251,6 +251,16 @@ but there's at least one.
 
     # COWABUNGA !
     XTREME_STYLING = fx.b + fx.i + fx.u + fx.s
+
+- Haven't figured out how to detect it yet,
+  but for now ANSI support can be enabled on Windows 10 with the following
+  incantation::
+
+    >>> import console.windows as cw
+
+    >>> cw.enable_virtual_terminal_processing()
+    (0, 0)
+
 
 
 Deeper Dive
@@ -267,6 +277,8 @@ be found below:
     - `XTerm Control Sequences
       <http://invisible-island.net/xterm/ctlseqs/ctlseqs.html>`_
       (`PDF <https://www.x.org/docs/xterm/ctlseqs.pdf>`_)
+    - `ANSI Terminal Animations
+      <http://artscene.textfiles.com/vt100/>`_ - Get busy!
 
 
 .. rubric:: Aside - Warm Colors
