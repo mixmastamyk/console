@@ -471,6 +471,7 @@ def get_terminal_title(mode='title'):
         Note:
             Experimental, few terms outside xterm support this correctly.
             MATE Terminal returns "Terminal".
+            iTerm returns "".
     '''
     title = None
     if is_a_tty() and not env.SSH_CLIENT:
@@ -480,7 +481,7 @@ def get_terminal_title(mode='title'):
 
         elif sys.platform == 'darwin':
             if env.TERM_PROGRAM and env.TERM_PROGRAM == 'iTerm.app':
-                pass  # TODO: test this with xterm query below:
+                pass
             else:
                 return
         elif os.name == 'posix':

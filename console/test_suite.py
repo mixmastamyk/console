@@ -419,7 +419,8 @@ if True:  # fold
     def test_set_title():
         text = 'foo'
         utils.set_title(text)
-        possible_results = (text, None, 'Terminal')  # xterm, make, mate term
+        # xterm, make, mate term, iterm2
+        possible_results = (text, None, 'Terminal', '')
 
         # best effort test
         assert detection.get_terminal_title() in possible_results
