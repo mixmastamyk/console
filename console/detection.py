@@ -189,14 +189,19 @@ def detect_palette_support():
         Returns:
             None or str: 'basic', 'extended', 'truecolor'
     '''
-    result, col_init = None, None
+    result = col_init = win_enabled = None
     TERM = env.TERM or ''
-    col_init = _is_colorama_initialized()
+    if os.name == 'nt':
+        from .windows import (is_ansi_capable, enable_vt_processing,
+                              is_colorama_initialized)
+        if is_ansi_capable():
+            win_enabled = all(enable_vt_processing())
+        col_init = is_colorama_initialized()
+
     try:
         import webcolors
     except ImportError:
         webcolors = None
-
 
     if ('color' in TERM) or ('linux' in TERM) or col_init:
         result = 'basic'
@@ -205,12 +210,12 @@ def detect_palette_support():
         result = 'extended'
 
     # https://bugzilla.redhat.com/show_bug.cgi?id=1173688 - obsolete?
-    if env.COLORTERM in ('truecolor', '24bit'):
+    if env.COLORTERM in ('truecolor', '24bit') or win_enabled:
         result = 'truecolor'
 
     log.debug(f'{result!r} (TERM={env.TERM or ""}, '
-              f'COLORTERM={env.COLORTERM or ""}, webcolors={bool(webcolors)}, '
-              f'colorama-init={col_init}')
+              f'COLORTERM={env.COLORTERM or ""}, ANSICON={env.ANSICON}, '
+              f'webcolors={bool(webcolors)})')
     return result
 
 
@@ -240,18 +245,6 @@ def is_a_tty(stream=sys.stdout):
     '''
     result = stream.isatty() if hasattr(stream, 'isatty') else None
     log.debug(result)
-    return result
-
-
-def _is_colorama_initialized():
-    result = None
-    if os.name == 'nt':
-        try:
-            import colorama
-            if isinstance(sys.stdout, colorama.ansitowin32.StreamWrapper):
-                result = True
-        except ImportError:
-            pass
     return result
 
 

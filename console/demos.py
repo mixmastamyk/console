@@ -210,9 +210,9 @@ if __name__ == '__main__':
                 dwnb = getattr(bgb, color_key)
 
                 print('      ', '%-18.18s' % (color_key + ':'),
-                      full, ' t   ', bgall.default,
-                      dwne, ' i   ', bgall.default,
-                      dwnb, ' b   ', bgall.default,
+                      full, ' t   ', fx.end, # bgall.default
+                      dwne, ' i   ', fx.end, # broken on windows, mac terminal
+                      dwnb, ' b   ', fx.end,
                 sep='', end=' ')
                 if i % 2 == 1:
                     print()

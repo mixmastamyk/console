@@ -6,6 +6,7 @@
 
     https://docs.microsoft.com/en-us/windows/console/console-reference
 '''
+import logging
 try:
     from ctypes import (byref, c_short, c_ushort, Structure, windll,
                         create_unicode_buffer)
@@ -48,6 +49,8 @@ class CONSOLE_SCREEN_BUFFER_INFO(Structure):
     ]
 
 
+log = logging.getLogger(__name__)
+
 # winbase.h
 ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
 STD_INPUT_HANDLE = -10
@@ -72,6 +75,53 @@ def cls():
     # https://github.com/tartley/colorama/blob/master/colorama/winterm.py#L111
     from subprocess import call
     call('cls', shell=True)
+
+
+def get_windows_version():
+    ''' Return MajorVersion, MinorVersion, and BuildNumber as integers instead
+        of strings like the platform module.
+    '''
+    from ctypes import c_int, c_char, sizeof
+    class OSVersionInfo(Structure):
+        _fields_ = [
+            ('dwOSVersionInfoSize', c_int),
+            ('dwMajorVersion', c_int),
+            ('dwMinorVersion', c_int),
+            ('dwBuildNumber', c_int),
+            ('dwPlatformId', c_int),
+            ('szCSDVersion', c_char*128)
+        ]
+    version = OSVersionInfo()
+    version.dwOSVersionInfoSize = sizeof(OSVersionInfo)
+    kernel32.GetVersionExA(byref(version))
+    result = (version.dwMajorVersion, version.dwMinorVersion,
+              version.dwBuildNumber)
+    log.debug('%s', result)
+    return result
+
+
+def is_ansi_capable():
+    ''' Check to see whether this version of Windows is recent enough to
+        support "ANSI VT"" processing.
+    '''
+    if get_windows_version() > (10, 0, 10586):
+        result = True
+    else:
+        result = False
+    log.debug('%s', result)
+    return result
+
+
+def is_colorama_initialized():
+    result = None
+    try:
+        import sys, colorama
+        if isinstance(sys.stdout, colorama.ansitowin32.StreamWrapper):
+            result = True
+    except ImportError:
+        pass
+    log.debug('%s', result)
+    return result
 
 
 def enable_vt_processing():
@@ -99,7 +149,9 @@ def enable_vt_processing():
                 kernel32.SetConsoleMode(handle,
                             mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING)
             )
-    return tuple(results) or None  # last one only
+    results = tuple(results) or None
+    log.debug('%s', results)
+    return results
 
 
 def get_console_color(stream=STD_OUTPUT_HANDLE, mask='background'):
@@ -111,7 +163,7 @@ def get_console_color(stream=STD_OUTPUT_HANDLE, mask='background'):
     csbi = CONSOLE_SCREEN_BUFFER_INFO()
     kernel32.GetConsoleScreenBufferInfo(stdout, byref(csbi))
     color_id = csbi.wAttributes & _mask_map.get(mask, mask)
-
+    log.debug('%d', color_id)
     return color_id
 
 
@@ -123,6 +175,7 @@ def get_console_title():
     MAX_LEN = 256
     buffer_ = create_unicode_buffer(MAX_LEN)
     kernel32.GetConsoleTitleW(buffer_, MAX_LEN)
+    log.debug('%s', buffer_.value)
     return buffer_.value
 
 
