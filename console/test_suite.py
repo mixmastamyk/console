@@ -420,7 +420,9 @@ if True:  # fold
         text = 'foo'
         utils.set_title(text)
         # xterm, make, mate term, iterm2
-        possible_results = (text, None, 'Terminal', '')
+        possible_results = (text, None, 'Terminal', '',
+            text + ' (fish)', text + ' (bash)',   # iterm2, sigh
+        )
 
         # best effort test
         assert detection.get_terminal_title() in possible_results
