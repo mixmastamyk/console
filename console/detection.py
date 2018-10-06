@@ -111,7 +111,7 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
                     pal_name = 'iterm'
                     basic_palette = color_tables.iterm_palette4
             elif os.name == 'posix':
-                if env.TERM == 'linux':
+                if env.TERM in ('linux', 'fbterm'):
                     pal_name = 'vtrgb'
                     basic_palette = parse_vtrgb()
                 elif env.TERM.startswith('xterm'):
@@ -207,10 +207,12 @@ def detect_palette_support():
     except ImportError:
         webcolors = None
 
-    if ('color' in TERM) or ('linux' in TERM) or col_init:
+    # linux, fbterm, older Windows
+    if ('color' in TERM) or (TERM in ('linux', 'fbterm')) or col_init:
         result = 'basic'
 
-    if ('256color' in TERM) or env.ANSICON:  # xterm, Windows
+    # xterm, older Windows
+    if ('256color' in TERM) or env.ANSICON:
         result = 'extended'
 
     # https://bugzilla.redhat.com/show_bug.cgi?id=1173688 - obsolete?
