@@ -289,6 +289,28 @@ cmd_palette4 = [
     (255, 255, 255),    # 15    bright white
 ]
 
+# New palette, 1709, Fall Creators Update, 2017-10-17, build 16299
+# https://blogs.msdn.microsoft.com/commandline/2017/08/02/updating-the-windows-console-colors/
+cmd1709_palette4 = [
+    (12, 12, 12),       # 0     black
+    (197, 15, 31),      # 1     red
+    (19, 161, 14),      # 2     green
+    (193, 156, 0),      # 3     yellow
+    (0, 55, 218),       # 4     blue
+    (136, 23, 152),     # 5     magenta/purple
+    (58, 150, 221),     # 6     cyan
+    (204, 204, 204),    # 7     white/grey
+
+    (118, 118, 118),    # 8     bright black
+    (231, 72, 86),      # 9     bright red
+    (22, 198, 12),      # 10    bright green
+    (249, 241, 165),    # 11    bright yellow
+    (59, 120, 255),     # 12    bright blue
+    (180, 0, 158),      # 13    bright magenta
+    (97, 214, 214),     # 14    bright cyan
+    (242, 242, 242),    # 15    bright white
+]
+
 linuxcon_palette4 = [   # ubuntu config from: /etc/vtrgb
     (1, 1, 1),          # 0     black
     (222, 56, 43),      # 1     red

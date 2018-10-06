@@ -97,8 +97,12 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
             basic_palette = color_tables.xterm_palette4
         else:
             if os.name == 'nt':
-                pal_name = 'cmd'
-                basic_palette = color_tables.cmd_palette4
+                if sys.getwindowsversion()[2] > 16299: # Win10 FCU, new palette
+                    pal_name = 'cmd_1709'
+                    basic_palette = color_tables.cmd1709_palette4
+                else:
+                    pal_name = 'cmd_legacy'
+                    basic_palette = color_tables.cmd_palette4
             elif sys.platform == 'darwin':
                 if env.TERM_PROGRAM == 'Apple_Terminal':
                     pal_name = 'termapp'
@@ -361,7 +365,7 @@ def get_cursor_pos():
 def get_terminal_color(name, number=None):
     ''' Query the default terminal, for colors, etc.
 
-        Direct queries supported on xterm, iTerm, perhaps others, not Windows.
+        Direct queries supported on xterm, iTerm, perhaps others.
 
         Arguments:
             str:  name,  one of ('foreground', 'fg', 'background', 'bg',
@@ -379,36 +383,47 @@ def get_terminal_color(name, number=None):
               <https://www.x.org/releases/X11R7.7/doc/libX11/libX11/libX11.html#RGB_Device_String_Specification>`_
 
         Returns:
-            list[str]: 
-                A list of four-digit hex strings after parsing,
+            tuple[int]: 
+                A tuple of four-digit hex strings after parsing,
                 the last two digits are the least significant and can be
                 chopped if needed:
 
-                ``['DEAD', 'BEEF', 'CAFE']``
+                ``('DEAD', 'BEEF', 'CAFE')``
 
                 If an error occurs during retrieval or parsing,
-                the list will be empty.
+                the tuple will be empty.
 
         Examples:
             >>> query_terminal_color('bg')
-            ['0000', '0000', '0000']
+            ('0000', '0000', '0000')
 
             >>> query_terminal_color('index', 2)  # second color in indexed
-            ['4e4d', '9a9a', '0605']              # palette, 2 aka 32 in basic
+            ('4e4d', '9a9a', '0605')              # palette, 2 aka 32 in basic
 
         Note:
             Checks is_a_tty() first, since function would block if i/o were
             redirected through a pipe.
+
+            On Windows, only able to find palette defaults,
+            which may be off if customized.
+            To find the palette index instead,
+            see ``windows.get_console_color``.
     '''
-    colors = []
+    colors = ()
     if is_a_tty() and not env.SSH_CLIENT:
         if os.name == 'nt':
-            return colors
+            from .windows import get_console_color
+            color_id = get_console_color(name)
+            if sys.getwindowsversion()[2] > 16299:  # Win10 FCU, new palette
+                basic_palette = color_tables.cmd1709_palette4
+            else:
+                basic_palette = color_tables.cmd_palette4
+            return tuple(f'{i:02x}' for i in basic_palette[color_id]) # compat
         elif sys.platform == 'darwin':
             if env.TERM_PROGRAM and env.TERM_PROGRAM == 'iTerm.app':
-                pass
+                pass  # supports, though returns two chars per
             else:
-                return colors
+                return colors  # doesn't support
         elif os.name == 'posix':
             if env.TERM and env.TERM.startswith('xterm'):
                 pass
@@ -434,7 +449,7 @@ def get_terminal_color(name, number=None):
             if colors == ['']:
                 colors = []                             # empty on failure
 
-    return colors
+    return tuple(colors)
 
 
 def get_terminal_size(fallback=(80, 24)):
@@ -521,13 +536,13 @@ def get_theme():
         theme = 'dark' if BG < '8' else 'light'  # background wins
     else:
         if os.name == 'nt':
-            from .windows import get_console_color, STD_OUTPUT_HANDLE
-            color_id = get_console_color(STD_OUTPUT_HANDLE, 'background')
-            theme = 'dark' if color_id < 128 else 'light'
+            from .windows import get_console_color
+            color_id = get_console_color('background')
+            theme = 'dark' if color_id < 8 else 'light'
         else:
             # try xterm - find average across rgb
             colors = get_terminal_color('background')  # background wins
-            if colors:
+            if colors:  # TODO more precision - two hex < 128
                 colors = tuple(int(cm[:1], 16) for cm in colors)  # first hex char
                 avg = sum(colors) / len(colors)
                 theme = 'dark' if avg < 8 else 'light'

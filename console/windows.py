@@ -6,6 +6,7 @@
 
     https://docs.microsoft.com/en-us/windows/console/console-reference
 '''
+import sys
 import logging
 try:
     from ctypes import (byref, c_short, c_ushort, Structure, windll,
@@ -64,6 +65,27 @@ _mask_map = dict(
     background=0x00f0,
     bg=0x00f0,
 )
+_win_to_ansi_offset_map = {
+    # conhost, ansi
+     0:   0,   # BLACK,  :  black
+     1:   4,   # BLUE,   :  red
+     2:   2,   # GREEN,  :  green
+     3:   6,   # CYAN,   :  yellow
+     4:   1,   # RED,    :  blue
+     5:   5,   # MAGENTA :  magenta/purple
+     6:   3,   # YELLOW  :  cyan,
+     7:   7,   # GREY,   :  gray
+
+     8:   8,   # BLACK,  :  light black
+     9:  12,   # BLUE,   :  light red
+    10:  10,   # GREEN,  :  light green
+    11:  14,   # CYAN,   :  light yellow
+    12:   9,   # RED,    :  light blue
+    13:  13,   # MAGENTA :  light magenta
+    14:  11,   # YELLOW  :  light cyan
+    15:  15,   # GREY,   :  light white
+}
+
 
 
 def cls():
@@ -75,53 +97,6 @@ def cls():
     # https://github.com/tartley/colorama/blob/master/colorama/winterm.py#L111
     from subprocess import call
     call('cls', shell=True)
-
-
-def get_windows_version():
-    ''' Return MajorVersion, MinorVersion, and BuildNumber as integers instead
-        of strings like the platform module.
-    '''
-    from ctypes import c_int, c_char, sizeof
-    class OSVersionInfo(Structure):
-        _fields_ = [
-            ('dwOSVersionInfoSize', c_int),
-            ('dwMajorVersion', c_int),
-            ('dwMinorVersion', c_int),
-            ('dwBuildNumber', c_int),
-            ('dwPlatformId', c_int),
-            ('szCSDVersion', c_char*128)
-        ]
-    version = OSVersionInfo()
-    version.dwOSVersionInfoSize = sizeof(OSVersionInfo)
-    kernel32.GetVersionExA(byref(version))
-    result = (version.dwMajorVersion, version.dwMinorVersion,
-              version.dwBuildNumber)
-    log.debug('%s', result)
-    return result
-
-
-def is_ansi_capable():
-    ''' Check to see whether this version of Windows is recent enough to
-        support "ANSI VT"" processing.
-    '''
-    if get_windows_version() > (10, 0, 10586):
-        result = True
-    else:
-        result = False
-    log.debug('%s', result)
-    return result
-
-
-def is_colorama_initialized():
-    result = None
-    try:
-        import sys, colorama
-        if isinstance(sys.stdout, colorama.ansitowin32.StreamWrapper):
-            result = True
-    except ImportError:
-        pass
-    log.debug('%s', result)
-    return result
 
 
 def enable_vt_processing():
@@ -149,26 +124,70 @@ def enable_vt_processing():
                 kernel32.SetConsoleMode(handle,
                             mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING)
             )
-    results = tuple(results) or None
+        else:
+            results.append('Already Enabled')
+    results = tuple(results)
     log.debug('%s', results)
     return results
 
 
-def get_console_color(stream=STD_OUTPUT_HANDLE, mask='background'):
+def is_ansi_capable():
+    ''' Check to see whether this version of Windows is recent enough to
+        support "ANSI VT"" processing.
+    '''
+    BUILD_ANSI_AVAIL = 10586  # Win10 TH2
+    CURRENT_VERS = sys.getwindowsversion()[:3]
+
+    if CURRENT_VERS[2] > BUILD_ANSI_AVAIL:
+        result = True
+    else:
+        result = False
+    log.debug('version %s %s', CURRENT_VERS, result)
+    return result
+
+
+def is_colorama_initialized():
+    result = None
+    try:
+        import sys, colorama
+        if isinstance(sys.stdout, colorama.ansitowin32.StreamWrapper):
+            result = True
+    except ImportError:
+        pass
+    log.debug('%s', result)
+    return result
+
+
+def get_console_color(name, stream=STD_OUTPUT_HANDLE):
     ''' Returns current colors of console.
 
         https://docs.microsoft.com/en-us/windows/console/getconsolescreenbufferinfo
+
+        Arguments:
+            name:   one of ('background', 'bg', 'foreground', 'fg')
+            stream: Handle to stdout, stderr, etc.
+
+        Returns:
+            int:  a color id from the conhost palette.
+                  Ids under 0x8 (8) are dark colors, above light.
     '''
     stdout = kernel32.GetStdHandle(stream)
     csbi = CONSOLE_SCREEN_BUFFER_INFO()
     kernel32.GetConsoleScreenBufferInfo(stdout, byref(csbi))
-    color_id = csbi.wAttributes & _mask_map.get(mask, mask)
-    log.debug('%d', color_id)
+    color_id = csbi.wAttributes & _mask_map.get(name, name)
+    log.debug('color_id from conhost: %d', color_id)
+    if name in ('background', 'bg'):
+        color_id /= 16  # divide by 16
+        log.debug('color_id divided: %d', color_id)
+
+    # convert to ansi order
+    color_id = _win_to_ansi_offset_map.get(color_id, color_id)
+    log.debug('ansi color_id: %d', color_id)
     return color_id
 
 
 def get_console_title():
-    ''' Returns console title via kernel32.GetConsoleTitleW()
+    ''' Returns console title string.
 
         https://docs.microsoft.com/en-us/windows/console/getconsoletitle
     '''
