@@ -54,6 +54,7 @@ class ForegroundPalette(_HighColorPaletteBuilder):
 
     # extended      = 38
     _start_codes_extended = '38;5'
+    _start_codes_extended_fbterm = '1'
     _start_codes_true = '38;2'
 
 
@@ -92,6 +93,7 @@ class BackgroundPalette(_HighColorPaletteBuilder):
 
     # extended      = 48
     _start_codes_extended = '48;5'
+    _start_codes_extended_fbterm = '2'
     _start_codes_true = '48;2'
 
 

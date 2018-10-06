@@ -207,12 +207,12 @@ def detect_palette_support():
     except ImportError:
         webcolors = None
 
-    # linux, fbterm, older Windows
-    if ('color' in TERM) or (TERM in ('linux', 'fbterm')) or col_init:
+    # linux, older Windows + colorama
+    if ('color' in TERM) or (TERM == 'linux') or col_init:
         result = 'basic'
 
-    # xterm, older Windows
-    if ('256color' in TERM) or env.ANSICON:
+    # xterm, fbterm, older Windows + ansicon
+    if ('256color' in TERM) or (TERM == 'fbterm') or env.ANSICON:
         result = 'extended'
 
     # https://bugzilla.redhat.com/show_bug.cgi?id=1173688 - obsolete?

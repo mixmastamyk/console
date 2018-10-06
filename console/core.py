@@ -19,6 +19,8 @@ from .disabled import empty_bin, empty
 from .detection import get_available_palettes, load_x11_color_map, X11_RGB_PATHS
 from .proximity import (color_table4, find_nearest_color_hexstr,
                         find_nearest_color_index)
+
+import env
 try:
     import webcolors
 except ImportError:
@@ -174,11 +176,17 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
     def _get_extended_palette_entry(self, name, index, is_hex=False):
         ''' Compute extended entry, once on the fly. '''
         values = None
+        is_fbterm = (env.TERM == 'fbterm')  # sigh
 
         if 'extended' in self._palette_support:  # build entry
             if is_hex:
                 index = str(find_nearest_color_hexstr(index))
-            values = [self._start_codes_extended, index]
+
+            start_codes = self._start_codes_extended
+            if is_fbterm:
+                start_codes = self._start_codes_extended_fbterm
+
+            values = [start_codes, index]
 
         # downgrade section
         elif 'basic' in self._palette_support:
@@ -190,7 +198,8 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                                                        color_table=color_table4)
             values = self._index_to_ansi_values(nearest_idx)
 
-        return self._create_entry(name, values) if values else empty
+        return (self._create_entry(name, values, fbterm=is_fbterm)
+                if values else empty)
 
     def _get_true_palette_entry(self, name, digits):
         ''' Compute truecolor entry, once on the fly.
@@ -199,6 +208,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         '''
         values = None
         type_digits = type(digits)
+        is_fbterm = (env.TERM == 'fbterm')  # sigh
 
         if 'truecolor' in self._palette_support:  # build entry
             values = [self._start_codes_true]
@@ -219,7 +229,11 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                     digits = tuple(int(digit) for digit in digits)
                 nearest_idx = find_nearest_color_index(*digits)
 
-            values = [self._start_codes_extended, str(nearest_idx)]
+            start_codes = self._start_codes_extended
+            if is_fbterm:
+                start_codes = self._start_codes_extended_fbterm
+
+            values = [start_codes, str(nearest_idx)]
 
         elif 'basic' in self._palette_support:
             if type_digits is str:
@@ -231,7 +245,8 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                                                        color_table=color_table4)
             values = self._index_to_ansi_values(nearest_idx)
 
-        return self._create_entry(name, values) if values else empty
+        return (self._create_entry(name, values, fbterm=is_fbterm)
+                if values else empty)
 
     def _get_X11_palette_entry(self, name):
         result = empty
@@ -279,11 +294,14 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                 index += (ANSI_BG_HI_BASE - 8)  # 92
         return [str(index)]
 
-    def _create_entry(self, name, values):
+    def _create_entry(self, name, values, fbterm=False):
         ''' Render first values as string and place as first code,
             save, and return attr.
         '''
-        attr = _PaletteEntry(self, name.upper(), ';'.join(values))
+        if fbterm:
+            attr = _PaletteEntryFBTerm(self, name.upper(), ';'.join(values))
+        else:
+            attr = _PaletteEntry(self, name.upper(), ';'.join(values))
         setattr(self, name, attr)  # now cached
         return attr
 
@@ -436,3 +454,10 @@ class _PaletteEntry:
 
         self._stream = outfile
         sys.stdout = _LineWriter(self, self._stream, self.default)
+
+
+class _PaletteEntryFBTerm(_PaletteEntry):
+    ''' Help fbterm show 256 colors. '''
+    def __str__(self):
+        return f'{CSI}{";".join(self._codes)}}}'  # '}' at end not 'm'
+
