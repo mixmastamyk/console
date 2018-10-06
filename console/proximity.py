@@ -27,9 +27,14 @@
 from . import color_tables
 
 
+color_table4 = []
+color_table8 = []
+
+
 def _build_color_table(base, extended=True):
     # start with first 16 colors
-    color_table = base.copy()
+    color_table = []
+    color_table.extend(base)
 
     if extended:
         # colors 16..232: the 6x6x6 color cube
@@ -128,7 +133,3 @@ def find_nearest_color_hexstr(hexdigits, color_table=None):
         return None
 
     return find_nearest_color_index(*triplet, color_table=color_table)
-
-
-color_table4 = []
-color_table8 = []

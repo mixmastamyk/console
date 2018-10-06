@@ -98,6 +98,7 @@ if __name__ == '__main__':
             if _DEBUG:
                 log.debug('%r\n' % demo)
 
+
         print()
         print(make_header(i+1), 'with bg:')
         try:
