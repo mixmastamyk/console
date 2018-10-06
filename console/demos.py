@@ -223,7 +223,7 @@ if __name__ == '__main__':
             print('      FG t_deadbf:      ',
                 fgall.t_deadbf('▉▉▉▉▉'),
                 fge.t_deadbf('▉▉▉▉▉'),
-                fgb.t_deadbf('▉▉▉▉▉'),
+                fgb.t_deadbf('▉▉▉▉▉'), fx.end,  # win bug
             sep='')
         else:
             print('      Term support not available.')
