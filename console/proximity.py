@@ -34,7 +34,7 @@ color_table8 = []
 def _build_color_table(base, extended=True):
     # start with first 16 colors
     color_table = []
-    color_table.extend(base)
+    color_table.extend(base)  # handle tuples
 
     if extended:
         # colors 16..232: the 6x6x6 color cube

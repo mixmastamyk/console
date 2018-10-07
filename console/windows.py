@@ -87,7 +87,6 @@ _win_to_ansi_offset_map = {
 }
 
 
-
 def cls():
     ''' Clear (reset) the console. '''
     # Clumsy but works - Win32 API takes 50 lines of code

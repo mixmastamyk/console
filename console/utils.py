@@ -21,8 +21,15 @@ from . import _DEBUG, _CHOSEN_PALETTE
 
 
 log = logging.getLogger(__name__)
-ansi_csi_finder = re.compile(r'\x1b\[[0-?]*[ -/]*[@-~]')   # no C1
-ansi_osc_finder = re.compile(r'(\x1b\][0-?]*\007?|\007)')  # leave title
+
+ansi_csi0_finder = re.compile(r'\x1b\[[0-?]*[ -/]*[@-~]')
+ansi_csi1_finder = re.compile(r'\x9b[0-?]*[ -/]*[@-~]')
+
+# ansi_osc0_finder = re.compile(r'(\x1b\][0-?]*\a?|\a)')  # leave title
+ansi_osc0_finder = re.compile(r'\x1b\].*?(\a|\x1b\\)')
+ansi_osc1_finder = re.compile(r'\x9b.*?(\a|\x9d)')
+
+
 
 _mode_map = dict(
     forward=0,
@@ -114,25 +121,28 @@ def set_title(title, mode=0):
             return text  # for testing
 
 
-def strip_ansi(text, osc=False):
+def strip_ansi(text, c1=False, osc=False):
     ''' Strip ANSI escape sequences from a portion of text.
         https://stackoverflow.com/a/38662876/450917
 
         Arguments:
             line: str
             osc: bool  - include OSC commands in the strippage.
+            c1:  bool  - include C1 commands in the strippage.
 
         Notes:
-            Does not currently support the so-called C1 8-bit sequences,
-            but could be improved:
-
-                - ESC [   - Control Sequence Introducer (CSI  is 0x9b).
-                - ESC \   - String Terminator (ST  is 0x9c).
-                - ESC ]   - Operating System Command (OSC is 0x9d).
+            Enabling c1 and osc stripping is less efficient and the two options
+            can mildly conflict with one another.
+            The less problematic order was chosen, so there may still be rare
+            C1 OSC fragments left over.
     '''
-    text = ansi_csi_finder.sub('', text)
+    text = ansi_csi0_finder.sub('', text)
     if osc:
-        text = ansi_osc_finder.sub('', text)
+        text = ansi_osc0_finder.sub('', text)
+    if c1:
+        text = ansi_csi1_finder.sub('', text)  # go first, less destructive
+        if osc:
+            text = ansi_osc1_finder.sub('', text)
     return text
 
 

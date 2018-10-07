@@ -381,6 +381,8 @@ if True:  # fold
 # Utils
 # ----------------------------------------------------------------------------
 if True:  # fold
+    txt = ('\x1b[30m-C0-TEXT-\x1b[0m | \x9b30m-C1-Text-\x9bm | '
+           '\x1b]L-OSC-C0-\x1b\\ | \x1b]L-OSC-C0-7-\a | \x9bL-OSC-C1-\x9d END')
 
     def test_utiles_clear_line():
         utils.screen = sc
@@ -408,8 +410,18 @@ if True:  # fold
         assert 'Hang Loose, Hawaii' == utils.strip_ansi(text)
 
     def test_strip_ansi_osc():
-        text = '\x1b]0;Le Freak\x07, C\'est chic.'
-        assert "Le Freak, C'est chic." == utils.strip_ansi(text, osc=True)
+        text = '\x1b]lLe Freak\x07, C\'est chic.'
+        assert ", C'est chic." == utils.strip_ansi(text, osc=True)
+        text = '\x1b]lLe Freak\x1b\\, C\'est chic.'
+        assert ", C'est chic." == utils.strip_ansi(text, osc=True)
+
+    def test_strip_ansi_c1():
+        assert ('-C0-TEXT- | -C1-Text- | \x1b]L-OSC-C0-\x1b\\ | \x1b]L-OSC-C0-7-\x07 | -OSC-C1-\x9d END'
+                == utils.strip_ansi(txt, c1=True))
+
+    def test_strip_ansi_c1_osc():
+        assert ('-C0-TEXT- | -C1-Text- |  |  | -OSC-C1-\x9d END'
+                == utils.strip_ansi(txt, c1=True, osc=True))
 
     def test_strip_ansi_len():
         text = 'Hang \x1b[34;4;5mLoose\x1b[0m, Hawaii'

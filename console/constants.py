@@ -27,6 +27,12 @@ RIS = ESC + 'c'     #: Reset to Initial State, aka clear screen (see utils)
 
 ANSI_RESET = CSI + '0m'
 
+# some C1 codes
+C1_CSI = '\x9b'
+C1_OSC = '\x9d'
+C1_ST = '\x9c'
+
+
 # ansi codes
 ANSI_FG_LO_BASE = 30
 ANSI_BG_LO_BASE = 40
