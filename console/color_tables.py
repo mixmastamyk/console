@@ -269,7 +269,7 @@ index_to_rgb8 = {
 
 # colors 0..15: 16 basic colors
 # https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
-cmd_palette4 = [
+cmd_palette4 = (
     (0, 0, 0),          # 0     black
     (128, 0, 0),        # 1     red
     (0, 128, 0),        # 2     green
@@ -287,11 +287,11 @@ cmd_palette4 = [
     (255, 0, 255),      # 13    bright magenta
     (0, 255, 255),      # 14    bright cyan
     (255, 255, 255),    # 15    bright white
-]
+)
 
 # New palette, 1709, Fall Creators Update, 2017-10-17, build 16299
 # https://blogs.msdn.microsoft.com/commandline/2017/08/02/updating-the-windows-console-colors/
-cmd1709_palette4 = [
+cmd1709_palette4 = (
     (12, 12, 12),       # 0     black
     (197, 15, 31),      # 1     red
     (19, 161, 14),      # 2     green
@@ -309,9 +309,9 @@ cmd1709_palette4 = [
     (180, 0, 158),      # 13    bright magenta
     (97, 214, 214),     # 14    bright cyan
     (242, 242, 242),    # 15    bright white
-]
+)
 
-linuxcon_palette4 = [   # ubuntu config from: /etc/vtrgb
+linuxcon_palette4 = (   # ubuntu config from: /etc/vtrgb
     (1, 1, 1),          # 0     black
     (222, 56, 43),      # 1     red
     (57, 181, 74),      # 2     green
@@ -329,11 +329,11 @@ linuxcon_palette4 = [   # ubuntu config from: /etc/vtrgb
     (255, 0, 255),      # 13    bright magenta
     (0, 255, 255),      # 14    bright cyan
     (255, 255, 255),    # 15    bright white
-]
+)
 
 # https://en.wikipedia.org/wiki/Tango_Desktop_Project#Palette
 # https://blogs.n1zyy.com/andrew/2009/02/02/tango-color-scheme-for-xfce-terminal/
-tango_palette4 = [
+tango_palette4 = (
     (0x2e, 0x34, 0x34), # 0     black
     (0xcc, 0x00, 0x00), # 1     red
     (0x4e, 0x9a, 0x06), # 2     green
@@ -351,9 +351,9 @@ tango_palette4 = [
     (0xad, 0x7f, 0xa8), # 13    bright magenta
     (0x34, 0xe2, 0xe2), # 14    bright cyan
     (0xee, 0xee, 0xec), # 15    bright white
-]
+)
 
-solarized_dark_palette4 = [
+solarized_dark_palette4 = (
     (0x07, 0x36, 0x42), # 0     black
     (0xDC, 0x32, 0x2F), # 1     red
     (0x85, 0x99, 0x00), # 2     green
@@ -371,9 +371,9 @@ solarized_dark_palette4 = [
     (0x6C, 0x71, 0xC4), # 13    bright magenta),
     (0x93, 0xA1, 0xA1), # 14    bright cyan),
     (0xFD, 0xF6, 0xE3), # 15    bright white),
-]
+)
 
-termapp_palette4 = [
+termapp_palette4 = (
     (0, 0, 0),          # 0     black
     (194, 54, 33),      # 1     red
     (37, 188, 36),      # 2     green
@@ -391,9 +391,9 @@ termapp_palette4 = [
     (249, 53, 248),     # 13    bright magenta
     (20, 240, 240),     # 14    bright cyan
     (233, 235, 235),    # 15    bright white
-]
+)
 
-iterm_palette4 = [
+iterm_palette4 = (
     (0, 0, 0),          # 0     black
     (201, 27, 0),       # 1     red
     (0, 194, 0),        # 2     green
@@ -411,9 +411,9 @@ iterm_palette4 = [
     (255, 118, 255),    # 13    bright magenta
     (95, 253, 255),     # 14    bright cyan
     (255, 255, 254),    # 15    bright white
-]
+)
 
-vga_palette4 = [
+vga_palette4 = (
     (0, 0, 0),          # 0     black
     (170, 0, 0),        # 1     red
     (0, 170, 0),        # 2     green
@@ -431,9 +431,9 @@ vga_palette4 = [
     (255, 85, 255),     # 13    bright magenta
     (85, 255, 255),     # 14    bright cyan
     (255, 255, 255),    # 15    bright white
-]
+)
 
-xterm_palette4 = [
+xterm_palette4 = (
     (0x00, 0x00, 0x00),  # 0     black
     (0xcd, 0x00, 0x00),  # 1     red
     (0x00, 0xcd, 0x00),  # 2     green
@@ -451,9 +451,9 @@ xterm_palette4 = [
     (0xff, 0x00, 0xff),  # 13    bright magenta
     (0x00, 0xff, 0xff),  # 14    bright cyan
     (0xff, 0xff, 0xff),  # 15    bright white
-]
+)
 
-_new_palette4 = [
+_new_palette4 = (
     (),   # 0     black
     (),   # 1     red
     (),   # 2     green
@@ -471,4 +471,4 @@ _new_palette4 = [
     (),   # 13    bright magenta
     (),   # 14    bright cyan
     (),   # 15    bright white
-]
+)
