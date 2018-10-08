@@ -15,7 +15,7 @@ from . import color_tables, proximity
 from .constants import BEL, CSI, OSC, RS, ALL_PALETTES
 
 log = logging.getLogger(__name__)
-
+os_name = os.name
 
 # X11 colors support
 X11_RGB_PATHS = ()  # Windows
@@ -81,61 +81,16 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
             None, str: 'basic', 'extended', or 'truecolor'
     '''
     result = None
+    pal = basic_palette
     if color_is_forced():
-        result = detect_palette_support() or 'basic'
+        result, pal = detect_palette_support(basic_palette=pal) or 'basic'
 
     elif is_a_tty(stream=stream) and color_is_allowed():
-        result = detect_palette_support()
+        result, pal = detect_palette_support(basic_palette=pal)
 
+    proximity.build_color_tables(pal)
+    log.debug('Basic palette: %r', pal)
     log.debug('%r', result)
-
-    # find the platform-dependent 16-color basic palette
-    # TODO: move into detect_palette_support?
-    pal_name = 'Unknown'
-    if result and not basic_palette:
-        if env.SSH_CLIENT:  # fall back to xterm over ssh, info often wrong
-            pal_name = 'ssh (xterm)'
-            basic_palette = color_tables.xterm_palette4
-        else:
-            if os.name == 'nt':
-                if sys.getwindowsversion()[2] > 16299: # Win10 FCU, new palette
-                    pal_name = 'cmd_1709'
-                    basic_palette = color_tables.cmd1709_palette4
-                else:
-                    pal_name = 'cmd_legacy'
-                    basic_palette = color_tables.cmd_palette4
-            elif sys.platform == 'darwin':
-                if env.TERM_PROGRAM == 'Apple_Terminal':
-                    pal_name = 'termapp'
-                    basic_palette = color_tables.termapp_palette4
-                elif env.TERM_PROGRAM == 'iTerm.app':
-                    pal_name = 'iterm'
-                    basic_palette = color_tables.iterm_palette4
-            elif os.name == 'posix':
-                if env.TERM in ('linux', 'fbterm'):
-                    pal_name = 'vtrgb'
-                    basic_palette = parse_vtrgb()
-                elif env.TERM.startswith('xterm'):
-                    if 'Microsoft' in os.uname().release: # on Linux on Windows
-                        pal_name = 'cmd_1709'
-                        basic_palette = color_tables.cmd1709_palette4
-                        result = 'truecolor'
-                    else:
-                        try:  # check green to identify tango:
-                            if get_terminal_color('index', 2)[0][:2] == '4e':
-                                pal_name = 'tango'
-                                basic_palette = color_tables.tango_palette4
-                            else:
-                                raise RuntimeError('not the color scheme.')
-                        except (IndexError, RuntimeError):
-                            pal_name = 'xterm'
-                            basic_palette = color_tables.xterm_palette4
-            else:  # Amiga/Atari :-P
-                log.warn('Unexpected OS: os.name: %s', os.name)
-
-    proximity.build_color_tables(basic_palette)
-    log.debug('os.name: %s, basic_palette: %s = %r', os.name, pal_name,
-                                                     basic_palette)
     return result
 
 
@@ -192,7 +147,7 @@ def color_is_forced():
     return result
 
 
-def detect_palette_support():
+def detect_palette_support(basic_palette=None):
     ''' Returns whether we think the terminal supports basic, extended, or
         truecolor.  None if not able to tell.
 
@@ -201,7 +156,7 @@ def detect_palette_support():
     '''
     result = col_init = win_enabled = None
     TERM = env.TERM or ''
-    if os.name == 'nt':
+    if os_name == 'nt':
         from .windows import (is_ansi_capable, enable_vt_processing,
                               is_colorama_initialized)
         if is_ansi_capable():
@@ -225,10 +180,56 @@ def detect_palette_support():
     if env.COLORTERM in ('truecolor', '24bit') or win_enabled:
         result = 'truecolor'
 
-    log.debug(f'{result!r} (TERM={env.TERM or ""}, '
-              f'COLORTERM={env.COLORTERM or ""}, ANSICON={env.ANSICON}, '
-              f'webcolors={bool(webcolors)})')
-    return result
+    # find the platform-dependent 16-color basic palette
+    pal_name = 'Unknown'
+    if result and not basic_palette:
+        if env.SSH_CLIENT:  # fall back to xterm over ssh, info often wrong
+            pal_name = 'ssh (xterm)'
+            basic_palette = color_tables.xterm_palette4
+        else:
+            if os_name == 'nt':
+                if sys.getwindowsversion()[2] > 16299: # Win10 FCU, new palette
+                    pal_name = 'cmd_1709'
+                    basic_palette = color_tables.cmd1709_palette4
+                else:
+                    pal_name = 'cmd_legacy'
+                    basic_palette = color_tables.cmd_palette4
+            elif sys.platform == 'darwin':
+                if env.TERM_PROGRAM == 'Apple_Terminal':
+                    pal_name = 'termapp'
+                    basic_palette = color_tables.termapp_palette4
+                elif env.TERM_PROGRAM == 'iTerm.app':
+                    pal_name = 'iterm'
+                    basic_palette = color_tables.iterm_palette4
+            elif os_name == 'posix':
+                if env.TERM in ('linux', 'fbterm'):
+                    pal_name = 'vtrgb'
+                    basic_palette = parse_vtrgb()
+                elif env.TERM.startswith('xterm'):
+                    if 'Microsoft' in os.uname().release: # on Linux on Windows
+                        pal_name = 'cmd_1709'
+                        basic_palette = color_tables.cmd1709_palette4
+                        result = 'truecolor'
+                        log.debug('Nope, LOW64: %r', result)
+                    else:
+                        try:  # check green to identify tango:
+                            if get_terminal_color('index', 2)[0][:2] == '4e':
+                                pal_name = 'tango'
+                                basic_palette = color_tables.tango_palette4
+                            else:
+                                raise RuntimeError('not the color scheme.')
+                        except (IndexError, RuntimeError):
+                            pal_name = 'xterm'
+                            basic_palette = color_tables.xterm_palette4
+            else:  # Amiga/Atari :-P
+                log.warn('Unexpected OS: os.name: %s', os_name)
+
+    log.debug(
+        f'{result!r} ({os_name}, TERM={env.TERM or ""}, '
+        f'COLORTERM={env.COLORTERM or ""}, ANSICON={env.ANSICON}, '
+        f'webcolors={bool(webcolors)}, basic_palette={pal_name})'
+    )
+    return (result, basic_palette)
 
 
 def get_available_palettes(chosen_palette):

@@ -505,15 +505,16 @@ if True:  # fold
             ('xterm-256color', 'extended'),
             # ?
         )
+        pal = (1,)  # dummy palette, tests true
         for name, result in terms:
             detection.env = Environment(environ=dict(TERM=name))
-            assert detection.detect_palette_support() == result
+            assert detection.detect_palette_support(basic_palette=pal) == (result, pal)
 
         detection.env = Environment(environ=dict(ANSICON='1'))
-        assert detection.detect_palette_support() == 'extended'
+        assert detection.detect_palette_support(basic_palette=pal) == ('extended', pal)
 
         detection.env = Environment(environ=dict(COLORTERM='24bit'))
-        assert detection.detect_palette_support() == 'truecolor'
+        assert detection.detect_palette_support(basic_palette=pal) == ('truecolor', pal)
 
     def test_is_a_tty():
         f = StringIO()
