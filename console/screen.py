@@ -96,7 +96,6 @@ class Screen:
     alt_screen_enable = ason = CSI + '?1049h'
     alt_screen_disable = asoff = CSI + '?1049l'
 
-
     def __new__(cls, force=False):
         ''' Override new() to replace the class entirely on deactivation.
 

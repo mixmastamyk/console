@@ -33,7 +33,6 @@ _set_debug_mode(True)
 CSI = '\x1b['           # sanity check
 
 
-
 # Basic palette - fg, bg, fx
 # ----------------------------------------------------------------------------
 if True:  # fold
@@ -459,43 +458,43 @@ if True:  # fold
 
     def test_color_disabled_none():
         detection.env = Environment(environ={})
-        assert detection.color_is_disabled() == None
+        assert detection.color_is_disabled() is None
 
         detection.env = Environment(environ=dict(CLICOLOR=''))
-        assert detection.color_is_disabled() == None
+        assert detection.color_is_disabled() is None
 
         detection.env = Environment(environ=dict(CLICOLOR='1'))
-        assert detection.color_is_disabled() == None
+        assert detection.color_is_disabled() is None
 
     def test_color_disabled_true():
         detection.env = Environment(environ=dict(NO_COLOR='1'))
-        assert detection.color_is_disabled() == True
+        assert detection.color_is_disabled() is True
 
         detection.env = Environment(environ=dict(CLICOLOR='0'))
-        assert detection.color_is_disabled() == True
+        assert detection.color_is_disabled() is True
 
     def test_color_allowed():
         detection.env = Environment(environ={})
-        assert detection.color_is_allowed() == True
+        assert detection.color_is_allowed() is True
 
         detection.env = Environment(environ=dict(CLICOLOR='0'))
-        assert detection.color_is_allowed() == False
+        assert detection.color_is_allowed() is False
 
         detection.env = Environment(environ=dict(NO_COLOR=''))
-        assert detection.color_is_allowed() == False
+        assert detection.color_is_allowed() is False
 
     def test_color_forced():
         detection.env = Environment(environ={})
-        assert detection.color_is_forced() == None
+        assert detection.color_is_forced() is None
 
         detection.env = Environment(environ=dict(CLICOLOR_FORCE='0'))
-        assert detection.color_is_forced() == False
+        assert detection.color_is_forced() is False
 
         detection.env = Environment(environ=dict(CLICOLOR_FORCE='foo'))
-        assert detection.color_is_forced() == True
+        assert detection.color_is_forced() is True
 
         detection.env = Environment(environ=dict(CLICOLOR_FORCE='1'))
-        assert detection.color_is_forced() == True
+        assert detection.color_is_forced() is True
 
     def test_palette_support():
         terms = (
