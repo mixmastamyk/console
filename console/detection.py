@@ -115,15 +115,19 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
                     pal_name = 'vtrgb'
                     basic_palette = parse_vtrgb()
                 elif env.TERM.startswith('xterm'):
-                    try:  # check green to identify tango:
-                        if get_terminal_color('index', 2)[0][:2] == '4e':
-                            pal_name = 'tango'
-                            basic_palette = color_tables.tango_palette4
-                        else:
-                            raise RuntimeError('not the color scheme.')
-                    except (IndexError, RuntimeError):
-                        pal_name = 'xterm'
-                        basic_palette = color_tables.xterm_palette4
+                    if 'Microsoft' in os.uname().release: # on Linux on Windows
+                        pal_name = 'cmd_1709'
+                        basic_palette = color_tables.cmd1709_palette4
+                    else:
+                        try:  # check green to identify tango:
+                            if get_terminal_color('index', 2)[0][:2] == '4e':
+                                pal_name = 'tango'
+                                basic_palette = color_tables.tango_palette4
+                            else:
+                                raise RuntimeError('not the color scheme.')
+                        except (IndexError, RuntimeError):
+                            pal_name = 'xterm'
+                            basic_palette = color_tables.xterm_palette4
             else:  # Amiga/Atari :-P
                 log.warn('Unexpected OS: os.name: %s', os.name)
 

@@ -407,10 +407,16 @@ class _PaletteEntry:
         #~ sys.stderr = sys.stderr.stream
         self._stream.write(str(self.default))  # just in case
 
-    def __call__(self, text, *styles):
+    def __call__(self, text, *styles, original_length=False):
         ''' Formats text.  Not appropriate for huge input strings.
 
-            Tip from Pygments:
+            Arguments:
+                text                Original text.
+                *styles             Add "mix-in" styles, per invocation.
+                original_length     bool - Save original string length for
+                                    later use.
+
+            Note:
                 Color sequences are terminated at newlines,
                 so that paging the output works correctly.
         '''
@@ -427,7 +433,11 @@ class _PaletteEntry:
             result = '\n'.join(lines)
         else:
             result = f'{self}{text}{self.default}'
-        return result
+
+        if original_length:
+            return _LengthyString(len(text), result)
+        else:
+            return result
 
     def __str__(self):
         return f'{CSI}{";".join(self._codes)}m'
@@ -461,3 +471,12 @@ class _PaletteEntryFBTerm(_PaletteEntry):
     def __str__(self):
         return f'{CSI}{";".join(self._codes)}}}'  # '}' at end not 'm'
 
+
+class _LengthyString(str):
+    ''' String that returns the length of its bare string, before escape
+        sequences were added.
+    '''
+    def __new__(cls, original_length, content):
+       self = str.__new__(cls, content)
+       self.original_length = original_length
+       return self

@@ -25,10 +25,9 @@ log = logging.getLogger(__name__)
 ansi_csi0_finder = re.compile(r'\x1b\[[0-?]*[ -/]*[@-~]')
 ansi_csi1_finder = re.compile(r'\x9b[0-?]*[ -/]*[@-~]')
 
-# ansi_osc0_finder = re.compile(r'(\x1b\][0-?]*\a?|\a)')  # leave title
+# ansi_osc0_finder = re.compile(r'(\x1b\][0-?]*\a?|\a)')  # TODO: leave title
 ansi_osc0_finder = re.compile(r'\x1b\].*?(\a|\x1b\\)')
 ansi_osc1_finder = re.compile(r'\x9b.*?(\a|\x9d)')
-
 
 
 _mode_map = dict(
