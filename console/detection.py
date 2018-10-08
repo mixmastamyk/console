@@ -90,6 +90,7 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
     log.debug('%r', result)
 
     # find the platform-dependent 16-color basic palette
+    # TODO: move into detect_palette_support?
     pal_name = 'Unknown'
     if result and not basic_palette:
         if env.SSH_CLIENT:  # fall back to xterm over ssh, info often wrong
@@ -118,6 +119,7 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
                     if 'Microsoft' in os.uname().release: # on Linux on Windows
                         pal_name = 'cmd_1709'
                         basic_palette = color_tables.cmd1709_palette4
+                        result = 'truecolor'
                     else:
                         try:  # check green to identify tango:
                             if get_terminal_color('index', 2)[0][:2] == '4e':
