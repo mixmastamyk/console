@@ -210,9 +210,8 @@ def detect_palette_support(basic_palette=None):
                         pal_name = 'cmd_1709'
                         basic_palette = color_tables.cmd1709_palette4
                         result = 'truecolor'
-                        log.debug('Nope, LOW64: %r', result)
                     else:
-                        try:  # check green to identify tango:
+                        try:  # TODO: check green to identify tango, others?
                             if get_terminal_color('index', 2)[0][:2] == '4e':
                                 pal_name = 'tango'
                                 basic_palette = color_tables.tango_palette4
