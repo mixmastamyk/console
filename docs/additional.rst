@@ -252,9 +252,16 @@ but here's a couple.
     # COWABUNGA !
     XTREME_STYLING = fx.b + fx.i + fx.u + fx.s
 
-- Haven't figured out how to detect it yet,
-  but for now ANSI support can be enabled on Windows 10 with the following
-  incantation::
+- When using the extended or truecolor palettes,
+  keep in mind that some folks will have dark backgrounds and some light---\
+  which could make your fancy colors unreadable.
+
+  Checking the background with the detection module is one strategy,
+  though not available on every terminal.
+  An argument to change the theme may also be in order.
+  (Console does acknowledge several environment variables as well.)
+
+- ANSI support can be enabled on Windows 10 with the following incantation::
 
     >>> import console.windows as cw
 
