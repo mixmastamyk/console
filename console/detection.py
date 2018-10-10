@@ -112,11 +112,15 @@ def color_is_allowed():
     return result
 
 
-def color_is_disabled():
+def color_is_disabled(**envars):
     ''' Look for clues in environment, e.g.:
 
         - https://bixense.com/clicolors/
         - http://no-color.org/
+
+        Arguments:
+            envars:     Additional environment variables to check for
+                        equality, i.e. ``MYAPP_COLOR_DISABLED='1'``
 
         Returns:
             None, Bool:  Disabled
@@ -131,19 +135,35 @@ def color_is_disabled():
               env.NO_COLOR or '',
               env.CLICOLOR or ''
     )
+    for name, value in envars.items():
+        envar = getattr(env, name)
+        if envar.value == value:
+            result = True
+        log.debug('%s == %r: %r', name, value, result)
+
     return result
 
 
-def color_is_forced():
+def color_is_forced(**envars):
     ''' Look for clues in environment, e.g.:
 
         - https://bixense.com/clicolors/
 
+        Arguments:
+            envars:     Additional environment variables to check for
+                        equality, i.e. ``MYAPP_COLOR_FORCED='1'``
         Returns:
             Bool:  Forced
     '''
     result = env.CLICOLOR_FORCE and env.CLICOLOR_FORCE != '0'
     log.debug('%s (CLICOLOR_FORCE=%s)', result, env.CLICOLOR_FORCE or '')
+
+    for name, value in envars.items():
+        envar = getattr(env, name)
+        if envar.value == value:
+            result = True
+        log.debug('%s == %r: %r', name, value, result)
+
     return result
 
 

@@ -26,7 +26,7 @@ def slurp(filename):
 if sys.version_info.major < 3:
     raise NotImplementedError('Sorry, only Python 3 and above is supported.')
 
-if sys.version_info.minor < 6:
+if sys.version_info.minor < 6:  # hmm, doesn't seem to work
     install_requires.append('future_fstrings')
     if os.name == 'nt':
         install_requires.append('win_unicode_console')
