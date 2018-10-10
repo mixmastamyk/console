@@ -47,6 +47,9 @@ a:active, div.sphinxsidebar a:active {
 a:visited, div.sphinxsidebar a:visited {
     opacity: .9
 }
+a.reference {
+    border-bottom: 0 !important;
+}
 .mod {               /* shuttup readme issues, emulate links */
     color: #eca218;  /* Amber */
     font-family: "Source Code Pro", monospace, monospace !important;
