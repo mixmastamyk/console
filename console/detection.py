@@ -570,10 +570,10 @@ def get_theme():
         else:
             # try xterm - find average across rgb
             colors = get_terminal_color('background')  # background wins
-            if colors:  # TODO more precision - two hex < 128
-                colors = tuple(int(cm[:1], 16) for cm in colors)  # first hex char
+            if colors:
+                colors = tuple(int(cm, 16) for cm in colors)
                 avg = sum(colors) / len(colors)
-                theme = 'dark' if avg < 8 else 'light'
+                theme = 'dark' if avg < 128 else 'light'
 
     log.debug('%r', theme)
     return theme
