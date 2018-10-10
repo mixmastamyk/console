@@ -21,7 +21,7 @@ if __name__ == '__main__':
         except ImportError:
             pass
         try:
-            if not env.ANSICON:  # TODO: detect Win10 support
+            if not env.ANSICON:
                 import colorama
                 colorama.init()
         except ImportError:
