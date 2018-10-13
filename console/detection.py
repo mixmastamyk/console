@@ -18,10 +18,10 @@ log = logging.getLogger(__name__)
 os_name = os.name
 
 # X11 colors support
-X11_RGB_PATHS = ()  # Windows
+X11_RGB_PATHS = ()  # Windows
 if sys.platform == 'darwin':
     X11_RGB_PATHS = ('/opt/X11/share/X11/rgb.txt',)
-elif os.name == 'posix':  # Ubuntu, FreeBSD
+elif os.name == 'posix':  # Ubuntu, FreeBSD
     X11_RGB_PATHS = ('/etc/X11/rgb.txt', '/usr/share/X11/rgb.txt',
                      '/usr/local/lib/X11/rgb.txt', '/usr/X11R6/lib/X11/rgb.txt')
 
@@ -103,7 +103,7 @@ def color_is_allowed():
         Returns:
             Bool:  Allowed
     '''
-    result = True  # generally yes - env.CLICOLOR != '0'
+    result = True  # generally yes - env.CLICOLOR != '0'
 
     if color_is_disabled():
         result = False
@@ -188,7 +188,7 @@ def detect_palette_support(basic_palette=None):
     except ImportError:
         webcolors = None
 
-    # linux, older Windows + colorama
+    # linux, older Windows + colorama
     if ('color' in TERM) or (TERM == 'linux') or col_init:
         result = 'basic'
 
@@ -247,7 +247,7 @@ def _find_basic_palette(result):
                     basic_palette = color_tables.cmd1709_palette4
                     result = 'truecolor'
                 else:
-                    try:  # TODO: check green to identify palette, others?
+                    try:  # TODO: check green to identify palette, others?
                         if get_terminal_color('index', 2)[0][:2] == '4e':
                             pal_name = 'tango'
                             basic_palette = color_tables.tango_palette4
@@ -256,7 +256,7 @@ def _find_basic_palette(result):
                     except (IndexError, RuntimeError):
                         pal_name = 'xterm'
                         basic_palette = color_tables.xterm_palette4
-        else:  # Amiga/Atari :-P
+        else:  # Amiga/Atari :-P
             log.warn('Unexpected OS: os.name: %s', os_name)
 
     return result, pal_name, basic_palette
@@ -334,7 +334,7 @@ def parse_vtrgb(path='/etc/vtrgb'):
                 if i == 2:  # failsafe
                     break
 
-        palette = tuple(zip(*table))  # swap rows to columns
+        palette = tuple(zip(*table))  # swap rows to columns
 
     except IOError as err:
         palette = color_tables.vga_palette4
@@ -358,7 +358,7 @@ def _read_until(infile=sys.stdin, maxchars=20, end=RS):
     chars = []
     read = infile.read
 
-    # count down, stopping at 0
+    # count down, stopping at 0
     while maxchars:
         char = read(1)
         if char == end:
@@ -391,7 +391,7 @@ def get_cursor_pos():
             sys.stdout.flush()
             resp = _read_until(maxchars=10, end='R')
 
-        # parse response
+        # parse response
         resp = resp.lstrip(CSI)
         try:  # reverse
             values = tuple( int(token) for token in resp.partition(';')[::-2] )
@@ -483,7 +483,7 @@ def get_terminal_color(name, number=None):
                 sys.stdout.flush()
                 resp = _read_until(maxchars=26, end=BEL)
 
-            # parse response
+            # parse response
             colors = resp.partition(':')[2].split('/')
             if colors == ['']:
                 colors = []                             # empty on failure
@@ -551,7 +551,7 @@ def get_terminal_title(mode='title'):
             sys.stdout.flush()
             resp = _read_until(maxchars=100, end=ST)
 
-        # parse response
+        # parse response
         title = resp.lstrip(OSC)[1:].rstrip(ESC)
 
     log.debug('%r', title)

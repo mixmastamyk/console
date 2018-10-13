@@ -26,7 +26,7 @@ fx = style.EffectsPalette(palettes=ALL_PALETTES)
 defx = style.EffectsTerminator(palettes=ALL_PALETTES)
 sc = screen.Screen(force=True)
 
-fg, bg, fx, pytest  # pyflakes
+fg, bg, fx, pytest  # pyflakes
 
 # beginning of tests
 _set_debug_mode(True)
@@ -256,7 +256,7 @@ if True:  # fold
 
     def test_webcolors_xyzzyx():
         if webcolors:
-            with pytest.raises(AttributeError): # as err:
+            with pytest.raises(AttributeError):  # as err:
             #~ assert 'recognized' in err.value.args[0]
 
                 bg.w_xyzzyx
@@ -304,7 +304,7 @@ if True:  # fold
         text = muy_importante + msg + fx.end
         assert text == f'{CSI}37;1;41m{msg}{CSI}0m'
 
-        # important check:
+        # important check:
         # fg.white should not be affected, since we returned a new copy on add
         text = fg.white + msg + fx.end
         assert text == f'{CSI}37m{msg}{CSI}0m'
@@ -430,7 +430,7 @@ if True:  # fold
     def test_set_title():
         text = 'foo'
         utils.set_title(text)
-        # xterm, make, mate term, iterm2
+        # xterm, make, mate term, iterm2
         possible_results = (text, None, 'Terminal', '',
             text + ' (fish)', text + ' (bash)',   # iterm2, sigh
         )
@@ -595,7 +595,7 @@ if True:  # fold
     def test_find_nearest_color_index():
         from .proximity import find_nearest_color_index
         values = (
-            (0, 0, 0, 0),       # r, g, b, index
+            (0, 0, 0, 0),       # r, g, b, index
             (16, 16, 16, 233),
             (256, 0, 0, 9),
             (0, 256, 0, 10),
@@ -610,7 +610,7 @@ if True:  # fold
 
         values = (
             ('000',   0),   # hex strings, index
-            ('111', 233),   # grayscale
+            ('111', 233),   # grayscale
             ('222', 235),
             ('333', 236),
             ('444', 238),

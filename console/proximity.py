@@ -48,7 +48,7 @@ def _build_color_table(base, extended=True):
 
         # colors 233..253: grayscale  # to 255!
 
-        for i in range(1, 24):  # odd, this should go to 255, added 2 to range
+        for i in range(1, 24):  # odd, this should go to 255, added 2 to range
             v = 8 + i * 10
             color_table.append((v, v, v))
 
@@ -87,11 +87,11 @@ def find_nearest_color_index(r, g, b, color_table=None):
         Returns:
             int, None: index, or None on error.
     '''
-    distance = 257*257*3  # "infinity" (max distance from #000000 to #ffffff)
+    distance = 257*257*3  # noqa - "infinity" (max distance from #000000 to #ffffff)
     index = 0
     if not color_table:
         if not color_table8:
-             build_color_tables()
+            build_color_tables()
         color_table = color_table8
 
     for i, values in enumerate(color_table):  # fixed from range(0, 254):
@@ -102,7 +102,7 @@ def find_nearest_color_index(r, g, b, color_table=None):
 
         this_distance = (rd * rd) + (gd * gd) + (bd * bd)  # sum of squares
 
-        if this_distance < distance:  # closer
+        if this_distance < distance:  # closer
             index = i
             distance = this_distance
 
@@ -126,7 +126,7 @@ def find_nearest_color_hexstr(hexdigits, color_table=None):
                 digit = int(digit, 16)
                 triplet.append((digit * 16) + digit)
         elif len(hexdigits) == 6:
-            triplet.extend(int(hexdigits[i:i+2], 16) for i in (0, 2 ,4))
+            triplet.extend(int(hexdigits[i:i+2], 16) for i in (0, 2, 4))
         else:
             raise ValueError('wrong length: %r' % hexdigits)
     except ValueError:

@@ -15,9 +15,9 @@ FF  = '\f'          #:  12   014   0x0C    ^L     Formfeed (also: New page NP)
 CR  = '\r'          #:  13   015   0x0D    ^M     Carriage return
 ESC = '\x1b'        #:  27   033           ^[     Escape character
 
-FS  = '\x1C'        #:  28   034                  Field Separator
-GS  = '\x1D'        #:  29   035                  Group Separator
-RS  = '\x1E'        #:  30   036                  Record Separator
+FS  = '\x1c'        #:  28   034                  Field Separator
+GS  = '\x1d'        #:  29   035                  Group Separator
+RS  = '\x1e'        #:  30   036                  Record Separator
 
 DEL = '\177'        #: 127   177   0x7F           Delete character
 
@@ -28,15 +28,15 @@ RIS = ESC + 'c'     #: Reset to Initial State, aka clear screen (see utils)
 ANSI_RESET = CSI + '0m'
 
 # some C1 codes
-C1_CSI = '\x9b'
-C1_OSC = '\x9d'
-C1_ST = '\x9c'
+CSI_C1 = '\x9b'
+OSC_C1 = '\x9d'
+ST_C1= '\x9c'
 
 
 # ansi codes
 ANSI_FG_LO_BASE = 30
-ANSI_BG_LO_BASE = 40
 ANSI_FG_HI_BASE = 90
+ANSI_BG_LO_BASE = 40
 ANSI_BG_HI_BASE = 100
 
 ALL_PALETTES = ('basic', 'extended', 'truecolor')  # variants 'x11', 'web'

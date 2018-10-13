@@ -62,8 +62,8 @@ class Screen:
 
     mv_x        = cha = hpa = 'G'
     mv_y        = cva = vpa = 'd'
-    mv          = cup = ('H', '%d;%d')      # double trouble - move to pos
-    mv2         = hvp = ('f', '%d;%d')      # ""
+    mv          = cup = ('H', '%d;%d')      # double trouble - move to pos
+    mv2         = hvp = ('f', '%d;%d')      # ""
 
     erase       = ed = 'J'
     erase_line  = el = 'K'
@@ -74,7 +74,7 @@ class Screen:
     save_title = ('t', '22;%d')
     restore_title = ('t', '23;%d')
 
-    # These don't need parameter wrapping.  All start with ESC
+    # These don't need parameter wrapping.  All start with ESC
     auxoff      = CSI + '4i'
     auxon       = CSI + '5i'
     dsr         = loc = CSI + '6n'          # device status rpt, see detection
@@ -89,7 +89,7 @@ class Screen:
     hide_cursor = CSI + '?25l'
     show_cursor = CSI + '?25h'
 
-    # https://cirw.in/blog/bracketed-paste
+    # https://cirw.in/blog/bracketed-paste
     bracketedpaste_enable = bpon = CSI + '?2004h'
     bracketedpaste_disable = bpoff = CSI + '?2004l'
 

@@ -136,7 +136,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 #~ latex_documents = [
     #~ (master_doc, project + '.tex', project + ' Documentation',
-     #~ 'Mike Miller', 'manual'),
+    #~ 'Mike Miller', 'manual'),
 #~ ]
 
 

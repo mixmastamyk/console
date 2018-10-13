@@ -27,7 +27,7 @@ if __name__ == '__main__':
         except ImportError:
             pass
 
-    # this sucks, what needs to be done to get demos to run:
+    # this sucks, what needs to be done to get demos to run:
     import console
     from importlib import reload
     reload(console)
@@ -116,7 +116,7 @@ if __name__ == '__main__':
             attr = getattr(fg, f'i{j}')
             print(attr, '%4.4s' % attr.name, fx.end, end=' ')
 
-            # newline every 16 columns :-/
+            # newline every 16 columns :-/
             if not (j + 1) % 16:
                 print('\n      ', end='')
         print()
@@ -128,7 +128,7 @@ if __name__ == '__main__':
             attr = getattr(bg, f'i{j}')
             print(attr, '%4.4s' % attr.name, fx.end, end=' ')
 
-            # NL every 16 columns :-/
+            # NL every 16 columns :-/
             if not (j + 1) % 16:
                 print('\n      ', end='')
         print()
@@ -146,21 +146,21 @@ if __name__ == '__main__':
         print(make_header(i+5), 'Background - 24-bit, Millions of colors:')
         step = 3  # length of bar 256/3 = ~86
 
-        # draw rounded box around gradients
+        # draw rounded box around gradients
         print('      ╭' + '─' * 86, '╮\n      │', sep='', end='')   # RED
         for val in range(0, 256, step):
             code = format(val, '02x')
             print(getattr(bg, 't%s0000' % code), fx.end, end='')
         print('│')
 
-        print('      │', sep='', end='')                            # GREEN
+        print('      │', sep='', end='')                            # GREEN
         for val in range(255, -1, -step):
             code = format(val, '02x')
             #~ print(code, end =' ')
             print(getattr(bg, 't00%s00' % code), fx.end, end='')
         print('│')
 
-        print('      │', sep='', end='')                            # BLUE
+        print('      │', sep='', end='')                            # BLUE
         for val in range(0, 256, step):
             code = format(val, '02x')
             print(getattr(bg, 't0000%s' % code), fx.end, end='')
@@ -171,7 +171,7 @@ if __name__ == '__main__':
         print(make_header(i+5), 'Test color downgrade support '
                                 '(True ⏵ Indexed ⏵ Basic):')
         try:
-            import webcolors; webcolors # pyflakes
+            import webcolors; webcolors # pyflakes
         except ImportError as err:
             print('      Test not available without webcolors installed.')
             sys.exit()
@@ -183,18 +183,18 @@ if __name__ == '__main__':
             print()
 
             colors = (
-                't_222',            # grey
-                't_808080',         # grey
-                't_ccc',            # grey
-                't_ddd',            # grey
-                't_eee',            # grey
-                't_e95420',         # ubuntu orange
+                't_222',            # grey
+                't_808080',         # grey
+                't_ccc',            # grey
+                't_ddd',            # grey
+                't_eee',            # grey
+                't_e95420',         # ubuntu orange
                 'coral',            # wc
-                't_ff00ff',         # grey
+                't_ff00ff',         # grey
                 't_bb00bb',         # magenta
                 'x_bisque',
-                'x_dodgerblue',     # lighter blue
-                'w_cornflowerblue', # lighter blue
+                'x_dodgerblue',     # lighter blue
+                'w_cornflowerblue', # lighter blue
                 'w_navy',           # dark blue
                 'w_forestgreen',    # dark/medium green
                 'i_28',
@@ -223,7 +223,7 @@ if __name__ == '__main__':
             print('      FG t_deadbf:      ',
                 fgall.t_deadbf('▉▉▉▉▉'),
                 fge.t_deadbf('▉▉▉▉▉'),
-                fgb.t_deadbf('▉▉▉▉▉'), fx.end,  # win bug
+                fgb.t_deadbf('▉▉▉▉▉'), fx.end,  # win bug
             sep='')
         else:
             print('      Term support not available.')
@@ -235,7 +235,7 @@ if __name__ == '__main__':
                 print('       color scheme:', get_terminal_color('fg'), 'on',
                                               get_terminal_color('bg'), end=' ')
             except ModuleNotFoundError:
-                pass  # termios - Windows
+                pass  # termios - Windows
 
             import time
             try:

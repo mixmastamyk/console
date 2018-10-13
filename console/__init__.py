@@ -27,7 +27,7 @@ if sys.version_info >= (3, 6):
 
 
 # detect palette, other modules are dependent
-from .detection import TermStack, choose_palette as _choose_palette
+from .detection import TermStack, choose_palette as _choose_palette  # noqa
 
 _CHOSEN_PALETTE = _choose_palette()
 if _CHOSEN_PALETTE:

@@ -29,7 +29,7 @@ class ForegroundPalette(_HighColorPaletteBuilder):
             x11_rgb_filename    - '/path/to/X11/rgb.txt',
                                   defaults to a platform dependent value.
     '''
-    default         = 39    # must be first :-D
+    default         = 39    # must be first :-D
 
     black           = 30
     red             = 31
@@ -173,7 +173,7 @@ class EffectsTerminator(_BasicPaletteBuilder):
 
     bold            = 21
     b               = 21  # short
-    intensity       = 22  # bold, dim (maybe color) ---> norm
+    intensity       = 22  # bold, dim (maybe color) ---> norm
     italic = font   = 23
     i               = 23  # short
     underline       = 24

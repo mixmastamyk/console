@@ -60,7 +60,7 @@ class _BasicPaletteBuilder:
                               - Ellipsis - Autodetect environment.
         '''
         self = super().__new__(cls)
-        if palettes is Ellipsis:                # autodetecten-Sie
+        if palettes is Ellipsis:                # autodetecten-Sie
             if _CHOSEN_PALETTE:  # enable "up to" the chosen palette level:
                 palettes = get_available_palettes(_CHOSEN_PALETTE)
             else:
@@ -68,7 +68,7 @@ class _BasicPaletteBuilder:
                 palettes = ()                   # skipen-Sie bitte
         elif type(palettes) in (list, tuple):   # carry on fine sir
             pass
-        elif type(palettes) is str:             # make iterable
+        elif type(palettes) is str:             # make iterable
             palettes = (palettes,)
         elif palettes is None:                  # Ah, Shaddap-a ya face
             self = empty_bin
@@ -138,7 +138,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         result = None
 
         # follow the yellow brick road…
-        if _index_finder.match(name):       # Indexed aka Extended
+        if _index_finder.match(name):       # Indexed aka Extended
             result = self._get_extended_palette_entry(name, key)
 
         elif _nearest_finder.match(name):   # Nearest
@@ -193,7 +193,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             if is_hex:
                 nearest_idx = find_nearest_color_hexstr(index, color_table4)
             else:
-                from .color_tables import index_to_rgb8  # find rgb for idx
+                from .color_tables import index_to_rgb8  # find rgb for idx
                 nearest_idx = find_nearest_color_index(*index_to_rgb8[index],
                                                        color_table=color_table4)
             values = self._index_to_ansi_values(nearest_idx)
@@ -212,10 +212,10 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
 
         if 'truecolor' in self._palette_support:  # build entry
             values = [self._start_codes_true]
-            if type_digits is str:  # convert hex string
+            if type_digits is str:  # convert hex string
                 if len(digits) == 3:
                     values.extend(str(int(ch + ch, 16)) for ch in digits)
-                else:  # chunk 'BB00BB', to ints to 'R', 'G', 'B':
+                else:  # chunk 'BB00BB', to ints to 'R', 'G', 'B':
                     values.extend(str(int(digits[i:i+2], 16)) for i in (0, 2 ,4))
             else:  # tuple of str-digit or int, may not matter to bother:
                 values.extend(str(digit) for digit in digits)
@@ -254,8 +254,8 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             if not _x11_color_map:
                 load_x11_color_map(self._x11_rgb_path)
 
-            if _x11_color_map:
-                try:  # x11 map: returns tuple of decimal int strings: ('1', '2', '3')
+            if _x11_color_map:  # x11 map: returns tuple of
+                try:            # decimal int strings, e.g.: ('1', '2', '3')
                     color = _x11_color_map[name.lower()]
                 except KeyError as err:  # convert to AttributeError
                     raise AttributeError(
@@ -282,12 +282,12 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             Returns:
                 index as str in a list for compatibility with values.
         '''
-        if self.__class__.__name__[0] == 'F':   # Foreground
+        if self.__class__.__name__[0] == 'F':   # Foreground
             if index < 8:
                 index += ANSI_FG_LO_BASE
             else:
                 index += (ANSI_FG_HI_BASE - 8)  # 82
-        else:                                   # Background
+        else:                                   # Background
             if index < 8:
                 index += ANSI_BG_LO_BASE
             else:
@@ -334,7 +334,7 @@ class _LineWriter(object):
                     nl = '\n'
                 bytes_ += self.stream.write(
                                 f'{self.start}{line}{self.default}{nl}'
-                          ) or 0  # in case None returned (on Windows)
+                          ) or 0  # in case None returned (on Windows)
             return bytes_
 
     def __getattr__(self, attr):
@@ -426,7 +426,7 @@ class _PaletteEntry:
             self += attr
 
         pos = text.find('\n', 0, MAX_NL_SEARCH)  # if '\n' in text, w/limit
-        if pos != -1:  # found
+        if pos != -1:  # found
             lines = text.splitlines()
             for i, line in enumerate(lines):
                 lines[i] = f'{self}{line}{self.default}'  # add styles, see tip
@@ -459,7 +459,7 @@ class _PaletteEntry:
             Note:
                 This function is experimental and may not last.
         '''
-        if self._orig_stdout:  # restore Usted
+        if self._orig_stdout:  # restore Usted
             sys.stdout = self._orig_stdout
 
         self._stream = outfile
@@ -477,6 +477,6 @@ class _LengthyString(str):
         sequences were added.
     '''
     def __new__(cls, original_length, content):
-       self = str.__new__(cls, content)
-       self.original_length = original_length
-       return self
+        self = str.__new__(cls, content)
+        self.original_length = original_length
+        return self

@@ -44,7 +44,7 @@ _title_mode_map = dict(
     title=2,
 )
 
-if _DEBUG:  # TODO not getting set early enough
+if _DEBUG:  # TODO not getting set early enough
     def _write(message):
         log.debug('%r', message)
         print(message, end='', flush=True)
@@ -68,7 +68,7 @@ def clear_line(mode=2):
     '''
     text = screen.erase_line(_mode_map.get(mode, mode))
     _write(text)
-    return text  # for testing
+    return text  # for testing
 
 
 def clear_screen(mode=2):
@@ -79,11 +79,12 @@ def clear_screen(mode=2):
             mode:  | 0 | 'forward'   - Clear cursor to end of screen, cursor stays.
                    | 1 | 'backward'  - Clear cursor to beginning of screen, ""
                    | 2 | 'full'      - Clear entire visible screen, cursor to 1,1.
-                   | 3 | 'history'   - Clear entire visible screen and scrollback buffer (xterm).
+                   | 3 | 'history'   - Clear entire visible screen and scrollback
+                                       buffer (xterm).
     '''
     text = screen.erase(_mode_map.get(mode, mode))
     _write(text)
-    return text  # for testing
+    return text  # for testing
 
 
 def reset_terminal():
@@ -98,7 +99,7 @@ def reset_terminal():
     else:
         text = screen.reset
         _write(text)
-        return text  # for testing
+        return text  # for testing
 
 
 def set_title(title, mode=0):
@@ -117,7 +118,7 @@ def set_title(title, mode=0):
         if _CHOSEN_PALETTE:
             text = f'{OSC}{_title_mode_map.get(mode, mode)};{title}{BEL}'
             _write(text)
-            return text  # for testing
+            return text  # for testing
 
 
 def strip_ansi(text, c1=False, osc=False):
