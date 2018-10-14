@@ -14,6 +14,7 @@ extras_require = dict(
     colorama=('colorama',),
 )
 
+# read version as text to avoid machinations at import time:
 version = '1.00'
 with open('console/__init__.py') as infile:
     for line in infile:
