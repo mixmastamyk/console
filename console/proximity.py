@@ -27,8 +27,8 @@
 from . import color_tables
 
 
-color_table4 = []
-color_table8 = []
+color_table4 = []   # 16 colors
+color_table8 = []   # 265 colors
 
 
 def _build_color_table(base, extended=True):
@@ -47,7 +47,6 @@ def _build_color_table(base, extended=True):
             color_table.append((r, g, b))
 
         # colors 233..253: grayscale  # to 255!
-
         for i in range(1, 24):  # odd, this should go to 255, added 2 to range
             v = 8 + i * 10
             color_table.append((v, v, v))
