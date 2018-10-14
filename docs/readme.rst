@@ -87,7 +87,16 @@ Installen-Sie, Bitte
 
     ⏵ pip3 install --user console
 
-    # console[colorama,webcolors]   # optional pkgs
+Suggested additional support packages:
+
+.. code-block:: shell
+
+    webcolors             # more color names
+    future_fstrings       # Python Version < 3.6
+
+    colorama              # Windows Version < 10
+    win_unicode_console   # Useful for Python < 3.6
+
 
 Jah!
 While console is cross-platform,
@@ -191,9 +200,9 @@ then create your own objects from the classes in the
 :mod:`console.screen`
 modules.
 
-There's also logging done---\
-enable the debug level and you'll see the results of the queries from the
-detection module.
+There's also logging done—\
+enable the debug level before loading the console package and you'll see the
+results of the queries from the detection module.
 
 .. rubric:: **Constants**
 
@@ -241,8 +250,8 @@ may be accessed directly by name:
     fg.lightred           # Another 8 brighter colors w/o bold
 
     # Truecolor variants
-    fg.bisque             # Webcolors takes precedence, if installed
-    fg.navyblue           # X11 color name, if available
+    fg.bisque             # Webcolors or X11 color name, if avail
+    fg.navyblue           # Webcolors takes precedence, if installed
 
 
 Additional palettes are accessed via a prefix letter and a number of
@@ -256,8 +265,8 @@ digits (or name) to specify the color:
 
     # Truecolor
     bg.t_ff00bb    tHHH   # Truecolor, 3 or 6 digits
-    bg.x_navyblue  x_NM   # force an X11 color name, if available
-    bg.w_bisque    w_NM   # force Webcolors, if installed
+    bg.x_navyblue  x_NM   # Force an X11 color name, if available
+    bg.w_bisque    w_NM   # Force Webcolors, if installed
 
 **The underscores are optional.**
 Choose depending whether brevity or readability are more important to you.
@@ -310,7 +319,8 @@ Styles can be built on the fly as well:
 
     <pre>
     &gt;&gt;&gt; print(
-        f'{fg.i208 + fx.reverse}Tangerine Dream{fx.end}'
+        f'{fg.i208 + fx.reverse}Tangerine Dream{fx.end}',  # or
+        (fg.i208 + fx.reverse)('Tangerine Dream'),
     )
     <span style="color: #222; background-color:#ff8700">Tangerine Dream</span>
     </pre>
@@ -335,8 +345,8 @@ with or instead of text:
 Other template formats are no problem either, ``%s`` or ``${}``.
 
 Console is lightweight,
-but perhaps you'd like a pre-rendered string in a tight loop for performance
-reasons.
+but perhaps you'd like a pre-rendered string to be used in a tight loop for
+performance reasons.
 Simply use ``str()`` to finalize the output then use it in the loop.
 
 Palette entries work as context-managers as well:
@@ -373,7 +383,7 @@ tests can be run from the install folder.
 
     ⏵ pytest -s
 
-The Makefile at github has good information on such topics.
+The Makefile at github has more details on such topics.
 
 
 Contributions

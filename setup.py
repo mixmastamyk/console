@@ -14,6 +14,15 @@ extras_require = dict(
     colorama=('colorama',),
 )
 
+version = '1.00'
+with open('console/__init__.py') as infile:
+    for line in infile:
+        if line.startswith('__version__'):
+            try:
+                version = line.split("'")[1]
+            except IndexError:
+                pass
+            break
 
 def slurp(filename):
     try:
@@ -43,7 +52,7 @@ setup(
     long_description    = slurp('readme.rst'),
     packages            = ('console',),
     url                 = 'https://github.com/mixmastamyk/console',
-    version             = '0.91',
+    version             = version,
 
     extras_require      = extras_require,
     install_requires    = install_requires,
