@@ -8,7 +8,7 @@ from .disabled import empty_bin as _empty_bin
 _DEBUG = False
 _CHOSEN_PALETTE = None
 fg = bg = fx = defx = sc = _empty_bin
-__version__ = '0.91'
+__version__ = '0.92a0'
 
 
 def _set_debug_mode(value):
