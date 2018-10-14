@@ -3,6 +3,7 @@
     | © 2018, Mike Miller - Released under the LGPL, version 3+.
 '''
 import sys
+
 from .disabled import empty_bin as _empty_bin
 
 

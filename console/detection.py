@@ -11,7 +11,7 @@ import logging
 
 import env
 
-from . import color_tables, proximity
+from . import color_tables, proximity, __version__
 from .constants import BEL, CSI, OSC, RS, ALL_PALETTES
 
 log = logging.getLogger(__name__)
@@ -24,8 +24,6 @@ if sys.platform == 'darwin':
 elif os.name == 'posix':  # Ubuntu, FreeBSD
     X11_RGB_PATHS = ('/etc/X11/rgb.txt', '/usr/share/X11/rgb.txt',
                      '/usr/local/lib/X11/rgb.txt', '/usr/X11R6/lib/X11/rgb.txt')
-
-log.debug('X11_RGB_PATHS: %r', X11_RGB_PATHS)
 
 
 class TermStack:
@@ -82,6 +80,9 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
     '''
     result = None
     pal = basic_palette
+    log.debug('version: %r', __version__)
+    log.debug('X11_RGB_PATHS: %r', X11_RGB_PATHS)
+
     if color_is_forced():
         result, pal = detect_palette_support(basic_palette=pal) or 'basic'
 
