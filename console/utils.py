@@ -29,7 +29,6 @@ ansi_csi1_finder = re.compile(r'\x9b[0-?]*[ -/]*[@-~]')
 ansi_osc0_finder = re.compile(r'\x1b\].*?(\a|\x1b\\)')
 ansi_osc1_finder = re.compile(r'\x9b.*?(\a|\x9d)')
 
-
 _mode_map = dict(
     forward=0,
     backward=1,
@@ -44,11 +43,10 @@ _title_mode_map = dict(
     title=2,
 )
 
-if _DEBUG:  # TODO not getting set early enough
+if _DEBUG:
     def _write(message):
         log.debug('%r', message)
         print(message, end='', flush=True)
-
 else:
     def _write(message):
         print(message, end='', flush=True)

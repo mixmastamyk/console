@@ -5,16 +5,18 @@
 import sys
 from .disabled import empty_bin as _empty_bin
 
-_DEBUG = False
+
+_DEBUG = []  # mutable reference
 _CHOSEN_PALETTE = None
 fg = bg = fx = defx = sc = _empty_bin
-__version__ = '0.92a0'
+__version__ = '0.92a1'
 
 
-def _set_debug_mode(value):
+def set_debug_mode(value):
     ''' Provides for more detailed output via logging functionality. '''
-    global _DEBUG
-    _DEBUG = bool(value)
+    _DEBUG.clear()
+    if value:
+        _DEBUG.append(1)
 
 
 # Py3.6+ - set up a dummy future-fstrings encoding that is really utf8

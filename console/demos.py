@@ -10,11 +10,10 @@ if __name__ == '__main__':
 
     import sys, os
     import logging
-    import env
 
     log = logging.getLogger(__name__)
-    _DEBUG = '-d' in sys.argv
     if os.name == 'nt':
+        import env
         try:  # wuc must come before colorama.init() for detection to work.
             import win_unicode_console as wuc
             wuc.enable()
@@ -27,18 +26,17 @@ if __name__ == '__main__':
         except ImportError:
             pass
 
-    # this sucks, what needs to be done to get demos to run:
+    # What needs to be done to get demos to run:
     import console
-    from importlib import reload
-    reload(console)
     pal = console._CHOSEN_PALETTE
-
+    _DEBUG = '-d' in sys.argv
     if _DEBUG:
-        from . import _set_debug_mode
-        _set_debug_mode(_DEBUG)
+        from . import set_debug_mode
+        set_debug_mode(_DEBUG)
 
         fmt = '  %(levelname)-7.7s %(module)s/%(funcName)s:%(lineno)s %(message)s'
         logging.basicConfig(level=logging.DEBUG, format=fmt)
+
         # detection already happened - need to run this again to log. :-/
         from .detection import choose_palette
         pal = choose_palette()
