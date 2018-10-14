@@ -154,7 +154,6 @@ if __name__ == '__main__':
         print('      │', sep='', end='')                            # GREEN
         for val in range(255, -1, -step):
             code = format(val, '02x')
-            #~ print(code, end =' ')
             print(getattr(bg, 't00%s00' % code), fx.end, end='')
         print('│')
 
@@ -215,7 +214,7 @@ if __name__ == '__main__':
                 if i % 2 == 1:
                     print()
 
-            fgall = style.ForegroundPalette(palettes=ALL_PALETTES);
+            fgall = style.ForegroundPalette(palettes=ALL_PALETTES)
             fge =   style.ForegroundPalette(palettes=('basic', 'extended'))
             fgb =   style.ForegroundPalette(palettes='basic')
             print('      FG t_deadbf:      ',

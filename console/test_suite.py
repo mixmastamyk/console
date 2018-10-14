@@ -537,7 +537,7 @@ if True:  # fold
 # downgrade support:
 
     def test_downgrade():
-        bgall = style.BackgroundPalette(palettes=ALL_PALETTES);
+        bgall = style.BackgroundPalette(palettes=ALL_PALETTES)
         bge = style.BackgroundPalette(palettes=('basic', 'extended'))
         bgb = style.BackgroundPalette(palettes='basic')
         E = CSI
