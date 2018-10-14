@@ -13,7 +13,7 @@ try:
 except Exception as err:
     webcolors = None
 
-from . import detection, screen, style, utils, _set_debug_mode
+from . import detection, screen, style, utils, set_debug_mode
 from .constants import ALL_PALETTES
 
 from . import proximity, color_tables
@@ -29,7 +29,7 @@ sc = screen.Screen(force=True)
 fg, bg, fx, pytest  # pyflakes
 
 # beginning of tests
-_set_debug_mode(True)
+set_debug_mode(True)
 CSI = '\x1b['           # sanity check
 
 
@@ -432,7 +432,8 @@ if True:  # fold
         utils.set_title(text)
         # xterm, make, mate term, iterm2
         possible_results = (text, None, 'Terminal', '',
-            text + ' (fish)', text + ' (bash)',   # iterm2, sigh
+            # iterm2, sigh:
+            text + ' (fish)', text + ' (bash)', text + ' (Python)'
         )
 
         # best effort test
