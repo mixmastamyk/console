@@ -534,8 +534,6 @@ def get_terminal_title(mode='title'):
                 return
         elif os.name == 'posix':
             pass
-            #~ if not env.XTERM_VERSION:  # Mate: always "Terminal"
-                #~ return
 
         # xterm (maybe iterm) only support
         import tty, termios
@@ -579,13 +577,16 @@ def get_theme():
             from .windows import get_console_color
             color_id = get_console_color('background')
             theme = 'dark' if color_id < 8 else 'light'
-        else:
-            # try xterm - find average across rgb
-            colors = get_terminal_color('background')  # background wins
-            if colors:
-                colors = tuple(int(cm, 16) for cm in colors)
-                avg = sum(colors) / len(colors)
-                theme = 'dark' if avg < 128 else 'light'
+        elif os.name == 'posix':
+            if env.TERM in ('linux', 'fbterm'):  # default
+                theme = 'dark'
+            else:
+                # try xterm - find average across rgb
+                colors = get_terminal_color('background')  # bg wins
+                if colors:
+                    colors = tuple(int(cm, 16) for cm in colors)
+                    avg = sum(colors) / len(colors)
+                    theme = 'dark' if avg < 128 else 'light'
 
     log.debug('%r', theme)
     return theme
