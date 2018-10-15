@@ -55,7 +55,7 @@ Printing to a supporting terminal from Python might look like this:
     Try the*
     `Sphinx docs <https://mixmastamyk.bitbucket.io/console/>`_
     *instead.
-    When you see "😉" that's your reminder.*
+    When you see "😉" in a comment, that's a reminder.*
 
 .. code-block:: python
 
