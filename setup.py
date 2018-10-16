@@ -1,17 +1,26 @@
 #!/usr/bin/env python3
-import sys, os
+import sys
 from os.path import dirname, join
 from setuptools import setup
 
 
+if sys.version_info.major < 3:
+    raise NotImplementedError('Sorry, only Python 3 and above is supported.')
+
 # additional metadata, requirements
 keywords = ('ansi color detection escape terminal console sequence cursor '
             'style screen shell xterm')
-install_requires = ['ezenv',]
+
+# https://www.python.org/dev/peps/pep-0508/#environment-markers
+install_requires = [
+    'ezenv',
+    'future_fstrings;     python_version < "3.6" ',
+    'colorama;            os_name == "nt" and platform_version < "10.0.10586" ',
+    'win_unicode_console; os_name == "nt" and python_version < "3.6" ',
+]
 tests_require = ('pyflakes', 'pytest', 'readme_renderer'),
 extras_require = dict(
     webcolors=('webcolors',),
-    colorama=('colorama',),
 )
 
 # read version as text to avoid machinations at import time:
@@ -33,15 +42,6 @@ def slurp(filename):
         pass  # needed at upload time, not install time
 
 
-if sys.version_info.major < 3:
-    raise NotImplementedError('Sorry, only Python 3 and above is supported.')
-
-if sys.version_info.minor < 6:  # hmm, doesn't seem to work
-    install_requires.append('future_fstrings')
-    if os.name == 'nt':
-        install_requires.append('win_unicode_console')
-
-
 setup(
     name                = 'console',
     description         = 'Comprehensive utility library for ANSI terminals. '
@@ -57,7 +57,7 @@ setup(
 
     extras_require      = extras_require,
     install_requires    = install_requires,
-    python_requires     = '>=3.2',
+    python_requires     = '>=3.4',  # untested below that
     setup_requires      = install_requires,
     tests_require       = tests_require,
 

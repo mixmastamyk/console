@@ -87,15 +87,16 @@ Installen-Sie, Bitte
 
     ⏵ pip3 install --user console
 
-Suggested additional support packages:
+Suggested additional support packages,
+some of which may be installed automatically if needed:
 
 .. code-block:: shell
 
-    webcolors             # more color names
-    future_fstrings       # Python Version < 3.6
+    webcolors             # More color names
+    future_fstrings       # Needed: Python Version < 3.6
 
-    colorama              # Windows Version < 10
-    win_unicode_console   # Useful for Python < 3.6
+    colorama              # Needed: Windows Version < 10
+    win_unicode_console   # Useful: for Python < 3.6
 
 
 Jah!
@@ -114,7 +115,6 @@ under the lame (no-ANSI support) versions of Windows < 10.
     Keep an eye peeled for oddities under older Pythons.
     Sorry, neither 2.X, nor 1.X is not supported. ``:-P``
 
-.. Installed automatically when needed.
 
 ``console`` has recently been tested on:
 
