@@ -12,7 +12,7 @@ import logging
 import env
 
 from . import color_tables, proximity, __version__
-from .constants import BEL, CSI, OSC, RS, ALL_PALETTES
+from .constants import BEL, CSI, ESC, OSC, RS, ST, ALL_PALETTES
 
 log = logging.getLogger(__name__)
 os_name = os.name
@@ -358,11 +358,13 @@ def _read_until(infile=sys.stdin, maxchars=20, end=RS):
     ''' Read a terminal response of up to a few characters from stdin.  '''
     chars = []
     read = infile.read
+    if not isinstance(end, tuple):
+        end = (end,)
 
     # count down, stopping at 0
     while maxchars:
         char = read(1)
-        if char == end:
+        if char in end:
             break
         chars.append(char)
         maxchars -= 1
@@ -482,7 +484,7 @@ def get_terminal_color(name, number=None):
                 tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
                 sys.stdout.write(query_sequence)
                 sys.stdout.flush()
-                resp = _read_until(maxchars=26, end=BEL)
+                resp = _read_until(maxchars=26, end=(BEL, ST)).rstrip(ESC)
 
             # parse response
             colors = resp.partition(':')[2].split('/')
@@ -537,10 +539,8 @@ def get_terminal_title(mode='title'):
 
         # xterm (maybe iterm) only support
         import tty, termios
-        from .constants import ESC
 
         mode = dict(icon=20, title=21).get(mode, mode)
-        ST = '\\'  # sequence terminator, (ESC precedes)
         query_sequence = f'{CSI}{mode}t'
         with TermStack() as fd:
             termios.tcflush(fd, termios.TCIFLUSH)   # clear input
