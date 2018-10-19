@@ -27,8 +27,6 @@ if __name__ == '__main__':
             pass
 
     # What needs to be done to get demos to run:
-    import console
-    pal = console._CHOSEN_PALETTE
     _DEBUG = '-d' in sys.argv
     if _DEBUG:
         from . import set_debug_mode
@@ -37,13 +35,16 @@ if __name__ == '__main__':
         fmt = '  %(levelname)-7.7s %(module)s/%(funcName)s:%(lineno)s %(message)s'
         logging.basicConfig(level=logging.DEBUG, format=fmt)
 
-        # detection already happened - need to run this again to log. :-/
-        from .detection import choose_palette
-        pal = choose_palette()
-
-    # try some stuff out
-    from . import fg, bg, fx, defx
+    # detection already happened - need to run this again to log it. :-/
+    from .detection import choose_palette, get_available_palettes
     from . import style
+
+    pal = get_available_palettes(choose_palette())
+    fg = style.ForegroundPalette(palettes=pal)
+    bg = style.BackgroundPalette(palettes=pal)
+    fx = style.EffectsPalette(palettes=pal)
+    defx = style.EffectsTerminator(palettes=pal)
+
     from .constants import BEL, ALL_PALETTES
     from .detection import is_a_tty, get_terminal_color, get_theme
     from .screen import screen
@@ -53,6 +54,7 @@ if __name__ == '__main__':
     def make_header(i):
         return f'  {fx.dim}{i+1:02d}{fx.end} '
 
+    # try some stuff out
     def build_demos(caption, obj, extra_style=''):
         ''' Iterate over a Palette container and collect the items to add to
             demos.

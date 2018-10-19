@@ -10,7 +10,7 @@ from .disabled import empty_bin as _empty_bin
 _DEBUG = []  # mutable reference
 _CHOSEN_PALETTE = None
 fg = bg = fx = defx = sc = _empty_bin
-__version__ = '0.93a2'
+__version__ = '0.93a3'
 
 
 def set_debug_mode(value):
@@ -34,6 +34,7 @@ if sys.version_info >= (3, 6):
 from .detection import TermStack, choose_palette as _choose_palette  # noqa
 
 _CHOSEN_PALETTE = _choose_palette()
+
 if _CHOSEN_PALETTE:
     # may now import other modules
     from .style import fg, bg, fx, defx
