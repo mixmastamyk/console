@@ -158,7 +158,7 @@ cls = reset_terminal
 
 # -- wait key implementations ------------------------------------------------
 if os.name == 'nt':
-    from msvcrt import getch as _getch
+    from msvcrt import getwch as _getch
 elif os.name == 'posix':
     from .detection import _getch
 
@@ -168,13 +168,16 @@ def wait_key(keys=None):
         "Where's the any key?"
 
         Arguments:
-            key - if passed, wait for this specific key, e.g. ESC.
+            keys - if passed, wait for this specific key, e.g. ESC.
+                   may be a tuple.
         Returns:
             char or ESC - depending on key hit.
             None - immediately under i/o redirection, not an interactive tty.
     '''
     if is_a_tty():
         if keys:
+            if not isinstance(keys, tuple):
+                keys = (keys,)
             while True:
                 key = _getch()
                 if key in keys:

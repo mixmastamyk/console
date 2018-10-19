@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import sys
 from os.path import dirname, join
 from setuptools import setup
@@ -12,27 +11,29 @@ keywords = ('ansi color detection escape terminal console sequence cursor '
             'style screen shell xterm')
 
 # https://www.python.org/dev/peps/pep-0508/#environment-markers
-install_requires = [
+install_requires = (
     'ezenv',
     'future_fstrings;     python_version < "3.6" ',
     'colorama;            os_name == "nt" and platform_version < "10.0.10586" ',
     'win_unicode_console; os_name == "nt" and python_version < "3.6" ',
-]
+)
 tests_require = ('pyflakes', 'pytest', 'readme_renderer'),
 extras_require = dict(
     webcolors=('webcolors',),
 )
 
-# read version as text to avoid machinations at import time:
-version = '1.00'
-with open('console/__init__.py') as infile:
-    for line in infile:
-        if line.startswith('__version__'):
-            try:
-                version = line.split("'")[1]
-            except IndexError:
-                pass
-            break
+def get_version(filename, version='1.00'):
+    ''' Read version as text to avoid machinations at import time. '''
+    with open(filename) as infile:
+        for line in infile:
+            if line.startswith('__version__'):
+                try:
+                    version = line.split("'")[1]
+                except IndexError:
+                    pass
+                break
+    return version
+
 
 def slurp(filename):
     try:
@@ -53,7 +54,7 @@ setup(
     long_description    = slurp('readme.rst'),
     packages            = ('console',),
     url                 = 'https://github.com/mixmastamyk/console',
-    version             = version,
+    version             = get_version('console/__init__.py'),
 
     extras_require      = extras_require,
     install_requires    = install_requires,
