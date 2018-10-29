@@ -102,11 +102,11 @@ if __name__ == '__main__':
         print(make_header(i+1), 'with bg:')
         try:
             with bg.cornflowerblue:
-                print('\tCan I get the icon in Cornflower Blue?\n\t'
+                print('\tCan I get the icon in Cornflower Blue?\n\t'
                       'Absolutely. :-D')
         except AttributeError as err:
             with bg.blue:
-                print('\tCan I get the icon in Cornflower Blue?\n\t'
+                print('\tCan I get the icon in Cornflower Blue?\n\t'
                       'Absolutely. :-D')
         print('\n')
 

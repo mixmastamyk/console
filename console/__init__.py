@@ -12,7 +12,7 @@ from .disabled import empty_bin as _empty_bin
 _DEBUG = []  # mutable reference
 _CHOSEN_PALETTE = None
 fg = bg = fx = defx = sc = _empty_bin
-__version__ = '0.95a0'
+__version__ = '0.95a3'
 
 
 def set_debug_mode(value):
