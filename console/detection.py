@@ -456,7 +456,7 @@ def get_color(name, number=None):
             On Windows, only able to find palette defaults,
             which may be different if they were customized.
             To find the palette index instead,
-            see ``windows.get_console_color``.
+            see ``windows.get_color``.
     '''
     colors = ()
     if is_a_tty() and not env.SSH_CLIENT:
@@ -464,8 +464,8 @@ def get_color(name, number=None):
             _color_code_map['index'] = '4;' + str(number or '')
 
         if os.name == 'nt':
-            from .windows import get_console_color
-            color_id = get_console_color(name)
+            from .windows import get_color
+            color_id = get_color(name)
             if sys.getwindowsversion()[2] > 16299:  # Win10 FCU, new palette
                 basic_palette = color_tables.cmd1709_palette4
             else:
@@ -534,8 +534,8 @@ def get_title(mode='title'):
     title = None
     if is_a_tty() and not env.SSH_CLIENT:
         if os.name == 'nt':
-            from .windows import get_console_title
-            return get_console_title()
+            from .windows import get_title
+            return get_title()
 
         elif sys.platform == 'darwin':
             if env.TERM_PROGRAM and env.TERM_PROGRAM == 'iTerm.app':
@@ -585,8 +585,8 @@ def get_theme():
         theme = 'dark' if BG < '8' else 'light'  # background wins
     else:
         if os.name == 'nt':
-            from .windows import get_console_color
-            color_id = get_console_color('background')
+            from .windows import get_color
+            color_id = get_color('background')
             theme = 'dark' if color_id < 8 else 'light'
         elif os.name == 'posix':
             if env.TERM in ('linux', 'fbterm'):  # default
