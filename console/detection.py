@@ -17,6 +17,7 @@ from .constants import BEL, CSI, ESC, OSC, RS, ST, ALL_PALETTES
 log = logging.getLogger(__name__)
 os_name = os.name
 TERM_SIZE_FALLBACK = (80, 24)
+CURSOR_POS_FALLBACK = (0, 0)
 
 # X11 colors support
 X11_RGB_PATHS = ()  # Windows
@@ -378,7 +379,7 @@ def _read_until(infile=sys.stdin, maxchars=20, end=RS):
     return ''.join(chars)
 
 
-def get_cursor_pos():
+def get_cursor_pos(fallback=CURSOR_POS_FALLBACK):
     ''' Return the current column number of the terminal cursor.
         Used to figure out if we need to print an extra newline.
 
@@ -389,7 +390,7 @@ def get_cursor_pos():
             Checks is_a_tty() first, since function would block if i/o were
             redirected through a pipe.
     '''
-    values = ()
+    values = fallback
     if is_a_tty():
         import tty, termios
         try:
