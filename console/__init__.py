@@ -3,8 +3,7 @@
     | © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     TODO:
-        - detection: move dict creation outside functions
-
+        - ENV Var to disable auto detection
 '''
 import sys
 

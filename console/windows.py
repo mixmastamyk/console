@@ -21,7 +21,7 @@ except (ValueError, NameError, ImportError) as err:  # Sphinx import on Linux
     c_short = c_ushort = Structure = kernel32 = DWORD = windll = object
 
 
-class COORD(Structure):
+class _COORD(Structure):
     ''' Struct from wincon.h. '''
     _fields_ = [
         ('X', c_short),
@@ -29,7 +29,7 @@ class COORD(Structure):
     ]
 
 
-class SMALL_RECT(Structure):
+class _SMALL_RECT(Structure):
     ''' Struct from wincon.h. '''
     _fields_ = [
         ('Left', c_short),
@@ -42,11 +42,11 @@ class SMALL_RECT(Structure):
 class CONSOLE_SCREEN_BUFFER_INFO(Structure):
     ''' Struct from wincon.h. '''
     _fields_ = [
-        ('dwSize', COORD),
-        ('dwCursorPosition', COORD),
+        ('dwSize', _COORD),
+        ('dwCursorPosition', _COORD),
         ('wAttributes', c_ushort),
-        ('srWindow', SMALL_RECT),
-        ('dwMaximumWindowSize', COORD),
+        ('srWindow', _SMALL_RECT),
+        ('dwMaximumWindowSize', _COORD),
     ]
 
 

@@ -389,7 +389,6 @@ def get_cursor_pos():
     values = ()
     if is_a_tty():
         import tty, termios
-
         try:
             with TermStack() as fd:
                 tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
@@ -462,6 +461,7 @@ def get_terminal_color(name, number=None):
     if is_a_tty() and not env.SSH_CLIENT:
         if not 'index' in _color_code_map:
             _color_code_map['index'] = '4;' + str(number or '')
+
         if os.name == 'nt':
             from .windows import get_console_color
             color_id = get_console_color(name)
@@ -469,37 +469,31 @@ def get_terminal_color(name, number=None):
                 basic_palette = color_tables.cmd1709_palette4
             else:
                 basic_palette = color_tables.cmd_palette4
-            return tuple(f'{i:02x}' for i in basic_palette[color_id]) # compat
+            colors = (f'{i:02x}' for i in basic_palette[color_id]) # compat
+
         elif sys.platform == 'darwin':
             if env.TERM_PROGRAM and env.TERM_PROGRAM == 'iTerm.app':
                 pass  # supports, though returns two chars per
-            else:
-                return colors  # doesn't support
+
         elif os.name == 'posix':
             if env.TERM and env.TERM.startswith('xterm'):
-                pass
-            else:
-                return colors
-
-        import tty, termios
-        color_code = _color_code_map.get(name)
-        if color_code:
-            query_sequence = f'{OSC}{color_code};?{BEL}'
-        try:
-            with TermStack() as fd:
-                termios.tcflush(fd, termios.TCIFLUSH)   # clear input
-                tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
-                sys.stdout.write(query_sequence)
-                sys.stdout.flush()
-                resp = _read_until(maxchars=26, end=(BEL, ST)).rstrip(ESC)
-        except AttributeError:  # no .fileno()
-            return colors
-
-            # parse response
-            colors = resp.partition(':')[2].split('/')
-            if colors == ['']:
-                colors = []                             # empty on failure
-
+                import tty, termios
+                color_code = _color_code_map.get(name)
+                if color_code:
+                    query_sequence = f'{OSC}{color_code};?{BEL}'
+                    try:
+                        with TermStack() as fd:
+                            termios.tcflush(fd, termios.TCIFLUSH)  # clear input
+                            tty.setcbreak(fd, termios.TCSANOW)  # shut off echo
+                            sys.stdout.write(query_sequence)
+                            sys.stdout.flush()
+                            resp = _read_until(maxchars=26, end=(BEL, ST)).rstrip(ESC)
+                    except AttributeError:  # no .fileno()
+                        return colors
+                    else:  # parse response
+                        colors = resp.partition(':')[2].split('/')
+                        if colors == ['']:
+                            colors = []  # empty on failure
     return tuple(colors)
 
 
