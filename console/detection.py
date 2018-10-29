@@ -16,6 +16,7 @@ from .constants import BEL, CSI, ESC, OSC, RS, ST, ALL_PALETTES
 
 log = logging.getLogger(__name__)
 os_name = os.name
+TERM_SIZE_FALLBACK = (80, 24)
 
 # X11 colors support
 X11_RGB_PATHS = ()  # Windows
@@ -252,7 +253,7 @@ def _find_basic_palette(result):
                     result = 'truecolor'
                 else:
                     try:  # TODO: check green to identify palette, others?
-                        if get_terminal_color('index', 2)[0][:2] == '4e':
+                        if get_color('index', 2)[0][:2] == '4e':
                             pal_name = 'tango'
                             basic_palette = color_tables.tango_palette4
                         else:
@@ -409,7 +410,7 @@ def get_cursor_pos():
 
 
 _color_code_map = dict(foreground='10', fg='10', background='11', bg='11')
-def get_terminal_color(name, number=None):
+def get_color(name, number=None):
     ''' Query the default terminal, for colors, etc.
 
         Direct queries supported on xterm, iTerm, perhaps others.
@@ -441,11 +442,11 @@ def get_terminal_color(name, number=None):
                 the tuple will be empty.
 
         Examples:
-            >>> query_terminal_color('bg')
+            >>> get_color('bg')
             ('0000', '0000', '0000')
 
-            >>> query_terminal_color('index', 2)  # second color in indexed
-            ('4e4d', '9a9a', '0605')              # palette, 2 aka 32 in basic
+            >>> get_color('index', 2)   # second color in indexed
+            ('4e4d', '9a9a', '0605')    # palette, 2 aka 32 in basic
 
         Note:
             Blocks if terminal does not support the function.
@@ -453,7 +454,7 @@ def get_terminal_color(name, number=None):
             were redirected through a pipe.
 
             On Windows, only able to find palette defaults,
-            which may be off if customized.
+            which may be different if they were customized.
             To find the palette index instead,
             see ``windows.get_console_color``.
     '''
@@ -497,7 +498,7 @@ def get_terminal_color(name, number=None):
     return tuple(colors)
 
 
-def get_terminal_size(fallback=(80, 24)):
+def get_size(fallback=TERM_SIZE_FALLBACK):
     ''' Convenience copy of `shutil.get_terminal_size
         <https://docs.python.org/3/library/shutil.html#shutil.get_terminal_size>`_.
 
@@ -512,7 +513,7 @@ def get_terminal_size(fallback=(80, 24)):
 
 
 _query_mode_map = dict(icon=20, title=21)
-def get_terminal_title(mode='title'):
+def get_title(mode='title'):
     ''' Return the terminal/console title.
 
         Arguments:
@@ -572,7 +573,7 @@ def get_theme():
 
         First checks for the environment variable COLORFGBG.
         Next, queries terminal, supported on Windows and xterm, perhaps others.
-        See notes on query_terminal_color().
+        See notes on get_color().
 
         Returns:
             str, None: 'dark', 'light', None if no information.
@@ -592,7 +593,7 @@ def get_theme():
                 theme = 'dark'
             else:
                 # try xterm - find average across rgb
-                colors = get_terminal_color('background')  # bg wins
+                colors = get_color('background')  # bg wins
                 if colors:
                     colors = tuple(int(cm, 16) for cm in colors)
                     avg = sum(colors) / len(colors)

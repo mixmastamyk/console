@@ -46,7 +46,7 @@ if __name__ == '__main__':
     defx = style.EffectsTerminator(palettes=pal)
 
     from .constants import BEL, ALL_PALETTES
-    from .detection import is_a_tty, get_terminal_color, get_theme
+    from .detection import is_a_tty, get_color, get_theme
     from .screen import screen
     from .utils import set_title, strip_ansi, cls
 
@@ -231,8 +231,8 @@ if __name__ == '__main__':
         if is_a_tty():
             try:
                 print('       theme:', get_theme(), '\n')
-                print('       color scheme:', get_terminal_color('fg'), 'on',
-                                              get_terminal_color('bg'), end=' ')
+                print('       color scheme:', get_color('fg'), 'on',
+                                              get_color('bg'), end=' ')
             except ModuleNotFoundError:
                 pass  # termios - Windows
 

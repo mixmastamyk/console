@@ -157,7 +157,7 @@ def is_colorama_initialized():
     return result
 
 
-def get_console_color(name, stream=STD_OUTPUT_HANDLE):
+def get_color(name, stream=STD_OUTPUT_HANDLE):
     ''' Returns current colors of console.
 
         https://docs.microsoft.com/en-us/windows/console/getconsolescreenbufferinfo
@@ -185,7 +185,7 @@ def get_console_color(name, stream=STD_OUTPUT_HANDLE):
     return color_id
 
 
-def get_console_title():
+def get_title():
     ''' Returns console title string.
 
         https://docs.microsoft.com/en-us/windows/console/getconsoletitle
