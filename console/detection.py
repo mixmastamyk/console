@@ -194,8 +194,8 @@ def detect_palette_support(basic_palette=None):
         webcolors = None
 
     # linux, older Windows + colorama
-    if ('color' in TERM) or (TERM == 'linux') or col_init:
-        result = 'basic'
+    if (TERM.startswith('xterm') or (TERM == 'linux') or col_init):
+            result = 'basic'
 
     # xterm, fbterm, older Windows + ansicon
     if ('256color' in TERM) or (TERM == 'fbterm') or env.ANSICON:
@@ -223,9 +223,10 @@ def _find_basic_palette(result):
 
         This is used for "downgrading to the nearest color" support.
     '''
+    pal_name = 'default (xterm)'
+    basic_palette = color_tables.xterm_palette4
     if env.SSH_CLIENT:  # fall back to xterm over ssh, info often wrong
         pal_name = 'ssh (xterm)'
-        basic_palette = color_tables.xterm_palette4
     else:
         if os_name == 'nt':
             if sys.getwindowsversion()[2] > 16299: # Win10 FCU, new palette
@@ -251,6 +252,8 @@ def _find_basic_palette(result):
                     pal_name = 'cmd_1709'
                     basic_palette = color_tables.cmd1709_palette4
                     result = 'truecolor'
+                elif sys.platform.startswith('freebsd'):  # vga console :-/
+                    pass
                 else:
                     try:  # TODO: check green to identify palette, others?
                         if get_color('index', 2)[0][:2] == '4e':
@@ -259,8 +262,7 @@ def _find_basic_palette(result):
                         else:
                             raise RuntimeError('not the color scheme.')
                     except (IndexError, RuntimeError):
-                        pal_name = 'xterm'
-                        basic_palette = color_tables.xterm_palette4
+                        pass
         else:  # Amiga/Atari :-P
             log.warn('Unexpected OS: os.name: %s', os_name)
 
