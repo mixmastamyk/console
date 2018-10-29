@@ -119,11 +119,19 @@ under the lame (no-ANSI support) versions of Windows < 10.
 ``console`` has recently been tested on:
 
 - Ubuntu 18.04 - Python 3.6
+
+  - xterm, mate-terminal, linux, fbterm
+
+- FreeBSD 11 - Python 3.7
+- MacOS 10.13 - Python 3.6
+
+  - Terminal.app, iTerm2
+
 - Windows XP - Python 3.4 - 32 bit + colorama, ansicon
 - Windows 7 - Python 3.6 - 32 bit + colorama
 - Windows 10 - Python 3.7 - 64bit
-- MacOS 10.13 - Python 3.6
 
+  - Conhost, WSL
 
 ::
 
