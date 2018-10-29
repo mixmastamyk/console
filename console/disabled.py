@@ -17,14 +17,17 @@ class _EmptyAttribute(str):
     def __bool__(self):
         return False
 
+    def __call__(self, *args, **kwargs):
+        if args:
+            return args[0]
+        else:
+            return ''
+
     def __enter__(self):
         return self
 
     def __exit__(self, *args):
         pass
-
-    def __call__(self, *args, **kwargs):
-        return ''
 
     def __str__(self):
         return ''
