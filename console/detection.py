@@ -409,6 +409,7 @@ def get_cursor_pos():
     return values
 
 
+_color_code_map = dict(foreground='10', fg='10', background='11', bg='11')
 def get_terminal_color(name, number=None):
     ''' Query the default terminal, for colors, etc.
 
@@ -448,8 +449,9 @@ def get_terminal_color(name, number=None):
             ('4e4d', '9a9a', '0605')              # palette, 2 aka 32 in basic
 
         Note:
-            Checks is_a_tty() first, since function would block if i/o were
-            redirected through a pipe.
+            Blocks if terminal does not support the function.
+            Checks is_a_tty() first, since function would also block if i/o
+            were redirected through a pipe.
 
             On Windows, only able to find palette defaults,
             which may be off if customized.
@@ -458,6 +460,8 @@ def get_terminal_color(name, number=None):
     '''
     colors = ()
     if is_a_tty() and not env.SSH_CLIENT:
+        if not 'index' in _color_code_map:
+            _color_code_map['index'] = '4;' + str(number or '')
         if os.name == 'nt':
             from .windows import get_console_color
             color_id = get_console_color(name)
@@ -478,9 +482,7 @@ def get_terminal_color(name, number=None):
                 return colors
 
         import tty, termios
-        color_code = dict(foreground='10', fg='10',
-                          background='11', bg='11',
-                          index='4;' + str(number or '')).get(name)
+        color_code = _color_code_map.get(name)
         if color_code:
             query_sequence = f'{OSC}{color_code};?{BEL}'
         try:
@@ -515,6 +517,7 @@ def get_terminal_size(fallback=(80, 24)):
     return get_terminal_size(fallback=fallback)
 
 
+_query_mode_map = dict(icon=20, title=21)
 def get_terminal_title(mode='title'):
     ''' Return the terminal/console title.
 
@@ -550,7 +553,7 @@ def get_terminal_title(mode='title'):
         # xterm (maybe iterm) only support
         import tty, termios
 
-        mode = dict(icon=20, title=21).get(mode, mode)
+        mode = _query_mode_map.get(mode, mode)
         query_sequence = f'{CSI}{mode}t'
         try:
             with TermStack() as fd:
