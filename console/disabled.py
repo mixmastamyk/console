@@ -17,11 +17,8 @@ class _EmptyAttribute(str):
     def __bool__(self):
         return False
 
-    def __call__(self, *args, **kwargs):
-        if args:
-            return args[0]
-        else:
-            return ''
+    def __call__(self, text, *args, **kwargs):
+        return text
 
     def __enter__(self):
         return self
