@@ -31,7 +31,10 @@ class TermStack:
         attributes.
 
         Arguments::
-            infile      - The file object to operate on, defaulting to stdin.
+            stream      - The file object to operate on, defaulting to stdin.
+
+        Raises:
+            AttributeError: when stream has no attribute 'fileno'
 
         Example:
             A POSIX implementation of get char/key::
@@ -42,10 +45,10 @@ class TermStack:
                     tty.setraw(fd)
                     return sys.stdin.read(1)
     '''
-    def __init__(self, infile=sys.stdin):
+    def __init__(self, stream=sys.stdin):
         import termios
         self.termios = termios
-        self.fd = infile.fileno()
+        self.fd = stream.fileno()
 
     def __enter__(self):
         # save
@@ -387,12 +390,14 @@ def get_cursor_pos():
     if is_a_tty():
         import tty, termios
 
-        with TermStack() as fd:
-
-            tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
-            sys.stdout.write(CSI + '6n')            # screen.dsr, avoid import
-            sys.stdout.flush()
-            resp = _read_until(maxchars=10, end='R')
+        try:
+            with TermStack() as fd:
+                tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
+                sys.stdout.write(CSI + '6n')            # screen.dsr, avoid import
+                sys.stdout.flush()
+                resp = _read_until(maxchars=10, end='R')
+        except AttributeError:  # no .fileno()
+            return values
 
         # parse response
         resp = resp.lstrip(CSI)
@@ -478,13 +483,15 @@ def get_terminal_color(name, number=None):
                           index='4;' + str(number or '')).get(name)
         if color_code:
             query_sequence = f'{OSC}{color_code};?{BEL}'
+        try:
             with TermStack() as fd:
                 termios.tcflush(fd, termios.TCIFLUSH)   # clear input
-
                 tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
                 sys.stdout.write(query_sequence)
                 sys.stdout.flush()
                 resp = _read_until(maxchars=26, end=(BEL, ST)).rstrip(ESC)
+        except AttributeError:  # no .fileno()
+            return colors
 
             # parse response
             colors = resp.partition(':')[2].split('/')
@@ -518,6 +525,9 @@ def get_terminal_title(mode='title'):
         - `Control sequences
           <http://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Operating-System-Commands>`_
 
+        Returns:
+            title string, or None if not able to be found.
+
         Note:
             Experimental, few terms outside xterm support this correctly.
             MATE Terminal returns "Terminal".
@@ -542,13 +552,16 @@ def get_terminal_title(mode='title'):
 
         mode = dict(icon=20, title=21).get(mode, mode)
         query_sequence = f'{CSI}{mode}t'
-        with TermStack() as fd:
-            termios.tcflush(fd, termios.TCIFLUSH)   # clear input
+        try:
+            with TermStack() as fd:
+                termios.tcflush(fd, termios.TCIFLUSH)   # clear input
 
-            tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
-            sys.stdout.write(query_sequence)
-            sys.stdout.flush()
-            resp = _read_until(maxchars=100, end=ST)
+                tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
+                sys.stdout.write(query_sequence)
+                sys.stdout.flush()
+                resp = _read_until(maxchars=100, end=ST)
+        except AttributeError:  # no .fileno()
+            return title
 
         # parse response
         title = resp.lstrip(OSC)[1:].rstrip(ESC)
