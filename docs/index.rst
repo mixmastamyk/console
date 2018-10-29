@@ -31,6 +31,7 @@
     *"Better, stronger, faster…"*
 
 
+|
 
 Contents
 ===============
@@ -43,6 +44,7 @@ Contents
     additional
 
 
+|
 |
 
 .. container:: mt mb

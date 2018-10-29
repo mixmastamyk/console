@@ -99,10 +99,24 @@ Well, more specifically empty strings.
     </div>
 
 
-Initializing Your Own
+Custom Initialization
 ------------------------
 
     *Can You Dig It?*
+
+.. rubric:: Environment Variables
+
+To disable automatic detection of terminal capabilities at import time the
+environment variable
+``PY_CONSOLE_AUTODETECT`` may be set to ``0``.
+
+Forcing the support of all palettes ON can also be done externally with an
+environment variable,
+such as ``CLICOLOR_FORCE``,
+if desired.
+
+
+.. rubric:: Initializing Your Own
 
 To configure auto-detection, palette support,
 or detect other output streams besides stdout,
@@ -114,12 +128,6 @@ one may create palette builder objects yourself::
     # e.g. force all palettes on:
     fullbg = BackgroundPalette(palettes=ALL_PALETTES)
 
-
-.. note::
-
-    Forcing the support of all palettes ON can also be done externally with an
-    environment variable,
-    such as ``CLICOLOR_FORCE`` if desired.
 
 
 
@@ -168,16 +176,16 @@ Here's a short script to show off console's full-screen abilities::
         set_title(' 🤓 Hi, from console!')
         with screen.location(5, 4):
             print(
-                fg.lightgreen(f'** Hi, from a {fx.i}fullscreen{defx.i}'
-                               ' app! ** '),
+                fg.lightgreen('** Hi from a '
+                              f'{fx.i}fullscreen{defx.i} app! **'),
                 screen.mv_x(5),  # back up, then down
                 screen.down(5),
-                fg.yellow(f'(Hit the {fx.reverse}ESC{defx.reverse} '
-                           'key to exit): '),
+                fg.yellow(f'(Hit the {fx.reverse}ESC{defx.reverse}'
+                           ' key to exit): '),
                 end='', flush=True,
             )
-        with screen.hidden_cursor():
 
+        with screen.hidden_cursor():
             wait_key(exit_keys)
 
 The text below should appear.

@@ -1,11 +1,10 @@
 '''
     | console - Comprehensive utility library for ANSI terminals.
     | © 2018, Mike Miller - Released under the LGPL, version 3+.
-
-    TODO:
-        - ENV Var to disable auto detection
 '''
 import sys
+
+import env
 
 from .disabled import empty_bin as _empty_bin
 
@@ -33,14 +32,19 @@ if sys.version_info >= (3, 6):
     codecs.register(_codec_map.get)
 
 
-# detect palette, other modules are dependent
-from .detection import TermStack, choose_palette as _choose_palette  # noqa
+# defer imports for proper ordering
+from .detection import TermStack
 
-_CHOSEN_PALETTE = _choose_palette()
+if env.PY_CONSOLE_AUTODETECT != '0':
 
-if _CHOSEN_PALETTE:
-    # may now import other modules
-    from .style import fg, bg, fx, defx
-    from .screen import screen as sc
+    # detect palette, other modules are dependent
+    from .detection import choose_palette as _choose_palette  # noqa
 
-    fg, bg, fx, defx, sc, TermStack  # quiet pyflakes
+    _CHOSEN_PALETTE = _choose_palette()
+
+    if _CHOSEN_PALETTE:
+        # may now import other modules
+        from .style import fg, bg, fx, defx
+        from .screen import screen as sc
+
+        fg, bg, fx, defx, sc, TermStack  # quiet pyflakes
