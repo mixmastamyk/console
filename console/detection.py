@@ -602,7 +602,7 @@ def get_theme():
                 # try xterm - find average across rgb
                 colors = get_color('background')  # bg wins
                 if colors:
-                    colors = tuple(int(cm, 16) for cm in colors)
+                    colors = tuple(int(cm[:2], 16) for cm in colors)
                     avg = sum(colors) / len(colors)
                     theme = 'dark' if avg < 128 else 'light'
 
