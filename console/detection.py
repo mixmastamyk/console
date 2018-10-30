@@ -254,6 +254,7 @@ def _find_basic_palette(result):
                     basic_palette = color_tables.cmd1709_palette4
                     result = 'truecolor'  # override
                 elif sys.platform.startswith('freebsd'):  # vga console :-/
+                    pal_name = 'vga'
                     basic_palette = color_tables.vga_palette4
                 else:
                     try:  # TODO: check green to identify palette, others?
