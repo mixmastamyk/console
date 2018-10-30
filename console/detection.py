@@ -23,7 +23,7 @@ CURSOR_POS_FALLBACK = (0, 0)
 X11_RGB_PATHS = ()  # Windows
 if sys.platform == 'darwin':
     X11_RGB_PATHS = ('/opt/X11/share/X11/rgb.txt',)
-elif os.name == 'posix':  # Ubuntu, FreeBSD
+elif os_name == 'posix':  # Ubuntu, FreeBSD
     X11_RGB_PATHS = ('/etc/X11/rgb.txt', '/usr/share/X11/rgb.txt',
                      '/usr/local/lib/X11/rgb.txt', '/usr/X11R6/lib/X11/rgb.txt')
 
@@ -189,13 +189,8 @@ def detect_palette_support(basic_palette=None):
             win_enabled = all(enable_vt_processing())
         col_init = is_colorama_initialized()
 
-    try:
-        import webcolors
-    except ImportError:
-        webcolors = None
-
     # linux, older Windows + colorama
-    if (TERM.startswith('xterm') or (TERM == 'linux') or col_init):
+    if TERM.startswith('xterm') or (TERM == 'linux') or col_init:
             result = 'basic'
 
     # xterm, fbterm, older Windows + ansicon
@@ -210,6 +205,11 @@ def detect_palette_support(basic_palette=None):
     pal_name = 'Unknown'
     if result and not basic_palette:
         result, pal_name, basic_palette = _find_basic_palette(result)
+
+    try:
+        import webcolors
+    except ImportError:
+        webcolors = None
 
     log.debug(
         f'{result!r} ({os_name}, TERM={env.TERM or ""}, '
@@ -252,9 +252,9 @@ def _find_basic_palette(result):
                 if 'Microsoft' in os.uname().release:
                     pal_name = 'cmd_1709'
                     basic_palette = color_tables.cmd1709_palette4
-                    result = 'truecolor'
+                    result = 'truecolor'  # override
                 elif sys.platform.startswith('freebsd'):  # vga console :-/
-                    pass
+                    basic_palette = color_tables.vga_palette4
                 else:
                     try:  # TODO: check green to identify palette, others?
                         if get_color('index', 2)[0][:2] == '4e':
@@ -466,7 +466,7 @@ def get_color(name, number=None):
         if not 'index' in _color_code_map:
             _color_code_map['index'] = '4;' + str(number or '')
 
-        if os.name == 'nt':
+        if os_name == 'nt':
             from .windows import get_color
             color_id = get_color(name)
             if sys.getwindowsversion()[2] > 16299:  # Win10 FCU, new palette
@@ -478,9 +478,11 @@ def get_color(name, number=None):
         elif sys.platform == 'darwin':
             if env.TERM_PROGRAM and env.TERM_PROGRAM == 'iTerm.app':
                 pass  # supports, though returns two chars per
-
-        elif os.name == 'posix':
-            if env.TERM and env.TERM.startswith('xterm'):
+                      # had to deactivate due to crash
+        elif os_name == 'posix':
+            if sys.platform.startswith('freebsd'):
+                pass
+            elif env.TERM and env.TERM.startswith('xterm'):
                 import tty, termios
                 color_code = _color_code_map.get(name)
                 if color_code:
@@ -536,7 +538,7 @@ def get_title(mode='title'):
     '''
     title = None
     if is_a_tty() and not env.SSH_CLIENT:
-        if os.name == 'nt':
+        if os_name == 'nt':
             from .windows import get_title
             return get_title()
 
@@ -545,12 +547,11 @@ def get_title(mode='title'):
                 pass
             else:
                 return
-        elif os.name == 'posix':
+        elif os_name == 'posix':
             pass
 
         # xterm (maybe iterm) only support
         import tty, termios
-
         mode = _query_mode_map.get(mode, mode)
         query_sequence = f'{CSI}{mode}t'
         try:
@@ -587,12 +588,14 @@ def get_theme():
         FG, _, BG = env.COLORFGBG.partition(';')
         theme = 'dark' if BG < '8' else 'light'  # background wins
     else:
-        if os.name == 'nt':
-            from .windows import get_color
-            color_id = get_color('background')
+        if os_name == 'nt':
+            from .windows import get_color as _get_color  # avoid Unbound Local
+            color_id = _get_color('background')
             theme = 'dark' if color_id < 8 else 'light'
-        elif os.name == 'posix':
+        elif os_name == 'posix':
             if env.TERM in ('linux', 'fbterm'):  # default
+                theme = 'dark'
+            elif sys.platform.startswith('freebsd'):  # vga console :-/
                 theme = 'dark'
             else:
                 # try xterm - find average across rgb
