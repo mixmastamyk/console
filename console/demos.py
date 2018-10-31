@@ -114,7 +114,7 @@ if __name__ == '__main__':
               end='')
         for j in range(256):
             attr = getattr(fg, f'i{j}')
-            print(attr, '%4.4s' % attr.name, fx.end, end=' ')
+            print(attr, '%4.4s' % attr.name.lower(), fx.end, end=' ')
 
             # newline every 16 columns :-/
             if not (j + 1) % 16:
@@ -126,7 +126,7 @@ if __name__ == '__main__':
         for j in range(256):
 
             attr = getattr(bg, f'i{j}')
-            print(attr, '%4.4s' % attr.name, fx.end, end=' ')
+            print(attr, '%4.4s' % attr.name.lower(), fx.end, end=' ')
 
             # NL every 16 columns :-/
             if not (j + 1) % 16:

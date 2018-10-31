@@ -85,7 +85,7 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
     '''
     result = None
     pal = basic_palette
-    log.debug('version: %r', __version__)
+    log.debug('console version: %s', __version__)
     log.debug('X11_RGB_PATHS: %r', X11_RGB_PATHS)
 
     if color_is_forced():
