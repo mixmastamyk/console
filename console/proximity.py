@@ -74,44 +74,6 @@ def build_color_tables(base=color_tables.vga_palette4):
         color_table8.extend(table8)
 
 
-def _euclidian_distance(color1, color2):
-    ''' Euclid method - Sum of squares, to find distance
-
-        Fast but poor approximation.
-
-        "RGB color space is not orthogonal (straight)."
-    '''
-    rd = color1[0] - color2[0]
-    gd = color1[1] - color2[1]
-    bd = color1[2] - color2[2]
-
-    return (rd * rd) + (gd * gd) + (bd * bd)
-
-
-try:
-    # CIEDE2000 - slow but better approximation
-    # https://en.wikipedia.org/wiki/Color_difference#CIEDE2000
-    from colorzero import Color
-    from colorzero.deltae import ciede2000
-    from colorzero.conversions import rgb_to_xyz, xyz_to_lab
-
-    def _colorzero_ciede2000_distance(color1, color2):
-        ''' Euclid method - Sum of squares, to find distance
-
-            Fast but poor approximation.
-
-            "RGB color space is not orthogonal (straight)."
-        '''
-        # avoid all the packaging, a bit faster
-        other_color = xyz_to_lab(*rgb_to_xyz(color2[0]/255,
-                                             color2[1]/255,
-                                             color2[2]/255))
-        return ciede2000(color1, other_color)
-
-except ImportError:
-    pass
-
-
 def find_nearest_color_index(r, g, b, color_table=None, method='euclid'):
     ''' Given three integers representing R, G, and B,
         return the nearest color index.
@@ -131,17 +93,12 @@ def find_nearest_color_index(r, g, b, color_table=None, method='euclid'):
             build_color_tables()
         color_table = color_table8
 
-    # prepare args
-    if method == 'euclid':
-        target_color = (r, g, b)
-        find_distance_method = _euclidian_distance
-    elif method == 'colorzero_ciede2000':
-        target_color = Color.from_rgb_bytes(r, g, b).lab
-        find_distance_method = _colorzero_ciede2000_distance
+    for i, values in enumerate(color_table):
+        rd = r - values[0]
+        gd = g - values[1]
+        bd = b - values[2]
 
-    for i, entry_rgb in enumerate(color_table):
-
-        this_distance = find_distance_method(target_color, entry_rgb)
+        this_distance = (rd * rd) + (gd * gd) + (bd * bd)
 
         if this_distance < shortest_distance:  # closer
             index = i

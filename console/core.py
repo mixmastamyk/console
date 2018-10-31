@@ -98,9 +98,9 @@ class _BasicPaletteBuilder:
 class _HighColorPaletteBuilder(_BasicPaletteBuilder):
     ''' Container/Router for ANSI Extended & Truecolor palettes. '''
 
-    def __init__(self, x11_rgb_path=X11_RGB_PATHS,
+    def __init__(self,
+                 x11_rgb_path=X11_RGB_PATHS,
                  downgrade_method='euclid',
-                 #~ downgrade_method='colorzero_ciede2000',
                  **kwargs):
         super().__init__(**kwargs)
 
@@ -186,7 +186,6 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             if is_hex:
                 index = str(find_nearest_color_hexstr(index,
                                                       method=self._dg_method))
-
             start_codes = self._start_codes_extended
             if is_fbterm:
                 start_codes = self._start_codes_extended_fbterm
