@@ -130,6 +130,29 @@ one may create palette builder objects yourself::
 
 
 
+Palette Downgrade
+----------------------
+
+When using true or extended colors on a terminal that is not configured to
+support it,
+console with "downgrade" the colors to their nearest neighbors in the available
+palette.
+
+Neat, huh?
+It does this using a Euclidian 3D distance method which is quite fast but only
+somewhat accurate,
+due to the fact that the RGB color space is not uniform.
+
+That lead to some experimentation with
+`CIEDE2000 <https://en.wikipedia.org/wiki/Color_difference#CIEDE2000>`_
+libraries like colormath and colorzero.
+Unfortunately they were both slow as molasses,
+even with numpy loaded,
+which is also slow to import.
+
+Fast and inaccurate it is!
+Unless someone would like to write a very optimized C implementation for kicks,
+it doesn't seem worth the trouble for this application.
 
 ::
 
@@ -274,7 +297,7 @@ but here's a couple.
     >>> import console.windows as cw
 
     >>> cw.enable_vt_processing()
-    (0, 0)
+    (0, 0)  # status for (stdout, stderr)
 
 
 
