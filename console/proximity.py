@@ -99,7 +99,10 @@ def find_nearest_color_index(r, g, b, color_table=None):
         gd = g - values[1]
         bd = b - values[2]
 
-        this_distance = (rd * rd) + (gd * gd) + (bd * bd)  # sum of squares
+        # Sum of squares - to find distance
+        # TODO: apparently this is not as good as CIEDE2000, but impl req numpy
+        # https://en.wikipedia.org/wiki/Color_difference#CIEDE2000
+        this_distance = (rd * rd) + (gd * gd) + (bd * bd)
 
         if this_distance < distance:  # closer
             index = i

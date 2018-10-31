@@ -380,40 +380,31 @@ def _read_until(infile=sys.stdin, maxchars=20, end=RS):
     return ''.join(chars)
 
 
-def get_cursor_pos(fallback=CURSOR_POS_FALLBACK):
-    ''' Return the current column number of the terminal cursor.
-        Used to figure out if we need to print an extra newline.
+_color_code_map = dict(foreground='10', fg='10', background='11', bg='11')
+def _get_color_xterm(name, number=None):
+    import tty, termios
 
-        Returns:
-            tuple(int): (x, y), (,)  - empty, if an error occurred.
-
-        Note:
-            Checks is_a_tty() first, since function would block if i/o were
-            redirected through a pipe.
-    '''
-    values = fallback
-    if is_a_tty():
-        import tty, termios
+    colors = ()
+    color_code = _color_code_map.get(name)
+    if color_code:
+        query_sequence = f'{OSC}{color_code};?{BEL}'
         try:
             with TermStack() as fd:
+                termios.tcflush(fd, termios.TCIFLUSH)   # clear input
                 tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
-                sys.stdout.write(CSI + '6n')            # screen.dsr, avoid import
+                sys.stdout.write(query_sequence)
                 sys.stdout.flush()
-                resp = _read_until(maxchars=10, end='R')
+                resp = _read_until(maxchars=26, end=(BEL, ST)).rstrip(ESC)
         except AttributeError:  # no .fileno()
-            return values
+            pass # return colors
+        else:  # parse response
+            colors = resp.partition(':')[2].split('/')
+            if colors == ['']:
+                colors = []  # empty on failure
 
-        # parse response
-        resp = resp.lstrip(CSI)
-        try:  # reverse
-            values = tuple( int(token) for token in resp.partition(';')[::-2] )
-        except Exception as err:
-            log.error('parse error: %s on %r', err, resp)
-
-    return values
+    return colors
 
 
-_color_code_map = dict(foreground='10', fg='10', background='11', bg='11')
 def get_color(name, number=None):
     ''' Query the default terminal, for colors, etc.
 
@@ -477,31 +468,50 @@ def get_color(name, number=None):
             colors = (f'{i:02x}' for i in basic_palette[color_id]) # compat
 
         elif sys.platform == 'darwin':
-            if env.TERM_PROGRAM and env.TERM_PROGRAM == 'iTerm.app':
-                pass  # supports, though returns two chars per
-                      # had to deactivate due to crash
+            if env.TERM_PROGRAM == 'iTerm.app':
+                # supports, though returns two chars per
+                colors = _get_color_xterm(name, number)
+
         elif os_name == 'posix':
             if sys.platform.startswith('freebsd'):
                 pass
             elif env.TERM and env.TERM.startswith('xterm'):
-                import tty, termios
-                color_code = _color_code_map.get(name)
-                if color_code:
-                    query_sequence = f'{OSC}{color_code};?{BEL}'
-                    try:
-                        with TermStack() as fd:
-                            termios.tcflush(fd, termios.TCIFLUSH)  # clear input
-                            tty.setcbreak(fd, termios.TCSANOW)  # shut off echo
-                            sys.stdout.write(query_sequence)
-                            sys.stdout.flush()
-                            resp = _read_until(maxchars=26, end=(BEL, ST)).rstrip(ESC)
-                    except AttributeError:  # no .fileno()
-                        return colors
-                    else:  # parse response
-                        colors = resp.partition(':')[2].split('/')
-                        if colors == ['']:
-                            colors = []  # empty on failure
+                colors = _get_color_xterm(name, number)
+
     return tuple(colors)
+
+
+def get_cursor_pos(fallback=CURSOR_POS_FALLBACK):
+    ''' Return the current column number of the terminal cursor.
+        Used to figure out if we need to print an extra newline.
+
+        Returns:
+            tuple(int): (x, y), (,)  - empty, if an error occurred.
+
+        Note:
+            Checks is_a_tty() first, since function would block if i/o were
+            redirected through a pipe.
+    '''
+    values = fallback
+    if is_a_tty():
+        import tty, termios
+        try:
+            with TermStack() as fd:
+                tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
+                sys.stdout.write(CSI + '6n')            # screen.dsr, avoid import
+                sys.stdout.flush()
+                resp = _read_until(maxchars=10, end='R')
+        except AttributeError:  # no .fileno()
+            return values
+
+        # parse response
+        resp = resp.lstrip(CSI)
+        try:  # reverse
+            values = tuple( int(token) for token in resp.partition(';')[::-2] )
+        except Exception as err:
+            log.error('parse error: %s on %r', err, resp)
+
+    return values
 
 
 def get_size(fallback=TERM_SIZE_FALLBACK):
