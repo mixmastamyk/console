@@ -165,7 +165,7 @@ if __name__ == '__main__':
             print(getattr(bg, 't0000%s' % code), fx.end, end='')
         print('│')
         print('      ╰' + '─' * 86, '╯\n', sep='', end='')
-        print()
+        print(flush=True)
 
         print(make_header(i+5), 'Test color downgrade support '
                                 '(True ⏵ Indexed ⏵ Basic):')
@@ -202,7 +202,6 @@ if __name__ == '__main__':
                 'n_f0f',
                 't_deadbf',
             )
-
             for i, color_key in enumerate(colors):
                 full = getattr(bgall, color_key)
                 dwne = getattr(bge, color_key)

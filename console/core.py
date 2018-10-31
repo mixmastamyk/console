@@ -98,10 +98,14 @@ class _BasicPaletteBuilder:
 class _HighColorPaletteBuilder(_BasicPaletteBuilder):
     ''' Container/Router for ANSI Extended & Truecolor palettes. '''
 
-    def __init__(self, x11_rgb_path=X11_RGB_PATHS, **kwargs):
+    def __init__(self, x11_rgb_path=X11_RGB_PATHS,
+                 downgrade_method='euclid',
+                 #~ downgrade_method='colorzero_ciede2000',
+                 **kwargs):
         super().__init__(**kwargs)
 
         self._x11_rgb_path = x11_rgb_path
+        self._dg_method = downgrade_method
 
     def __getattr__(self, name):
         ''' Traffic cop - called only when an attribute is missing,
@@ -180,7 +184,8 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
 
         if 'extended' in self._palette_support:  # build entry
             if is_hex:
-                index = str(find_nearest_color_hexstr(index))
+                index = str(find_nearest_color_hexstr(index,
+                                                      method=self._dg_method))
 
             start_codes = self._start_codes_extended
             if is_fbterm:
@@ -191,11 +196,13 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         # downgrade section
         elif 'basic' in self._palette_support:
             if is_hex:
-                nearest_idx = find_nearest_color_hexstr(index, color_table4)
+                nearest_idx = find_nearest_color_hexstr(index, color_table4,
+                                                        method=self._dg_method)
             else:
                 from .color_tables import index_to_rgb8  # find rgb for idx
                 nearest_idx = find_nearest_color_index(*index_to_rgb8[index],
-                                                       color_table=color_table4)
+                                                       color_table=color_table4,
+                                                       method=self._dg_method)
             values = self._index_to_ansi_values(nearest_idx)
 
         return (self._create_entry(name, values, fbterm=is_fbterm)
@@ -223,11 +230,13 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         # downgrade section
         elif 'extended' in self._palette_support:
             if type_digits is str:
-                nearest_idx = find_nearest_color_hexstr(digits)
+                nearest_idx = find_nearest_color_hexstr(digits,
+                                                       method=self._dg_method)
             else:  # tuple
                 if type(digits[0]) is str:  # convert to ints
                     digits = tuple(int(digit) for digit in digits)
-                nearest_idx = find_nearest_color_index(*digits)
+                nearest_idx = find_nearest_color_index(*digits,
+                                                       method=self._dg_method)
 
             start_codes = self._start_codes_extended
             if is_fbterm:
@@ -237,12 +246,14 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
 
         elif 'basic' in self._palette_support:
             if type_digits is str:
-                nearest_idx = find_nearest_color_hexstr(digits, color_table4)
+                nearest_idx = find_nearest_color_hexstr(digits, color_table4,
+                                                       method=self._dg_method)
             else:  # tuple
                 if type(digits[0]) is str:  # convert to ints
                     digits = tuple(int(digit) for digit in digits)
                 nearest_idx = find_nearest_color_index(*digits,
-                                                       color_table=color_table4)
+                                                       color_table=color_table4,
+                                                       method=self._dg_method)
             values = self._index_to_ansi_values(nearest_idx)
 
         return (self._create_entry(name, values, fbterm=is_fbterm)
