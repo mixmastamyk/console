@@ -45,6 +45,6 @@ if env.PY_CONSOLE_AUTODETECT != '0':
     if _CHOSEN_PALETTE:
         # may now import other modules
         from .style import fg, bg, fx, defx
-        from .screen import screen as sc
+        from .screen import sc
 
         fg, bg, fx, defx, sc, TermStack  # quiet pyflakes

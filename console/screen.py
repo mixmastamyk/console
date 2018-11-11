@@ -149,21 +149,22 @@ class Screen:
                 with screen.location(40, 20):
                     print('Hello, world!')
         '''
-        self._stream.write(self.save_pos)  # cursor position
+        stream = self._stream
+        stream.write(self.save_pos)  # cursor position
 
         if x is not None and y is not None:
-            self._stream.write(self.mv(y, x))
+            stream.write(self.mv(y, x))
         elif x is not None:
-            self._stream.write(self.mv_x(x))
+            stream.write(self.mv_x(x))
         elif y is not None:
-            self._stream.write(self.mv_y(y))
+            stream.write(self.mv_y(y))
 
-        self._stream.flush()
+        stream.flush()
         try:
             yield self
         finally:
-            self._stream.write(self.rest_pos)
-            self._stream.flush()
+            stream.write(self.rest_pos)
+            stream.flush()
 
     @contextmanager
     def fullscreen(self):
@@ -175,15 +176,16 @@ class Screen:
                 with screen.fullscreen():
                     print('Hello, world!')
         '''
-        self._stream.write(self.alt_screen_enable)
-        self._stream.write(str(self.save_title(0)))     # 0 = both icon, title
-        self._stream.flush()
+        stream = self._stream
+        stream.write(self.alt_screen_enable)
+        stream.write(str(self.save_title(0)))     # 0 = both icon, title
+        stream.flush()
         try:
             yield self
         finally:
-            self._stream.write(self.alt_screen_disable)
-            self._stream.write(str(self.restore_title(0)))  # 0 = icon & title
-            self._stream.flush()
+            stream.write(self.alt_screen_disable)
+            stream.write(str(self.restore_title(0)))  # 0 = icon & title
+            stream.flush()
 
     @contextmanager
     def hidden_cursor(self):
@@ -194,13 +196,14 @@ class Screen:
                 with screen.hidden_cursor():
                     print('Clandestine activity…')
         '''
-        self._stream.write(self.hide_cursor)
-        self._stream.flush()
+        stream = self._stream
+        stream.write(self.hide_cursor)
+        stream.flush()
         try:
             yield self
         finally:
-            self._stream.write(self.show_cursor)
-            self._stream.flush()
+            stream.write(self.show_cursor)
+            stream.flush()
 
 
-screen = Screen()
+sc = Screen()

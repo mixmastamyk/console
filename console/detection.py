@@ -12,7 +12,7 @@ import logging
 import env
 
 from . import color_tables, proximity, __version__
-from .constants import BEL, CSI, ESC, OSC, RS, ST, ALL_PALETTES
+from .constants import BS, BEL, CSI, ESC, OSC, RS, ST, ALL_PALETTES
 
 log = logging.getLogger(__name__)
 os_name = os.name
@@ -217,6 +217,41 @@ def detect_palette_support(basic_palette=None):
         f'webcolors={bool(webcolors)}, basic_palette={pal_name})'
     )
     return (result, basic_palette)
+
+
+def detect_unicode_support():
+    ''' Try to detect unicode (utf8?) support in the terminal.
+
+        Experimental, implementation idea is from the link below:
+           https://unix.stackexchange.com/questions/184345/detect-how-much-of-unicode-my-terminal-supports-even-through-screen
+
+        TODO: needs improvement.
+    '''
+    result = None
+    if is_a_tty():
+        if os_name == 'nt':
+            from .windows import get_position as _get_position
+        else:
+            _get_position = get_position
+
+        out = sys.stdout
+        # what if cursor is not at beginning of line?
+        x, _ = _get_position()
+        out.write('é')
+        out.flush()
+        x2, _ = _get_position()
+
+        difference = x2 - x
+        if difference == 1:
+            result = True
+        else:
+            result = False  # 0, 2 - no
+
+        # clean up
+        out.write(BS)
+        out.flush()
+
+    return result
 
 
 def _find_basic_palette(result):
@@ -481,13 +516,14 @@ def get_color(name, number=None):
     return tuple(colors)
 
 
-def get_cursor_pos(fallback=CURSOR_POS_FALLBACK):
+def get_position(fallback=CURSOR_POS_FALLBACK):
     ''' Return the current column number of the terminal cursor.
         Used to figure out if we need to print an extra newline.
 
         Returns:
             tuple(int): (x, y), (,)  - empty, if an error occurred.
 
+        TODO: needs non-ansi mode for Windows
         Note:
             Checks is_a_tty() first, since function would block if i/o were
             redirected through a pipe.

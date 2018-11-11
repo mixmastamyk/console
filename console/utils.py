@@ -15,7 +15,7 @@ import logging
 import re
 
 from .constants import OSC, BEL
-from .screen import screen
+from .screen import sc
 from .detection import is_a_tty
 from . import _DEBUG, _CHOSEN_PALETTE
 
@@ -64,7 +64,7 @@ def clear_line(mode=2):
         Note:
             Cursor position does not change.
     '''
-    text = screen.erase_line(_mode_map.get(mode, mode))
+    text = sc.erase_line(_mode_map.get(mode, mode))
     _write(text)
     return text  # for testing
 
@@ -80,7 +80,7 @@ def clear_screen(mode=2):
                    | 3 | 'history'   - Clear entire visible screen and scrollback
                                        buffer (xterm).
     '''
-    text = screen.erase(_mode_map.get(mode, mode))
+    text = sc.erase(_mode_map.get(mode, mode))
     _write(text)
     return text  # for testing
 
@@ -95,7 +95,7 @@ def reset_terminal():
         from .windows import cls
         cls()
     else:
-        text = screen.reset
+        text = sc.reset
         _write(text)
         return text  # for testing
 

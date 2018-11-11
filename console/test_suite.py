@@ -384,7 +384,7 @@ if True:  # fold
            '\x1b]L-OSC-C0-\x1b\\ | \x1b]L-OSC-C0-7-\a | \x9bL-OSC-C1-\x9d END')
 
     def test_utiles_clear_line():
-        utils.screen = sc
+        utils.sc = sc
         end = 'K'
         for i in range(3):
             text = utils.clear_line(i)
@@ -395,6 +395,7 @@ if True:  # fold
             assert text == CSI + str(i) + end
 
     def test_utiles_clear_screen():
+        utils.sc = sc
         end = 'J'
         for i in range(3):
             text = utils.clear_screen(i)
@@ -533,7 +534,7 @@ if True:  # fold
 
     def test_get_cursor_pos():
         # gets correct results on osx/iterm (81, 40)
-        detection.get_cursor_pos()
+        detection.get_position()
 
 # downgrade support:
 

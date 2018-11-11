@@ -217,4 +217,6 @@ Looked at and picked a few design cues from several of these:
     - style
     - termcolor
 
+    - ptpython, urwid
+
 etc.

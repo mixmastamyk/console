@@ -9,7 +9,7 @@
 import sys
 import logging
 try:
-    from ctypes import (byref, c_short, c_ushort, Structure, windll,
+    from ctypes import (byref, c_short, c_ushort, c_long, Structure, windll,
                         create_unicode_buffer)
     from ctypes.wintypes import DWORD, HANDLE
 
@@ -18,7 +18,7 @@ try:
     kernel32.GetStdHandle.restype = HANDLE
 
 except (ValueError, NameError, ImportError) as err:  # Sphinx import on Linux
-    c_short = c_ushort = Structure = kernel32 = DWORD = windll = object
+    c_short = c_ushort = c_long = Structure = kernel32 = DWORD = windll = object
 
 
 class _COORD(Structure):
@@ -170,9 +170,9 @@ def get_color(name, stream=STD_OUTPUT_HANDLE):
             int:  a color id from the conhost palette.
                   Ids under 0x8 (8) are dark colors, above light.
     '''
-    stdout = kernel32.GetStdHandle(stream)
+    stream = kernel32.GetStdHandle(stream)
     csbi = CONSOLE_SCREEN_BUFFER_INFO()
-    kernel32.GetConsoleScreenBufferInfo(stdout, byref(csbi))
+    kernel32.GetConsoleScreenBufferInfo(stream, byref(csbi))
     color_id = csbi.wAttributes & _mask_map.get(name, name)
     log.debug('color_id from conhost: %d', color_id)
     if name in ('background', 'bg'):
@@ -183,6 +183,24 @@ def get_color(name, stream=STD_OUTPUT_HANDLE):
     color_id = _win_to_ansi_offset_map.get(color_id, color_id)
     log.debug('ansi color_id: %d', color_id)
     return color_id
+
+
+def get_position(stream=STD_OUTPUT_HANDLE):
+    ''' Returns current position of cursor, starts at 1. '''
+    stream = kernel32.GetStdHandle(stream)
+    csbi = CONSOLE_SCREEN_BUFFER_INFO()
+    kernel32.GetConsoleScreenBufferInfo(stream, byref(csbi))
+
+    pos = csbi.dwCursorPosition
+    # zero based, add ones for compatibility.
+    return (pos.X + 1, pos.Y + 1)
+
+
+def set_position(x, y, stream=STD_OUTPUT_HANDLE):
+    ''' Sets current position of the cursor. '''
+    stream = kernel32.GetStdHandle(stream)
+    value = x + (y << 16)
+    kernel32.SetConsoleCursorPosition(stream, c_long(value))
 
 
 def get_title():

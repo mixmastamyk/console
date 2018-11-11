@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     from .constants import BEL, ALL_PALETTES
     from .detection import is_a_tty, get_color, get_theme
-    from .screen import screen
+    from .screen import sc
     from .utils import set_title, strip_ansi, cls
 
     # util functions
@@ -80,8 +80,8 @@ if __name__ == '__main__':
             f'↑ Title: {set_title("Console FTW! 🤣")!r} (gone in a µs.)',
             f'Combined, bold + underline + red: {fx.bold + fx.underline + fg.red}' +
                 f'Merry {fg.green}X-Mas{fg.default}!{fx.end}',
-            f'Cursor right → : [{screen.right}] (<-- one space between brackets)',
-            f'Cursor down ↓ 2: {screen.down(2)}',
+            f'Cursor right → : [{sc.right}] (<-- one space between brackets)',
+            f'Cursor down ↓ 2: {sc.down(2)}',
 
             'Text wrap: ' + fg.purple('Fill my eyes with that Double Vision…'
                                 + BEL, fx.underline, fx.italic, fx.overline),
