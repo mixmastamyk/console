@@ -112,7 +112,7 @@ def find_nearest_color_hexstr(hexdigits, color_table=None, method='euclid'):
         color index.
 
         Arguments:
-            hexdigits:  a three/6 digit hex string, e.g. 'b0b'
+            hexdigits:  a three/6 digit hex string, e.g. 'b0b', '123456'
 
         Returns:
             int, None: index, or None on error.

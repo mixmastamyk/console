@@ -270,6 +270,40 @@ package as well::
     >>>  # this space intentionally left blank ;-)
 
 
+Progress Bars
+-------------------
+
+A progress bar implementation is located in :mod:`console.progress` and may be
+demoed thusly:
+
+.. code-block:: shell
+
+    ⏵ python3 -m console.progress -l
+
+
+There are multiple themes,
+but typical use of the module is achieved like so::
+
+    import time
+
+    from console.screen import sc
+    from console.utils import clear_line
+    from console.progress import ProgressBar
+
+    with sc.hidden_cursor():
+        bar = ProgressBar()
+
+        for i in range(0, 101):
+            print(bar(i), flush=True, end='')
+            time.sleep(.2)
+            print(clear_line(1), sc.mv_x, end='')
+
+Not all of this code is required, of course.
+For example, you may not want to hide the cursor or clear the line each time,
+but often will.
+
+
+
 Tips
 ------------
 

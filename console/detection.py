@@ -225,10 +225,19 @@ def detect_unicode_support():
         Experimental, implementation idea is from the link below:
            https://unix.stackexchange.com/questions/184345/detect-how-much-of-unicode-my-terminal-supports-even-through-screen
 
-        TODO: needs improvement.
+        TODO:
+            needs improvement.
+            # should return None or True on redirection?
+
+        Returns:
+            Boolean | None if not a TTY
     '''
     result = None
-    if is_a_tty():
+
+    if env.LANG and env.LANG.endswith('UTF-8'):  # approximation
+        result = True
+
+    elif is_a_tty():
         if os_name == 'nt':
             from .windows import get_position as _get_position
         else:

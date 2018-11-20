@@ -429,6 +429,9 @@ class _PaletteEntry:
                 Color sequences are terminated at newlines,
                 so that paging the output works correctly.
         '''
+        if not text:  # when an empty string is passed, don't emit codes.
+            return ''
+
         # if the category of styles is different,
         # copy uses fx.end instead of palette.default, see addition:
         for attr in styles:
