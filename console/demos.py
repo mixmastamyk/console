@@ -167,9 +167,7 @@ if __name__ == '__main__':
         print('      ╰' + '─' * 86, '╯\n', sep='', end='')
         print(flush=True)
 
-
         print(make_header(i+5), 'Progress Bars:')
-        import time
         from console.progress import ProgressBar, HiDefProgressBar
 
         print()

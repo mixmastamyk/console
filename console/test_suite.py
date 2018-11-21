@@ -644,3 +644,18 @@ if True:  # fold
 
         assert attrid1 == attrid2
         assert attrid3 == attrid4
+
+
+# Progress
+# ----------------------------------------------------------------------------
+if True:  # fold
+    from console.progress import ProgressBar#, HiDefProgressBar
+
+    def test_progress_ascii():
+
+        pb = ProgressBar(theme='basic', width=32)
+        assert str(pb(-7))  == '<------------------------------] ERR'
+        assert str(pb(0))   == '[------------------------------]  0%'
+        assert str(pb(55))  == '[################--------------] 55%'
+        assert str(pb(100)) == '[##############################] +'
+        assert str(pb(103)) == '[##############################> ERR'

@@ -6,8 +6,7 @@
 
     TODO:
         - themes: string indexes instead of ints
-        - gradients
-        - rainbar
+        - gradients/rainbar
         - Tests
 '''
 import time
@@ -118,7 +117,7 @@ else:
 
 # TODO: choose 256 color
 _pals = get_available_palettes(_CHOSEN_PALETTE)
-if 'extended' in _pals:
+if _pals and 'extended' in _pals:
     styles['default'] = styles['ocean8']
 elif _pals:
     styles['default'] = styles['ocean']
