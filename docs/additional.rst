@@ -294,13 +294,15 @@ but typical use of the module is achieved like so::
         bar = ProgressBar()
 
         for i in range(0, 101):
-            print(bar(i), flush=True, end='')
+            print(clear_line(1), sc.mv_x(1), bar(i),
+                  flush=True, end='')
             time.sleep(.2)
-            print(clear_line(1), sc.mv_x, end='')
 
 Not all of this code is required, of course.
 For example, you may not want to hide the cursor or clear the line each time,
 but often will.
+There is also a ``HiDefProgressBar`` class that can render itself with sub-cell
+unicode block characters for environments with constrained space.
 
 
 

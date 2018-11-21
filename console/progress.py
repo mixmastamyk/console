@@ -6,8 +6,9 @@
 
     TODO:
         - themes: string indexes instead of ints
-        - gradient?
+        - gradients
         - rainbar
+        - Tests
 '''
 import time
 
@@ -75,36 +76,36 @@ styles = dict(
                     _err_color,         # error
                   ),
     greyen      = (
-                    _dim_green,          # first
-                    fg.green,            # complete
-                    fg.i236,             # empty
-                    fx.dim + fg.i236,    # last
-                    _dim_green,          # done
-                    _err_color,          # error
+                    _dim_green,         # first
+                    fg.green,           # complete
+                    fg.i236,            # empty
+                    fx.dim + fg.i236,   # last
+                    _dim_green,         # done
+                    _err_color,         # error
                   ),
     ocean       = (
-                    _dim_green,          # first
-                    fg.green,            # complete
-                    fg.blue,             # empty
-                    fx.dim + fg.blue,    # last
-                    _dim_green,          # done
-                    _err_color,          # error
+                    _dim_green,         # first
+                    fg.green,           # complete
+                    fg.blue,            # empty
+                    fx.dim + fg.blue,   # last
+                    _dim_green,         # done
+                    _err_color,         # error
                   ),
     ocean8       = (
-                    fx.dim + fg.i70,     # first
-                    fg.i70,              # complete
-                    fg.i24,              # empty
-                    fx.dim + fg.i24,     # last
-                    fx.dim + fg.i70,     # done
-                    _err_color,          # error
+                    fx.dim + fg.i70,    # first
+                    fg.i70,             # complete
+                    fg.i24,             # empty
+                    fx.dim + fg.i24,    # last
+                    fx.dim + fg.i70,    # done
+                    _err_color,         # error
                   ),
     greyen_bg   = (
-                    fg.i22,              # first
-                    fx.bold + bg.green,  # complete
-                    fx.dim + bg.i236,    # empty
-                    fx.dim + fg.i236,    # last
-                    bg.i22,              # done
-                    _err_color,          # error
+                    fx.dim + fg.i70,    # first
+                    fx.bold + bg.i70,   # complete
+                    fx.dim + bg.i236,   # empty
+                    fx.dim + fg.i236,   # last
+                    bg.i22,             # done
+                    _err_color,         # error
                   ),
 )
 

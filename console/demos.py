@@ -167,6 +167,28 @@ if __name__ == '__main__':
         print('      ╰' + '─' * 86, '╯\n', sep='', end='')
         print(flush=True)
 
+
+        print(make_header(i+5), 'Progress Bars:')
+        import time
+        from console.progress import ProgressBar, HiDefProgressBar
+
+        print()
+        pb = ProgressBar(label=True)
+        print('    ', pb(0), end='')
+        print('  ', pb(55), end='')
+        print('  ', pb(100))
+
+        pb = ProgressBar(theme='solid')
+        print('    ', pb(0), end='')
+        print('      ', pb(24), end='')
+        print('      ', pb(100))
+
+        pb = HiDefProgressBar(styles='greyen')
+        print('    ', pb(0), end='')
+        print('  ', pb(55), end='')
+        print('  ', pb(100))
+
+        print()
         print(make_header(i+5), 'Test color downgrade support '
                                 '(True ⏵ Indexed ⏵ Basic):')
         try:
