@@ -22,19 +22,18 @@ readme.rst: docs/readme.templ
 	RM_MODE=pypi python3 -c "$$JINJA_FU" > readme.rst
 
 
-readme.html:
+readme.html: readme.rst
 	rst2html.py readme.rst > readme.html
 
 
-check_readme:
+check_readme: readme.rst
 	# requires readme_renderer
 	python3 setup.py check --restructuredtext --strict
 
 
 clean:
 	git gc
-	rm -f readme.html
-	rm -rf .pytest_cache build dist
+	rm -rf readme.html .pytest_cache build dist
 	make -C docs clean
 
 	-find -type d -name __pycache__ -exec rm -rf '{}' \;
@@ -53,23 +52,13 @@ docs: docs/readme.rst readme.rst
 publish: test check_readme docs
 	rm -rf build  # possible wheel bug
 	python3 setup.py sdist bdist_wheel --universal upload
-	# backslash at end of line very important:
-#~ 	VERSION=`python3 -c 'from console.constants import __version__ as v; print(v)'`;\
-#~ 	git tag -a $$VERSION -m "version $$VERSION"
-#~ 	git push --tags
 
-
-tag:
-	# backslash at end of line very important:
-#~ 	VERSION=`python3 -c 'from console.constants import __version__ as v; print(v)'`;
-	VERSION=`/bin/grep "version " setup.py | cut -d "'" -f 2`;\
-	git tag -a $$VERSION -m "version $$VERSION"
-	git push --tags
+	pip3 install --user -e .  # fix bug on next invocation
 
 
 test:
 	clear
-	pyflakes *.py console/*.py
+	pyflakes *.py */*.py
 	tput reset  # clear screen, scrollback
 	pytest --capture=no --color=no
 

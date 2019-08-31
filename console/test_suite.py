@@ -10,7 +10,7 @@ import pytest
 
 try:
     import webcolors
-except Exception as err:
+except Exception:
     webcolors = None
 
 from . import detection, screen, style, utils, set_debug_mode
@@ -487,7 +487,7 @@ if True:  # fold
 
     def test_color_forced():
         detection.env = Environment(environ={})
-        assert detection.color_is_forced() is None
+        assert detection.color_is_forced().value is None
 
         detection.env = Environment(environ=dict(CLICOLOR_FORCE='0'))
         assert detection.color_is_forced() is False

@@ -104,7 +104,7 @@ if __name__ == '__main__':
             with bg.cornflowerblue:
                 print('\tCan I get the icon in Cornflower Blue?\n\t'
                       'Absolutely. :-D')
-        except AttributeError as err:
+        except AttributeError:
             with bg.blue:
                 print('\tCan I get the icon in Cornflower Blue?\n\t'
                       'Absolutely. :-D')
@@ -175,23 +175,25 @@ if __name__ == '__main__':
         print('    ', pb(0), end='')
         print('  ', pb(55), end='')
         print('  ', pb(100))
+        print()
 
         pb = ProgressBar(theme='solid')
         print('    ', pb(0), end='')
         print('      ', pb(24), end='')
         print('      ', pb(100))
+        print()
 
         pb = HiDefProgressBar(styles='greyen')
         print('    ', pb(0), end='')
         print('  ', pb(55), end='')
         print('  ', pb(100))
-
         print()
+
         print(make_header(i+5), 'Test color downgrade support '
                                 '(True ⏵ Indexed ⏵ Basic):')
         try:
             import webcolors; webcolors # pyflakes
-        except ImportError as err:
+        except ImportError:
             print('      Test not available without webcolors installed.')
             sys.exit()
 

@@ -12,7 +12,7 @@ from .disabled import empty_bin as _empty_bin
 _DEBUG = []  # mutable reference
 _CHOSEN_PALETTE = None
 fg = bg = fx = defx = sc = _empty_bin
-__version__ = '0.95a6'
+__version__ = '0.95a7'
 
 
 def set_debug_mode(value):
@@ -24,12 +24,12 @@ def set_debug_mode(value):
 
 # Py3.6+ - set up a dummy future-fstrings encoding that is really utf8
 if sys.version_info >= (3, 6):
-    import codecs
-    import encodings
+    import codecs as _codecs
+    import encodings as _encodings
 
-    _utf8 = encodings.search_function('utf8')
+    _utf8 = _encodings.search_function('utf8')
     _codec_map = {'future-fstrings': _utf8, 'future_fstrings': _utf8}
-    codecs.register(_codec_map.get)
+    _codecs.register(_codec_map.get)
 
 
 # defer imports for proper ordering

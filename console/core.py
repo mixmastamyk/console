@@ -267,7 +267,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             if _x11_color_map:  # x11 map: returns tuple of
                 try:            # decimal int strings, e.g.: ('1', '2', '3')
                     color = _x11_color_map[name.lower()]
-                except KeyError as err:  # convert to AttributeError
+                except KeyError:  # convert to AttributeError
                     raise AttributeError(
                         f'{name.lower()!r} not found in X11 palette.')
                 result = self._get_true_palette_entry(name, color)
@@ -279,7 +279,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             try:  # wc: returns tuple of "decimal" int: (1, 2, 3)
                 color = webcolors.name_to_rgb(name)
                 result = self._get_true_palette_entry(name, color)
-            except ValueError as err:  # convert to AttributeError
+            except ValueError:  # convert to AttributeError
                 raise AttributeError(
                     f'{name!r} not found in webcolors palette.')
         return result

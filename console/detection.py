@@ -26,6 +26,7 @@ if sys.platform == 'darwin':
 elif os_name == 'posix':  # Ubuntu, FreeBSD
     X11_RGB_PATHS = ('/etc/X11/rgb.txt', '/usr/share/X11/rgb.txt',
                      '/usr/local/lib/X11/rgb.txt', '/usr/X11R6/lib/X11/rgb.txt')
+# TODO: move termios imports up here with os_name test
 
 
 class TermStack:
@@ -301,13 +302,14 @@ def _find_basic_palette(result):
                     pal_name = 'vga'
                     basic_palette = color_tables.vga_palette4
                 else:
+                    import termios
                     try:  # TODO: check green to identify palette, others?
                         if get_color('index', 2)[0][:2] == '4e':
                             pal_name = 'tango'
                             basic_palette = color_tables.tango_palette4
                         else:
                             raise RuntimeError('not the color scheme.')
-                    except (IndexError, RuntimeError):
+                    except (IndexError, RuntimeError, termios.error):
                         pass
         else:  # Amiga/Atari :-P
             log.warn('Unexpected OS: os.name: %s', os_name)
@@ -369,7 +371,7 @@ def load_x11_color_map(paths=X11_RGB_PATHS):
                     x11_color_map[key.lower()] = tuple(tokens[:3])
             log.debug('X11 palette found at %r.', path)
             break
-        except FileNotFoundError as err:
+        except FileNotFoundError:
             log.debug('X11 palette file not found: %r', path)
         except IOError as err:
             log.debug('X11 palette file not read: %s', err)
@@ -389,7 +391,7 @@ def parse_vtrgb(path='/etc/vtrgb'):
 
         palette = tuple(zip(*table))  # swap rows to columns
 
-    except IOError as err:
+    except IOError:
         palette = color_tables.vga_palette4
 
     return palette

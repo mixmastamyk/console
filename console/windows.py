@@ -17,7 +17,7 @@ try:
     # https://stackoverflow.com/a/17998333/450917
     kernel32.GetStdHandle.restype = HANDLE
 
-except (ValueError, NameError, ImportError) as err:  # Sphinx import on Linux
+except (ValueError, NameError, ImportError):  # Sphinx import on Linux
     c_short = c_ushort = c_long = Structure = kernel32 = DWORD = windll = object
 
 
