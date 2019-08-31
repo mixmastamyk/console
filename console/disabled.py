@@ -11,8 +11,11 @@ class _EmptyAttribute(str):
     ''' A passive, empty string.  https://youtu.be/sFacWGBJ_cs '''
     name = ''
 
-    def __add__(self, other):
-        return self
+    def __add__(self, other):  # empty, so return other
+        return other
+
+    def __radd__(self, other):
+        return other
 
     def __bool__(self):
         return False
