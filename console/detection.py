@@ -347,37 +347,6 @@ def is_a_tty(stream=sys.stdout):
     return result
 
 
-def load_x11_color_map(paths=X11_RGB_PATHS):
-    ''' Load and parse X11's rgb.txt.
-
-        Loads:
-            x11_color_map: { name_lower: ('R', 'G', 'B') }
-    '''
-    if type(paths) is str:
-        paths = (paths,)
-
-    x11_color_map = color_tables.x11_color_map
-    for path in paths:
-        try:
-            with open(path) as infile:
-                for line in infile:
-                    if line.startswith('!') or line.isspace():
-                        continue
-
-                    tokens = line.rstrip().split(maxsplit=3)
-                    key = tokens[3]
-                    if ' ' in key:  # skip names with spaces to match webcolors
-                        continue
-
-                    x11_color_map[key.lower()] = tuple(tokens[:3])
-            log.debug('X11 palette found at %r.', path)
-            break
-        except FileNotFoundError:
-            log.debug('X11 palette file not found: %r', path)
-        except IOError as err:
-            log.debug('X11 palette file not read: %s', err)
-
-
 def parse_vtrgb(path='/etc/vtrgb'):
     ''' Parse the color table for the Linux console. '''
     palette = ()

@@ -14,10 +14,8 @@ import re
 from . import _CHOSEN_PALETTE
 from .constants import (CSI, ANSI_BG_LO_BASE, ANSI_BG_HI_BASE, ANSI_FG_LO_BASE,
                         ANSI_FG_HI_BASE, ANSI_RESET)
-from .color_tables import x11_color_map as _x11_color_map
 from .disabled import empty_bin, empty
-from .detection import (get_available_palettes, is_fbterm, load_x11_color_map,
-                        X11_RGB_PATHS)
+from .detection import get_available_palettes, is_fbterm
 from .proximity import (color_table4, find_nearest_color_hexstr,
                         find_nearest_color_index)
 
@@ -103,13 +101,9 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         Unlike the Basic palette builder, this one computes attributes on the
         fly.
     '''
-    def __init__(self,
-                 x11_rgb_path=X11_RGB_PATHS,
-                 downgrade_method='euclid',
-                 **kwargs):
+    def __init__(self, downgrade_method='euclid', **kwargs):
         super().__init__(**kwargs)
 
-        self._x11_rgb_path = x11_rgb_path
         self._dg_method = downgrade_method
 
     def __getattr__(self, name):
@@ -208,8 +202,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                                                        method=self._dg_method)
             values = self._index_to_ansi_values(nearest_idx)
 
-        return (self._create_entry(name, values)
-                if values else empty)
+        return (self._create_entry(name, values) if values else empty)
 
     def _get_true_palette_entry(self, name, digits):
         ''' Compute truecolor entry, once on the fly.
@@ -221,12 +214,12 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
 
         if 'truecolor' in self._palette_support:  # build entry
             values = [self._start_codes_true]
-            if type_digits is str:  # convert hex string
+            if type_digits is str:  # convert from hex string
                 if len(digits) == 3:
                     values.extend(str(int(ch + ch, 16)) for ch in digits)
                 else:  # chunk 'BB00BB', to ints to 'R', 'G', 'B':
                     values.extend(str(int(digits[i:i+2], 16)) for i in (0, 2 ,4))
-            else:  # tuple of str-digit or int, may not matter to bother:
+            else:  # tuple of str-digit or int from webcolors
                 values.extend(str(digit) for digit in digits)
 
         # downgrade section
@@ -258,22 +251,17 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                                                        method=self._dg_method)
             values = self._index_to_ansi_values(nearest_idx)
 
-        return (self._create_entry(name, values)
-                if values else empty)
+        return (self._create_entry(name, values) if values else empty)
 
     def _get_X11_palette_entry(self, name):
+        from .color_tables import x11_color_map
         result = empty
-        if self._x11_rgb_path:
-            if not _x11_color_map:
-                load_x11_color_map(self._x11_rgb_path)
 
-            if _x11_color_map:  # x11 map: returns tuple of
-                try:            # decimal int strings, e.g.: ('1', '2', '3')
-                    color = _x11_color_map[name.lower()]
-                except KeyError:  # convert to AttributeError
-                    raise AttributeError(
-                        f'{name.lower()!r} not found in X11 palette.')
-                result = self._get_true_palette_entry(name, color)
+        try:            # decimal int strings, e.g.: ('1', '2', '3')
+            color = x11_color_map[name.lower()]
+        except KeyError:  # convert to AttributeError
+            raise AttributeError(f'{name.lower()!r} not found in X11 palette.')
+        result = self._get_true_palette_entry(name, color)
         return result
 
     def _get_web_palette_entry(self, name):
@@ -286,6 +274,18 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                 raise AttributeError(
                     f'{name!r} not found in webcolors palette.')
         return result
+
+    def _create_entry(self, name, values):
+        ''' Render first values as string and place as first code,
+            save, and return attr.
+        '''
+        str_values = ';'.join(values)
+        if is_fbterm:
+            attr = _PaletteEntryFBTerm(self, name.upper(), str_values)
+        else:
+            attr = _PaletteEntry(self, name.upper(), str_values)
+        setattr(self, name, attr)  # now cached
+        return attr
 
     def _index_to_ansi_values(self, index):
         ''' Converts a palette index to the corresponding ANSI color.
@@ -306,18 +306,6 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             else:
                 index += (ANSI_BG_HI_BASE - 8)  # 92
         return [str(index)]
-
-    def _create_entry(self, name, values):
-        ''' Render first values as string and place as first code,
-            save, and return attr.
-        '''
-        str_values = ';'.join(values)
-        if is_fbterm:
-            attr = _PaletteEntryFBTerm(self, name.upper(), str_values)
-        else:
-            attr = _PaletteEntry(self, name.upper(), str_values)
-        setattr(self, name, attr)  # now cached
-        return attr
 
     def clear(self):
         ''' Cleanse the palette to free memory.
@@ -388,11 +376,9 @@ class _PaletteEntry:
             # Make a copy, so codes don't pile up after each addition
             # Render initial values once as string and place as first code:
             newcodes = self._codes + other._codes
-            #~ log.debug('codes for new instance: %r', newcodes)  # noisy
             attr = _PaletteEntry(self.parent, self.name,
                                  ';'.join(newcodes))
             same_category = self.parent is other.parent  # color or style
-            #~ log.debug('palette entries match: %s', same_category)  # noisy
 
             if not same_category:  # different, use instead of color default
                 attr.default = ANSI_RESET
