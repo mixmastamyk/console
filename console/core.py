@@ -16,11 +16,11 @@ from .constants import (CSI, ANSI_BG_LO_BASE, ANSI_BG_HI_BASE, ANSI_FG_LO_BASE,
                         ANSI_FG_HI_BASE, ANSI_RESET)
 from .color_tables import x11_color_map as _x11_color_map
 from .disabled import empty_bin, empty
-from .detection import get_available_palettes, load_x11_color_map, X11_RGB_PATHS
+from .detection import (get_available_palettes, is_fbterm, load_x11_color_map,
+                        X11_RGB_PATHS)
 from .proximity import (color_table4, find_nearest_color_hexstr,
                         find_nearest_color_index)
 
-import env
 try:
     import webcolors
 except ImportError:
@@ -29,7 +29,6 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 MAX_NL_SEARCH = 4096
-is_fbterm = (env.TERM == 'fbterm')
 
 
 # Palette attribute name finders, now we've got two problems.
@@ -209,7 +208,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                                                        method=self._dg_method)
             values = self._index_to_ansi_values(nearest_idx)
 
-        return (self._create_entry(name, values, fbterm=is_fbterm)
+        return (self._create_entry(name, values)
                 if values else empty)
 
     def _get_true_palette_entry(self, name, digits):
@@ -259,7 +258,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                                                        method=self._dg_method)
             values = self._index_to_ansi_values(nearest_idx)
 
-        return (self._create_entry(name, values, fbterm=is_fbterm)
+        return (self._create_entry(name, values)
                 if values else empty)
 
     def _get_X11_palette_entry(self, name):
@@ -308,12 +307,12 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                 index += (ANSI_BG_HI_BASE - 8)  # 92
         return [str(index)]
 
-    def _create_entry(self, name, values, fbterm=False):
+    def _create_entry(self, name, values):
         ''' Render first values as string and place as first code,
             save, and return attr.
         '''
         str_values = ';'.join(values)
-        if fbterm:
+        if is_fbterm:
             attr = _PaletteEntryFBTerm(self, name.upper(), str_values)
         else:
             attr = _PaletteEntry(self, name.upper(), str_values)

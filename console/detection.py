@@ -16,6 +16,7 @@ from .constants import BS, BEL, CSI, ESC, OSC, RS, ST, ALL_PALETTES
 
 log = logging.getLogger(__name__)
 os_name = os.name
+is_fbterm = (env.TERM == 'fbterm')
 TERM_SIZE_FALLBACK = (80, 24)
 CURSOR_POS_FALLBACK = (0, 0)
 
