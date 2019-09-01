@@ -173,13 +173,13 @@ if __name__ == '__main__':
         print()
         pb = ProgressBar(label=True)
         print('    ', pb(0), end='')
-        print('  ', pb(55), end='')
+        print('  ', pb(45), end='')
         print('  ', pb(100))
         print()
 
         pb = ProgressBar(theme='solid')
         print('    ', pb(0), end='')
-        print('      ', pb(24), end='')
+        print('      ', pb(50), end='')
         print('      ', pb(100))
         print()
 

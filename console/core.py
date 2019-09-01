@@ -29,6 +29,8 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 MAX_NL_SEARCH = 4096
+is_fbterm = (env.TERM == 'fbterm')
+
 
 # Palette attribute name finders, now we've got two problems.
 # Not a huge fan of regex but here they nicely enforce the naming rules:
@@ -41,12 +43,13 @@ _web_finder = re.compile(r'^w\w{4,64}$', re.A)                      # x_NAME
 
 
 class _BasicPaletteBuilder:
-    ''' ANSI code container for styles, fonts, etc.
+    ''' Code container for ANSI colors, styles, fonts, etc.
 
-        A base-class that modifies the attributes of child container classes on
-        initialization.  Integer attributes are recognized as ANSI codes to be
-        wrapped with a manager object to provide mucho additional
-        functionality.  Useful for the basic 8/16 color/fx palettes.
+        A container object base-class that creates child attributes on
+        initialization.  Attributes are ANSI codes as integers wrapped in a
+        manager object to provide additional functionality.
+
+        Basic is useful for the basic 8/16 color and fx palettes.
     '''
     def __new__(cls, palettes=Ellipsis):
         ''' Override new() to replace the class entirely on deactivation.
@@ -96,8 +99,11 @@ class _BasicPaletteBuilder:
 
 
 class _HighColorPaletteBuilder(_BasicPaletteBuilder):
-    ''' Container/Router for ANSI Extended & Truecolor palettes. '''
+    ''' Container/Router for ANSI Extended & Truecolor palettes.
 
+        Unlike the Basic palette builder, this one computes attributes on the
+        fly.
+    '''
     def __init__(self,
                  x11_rgb_path=X11_RGB_PATHS,
                  downgrade_method='euclid',
@@ -132,8 +138,8 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             Output:
 
                 - String index from int index:      '30'
-                - tuple of dec-int strings:         ('1', '2', '3')
-                    - joined with ';' to string:        Prefix + '1;2;3'
+                - Tuple of dec-int strings:         ('1', '2', '3')
+                    - joined with ';' to string:    Prefix + '1;2;3'
 
             Final Output:
                 - wrap in _PaletteEntry(output)
@@ -180,7 +186,6 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
     def _get_extended_palette_entry(self, name, index, is_hex=False):
         ''' Compute extended entry, once on the fly. '''
         values = None
-        is_fbterm = (env.TERM == 'fbterm')  # sigh
 
         if 'extended' in self._palette_support:  # build entry
             if is_hex:
@@ -214,7 +219,6 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         '''
         values = None
         type_digits = type(digits)
-        is_fbterm = (env.TERM == 'fbterm')  # sigh
 
         if 'truecolor' in self._palette_support:  # build entry
             values = [self._start_codes_true]
@@ -285,7 +289,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         return result
 
     def _index_to_ansi_values(self, index):
-        ''' Converts an palette index to the corresponding ANSI color.
+        ''' Converts a palette index to the corresponding ANSI color.
 
             Arguments:
                 index   - an int (from 0-15)
@@ -308,10 +312,11 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         ''' Render first values as string and place as first code,
             save, and return attr.
         '''
+        str_values = ';'.join(values)
         if fbterm:
-            attr = _PaletteEntryFBTerm(self, name.upper(), ';'.join(values))
+            attr = _PaletteEntryFBTerm(self, name.upper(), str_values)
         else:
-            attr = _PaletteEntry(self, name.upper(), ';'.join(values))
+            attr = _PaletteEntry(self, name.upper(), str_values)
         setattr(self, name, attr)  # now cached
         return attr
 
@@ -336,16 +341,16 @@ class _LineWriter(object):
         if data == '\n':  # print does this
             return self.stream.write(data)
         else:
-            bytes_ = 0
+            bytes_written = 0
             for line in data.splitlines(True):
                 nl = ''
                 if line.endswith('\n'):  # mv nl to end:
                     line = line[:-1]
                     nl = '\n'
-                bytes_ += self.stream.write(
-                                f'{self.start}{line}{self.default}{nl}'
-                          ) or 0  # in case None returned (on Windows)
-            return bytes_
+                bytes_written += self.stream.write(
+                                    f'{self.start}{line}{self.default}{nl}'
+                                 ) or 0  # in case None returned (on Windows)
+            return bytes_written
 
     def __getattr__(self, attr):
          return getattr(self.stream, attr)
@@ -387,10 +392,10 @@ class _PaletteEntry:
             #~ log.debug('codes for new instance: %r', newcodes)  # noisy
             attr = _PaletteEntry(self.parent, self.name,
                                  ';'.join(newcodes))
-            same_category = self.parent is other.parent
+            same_category = self.parent is other.parent  # color or style
             #~ log.debug('palette entries match: %s', same_category)  # noisy
 
-            if not same_category:  # different, use end instead of default
+            if not same_category:  # different, use instead of color default
                 attr.default = ANSI_RESET
 
             return attr
@@ -481,7 +486,7 @@ class _PaletteEntry:
 class _PaletteEntryFBTerm(_PaletteEntry):
     ''' Help fbterm show 256 colors. '''
     def __str__(self):
-        return f'{CSI}{";".join(self._codes)}}}'  # '}' at end not 'm'
+        return f'{CSI}{";".join(self._codes)}}}'  # note '}' at end not std 'm'
 
 
 class _LengthyString(str):
