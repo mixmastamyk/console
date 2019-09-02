@@ -527,6 +527,10 @@ def get_position(fallback=CURSOR_POS_FALLBACK):
     '''
     values = fallback
     if is_a_tty():
+        if os_name == 'nt':
+            from .windows import get_position
+            return get_position()
+
         try:
             with TermStack() as fd:
                 tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
@@ -600,8 +604,8 @@ def get_title(mode='title'):
         try:
             with TermStack() as fd:
                 termios.tcflush(fd, termios.TCIFLUSH)   # clear input
-
                 tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
+
                 sys.stdout.write(query_sequence)
                 sys.stdout.flush()
                 resp = _read_until(maxchars=100, end=ST)

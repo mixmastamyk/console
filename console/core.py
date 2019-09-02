@@ -26,7 +26,17 @@ except ImportError:
 
 
 log = logging.getLogger(__name__)
+string_plus_call_warning = '''
 
+    Potentially inefficient or problematic construct:
+        Form:  pal.style1 + pal.style2(msg)
+        Given: %r + %r
+
+    Suggested alternatives:
+        (pal.style1 + pal.style2)(msg)  # new anonymous style
+    Or:
+        pal.style2(msg, pal.style1)     # via "mixins"
+'''
 
 # Palette attribute name finders, now we've got two problems.
 # Not a huge fan of regex but here they nicely enforce the naming rules:
@@ -369,6 +379,11 @@ class _PaletteEntry:
     def __add__(self, other):
         ''' Add: self + other '''
         if isinstance(other, str):
+            if other.startswith(CSI) and other.endswith('m'):
+                import warnings
+                msg = string_plus_call_warning % (self, other)
+                warnings.warn(msg)
+                log.debug(msg)
             return str(self) + other
 
         elif isinstance(other, _PaletteEntry):

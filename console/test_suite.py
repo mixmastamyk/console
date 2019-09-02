@@ -645,6 +645,18 @@ if True:  # fold
         assert attrid1 == attrid2
         assert attrid3 == attrid4
 
+    def test_style_plus_call_construct():
+        ''' test warning on inefficient/problematic form '''
+        import warnings
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")  # all warnings always
+            # trigger
+            fg.green + bg.red('Merry\nXmas!')
+            # verify:
+            assert len(w) == 1
+            assert issubclass(w[-1].category, UserWarning)
+            assert "problematic" in str(w[-1].message)
+
 
 # Progress
 # ----------------------------------------------------------------------------

@@ -206,4 +206,5 @@ class Screen:
             stream.flush()
 
 
+# It's Automatic:  https://youtu.be/y5ybok6ZGXk
 sc = Screen()
