@@ -6,7 +6,11 @@
     This module generates ANSI character codes to manage terminal screens and
     move the cursor around.
 
-    Context-managers with contextlib derived from:
+    Note: The attributes of the Screen container currently are not directly
+    composable with the core._PaletteEntry due to the fact that many of them
+    need parameters.  This may change in the future.
+
+    Context-managers with contextlib inspired and derived from:
 
     .. code-block:: text
 

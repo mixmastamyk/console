@@ -380,6 +380,9 @@ class _PaletteEntry:
         ''' Add: self + other '''
         if isinstance(other, str):
             if other.startswith(CSI) and other.endswith('m'):
+                # TODO: this could be handled slightly better by splitting the
+                #       string on newlines and splicing the new style into
+                #       non-default ansi sequences.
                 import warnings
                 msg = string_plus_call_warning % (self, other)
                 warnings.warn(msg)
