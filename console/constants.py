@@ -34,13 +34,16 @@ OSC_C1 = '\x9d'
 ST_C1= '\x9c'
 
 
-# ansi codes
+# where ansi codes start, floor values
 ANSI_FG_LO_BASE = 30
 ANSI_FG_HI_BASE = 90
 ANSI_BG_LO_BASE = 40
 ANSI_BG_HI_BASE = 100
 
 ALL_PALETTES = ('basic', 'extended', 'truecolor')  # variants 'x11', 'web'
+
+# misc
+MAX_NL_SEARCH = 4096  # TODO mv to "defaults"
 
 
 if __name__ == '__main__':

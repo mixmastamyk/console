@@ -3,8 +3,8 @@
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
-    This module generates ANSI character codes to move the cursor around,
-    and manage terminal screens.
+    This module generates ANSI character codes to manage terminal screens and
+    move the cursor around.
 
     Context-managers with contextlib derived from:
 

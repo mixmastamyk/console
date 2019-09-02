@@ -3,7 +3,7 @@
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
-    Complicated Gobbyldegook supporting the simple interfaces located here.
+    Complicated gobbyldegook supporting simple user interfaces located here.
 
     Classes below not meant to be instantiated by client code.
 '''
@@ -13,7 +13,7 @@ import re
 
 from . import _CHOSEN_PALETTE
 from .constants import (CSI, ANSI_BG_LO_BASE, ANSI_BG_HI_BASE, ANSI_FG_LO_BASE,
-                        ANSI_FG_HI_BASE, ANSI_RESET)
+                        ANSI_FG_HI_BASE, ANSI_RESET, MAX_NL_SEARCH)
 from .disabled import empty_bin, empty
 from .detection import get_available_palettes, is_fbterm
 from .proximity import (color_table4, find_nearest_color_hexstr,
@@ -26,7 +26,6 @@ except ImportError:
 
 
 log = logging.getLogger(__name__)
-MAX_NL_SEARCH = 4096
 
 
 # Palette attribute name finders, now we've got two problems.
@@ -110,10 +109,10 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         ''' Traffic cop - called only when an attribute is missing,
             i.e. once per palette entry attribute.
 
-            The "basic" palette will never get here, as it is already defined.
-            Data flow:
+            The "basic" palette attributes will never get here,
+            as they are already defined.  Data flow:
 
-            Input/lookup:                           Examples:
+            Prefixes:                               Examples:
 
                 - t_ hex-string:                    'bb00bb'
                 - x_ name to tuple of dec-int str:  ('1', '2', '3')

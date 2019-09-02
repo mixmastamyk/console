@@ -4,17 +4,17 @@
 
         Module inspired by: colorama.ansi.py © Jonathan Hartley 2013.
 
-    This module is focused on the escape codes concerning character styles
-    and colors interpreted by terminals, sometimes called
+    This module is focused on the escape codes concerning character styles and
+    colors interpreted by terminals, sometimes called
     "SGR (Select Graphic Rendition) parameters."
 
     A number of classes below facilitate using them.  See:
 
-        - `ANSI escape codes
-          <https://en.wikipedia.org/wiki/ANSI_escape_code>`_
-          and section 5:
-        - `Select Graphic Rendition params
-          <https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters>`_
+    - `ANSI escape codes
+      <https://en.wikipedia.org/wiki/ANSI_escape_code>`_
+      and section 5:
+    - `Select Graphic Rendition params
+      <https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters>`_
 '''
 from .core import _BasicPaletteBuilder, _HighColorPaletteBuilder
 
@@ -26,8 +26,6 @@ class ForegroundPalette(_HighColorPaletteBuilder):
             autodetect          - Attempt to detect palette support.
             palettes            - If autodetect disabled, set palette support
                                   explicitly.  str, seq, or None
-            x11_rgb_filename    - '/path/to/X11/rgb.txt',
-                                  defaults to a platform dependent value.
     '''
     default         = 39    # must be first :-D
 
@@ -41,7 +39,7 @@ class ForegroundPalette(_HighColorPaletteBuilder):
     cyan            = 36
     white           = 37
 
-    # aixterm, bright colors without bold - widely supported, not official
+    # aixterm, bright colors without bold - widely supported, but not official
     lightblack      = 90
     lightred        = 91
     lightgreen      = 92
@@ -65,8 +63,6 @@ class BackgroundPalette(_HighColorPaletteBuilder):
             autodetect          - Attempt to detect palette support.
             palettes            - If autodetect disabled, set palette support
                                   explicitly.  str, seq, or None
-            x11_rgb_filename    - '/path/to/X11/rgb.txt',
-                                  defaults to a platform dependent value.
     '''
     default         = 49
 
@@ -157,8 +153,8 @@ class EffectsPalette(_BasicPaletteBuilder):
 class EffectsTerminator(_BasicPaletteBuilder):
     ''' "I'll be baaahhhck."
 
-        Rarely used codes to turn off specific style features, not supported at
-        times.  Generally, use of EffectsPalette.end is simpler and more
+        Rarely used codes to turn off *specific* style features, not supported
+        at times.  Generally, use of EffectsPalette.end is simpler and more
         reliable.
 
         Arguments:
@@ -191,6 +187,7 @@ class EffectsTerminator(_BasicPaletteBuilder):
     ideogram        = 65
 
 
+# It's Automatic:  https://youtu.be/y5ybok6ZGXk
 fg = ForegroundPalette()
 bg = BackgroundPalette()
 

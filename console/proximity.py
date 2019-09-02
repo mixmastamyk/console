@@ -5,7 +5,7 @@
     console.proximity
     ~~~~~~~~~~~~~~~~~~
 
-    Given an 8-bit RGB color,
+    Given an (3x) 8-bit RGB color,
     find the closest extended 8-bit terminal color index.
 
     Nearest-color algorithm derived from:
@@ -23,6 +23,11 @@
 
         :copyright: Copyright 2006-2017 by the Pygments team, see AUTHORS.
         :license: BSD, see LICENSE for details.
+
+
+    Note:
+        An experiment was done using a more accurate CIELAB distance algorithm,
+        but the solution was quite heavy and therefore removed.
 '''
 from . import color_tables
 

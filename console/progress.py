@@ -2,12 +2,11 @@
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
-    Experimental - Progress Bar functionality.
+    Experimental Progress Bar functionality.
 
     TODO:
-        - themes: string indexes instead of ints
         - gradients/rainbar
-        - Tests
+        - More tests
 '''
 import time
 
@@ -19,11 +18,9 @@ from console.detection import (detect_unicode_support, get_available_palettes,
 TIMEDELTA_1 = 60
 TIMEDELTA_2 = 300
 
-# Theme-ing info
-_if, _ic, _ie, _il, _id, _ir = range(6)  # indexes
-
+# Theme-ing info:
 icons = dict(
-    # name      first, complete, empty, last, error
+    # name:      first, complete, empty, last, error
     ascii       = ('[', '#', '-', ']'),
     blocks      = (' ', '▮', '▯', ' '),
     bullets     = (' ', '•', '•', ' '),  # empty white bullet wrong size/align
@@ -38,6 +35,11 @@ icons = dict(
     spaces      = ('▕', ' ', ' ', '▏'),
 )
 
+# icon indexes
+_if, _ic, _ie, _il, _id, _ir = range(6)
+
+
+# default styles
 _dim_green = fx.dim + fg.green
 _err_color = fg.lightred
 styles = dict(
@@ -138,7 +140,8 @@ themes['default'] = themes['normal']
 
 
 class ProgressBar:
-    ''' A stylable bar graph for displaying progress of completion.
+    ''' A stylable bar graph for displaying the current progress of task
+        completion.
 
         Arguments:
             width: 10 or greater
@@ -210,7 +213,6 @@ class ProgressBar:
 
         if self.debug:
             rendered = (f'r:{self.ratio:5.2f} ncc:{self._num_complete_chars:2d} '
-                        #~ f'cr:{self.iwidth * self.ratio / self.total:5.2f} '
                         f'rm:{self.remainder!r} '
                         f'nec:{self._num_empty_chars:2d} '
                         f'{rendered} l:{len_stripped(rendered)}')
