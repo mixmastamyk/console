@@ -30,8 +30,9 @@ log = logging.getLogger(__name__)
 MAX_NL_SEARCH = defaults.MAX_NL_SEARCH
 string_plus_call_warning = '''
 
-    Potentially inefficient or problematic construct:
+    Ambiguous and/or inefficient addition operation used:
         Form:  pal.style1 + pal.style2(msg)
+          or:  adding a style to a previously ANSI escaped string.
         Given: %r + %r
 
     Suggested alternatives:
@@ -382,14 +383,39 @@ class _PaletteEntry:
         ''' Add: self + other '''
         if isinstance(other, str):
             if other.startswith(CSI) and other.endswith('m'):
-                # TODO: this could be handled slightly better by splitting the
-                #       string on newlines and splicing the new style into
-                #       non-default ansi sequences.
-                import warnings
+                # This op is ambiguous and difficult to completely handle,
+                import warnings  # warn first
                 msg = string_plus_call_warning % (self, other)
-                warnings.warn(msg)
+                warnings.warn(msg, SyntaxWarning)
                 log.debug(msg)
-            return str(self) + other
+                # Attempt to break up the other ansi string by lines,
+                # insert codes into each opening sequence, optionally fix end
+                try:
+                    lines = []
+                    for line in other.splitlines():
+                        tokens = []
+                        tokens.append(CSI)
+                        tokens.append(';'.join(self._codes))  # if multiple
+                        tokens.append(';')
+                        tokens.append(CSI.join(line.split(CSI)[1:-1]))
+
+                        # figure what end code will be:
+                        end_code = self.default._codes[0]
+                        if end_code == other[-3:-1]:    # same category
+                            tokens.append(end_code)
+                        else:                           # different
+                            tokens.append(ANSI_RESET)
+                        lines.append(''.join(tokens))
+
+                    lines = '\n'.join(lines)
+                    return lines
+                except IndexError as err:
+                    log.warn('Could not perform enhanced addition with operands'
+                             ': %r %r.  Falling back to str concatenation. %s',
+                              self, other, err)
+                    str(self) + other
+            else:
+                return str(self) + other
 
         elif isinstance(other, _PaletteEntry):
             # Make a copy, so codes don't pile up after each addition

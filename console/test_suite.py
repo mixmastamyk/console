@@ -654,8 +654,8 @@ if True:  # fold
             fg.green + bg.red('Merry\nXmas!')
             # verify:
             assert len(w) == 1
-            assert issubclass(w[-1].category, UserWarning)
-            assert "problematic" in str(w[-1].message)
+            assert issubclass(w[-1].category, SyntaxWarning)
+            assert "Ambiguous" in str(w[-1].message)
 
 
 # Progress

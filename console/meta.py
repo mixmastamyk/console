@@ -15,7 +15,7 @@ __author__      = authors = ', '.join([
                             ])
 copyright       = '© 2018-%s' % _localtime().tm_year
 description     = ('Comprehensive, composable utility library for ANSI terminals.'
-                   ' Better, stronger, faster.  Tch-tch-tch-tch')
+                   ' Better, stronger, faster.  Tch-tch-tch-tch…')
 email           = 'mixmastamyk@github.com'
 license         = 'LGPL 3',
 keywords        = ('ansi color detection escape terminal console sequence '

@@ -338,15 +338,44 @@ unicode block characters for environments with constrained space.
 Tips
 ------------
 
-Not many to list yet,
-but here's a couple.
-
 - The styles bold, italic, underline, and strike have one-letter shortcuts as
   they do in HTML,
   if you're into that sort of thing::
 
     # COWABUNGA, DUDE !
     XTREME_STYLING = fx.b + fx.i + fx.u + fx.s
+
+- Try to avoid this type of ambiguous addition operation:
+
+  .. code-block:: python
+
+    fg.white + bg.red('Hello\nWorld')
+
+  Why is it ambiguous?
+  Well, the left operand is a palette entry object,
+  while the second reduces to an ANSI escaped string.
+  Did you mean to add a sequence just to the beginning of the string,
+  or every line?  Remember paging?
+  Also, what about the ending sequence?
+  Should it reset the foreground, background, styles, or everything?
+  Hard to know because there's not enough information to decide.
+
+  Console warns you about this.
+  It also does its best to divvy up the string,
+  add the first operand to every line,
+  and fix the reset to default sequence at the end.
+  So it *might* work as expected.
+  But that's not very efficient.
+  Best to try one of these workarounds instead:
+
+  .. code-block:: python
+
+    # create a new anonymous style
+    (pal.style1 + pal.style2)(msg)
+
+    # or add via "mixins"
+    pal.style2(msg, pal.style1)
+
 
 - When using the extended or truecolor palettes,
   keep in mind that some folks will have dark backgrounds and some light---\
@@ -424,6 +453,9 @@ Interesting knowledge rediscovered, perhaps.
     `🖹 <http://www.lyricsondemand.com/tvthemes/bjandthebearlyrics.html>`_
 
 |
+
+Signing off from the late seventies,
+a new futuristic decade awaits!
 
     - *Keep On Truckin'*
     - *Catch you on the flip-side*
