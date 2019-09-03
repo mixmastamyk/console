@@ -16,6 +16,25 @@
 
     *Gimme! Gimme! Gimme! (A Man After Midnight)*
 
+.. raw:: html
+
+    <style>
+        .backb { display: inline-block; transform: rotateY(180deg) }
+        #wrapper {
+            text-align: center;
+            margin-top: -13px;
+        }
+        #cen {
+            display: inline-block;
+        }
+    </style>
+
+    <div id="wrapper">
+        <div id="cen">
+            —A<div class="backb">B</div>BA &nbsp; &nbsp;
+        </div>
+    </div>
+
 |
 
 Additional Topics
@@ -42,17 +61,18 @@ are created up front,
 the rest are built up as needed,
 on demand.
 Like a traffic cop,
-builders direct attribute access to the appropriate code to initialize them.
+palettes direct attribute access to the appropriate code to initialize each
+Entry.
 
 Once created,
-attributes are cached and available for future use.
+Entry attributes are cached and available for future use.
 This namespace cache may also be cleared in uncommon scenarios using huge
 palettes,
 with the ``clear()`` method.
 
 .. rubric:: Palette Entries:
 
-Entrie objects are what actually produce the escape sequences---\
+Entry objects are what actually produce the escape sequences---\
 they are accessed as attributes of a palette collection, e.g.:
 
     - ``.red``

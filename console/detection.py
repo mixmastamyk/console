@@ -470,10 +470,10 @@ def get_color(name, number=None):
 
         Examples:
             >>> get_color('bg')
-            ('0000', '0000', '0000')
+            ... ('0000', '0000', '0000')
 
-            >>> get_color('index', 2)   # second color in indexed
-            ('4e4d', '9a9a', '0605')    # palette, 2 aka 32 in basic
+            >>> get_color('index', 2)       # second color in indexed
+            ... ('4e4d', '9a9a', '0605')    # palette, 2 aka 32 in basic
 
         Note:
             Blocks if terminal does not support the function.
