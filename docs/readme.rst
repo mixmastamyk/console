@@ -29,17 +29,22 @@ as well as other functionality such clearing screens,
 moving cursors,
 setting title bars,
 and detecting capabilities.
-A bit more comprehensive than most.
-How does it work?
+
+How is it different?
+It's highly composable and more comprehensive than most.
+And how does it work?
+Oh, a piece of cake.
+
 
     *"Piece of cake?
-    Oh, I wish somebody would tell me what that means." — Dr. Huer*
+    Oh, I wish somebody would tell me what that means." —Dr. Huer*
 
 
 :reverse:`␛`\ [1;3m\ *Hello World* :reverse:`␛`\ [0m
 ----------------------------------------------------------
 
-Adding a little color with console might look like this:
+There are a number of flexible ways to use console's styling functionality.
+Most simply, adding a little color with console might look like this:
 
 .. code-block:: python
 
@@ -52,14 +57,17 @@ FYI, the string  ``'\x1b'`` represents the ASCII Escape character
 (27 in decimal, ``1b`` hex).
 Command 32 turns the text green
 and 39 back to the default color,
-but there's no need to worry about that.
+but there's no real need to worry about that.
 Printing to a supporting terminal from Python might look like this:
+
+.. code-block:: python
+
+    >>> print(fg.red, fx.italic, '♥ Heart', fx.end,
+    ...       ' of Glass…', sep='')
 
 .. raw:: html
 
-    <pre>
-    &gt;&gt;&gt; print(fg.red, fx.italic, '♥ Heart', fx.end,
-              ' of Glass…', sep='')
+    <pre style="margin-top: -13px;">
     <span style="color:red; font-style: italic">♥ Heart</span> of Glass…
     </pre>
 
@@ -67,9 +75,16 @@ Above, ``fx.end`` is a convenient object to note---\
 it ends all styles and fore/background colors at once,
 where as ``bg.default`` for example,
 resets only the background to its default color.
-This need not be your responsibility however,
-one may use the call form instead: ``fg.yellow('Woot!')``
+This need not be your responsibility however.
+One may use the call form instead,
+where it is automatic:
+
+.. code-block:: python
+
+    fg.yellow('Woot!')  # --> '\x1b[33mWoot!\x1b[39m'
+
 More on that later.
+
 
 .. raw:: html
 
@@ -96,7 +111,7 @@ some of which may be installed automatically if needed:
     future_fstrings       # Needed: Python Version < 3.6
 
     colorama              # Needed: Windows Version < 10
-    win_unicode_console   # Useful: for Python < 3.6
+    win_unicode_console   # Useful: for Win Python < 3.6
 
 
 Jah!
@@ -113,12 +128,12 @@ under the lame (no-ANSI support) versions of Windows < 10.
     for experimental support under Python versions 3.5 and 3.4,
     perhaps earlier.
     Keep an eye peeled for oddities under older Pythons.
-    Sorry, neither 2.X, nor 1.X is not supported. ``:-P``
+    Sorry, neither 2.X or 1.X is supported. ``:-P``
 
 
-``console`` has recently been tested on:
+Der ``console`` package has recently been tested on:
 
-- Ubuntu 18.04 - Python 3.6
+- Ubuntu 19.04 - Python 3.7
 
   - xterm, mate-terminal, linux, fbterm
 
@@ -144,7 +159,7 @@ Overview
 As mentioned,
 console handles lots more than color and styles.
 
-.. rubric:: **Utils**
+.. rubric:: **Utils Module**
 
 :mod:`console.utils`
 includes a number of nifty functions:
@@ -162,7 +177,7 @@ wait for keypresses,
 clear a line or the screen (with or without scrollback),
 and easily ``pause`` a script like the old DOS commands of yesteryear.
 
-.. rubric:: **Screen**
+.. rubric:: **Screen Module**
 
 With :mod:`console.screen` you can
 save or restore it,
@@ -174,14 +189,23 @@ if any of that floats your boat. 
 `Blessings <https://pypi.org/project/blessings/>`_-\
 compatible context managers are also available for full-screen fun.
 
+.. code-block:: python
 
-.. rubric:: **Detection**
+    >>> from console import screen
+
+    >>> with screen.location(40, 20):
+    ...     print('Hello, World.')
+
+
+.. rubric:: **Detection Module**
 
 Detect the terminal environment with
 :mod:`console.detection`:
 
-    - Determine palette support, load definitions.
-    - Check relevant environment variables, such as
+    - Redirection---is this an interactive "``tty``" or not?
+    - Determine palette support
+    - Check relevant user preferences through environment variables,
+      such as
       `TERM <https://www.gnu.org/software/gettext/manual/html_node/The-TERM-variable.html>`_,
       `NO_COLOR <http://no-color.org/>`_,
       `COLORFGBG <https://unix.stackexchange.com/q/245378/159110>`_,
@@ -189,8 +213,7 @@ Detect the terminal environment with
       `CLICOLOR <https://bixense.com/clicolors/>`_,
       etc.
     - Query terminal colors and themes---light or dark?
-    - Redirection---is this an interactive "``tty``" or not?
-    - Get titles, and more.
+    - Get titles, cursor position, and more.
 
 Console does its best to figure out what your terminal supports on startup
 and will configure its convenience objects
@@ -235,24 +258,25 @@ Unleash your inner
 `Britto <https://www.art.com/gallery/id--a266/romero-britto-posters.htm>`_
 below:
 
-- Basic, the original 8/16 named colors
-- Extended, 256 indexed colors
-- "True", a.k.a. 16 million colors, consisting of:
+    - Basic, the original 8/16 named colors
+    - Extended, a set of 256 indexed colors
+    - "True", a.k.a. 16 million colors, consisting of:
 
-  - RGB specified colors
-  - X11-named colors, or
-  - Webcolors-named colors
+      - RGB specified colors
+      - X11-named colors, or
+      - Webcolors-named colors
 
 As mentioned,
 the original palette,
 X11,
 and Webcolor palettes
-may be accessed directly by name:
+may be accessed directly from a palette object by name.
+For example:
 
 .. code-block:: python
 
     # Basic                Comment
-    fg.red                # Original 8 colors
+    fg.red                # One of the original 8 colors
     fg.lightred           # Another 8 brighter colors w/o bold
 
     # Truecolor variants
@@ -260,91 +284,103 @@ may be accessed directly by name:
     fg.navyblue           # Webcolors takes precedence, if installed
 
 
-Additional palettes are accessed via a prefix letter and a number of
-digits (or name) to specify the color:
+Additional palettes are selected via a prefix letter and a number of
+digits (or name) to specify the color.
+For example:
 
 .. code-block:: python
 
     # Extended     Format  Comment
     bg.i_123       iDDD   # Extended/indexed 256-color palette
-    bg.n_f0f       nHHH   # Hex to nearest indexed color
+    bg.n_f0f       nHHH   # Hex to *nearest* indexed color
 
     # Truecolor
     bg.t_ff00bb    tHHH   # Truecolor, 3 or 6 digits
     bg.x_navyblue  x_NM   # Force an X11 color name, if available
     bg.w_bisque    w_NM   # Force Webcolors, if installed
 
-**The underscores are optional.**
+Note: The underscores are optional.
+
 Choose depending whether brevity or readability are more important to you.
 The assorted true color forms are useful to choose one explicitly without
 ambiguity.
 (X11 and Webcolors
 `differ <https://en.wikipedia.org/wiki/X11_color_names#Clashes_between_web_and_X11_colors_in_the_CSS_color_scheme>`_
-on a few colors.)
-An unrecognized color name or index will result in an ``AttributeError``.
+on a few obscure colors.)
+Be aware,
+an unrecognized color name or index will result in an ``AttributeError``.
 
 
 Composability++
 ~~~~~~~~~~~~~~~~
 
-    *Dy-no-mite!! — J.J.*
+    *DYN-O-MITE!! — J.J. from Good Times*
 
 Console's palette entry objects are meant to be highly composable and useful in
 multiple ways.
 For example,
 you might like to create your own compound styles to use over and over again.
 
-They can also be called as functions if desired and have "mixin" styles added
-in as well.
+They can also be called (remember?) as functions if desired and have "mixin"
+styles added in as well.
 The callable form also automatically resets styles to their defaults at the end
 of each line in the string (to avoid breaking pagers),
 so those tasks no longer need to be managed manually:
 
+
+.. code-block:: python
+
+    >>> muy_importante = fg.white + fx.bold + bg.red
+    >>> print(muy_importante('¡AHORITA!', fx.underline))  # ← mixin
+
 .. raw:: html
 
-    <pre>
-    &gt;&gt;&gt; muy_importante = fg.white + fx.bold + bg.red
-
-    &gt;&gt;&gt; print(muy_importante('AHORITA!', fx.underline))  # ← mixin
-    <div style="display: inline-block; background: #d00; color: white; font-weight: bold; text-decoration: underline">AHORITA!</div>
+    <pre style="margin-top: -13px;">
+    <div style="display: inline-block; background: #d00; color: white; font-weight: bold; text-decoration: underline">¡AHORITA!</div>
     </pre>
 
-When palette objects are combined together as done above,
+One nice feature---\
+when palette objects are combined together as done above,
 the list of codes to be rendered to is kept on ice until final output as a
 string.
-Meaning, there won't be redundant escape sequences in the output.
+Meaning, there won't be redundant escape sequences in the output,
+no matter how many you add.
 No sirree !
 
 .. code-block:: python
 
-    '\x1b[37;1;41;4mAHORITA!\x1b[0m'
+    '\x1b[37;1;41;4m¡AHORITA!\x1b[0m'
 
 Styles can be built on the fly as well:
 
+.. code-block:: python
+
+    >>> print(
+    ...   f'{fg.i208 + fx.reverse}Tangerine Dream{fx.end}',  # or
+    ...     (fg.i208 + fx.reverse)('Tangerine Dream'),
+    ... )
+
 .. raw:: html
 
-    <pre>
-    &gt;&gt;&gt; print(
-        f'{fg.i208 + fx.reverse}Tangerine Dream{fx.end}',  # or
-        (fg.i208 + fx.reverse)('Tangerine Dream'),
-    )
+    <pre style="margin-top: -13px;">
     <span style="color: #222; background-color:#ff8700">Tangerine Dream</span>
     </pre>
+
 
 .. rubric:: **Templating**
 
 To build templates,
 call a palette entry with placeholder strings,
-with or instead of text:
+with (or instead of) text:
 
 .. code-block:: python
 
-    >>> template = bg.i22('{}')  # dark green
+    >>> sam_template = bg.i22('{}')  # dark green
 
 .. raw:: html
 
     <pre>
-    &gt;&gt;&gt; print(template.format(' GREEN Eggs… '))
+    &gt;&gt;&gt; print(sam_template.format(' GREEN Eggs… '))
     <div style="display: inline-block; background: #040;"> GREEN Eggs… </div>
     </pre>
 
@@ -354,6 +390,14 @@ Console is lightweight,
 but perhaps you'd like a pre-rendered string to be used in a tight loop for
 performance reasons.
 Simply use ``str()`` to finalize the output then use it in the loop.
+
+.. code-block:: python
+
+    >>> msg = str(muy_importante('¡AHORITA!'))
+
+    >>> for i in range(100000000):
+    ...     print(msg)  # rapidinho, por favor
+
 
 Palette entries work as context-managers as well:
 
@@ -389,13 +433,15 @@ tests can be run from the install folder.
 
     ⏵ pytest -s
 
-The Makefile at github has more details on such topics.
+The Makefile in the repo at github has more details on such topics.
 
 
 Contributions
 ------------------
 
-Could use some help on Windows and MacOS as my daily driver is a 🐧 Tux racer.
+Could use some help testing on Windows and MacOS as my daily driver is a 🐧 Tux
+racer.
+Can you help?
 
 
 Legalese
@@ -403,10 +449,9 @@ Legalese
 
     *"Stickin' it to the Man"*
 
-- Copyright 2018, Mike Miller
-- Released under the LGPL, version 3+.
-- Enterprise Pricing:
+    - Copyright 2018-2019, Mike Miller
+    - Released under the LGPL, version 3+.
+    - Enterprise Pricing:
 
-  | 6 MEEllion dollars!
-  | *Bwah-haha-ha!*
-  | (only have to sell *one* copy!)
+      | 6 MEEllion dollars…  *Bwah-haha-ha!*
+      | (only have to sell *one* copy!)

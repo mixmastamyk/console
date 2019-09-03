@@ -48,28 +48,27 @@ Background
 So ANSI escape codes have been standard on UNIX
 with the belt-and-suspenders crowd for several decades,
 and even saw use on DOS and BBSs back in the day.
-With the advent of macOS (X),
+With the advent of macOS X,
 a whole new generation of lumber-sexuals have exposed themselves(?)
 to the terminal environment and command-line
 *and liked it*.
 
+
 "I'm a PC"
 ~~~~~~~~~~~~~~
 
-
-With Windows 10──\
-the Ballmer/Suit barrier has finally been breached,
+With recent versions of Windows 10
+the Ballmer/Suit barrier was finally breached,
 allowing *multi-decade-late*
 `improvements
 <http://www.nivot.org/blog/post/2016/02/04/Windows-10-TH2-(v1511)-Console-Host-Enhancements>`_
 to be made to its until-now pathetic "console."
-Often still known as the "DOS Prompt" because it has been stuck in time since
-then.
+Often still known as the "DOS Prompt" since it has been frozen since then.
 Vaguely analogous to today's virtual terminals,
 as a Yugo might compare to a classic BMW.
 But now, it's supercharged.
 
-So, all the top platforms support ANSI escape sequences.
+So, all the top platforms support ANSI escape sequences now.
 Again!
 What's old is new again.
 Add Unicode and millions of colors and it's now better than ever.
@@ -115,9 +114,9 @@ trivial perhaps.
 .. rubric:: Terminfo?
 
 Besides the difficulty factor mentioned,
-this classic answer to this problem also suffers in that it doesn't support
-"true" color palettes,
-and not included by default on Windows.
+this classic answer to this problem also suffers in that it historically
+doesn't support "true" color (24 bit) palettes,
+and is not included by default on Windows.
 
 
 Meanwhile, over at the Cheeseshop…
@@ -166,9 +165,7 @@ one or more important items are often missing:
       - 256 extended color - rare
       - Nearest 8-bit color - rarer
       - 16M color - rarer
-      - Standard color names
-
-        - X11, Webcolors - rarest
+      - Standard color names, like X11 & Webcolors - rarest
 
     - Querying the terminal, auto-detection, support and deactivation.
 

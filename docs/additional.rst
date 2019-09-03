@@ -59,8 +59,7 @@ they are accessed as attributes of a palette collection, e.g.:
     - ``.i22``
     - ``.cornflowerblue``
 
-The Entries provide much of the functionality from
-:mod:`console.style`:
+The Entries provide much of the functionality.  They
 
     - Keep track of their ANSI codes and those they've been added to.
     - Can be called and "mixed in" with other attributes to render
@@ -85,7 +84,7 @@ Well, more specifically empty strings.
 
     <div class="center rounded dark p1">
         <div class=pacman>
-            <span class=pline>╭────────────────────────╮&nbsp;&nbsp;<br>
+            <span class=pline>╭───────────────────────────╮&nbsp;&nbsp;<br>
             │
             </span>
             <span class=dots>·····•·····</span>
@@ -106,9 +105,12 @@ Custom Initialization
 
 .. rubric:: Environment Variables
 
+On rare posix terminals color detection may hang and need to be disabled.
+
 To disable automatic detection of terminal capabilities at import time the
 environment variable
 ``PY_CONSOLE_AUTODETECT`` may be set to ``0``.
+Writing a bug at the console repo would help also.
 
 Forcing the support of all palettes ON can also be done externally with an
 environment variable,
@@ -120,7 +122,13 @@ if desired.
 
 To configure auto-detection, palette support,
 or detect other output streams besides stdout,
-one may create palette builder objects yourself::
+one may create palette builder objects yourself:
+
+::
+
+    ⏵ env PY_CONSOLE_AUTODETECT='0' script.py
+
+.. code-block:: python
 
     from console.constants import ALL_PALETTES
     from console.style import BackgroundPalette
@@ -135,7 +143,7 @@ Palette Downgrade
 
 When using true or extended colors on a terminal that is not configured to
 support it,
-console with "downgrade" the colors to their nearest neighbors in the available
+console will "downgrade" the colors to their nearest neighbors in the available
 palette.
 
 Neat, huh?
@@ -146,12 +154,12 @@ due to the fact that the RGB color space is not uniform.
 That lead to some experimentation with
 `CIEDE2000 <https://en.wikipedia.org/wiki/Color_difference#CIEDE2000>`_
 libraries like colormath and colorzero.
-Unfortunately they were both slow as molasses,
+Unfortunately they were both heavy and slow as molasses,
 even with numpy loaded,
 which is also slow to import.
 
 Fast and inaccurate it is!
-Unless someone would like to write a very optimized C implementation for kicks,
+Unless someone would like to write a highly optimized C implementation for kicks,
 it doesn't seem worth the trouble for this application.
 
 ::
@@ -167,10 +175,10 @@ Context Managers
 
 .. rubric:: Configuring Output
 
-Console's Entry objects can be used as context managers as well.
+Console's Palette Entry objects can be used as context managers as well.
 We saw this in the readme previously.
-An output file can be set if it needs to be changed from stdout and
-not able to be redirected outside the process::
+An output file may also be set if it needs to be changed from stdout and not
+able to be redirected outside the process::
 
     dodgers = bg.w_dodgerblue
     dodgers.set_output(sys.stderr)
@@ -179,16 +187,15 @@ not able to be redirected outside the process::
         print('Infield: Garvey, Lopes, Russel, Cey, Yeager')
         print('Outfield: Baker, Monday, Smith')
 
-(There may be a way to streamline this in the future.
-So, don't get too dependent on the set_output function. ;-)
+(This feature is somewhat experimental for now. ;-)
 
 
 .. rubric:: Fullscreen Apps, a la Blessings
 
 Here's a short script to show off console's full-screen abilities::
 
-    from console import fg, fx, defx  # shortcut: sc
-    from console.screen import screen
+    from console import fg, fx, defx
+    from console.screen import sc as screen
     from console.utils import wait_key, set_title
     from console.constants import ESC
 
@@ -212,7 +219,8 @@ Here's a short script to show off console's full-screen abilities::
             wait_key(exit_keys)
 
 The text below should appear.
-After hitting the ESC restore your terminal shall be restored:
+Check the title too!
+After hitting the ESC key your terminal shall be restored:
 
 .. raw:: html
 
@@ -297,6 +305,7 @@ but typical use of the module is achieved like so::
             print(clear_line(1), sc.mv_x(1), bar(i),
                   flush=True, end='')
             time.sleep(.2)
+        print()
 
 Not all of this code is required, of course.
 For example, you may not want to hide the cursor or clear the line each time,
@@ -309,14 +318,14 @@ unicode block characters for environments with constrained space.
 Tips
 ------------
 
-Don't have many to list yet,
+Not many to list yet,
 but here's a couple.
 
 - The styles bold, italic, underline, and strike have one-letter shortcuts as
   they do in HTML,
   if you're into that sort of thing::
 
-    # COWABUNGA !
+    # COWABUNGA, DUDE !
     XTREME_STYLING = fx.b + fx.i + fx.u + fx.s
 
 - When using the extended or truecolor palettes,
@@ -326,7 +335,8 @@ but here's a couple.
   Checking the background with the detection module is one strategy,
   though not available on every terminal.
   An argument to change the theme may also be in order.
-  (Console does acknowledge several environment variables as well.)
+  (Console does acknowledge several environment variables like ``COLORFGBG``
+  as well.)
 
 - ANSI support can be enabled on Windows 10 with the following incantation::
 
@@ -353,7 +363,7 @@ be found below:
       (`PDF <https://www.x.org/docs/xterm/ctlseqs.pdf>`_)
     - `ANSI Terminal Animations
       <http://artscene.textfiles.com/vt100/>`_ - Get busy!
-
+    - :mod:`console` source code
 
 .. rubric:: Aside - Warm Colors
 
@@ -372,7 +382,7 @@ Interesting knowledge rediscovered, perhaps.
 
     *or not!"*
 
-    *---Jack Palance*
+    *---Jack Palance, on Ripley's*
 
 
 10-7, Signing Off…
@@ -398,10 +408,7 @@ Interesting knowledge rediscovered, perhaps.
     - *Keep On Truckin'*
     - *Catch you on the flip-side*
     - *Good night, John-boy*
-
-and…
-
-    - *Goodbye Seventies*
+    - and… *Goodbye Seventies*
 
 
 .. raw:: html

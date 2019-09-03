@@ -1,8 +1,9 @@
 
-body, div.body{
+body, div.body {
     background: #181818;
     color: #c8c8c8;
     font-family: Georgia, serif;
+    line-height: 1.;
 }
 pre {
     background: #080808;
@@ -22,6 +23,8 @@ div.body h3 { font-size: 140% }
 div.body h4 { font-size: 120% }
 div.body h5 { font-size: 100% }
 div.body h6 { font-size:  90% }
+div.body p  { line-height: 1.6}
+
 
 /*
     sphinxsidebar
@@ -131,7 +134,7 @@ code, span.pre  {
 /*
     syntax highlighting
 */
-div.highlight { background: inherit; }
+div.highlight, pre.highlight { background: inherit; }
 .highlight .kn, .highlight .k {
     color: #3894e8;
     font-weight: bold;
@@ -191,7 +194,7 @@ div.pacman {
 #bas { color: cyan; }
 #pok { color: SandyBrown; }
 .pline { color: #2222E8; }
-.dots { color: #ffb897; }
+.dots { color: #ffb897; letter-spacing: 3px }
 
 p.caption {
     margin: 0;
