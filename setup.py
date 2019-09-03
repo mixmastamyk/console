@@ -2,13 +2,13 @@ import sys
 from os.path import dirname, join
 from setuptools import setup
 
+# avoid starting console detection:
+import imp
+meta = imp.load_source('meta', 'console/meta.py')
+
 
 if sys.version_info.major < 3:
     raise NotImplementedError('Sorry, only Python 3 and above is supported.')
-
-# additional metadata, requirements
-keywords = ('ansi color detection escape terminal console sequence cursor '
-            'style screen shell xterm')
 
 # https://www.python.org/dev/peps/pep-0508/#environment-markers
 install_requires = (
@@ -22,19 +22,6 @@ extras_require = dict(
     webcolors=('webcolors',),
 )
 
-def get_version(filename, version='1.00'):
-    ''' Read version as text to avoid machinations at import time. '''
-    with open(filename) as infile:
-        for line in infile:
-            if line.startswith('__version__'):
-                try:
-                    version = line.split("'")[1]
-                except IndexError:
-                    pass
-                break
-    return version
-
-
 def slurp(filename):
     try:
         with open(join(dirname(__file__), filename), encoding='utf8') as infile:
@@ -44,36 +31,21 @@ def slurp(filename):
 
 
 setup(
-    name                = 'console',
-    description         = 'Comprehensive utility library for ANSI terminals. '
-                          'Better, stronger, faster.',
-    author_email        = 'mixmastamyk@github.com',
-    author              = 'Mike Miller',
-    keywords            = keywords,
+    name                = meta.pkgname,
+    description         = meta.description,
+    author_email        = meta.email,
+    author              = meta.authors,
+    keywords            = meta.keywords,
     license             = 'LGPL 3',
     long_description    = slurp('readme.rst'),
-    packages            = ('console',),
-    url                 = 'https://github.com/mixmastamyk/console',
-    version             = get_version('console/__init__.py'),
+    packages            = (meta.pkgname,),
+    url                 = meta.repo_url,
+    version             = meta.version,
 
     extras_require      = extras_require,
     install_requires    = install_requires,
     python_requires     = '>=3.4',  # untested below that
     setup_requires      = install_requires,
     tests_require       = tests_require,
-
-    classifiers         = [
-        'Development Status :: 4 - Beta',
-        'Environment :: Console',
-        'Intended Audience :: Developers',
-        'Intended Audience :: System Administrators',
-        'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Topic :: Software Development :: Libraries',
-        'Topic :: Terminals',
-    ],
+    classifiers         = meta.trove_classifiers,
 )

@@ -13,9 +13,10 @@ import re
 
 from . import _CHOSEN_PALETTE
 from .constants import (CSI, ANSI_BG_LO_BASE, ANSI_BG_HI_BASE, ANSI_FG_LO_BASE,
-                        ANSI_FG_HI_BASE, ANSI_RESET, MAX_NL_SEARCH)
+                        ANSI_FG_HI_BASE, ANSI_RESET)
 from .disabled import empty_bin, empty
 from .detection import get_available_palettes, is_fbterm
+from .meta import defaults
 from .proximity import (color_table4, find_nearest_color_hexstr,
                         find_nearest_color_index)
 
@@ -26,6 +27,7 @@ except ImportError:
 
 
 log = logging.getLogger(__name__)
+MAX_NL_SEARCH = defaults.MAX_NL_SEARCH
 string_plus_call_warning = '''
 
     Potentially inefficient or problematic construct:

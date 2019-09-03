@@ -16,15 +16,16 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 
+from console import meta
 
 # -- Project information -----------------------------------------------------
 
-project = 'console'
-author = 'Mike Miller'
-copyright = '2018, ' + author
+project = meta.pkgname
+author = meta.authors
+copyright = meta.copyright
 
 # The short X.Y version
-version = ''
+version = meta.version
 # The full version, including alpha/beta/rc tags
 release = ''
 

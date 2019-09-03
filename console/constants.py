@@ -42,9 +42,6 @@ ANSI_BG_HI_BASE = 100
 
 ALL_PALETTES = ('basic', 'extended', 'truecolor')  # variants 'x11', 'web'
 
-# misc
-MAX_NL_SEARCH = 4096  # TODO mv to "defaults"
-
 
 if __name__ == '__main__':
 
