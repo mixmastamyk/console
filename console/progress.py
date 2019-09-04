@@ -13,7 +13,7 @@ import time
 
 from console import fg, bg, fx, _CHOSEN_PALETTE
 from console.screen import sc
-from console.utils import clear_line, len_stripped
+from console.utils import len_stripped  # clear_line,
 from console.detection import (detect_unicode_support, get_available_palettes,
                                get_size)
 
@@ -153,7 +153,6 @@ class ProgressBar:
     debug = None
     done = False
     oob_error = False  # out of bounds
-    full_width = False
     label_fmt = '%2.0f%%'
     label_mode = True
     min_width = 12
@@ -187,20 +186,16 @@ class ProgressBar:
             elif key == 'styles':
                 self.styles = styles[val]
             elif key == 'expand':
-                from .detection import get_size
                 width = get_size()[0]
                 if self.label_mode != 'internal':
                     width -= len(self.label_fmt)
                 self.width = width
-
             else:
                 setattr(self, key, val)
 
         padding = len(self.icons[_if]) + len(self.icons[-1])
         if self.width < self.min_width:
             self.width = self.min_width
-        if self.full_width:
-            self.width = get_size()[0]
         self.iwidth = self.width - padding  # internal width
 
         # configure styles
@@ -411,7 +406,6 @@ if __name__ == '__main__':
     ]
 
     from console.utils import cls
-    from console.screen import sc
 
     # print each in progress
     cls()
