@@ -5,13 +5,15 @@
     Experimental Progress Bar functionality.
 
     TODO:
+        - docstrings
         - gradients/rainbar
         - More tests
 '''
 import time
 
 from console import fg, bg, fx, _CHOSEN_PALETTE
-from console.utils import len_stripped
+from console.screen import sc
+from console.utils import clear_line, len_stripped
 from console.detection import (detect_unicode_support, get_available_palettes,
                                get_size)
 
@@ -147,6 +149,7 @@ class ProgressBar:
             width: 10 or greater
     '''
     complete = 0
+    clear_left = False      # true to clear at 0, non-zero int for offset
     debug = None
     done = False
     oob_error = False  # out of bounds
@@ -183,6 +186,13 @@ class ProgressBar:
                     self.unicode_support = False
             elif key == 'styles':
                 self.styles = styles[val]
+            elif key == 'expand':
+                from .detection import get_size
+                width = get_size()[0]
+                if self.label_mode != 'internal':
+                    width -= len(self.label_fmt)
+                self.width = width
+
             else:
                 setattr(self, key, val)
 
@@ -206,10 +216,20 @@ class ProgressBar:
         if self._cached_str:
             return self._cached_str
 
-        if self.label_mode == 'internal':  # solid theme
-            rendered = self._render_internal_label()
+        # shall we clear the line to the left?
+        offset = self.clear_left
+        if offset:
+            if offset is True:
+                offset = 0
+            #~ rendered = str(clear_line(1)) + str(sc.mv_x(offset))
+            rendered = str(sc.mv_x(offset))
         else:
-            rendered = self._render()
+            rendered = ''
+
+        if self.label_mode == 'internal':  # solid theme
+            rendered += self._render_internal_label()
+        else:
+            rendered += self._render()
 
         if self.debug:
             rendered = (f'r:{self.ratio:5.2f} ncc:{self._num_complete_chars:2d} '
@@ -236,7 +256,7 @@ class ProgressBar:
         self._num_empty_chars = self.iwidth - ncc
 
         self._update_status()
-        self._cached_str = None
+        self._cached_str = None  # clear cache
         return self
 
     def _get_ncc(self, width, ratio):
@@ -371,7 +391,7 @@ if __name__ == '__main__':
     ProgressBar.label_mode = '-l' in sys.argv
 
     bars = [
-        ('basic',       ProgressBar(theme='basic')),
+        ('basic',       ProgressBar(theme='basic', clear_left=True, expand=True)),
         ('basic clr',   ProgressBar(theme='basic_color')),
         ('* default',   ProgressBar()),
         ('shaded',      ProgressBar(theme='shaded')),
@@ -381,10 +401,10 @@ if __name__ == '__main__':
         ('hvy-metal',   ProgressBar(theme='heavy_metal')),
         ('segmented',   ProgressBar(icons='segmented')),
         ('triangles',   ProgressBar(theme='shaded', icons='triangles')),
-        ('solid',       ProgressBar(theme='solid')),
+        ('solid',       ProgressBar(theme='solid', clear_left=True, expand=True)),
         ('solid mono',  ProgressBar(theme='solid', styles='amber_mono')),
-        ('partial',     HiDefProgressBar(styles='greyen')),
 
+        ('partial',     HiDefProgressBar(styles='greyen')),
         ('dies',        HiDefProgressBar(theme='dies',
                                          partial_chars='⚀⚁⚂⚃⚄⚅',
                                          partial_char_extra_style=None)),

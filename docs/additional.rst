@@ -309,30 +309,77 @@ demoed thusly:
     ⏵ python3 -m console.progress -l
 
 
-There are multiple themes,
-but typical use of the module is achieved like so::
+Hello world looks like this:
 
-    import time
+.. code-block:: python
+
+    >>> from console.progress import ProgressBar
+
+    >>> bar = ProgressBar()
+    >>> print(bar(50))
+
+.. raw:: html
+
+    <style>
+        .b { color: #005f87 }
+        .g { color: #5faf00 }
+        .o { opacity: .8 }
+    </style>
+    <pre style="margin-top: -13px; padding-top: .1em">
+    <span class=g>
+    ▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮</span><span class=b>▯▯▯▯▯▯▯▯▯▯▯▯▯▯▯</span>  <span class=o>50%</span>
+
+    </pre>
+
+
+"Icon" sets and color schemes can be set independently,
+or combined into a full theme.
+There is also a ``HiDefProgressBar`` class that can render itself with sub-cell
+Unicode block characters for "more resolution" in environments with constrained
+space.
+Some examples:
+
+.. code-block:: python
+
+    ProgressBar(theme='basic')
+    ProgressBar(theme='basic_color')
+    ProgressBar(theme='shaded')
+    ProgressBar(theme='warm_shaded')
+    ProgressBar(theme='shaded', icons='faces')
+    ProgressBar(theme='heavy_metal')
+    ProgressBar(icons='segmented')
+    ProgressBar(theme='shaded', icons='triangles')
+    ProgressBar(theme='solid')
+    ProgressBar(theme='solid', styles='amber_mono')
+
+    # To use partial characters:
+    HiDefProgressBar(styles='greyen')
+    HiDefProgressBar(theme='dies', partial_chars='⚀⚁⚂⚃⚄⚅',
+                                   partial_char_extra_style=None)
+
+
+A more robust use of the module is detailed below::
+
+    import time  # demo purposes only
 
     from console.screen import sc
     from console.utils import clear_line
     from console.progress import ProgressBar
 
     with sc.hidden_cursor():
-        bar = ProgressBar()
+        bar = ProgressBar(clear_left=True)
 
         for i in range(0, 101):
-            print(clear_line(1), sc.mv_x(1), bar(i),
-                  flush=True, end='')
+            print(bar(i), flush=True, end='')
             time.sleep(.2)
         print()
 
 Not all of this code is required, of course.
 For example, you may not want to hide the cursor or clear the line each time,
 but often will.
-There is also a ``HiDefProgressBar`` class that can render itself with sub-cell
-unicode block characters for environments with constrained space.
-
+To expand to the full line,
+``expand=True`` is available as well.
+See the source for more details.
 
 
 Tips
@@ -365,8 +412,8 @@ Tips
   add the first operand to every line,
   and fix the reset to default sequence at the end.
   So it *might* work as expected.
-  But that's not very efficient.
-  Best to try one of these workarounds instead:
+  It's not very efficient either.
+  Best to use one of these instead:
 
   .. code-block:: python
 
