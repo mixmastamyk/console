@@ -1,3 +1,4 @@
+# -*- coding: future_fstrings -*-
 '''
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
@@ -13,7 +14,7 @@ import time
 
 from console import fg, bg, fx, _CHOSEN_PALETTE
 from console.screen import sc
-from console.utils import len_stripped  # clear_line,
+from console.utils import clear_line, len_stripped
 from console.detection import (detect_unicode_support, get_available_palettes,
                                get_size)
 
@@ -190,6 +191,11 @@ class ProgressBar:
                 if self.label_mode != 'internal':
                     width -= len(self.label_fmt)
                 self.width = width
+            elif key == 'clear_left':  # convert to sequence
+                if val is True:
+                    val = 0
+                if type(val) is int:
+                    self.clear_left = f'{clear_line(1)}{sc.mv_x(val)}'
             else:
                 setattr(self, key, val)
 
@@ -211,28 +217,23 @@ class ProgressBar:
         if self._cached_str:
             return self._cached_str
 
+        pieces = []
         # shall we clear the line to the left?
-        offset = self.clear_left
-        if offset:
-            if offset is True:
-                offset = 0
-            #~ rendered = str(clear_line(1)) + str(sc.mv_x(offset))
-            rendered = str(sc.mv_x(offset))
-        else:
-            rendered = ''
+        pieces.append(self.clear_left if self.clear_left else '')
 
         if self.label_mode == 'internal':  # solid theme
-            rendered += self._render_internal_label()
+            pieces.append(self._render_internal_label())
         else:
-            rendered += self._render()
+            pieces.append(self._render())
 
+        self._cached_str = rendered = ''.join(pieces)
         if self.debug:
-            rendered = (f'r:{self.ratio:5.2f} ncc:{self._num_complete_chars:2d} '
-                        f'rm:{self.remainder!r} '
-                        f'nec:{self._num_empty_chars:2d} '
-                        f'{rendered} l:{len_stripped(rendered)}')
-
-        self._cached_str = rendered = rendered.rstrip()
+            pieces.append(
+                f'r:{self.ratio:5.2f} ncc:{self._num_complete_chars:2d} '
+                f'rm:{self.remainder!r} '
+                f'nec:{self._num_empty_chars:2d} '
+                f'l:{len_stripped(rendered)}'
+            )
         return rendered
 
     def __call__(self, complete):
@@ -386,7 +387,7 @@ if __name__ == '__main__':
     ProgressBar.label_mode = '-l' in sys.argv
 
     bars = [
-        ('basic',       ProgressBar(theme='basic', clear_left=True, expand=True)),
+        ('basic',       ProgressBar(theme='basic', clear_left=1, expand=True)),
         ('basic clr',   ProgressBar(theme='basic_color')),
         ('* default',   ProgressBar()),
         ('shaded',      ProgressBar(theme='shaded')),
