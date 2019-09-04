@@ -35,7 +35,6 @@ It's highly composable and more comprehensive than most.
 And how does it work?
 Oh, a piece of cake.
 
-
     *"Piece of cake?
     Oh, I wish somebody would tell me what that means." —Dr. Huer*
 
@@ -53,12 +52,17 @@ Most simply, adding a little color with console might look like this:
     >>> fg.green + 'Hello World!' + fg.default
     '\x1b[32mHello World!\x1b[39m'
 
+But there are better ways.
+
 FYI, the string  ``'\x1b'`` represents the ASCII Escape character
 (27 in decimal, ``1b`` hex).
 Command 32 turns the text green
 and 39 back to the default color,
-but there's no real need to worry about that.
+but there's no need to worry about that.
+That's why you're here.
+
 Printing to a supporting terminal from Python might look like this:
+
 
 .. code-block:: python
 
@@ -84,7 +88,6 @@ where it is automatic:
     fg.yellow('Woot!')  # --> '\x1b[33mWoot!\x1b[39m'
 
 More on that later.
-
 
 .. raw:: html
 
@@ -194,7 +197,7 @@ compatible context managers are also available for full-screen fun.
     >>> from console import screen
 
     >>> with screen.location(40, 20):
-    ...     print('Hello, World.')
+    ...     print('Hello, Woild.')
 
 
 .. rubric:: **Detection Module**
@@ -212,7 +215,7 @@ Detect the terminal environment with
       and
       `CLICOLOR <https://bixense.com/clicolors/>`_,
       etc.
-    - Query terminal colors and themes---light or dark?
+    - Query terminal colors and themes—light or dark?
     - Get titles, cursor position, and more.
 
 Console does its best to figure out what your terminal supports on startup
@@ -327,7 +330,6 @@ The callable form also automatically resets styles to their defaults at the end
 of each line in the string (to avoid breaking pagers),
 so those tasks no longer need to be managed manually:
 
-
 .. code-block:: python
 
     >>> muy_importante = fg.white + fx.bold + bg.red
@@ -339,13 +341,14 @@ so those tasks no longer need to be managed manually:
     <div style="display: inline-block; background: #d00; color: white; font-weight: bold; text-decoration: underline">¡AHORITA!</div>
     </pre>
 
+
 One nice feature---\
 when palette objects are combined together as done above,
 the list of codes to be rendered to is kept on ice until final output as a
 string.
 Meaning, there won't be redundant escape sequences in the output,
 no matter how many you add.
-No sirree !
+No sirree!  ↓
 
 .. code-block:: python
 
@@ -366,7 +369,6 @@ Styles can be built on the fly as well:
     <span style="color: #222; background-color:#ff8700">Tangerine Dream</span>
     </pre>
 
-
 .. rubric:: **Templating**
 
 To build templates,
@@ -376,11 +378,11 @@ with (or instead of) text:
 .. code-block:: python
 
     >>> sam_template = bg.i22('{}')  # dark green
+    >>> print(sam_template.format(' GREEN Eggs… '))
 
 .. raw:: html
 
-    <pre>
-    &gt;&gt;&gt; print(sam_template.format(' GREEN Eggs… '))
+    <pre style="margin-top: -13px;">
     <div style="display: inline-block; background: #040;"> GREEN Eggs… </div>
     </pre>
 
