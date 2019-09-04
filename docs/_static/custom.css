@@ -122,6 +122,9 @@ code, span.pre  {
 .mb {
     margin-bottom: 1.3em;
 }
+.mfull {
+    margin: 1.3em;
+}
 .rounded {
     border-radius: .8em;
 }
@@ -158,6 +161,12 @@ div.highlight, pre.highlight { background: inherit; }
     color: IndianRed;
 }
 
+.italic {  /* workaround rst/sphinx lack of link styling. */
+    font-style: italic;
+}
+.flright {
+    float: right;
+}
 .reverse {
     font-size: .9em;
     opacity: .9;

@@ -11,8 +11,9 @@ import logging
 
 import env
 
-from . import color_tables, proximity, __version__
+from . import color_tables, proximity
 from .constants import BS, BEL, CSI, ESC, OSC, RS, ST, ALL_PALETTES
+from .meta import __version__
 
 
 log = logging.getLogger(__name__)
@@ -86,6 +87,7 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
     pal = basic_palette
     log.debug('console version: %s', __version__)
 
+    # TODO: clumsy, refactor
     if color_is_forced():
         result, pal = detect_palette_support(basic_palette=pal) or 'basic'
 

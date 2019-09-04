@@ -1,6 +1,9 @@
 '''
     | console - Comprehensive utility library for ANSI terminals.
     | © 2018, Mike Miller - Released under the LGPL, version 3+.
+
+    TODO:
+        - bug: color downgrade and some tests not working on fbterm.
 '''
 import sys
 
@@ -9,7 +12,6 @@ import env
 from .disabled import empty_bin as _empty_bin
 
 
-__version__ = '0.95a7'
 _DEBUG = []  # mutable reference
 _CHOSEN_PALETTE = None
 fg = bg = fx = defx = sc = _empty_bin

@@ -392,6 +392,39 @@ Tips
     # COWABUNGA, DUDE !
     XTREME_STYLING = fx.b + fx.i + fx.u + fx.s
 
+- When using the extended or truecolor palettes,
+  keep in mind that some folks will have dark backgrounds and some light---\
+  which could make your fancy colors unreadable.
+
+  Checking the background with the detection module is one strategy,
+  though not available on every terminal.
+  An argument to change the theme may also be in order.
+  (Console does acknowledge several environment variables like ``COLORFGBG``
+  as well.)
+
+- ANSI support can be enabled on Windows 10 with the following incantation::
+
+    >>> import console.windows as cw
+
+    >>> cw.enable_vt_processing()
+    (0, 0)  # status for (stdout, stderr)
+
+
+Troubleshooting
+------------------
+
+- Console performs auto-detection of the environment at startup to determine
+  terminal capabilities.
+  This could hang obscure terminals that advertise xterm on posix compatibility
+  without a full implementation.
+  To disable this,
+  set the environment variable:
+  ``PY_CONSOLE_AUTODETECT='0'``
+  to disable it.
+  You'll now have to create the palette and screen objects
+  (and possibly configure them)
+  yourself.
+
 - Try to avoid this type of ambiguous addition operation:
 
   .. code-block:: python
@@ -410,36 +443,19 @@ Tips
   Console warns you about this.
   It also does its best to divvy up the string,
   add the first operand to every line,
-  and fix the reset to default sequence at the end.
-  So it *might* work as expected.
+  and fix the reset-to-default sequence at the end.
+  So it *might* work as expected,
+  maybe not.
   It's not very efficient either.
-  Best to use one of these instead:
+  Best to use one of these explicit forms instead:
 
   .. code-block:: python
 
-    # create a new anonymous style
+    # create a new anonymous style, apply it:
     (pal.style1 + pal.style2)(msg)
 
-    # or add via "mixins"
+    # or add it in via "mixins"
     pal.style2(msg, pal.style1)
-
-
-- When using the extended or truecolor palettes,
-  keep in mind that some folks will have dark backgrounds and some light---\
-  which could make your fancy colors unreadable.
-
-  Checking the background with the detection module is one strategy,
-  though not available on every terminal.
-  An argument to change the theme may also be in order.
-  (Console does acknowledge several environment variables like ``COLORFGBG``
-  as well.)
-
-- ANSI support can be enabled on Windows 10 with the following incantation::
-
-    >>> import console.windows as cw
-
-    >>> cw.enable_vt_processing()
-    (0, 0)  # status for (stdout, stderr)
 
 
 
@@ -467,19 +483,29 @@ Did you know that thirty years before
 `f.lux <https://en.wikipedia.org/wiki/F.lux>`_
 and
 `redshift <https://en.wikipedia.org/wiki/Redshift_(software)>`_
-debuted that Amber Monochrome monitors where known as the "ergonomic"
-choice?
+debuted that Amber Monochrome monitors on a dark background were known as the
+"ergonomic" choice?
+
 Easier on the eyes for extended periods (i.e. late nights) they said.
-Interesting knowledge rediscovered, perhaps.
+Interesting knowledge rediscovered perhaps.
 
-.. container:: center mt mb
+.. container:: center mfull italic flright
 
-    *"Believe it…*
+    "Believe it…
 
-    *or not!"*
+    or not!"
 
-    *---Jack Palance, on Ripley's*
+    ---Jack Palance, on `Ripley's <https://youtu.be/o4ELw6kCEDs>`_
 
+.. raw:: html
+
+    <iframe width="45%" height="auto" frameborder="0" class="mt mb"
+        src="https://www.youtube.com/embed/o4ELw6kCEDs"
+        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+    </iframe>
+
+|
 
 10-7, Signing Off…
 --------------------
@@ -501,7 +527,7 @@ Interesting knowledge rediscovered, perhaps.
 
 |
 
-Signing off from the late seventies,
+Signing off from the '79,
 a new futuristic decade awaits!
 
     - *Keep On Truckin'*

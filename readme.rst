@@ -79,7 +79,8 @@ where as ``bg.default`` for example,
 resets only the background to its default color.
 This need not be your responsibility however.
 One may use the call form instead,
-where it is automatic:
+where
+`it's automatic <https://youtu.be/y5ybok6ZGXk>`_:
 
 .. code-block:: python
 
