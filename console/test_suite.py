@@ -458,7 +458,7 @@ if True:  # fold
 if True:  # fold
     from env import Environment
 
-    def test_color_disabled_none():
+    def test_color_disabled_none_false():
         detection.env = Environment(environ={})
         assert detection.color_is_disabled() is None
 
@@ -466,7 +466,7 @@ if True:  # fold
         assert detection.color_is_disabled() is None
 
         detection.env = Environment(environ=dict(CLICOLOR='1'))
-        assert detection.color_is_disabled() is None
+        assert detection.color_is_disabled() is False
 
     def test_color_disabled_true():
         detection.env = Environment(environ=dict(NO_COLOR='1'))

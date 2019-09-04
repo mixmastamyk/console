@@ -118,10 +118,11 @@ def color_is_disabled(**envars):
         result = True
     elif env.CLICOLOR == '0':
         result = True
+    elif env.CLICOLOR:
+        result = False
 
-    log.debug('%r (NO_COLOR=%s, CLICOLOR=%s)', result,
-              env.NO_COLOR or '',
-              env.CLICOLOR or ''
+    log.debug('%r (NO_COLOR=%s, CLICOLOR=%s)',
+        result, env.NO_COLOR or None, env.CLICOLOR or None,
     )
     # check custom variables
     for name, value in envars.items():
@@ -145,7 +146,7 @@ def color_is_forced(**envars):
             Bool:  Forced
     '''
     result = env.CLICOLOR_FORCE and (env.CLICOLOR_FORCE != '0')
-    log.debug('%s (CLICOLOR_FORCE=%s)', result or False, env.CLICOLOR_FORCE)
+    log.debug('%s (CLICOLOR_FORCE=%s)', result or None, env.CLICOLOR_FORCE or None)
 
     # check custom variables
     for name, value in envars.items():
