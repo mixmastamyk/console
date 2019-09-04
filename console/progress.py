@@ -217,9 +217,8 @@ class ProgressBar:
         if self._cached_str:
             return self._cached_str
 
-        pieces = []
         # shall we clear the line to the left?
-        pieces.append(self.clear_left if self.clear_left else '')
+        pieces = [self.clear_left if self.clear_left else '']
 
         if self.label_mode == 'internal':  # solid theme
             pieces.append(self._render_internal_label())
@@ -234,6 +233,7 @@ class ProgressBar:
                 f'nec:{self._num_empty_chars:2d} '
                 f'l:{len_stripped(rendered)}'
             )
+            self._cached_str = rendered = ''.join(pieces)  # again :-/
         return rendered
 
     def __call__(self, complete):
