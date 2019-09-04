@@ -475,16 +475,6 @@ if True:  # fold
         detection.env = Environment(environ=dict(CLICOLOR='0'))
         assert detection.color_is_disabled() is True
 
-    def test_color_allowed():
-        detection.env = Environment(environ={})
-        assert detection.color_is_allowed() is True
-
-        detection.env = Environment(environ=dict(CLICOLOR='0'))
-        assert detection.color_is_allowed() is False
-
-        detection.env = Environment(environ=dict(NO_COLOR=''))
-        assert detection.color_is_allowed() is False
-
     def test_color_forced():
         detection.env = Environment(environ={})
         assert detection.color_is_forced().value is None

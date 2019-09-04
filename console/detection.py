@@ -79,7 +79,7 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
         Arguments:
             stream:             Which output file to check: stdout, stderr
             basic_palette:      Force the platform-dependent 16 color palette,
-                                for testing.  List of 16 rgb-int tuples.
+                                for testing.  Tuple of 16 rgb-int tuples.
         Returns:
             None | str: 'basic', 'extended', or 'truecolor'
     '''
@@ -91,29 +91,11 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
     if color_is_forced():
         result, pal = detect_palette_support(basic_palette=pal) or 'basic'
 
-    elif is_a_tty(stream=stream) and color_is_allowed():
+    elif is_a_tty(stream=stream) and not color_is_disabled():
         result, pal = detect_palette_support(basic_palette=pal)
 
     proximity.build_color_tables(pal)
     log.debug('Basic palette: %r', pal)
-    log.debug('%r', result)
-    return result
-
-
-def color_is_allowed():
-    ''' Look for clues in environment, e.g.:
-
-        - https://bixense.com/clicolors/
-        - http://no-color.org/
-
-        Returns:
-            Bool:  Allowed
-    '''
-    result = True  # generally yes - env.CLICOLOR != '0'
-
-    if color_is_disabled():
-        result = False
-
     log.debug('%r', result)
     return result
 
@@ -162,8 +144,8 @@ def color_is_forced(**envars):
         Returns:
             Bool:  Forced
     '''
-    result = env.CLICOLOR_FORCE and env.CLICOLOR_FORCE != '0'
-    log.debug('%s (CLICOLOR_FORCE=%s)', result, env.CLICOLOR_FORCE or '')
+    result = env.CLICOLOR_FORCE and (env.CLICOLOR_FORCE != '0')
+    log.debug('%s (CLICOLOR_FORCE=%s)', result or False, env.CLICOLOR_FORCE)
 
     # check custom variables
     for name, value in envars.items():
