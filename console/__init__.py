@@ -4,9 +4,8 @@
 
     TODO:
         - bug: color downgrade and some tests not working on fbterm.
-        - refr: main function, detection module
         - clean up core.py
-        - test on mac os, windows
+        - test on windows
 '''
 import sys
 
