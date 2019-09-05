@@ -26,8 +26,6 @@ OSC = ESC + ']'     #: Operating System Command
 RIS = ESC + 'c'     #: Reset to Initial State, aka clear screen (see utils)
 ST = '\\'           #: Sequence terminator, (ESC precedes)
 
-ANSI_RESET = CSI + '0m'
-
 # some C1 codes
 CSI_C1 = '\x9b'
 OSC_C1 = '\x9d'
@@ -39,6 +37,9 @@ ANSI_FG_LO_BASE = 30
 ANSI_FG_HI_BASE = 90
 ANSI_BG_LO_BASE = 40
 ANSI_BG_HI_BASE = 100
+
+ANSI_RESET = CSI + '0m'
+ANSI_RESET_FB = CSI + '0}'
 
 ALL_PALETTES = ('basic', 'extended', 'truecolor')  # variants 'x11', 'web'
 

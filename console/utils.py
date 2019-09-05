@@ -10,13 +10,12 @@
 
         - `getpass <https://docs.python.org/3/library/getpass.html>`_
 '''
-import os
 import logging
 import re
 
 from .constants import OSC, BEL
 from .screen import sc
-from .detection import is_a_tty
+from .detection import is_a_tty, os_name
 from . import _DEBUG, _CHOSEN_PALETTE
 
 
@@ -91,7 +90,7 @@ def reset_terminal():
         Greater than a fullscreen terminal clear, also clears the scrollback
         buffer.  May expose bugs in dumb terminals.
     '''
-    if os.name == 'nt':
+    if os_name == 'nt':
         from .windows import cls
         cls()
     else:
@@ -109,7 +108,7 @@ def set_title(title, mode=0):
                    | 1 | 'icon'   - Set only icon/taskbar title
                    | 2 | 'title'  - Set only window/tab title
     '''
-    if os.name == 'nt':
+    if os_name == 'nt':
         from .windows import set_title
         return set_title(title)
     else:
@@ -152,14 +151,15 @@ def len_stripped(text):
     return len(strip_ansi(text))
 
 
+# convenience, compatibility
 clear = clear_screen
 cls = reset_terminal
 
 
 # -- wait key implementations ------------------------------------------------
-if os.name == 'nt':
+if os_name == 'nt':
     from msvcrt import getwch as _getch
-elif os.name == 'posix':
+elif os_name == 'posix':
     from .detection import _getch
 
 

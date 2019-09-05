@@ -21,6 +21,43 @@ except (ValueError, NameError, ImportError):  # Sphinx import on Linux
     c_short = c_ushort = c_long = Structure = kernel32 = DWORD = windll = object
 
 
+# winbase.h constants
+ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
+STD_INPUT_HANDLE = -10
+STD_OUTPUT_HANDLE = -11
+STD_ERROR_HANDLE = -12
+
+BUILD_ANSI_AVAIL = 10586  # Win10 TH2
+_mask_map = dict(
+    foreground=0x000f,
+    fg=0x000f,
+    background=0x00f0,
+    bg=0x00f0,
+)
+_win_to_ansi_offset_map = {
+    # conhost, ansi
+     0:   0,   # BLACK,  :  black
+     1:   4,   # BLUE,   :  red
+     2:   2,   # GREEN,  :  green
+     3:   6,   # CYAN,   :  yellow
+     4:   1,   # RED,    :  blue
+     5:   5,   # MAGENTA :  magenta/purple
+     6:   3,   # YELLOW  :  cyan,
+     7:   7,   # GREY,   :  gray
+
+     8:   8,   # BLACK,  :  light black
+     9:  12,   # BLUE,   :  light red
+    10:  10,   # GREEN,  :  light green
+    11:  14,   # CYAN,   :  light yellow
+    12:   9,   # RED,    :  light blue
+    13:  13,   # MAGENTA :  light magenta
+    14:  11,   # YELLOW  :  light cyan
+    15:  15,   # GREY,   :  light white
+}
+
+log = logging.getLogger(__name__)
+
+
 class _COORD(Structure):
     ''' Struct from wincon.h. '''
     _fields_ = [
@@ -48,43 +85,6 @@ class CONSOLE_SCREEN_BUFFER_INFO(Structure):
         ('srWindow', _SMALL_RECT),
         ('dwMaximumWindowSize', _COORD),
     ]
-
-
-log = logging.getLogger(__name__)
-
-# winbase.h
-ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
-STD_INPUT_HANDLE = -10
-STD_OUTPUT_HANDLE = -11
-STD_ERROR_HANDLE = -12
-
-
-_mask_map = dict(
-    foreground=0x000f,
-    fg=0x000f,
-    background=0x00f0,
-    bg=0x00f0,
-)
-_win_to_ansi_offset_map = {
-    # conhost, ansi
-     0:   0,   # BLACK,  :  black
-     1:   4,   # BLUE,   :  red
-     2:   2,   # GREEN,  :  green
-     3:   6,   # CYAN,   :  yellow
-     4:   1,   # RED,    :  blue
-     5:   5,   # MAGENTA :  magenta/purple
-     6:   3,   # YELLOW  :  cyan,
-     7:   7,   # GREY,   :  gray
-
-     8:   8,   # BLACK,  :  light black
-     9:  12,   # BLUE,   :  light red
-    10:  10,   # GREEN,  :  light green
-    11:  14,   # CYAN,   :  light yellow
-    12:   9,   # RED,    :  light blue
-    13:  13,   # MAGENTA :  light magenta
-    14:  11,   # YELLOW  :  light cyan
-    15:  15,   # GREY,   :  light white
-}
 
 
 def cls():
@@ -134,14 +134,13 @@ def is_ansi_capable():
     ''' Check to see whether this version of Windows is recent enough to
         support "ANSI VT"" processing.
     '''
-    BUILD_ANSI_AVAIL = 10586  # Win10 TH2
     CURRENT_VERS = sys.getwindowsversion()[:3]
 
     if CURRENT_VERS[2] > BUILD_ANSI_AVAIL:
         result = True
     else:
         result = False
-    log.debug('version %s %s', CURRENT_VERS, result)
+    log.debug('Windows version: %s %s', CURRENT_VERS, result)
     return result
 
 

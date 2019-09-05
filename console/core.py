@@ -13,7 +13,7 @@ import re
 
 from . import _CHOSEN_PALETTE
 from .constants import (CSI, ANSI_BG_LO_BASE, ANSI_BG_HI_BASE, ANSI_FG_LO_BASE,
-                        ANSI_FG_HI_BASE, ANSI_RESET)
+                        ANSI_FG_HI_BASE, ANSI_RESET, ANSI_RESET_FB)
 from .disabled import empty_bin, empty
 from .detection import get_available_palettes, is_fbterm
 from .meta import defaults
@@ -28,7 +28,7 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 MAX_NL_SEARCH = defaults.MAX_NL_SEARCH
-string_plus_call_warning = '''
+_string_plus_call_warning_template = '''
 
     Ambiguous and/or inefficient addition operation used:
         Form:  pal.style1 + pal.style2(msg)
@@ -41,7 +41,7 @@ string_plus_call_warning = '''
         pal.style2(msg, pal.style1)     # via "mixins"
 '''
 
-# Palette attribute name finders, now we've got two problems.
+# Palette attribute name finders.  Now we've got two problems.
 # Not a huge fan of regex but here they nicely enforce the naming rules:
 _hd = r'[0-9A-Fa-f]'  # hex digits
 _index_finder = re.compile(r'^i_?\d{1,3}$', re.A)                   # i_DDD
@@ -120,36 +120,41 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
 
     def __getattr__(self, name):
         ''' Traffic cop - called only when an attribute is missing,
-            i.e. once per palette entry attribute.
+            i.e. once per palette entry attribute.  The "basic" palette
+            attributes will never get here, as they are already defined.
 
-            The "basic" palette attributes will never get here,
-            as they are already defined.  Data flow:
+            Data flow: look up the name by its prefix (or not), then convert to
+            a RGB three-tuple, for optional calculation and output.
 
-            Prefixes:                               Examples:
+            Attribute prefixes:                     Examples:
 
-                - t_ hex-string:                    'bb00bb'
-                - x_ name to tuple of dec-int str:  ('1', '2', '3')
-                - w_ name to tuple of int8:         (1, 2, 3)
+                - t_ hex-string:                    .t_bb00bb
+                - x_ name:                          .x_lime
+                - w_ name to tuple of int8:         .w_bisque
+                - Bare names                        .cornflowerblue
+
+            Convert to three-tuples:
+                (1, 2, 3) or ('1', '2', '3')
 
             On downgrade, find nearest:
 
-                 - Prefer tuple of int8:            (1, 2, 3)
+                 - Prefer tuple of ints:            (1, 2, 3)
                  - Also handles 3 digit hex-string: 'b0b'
 
                 - returns: integer index
                     * 0-15 or
                     * 0-255
 
-            Output:
+            Output, one of:
 
-                - String index from int index:      '30'
+                - String index from integer:        '30'
                 - Tuple of dec-int strings:         ('1', '2', '3')
                     - joined with ';' to string:    Prefix + '1;2;3'
 
             Final Output:
                 - wrap in _PaletteEntry(output)
         '''
-        key = name[1:].lstrip('_')  # rm potential prefix
+        key = name[1:].lstrip('_')  # rm prefix from key
         result = None
 
         # follow the yellow brick road…
@@ -199,7 +204,6 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             start_codes = self._start_codes_extended
             if is_fbterm:
                 start_codes = self._start_codes_extended_fbterm
-
             values = [start_codes, index]
 
         # downgrade section
@@ -219,14 +223,14 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
     def _get_true_palette_entry(self, name, digits):
         ''' Compute truecolor entry, once on the fly.
 
-            values must become sequence of decimal int strings: ('1', '2', '3')
+            values become sequence of decimal int strings: ('1', '2', '3')
         '''
         values = None
-        type_digits = type(digits)
+        digits_type = type(digits)
 
         if 'truecolor' in self._palette_support:  # build entry
             values = [self._start_codes_true]
-            if type_digits is str:  # convert from hex string
+            if digits_type is str:  # convert from hex string
                 if len(digits) == 3:
                     values.extend(str(int(ch + ch, 16)) for ch in digits)
                 else:  # chunk 'BB00BB', to ints to 'R', 'G', 'B':
@@ -236,23 +240,22 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
 
         # downgrade section
         elif 'extended' in self._palette_support:
-            if type_digits is str:
+            start_codes = self._start_codes_extended
+            if is_fbterm:
+                start_codes = self._start_codes_extended_fbterm
+
+            if digits_type is str:
                 nearest_idx = find_nearest_color_hexstr(digits,
-                                                       method=self._dg_method)
+                                                        method=self._dg_method)
             else:  # tuple
                 if type(digits[0]) is str:  # convert to ints
                     digits = tuple(int(digit) for digit in digits)
                 nearest_idx = find_nearest_color_index(*digits,
                                                        method=self._dg_method)
-
-            start_codes = self._start_codes_extended
-            if is_fbterm:
-                start_codes = self._start_codes_extended_fbterm
-
             values = [start_codes, str(nearest_idx)]
 
         elif 'basic' in self._palette_support:
-            if type_digits is str:
+            if digits_type is str:
                 nearest_idx = find_nearest_color_hexstr(digits, color_table4,
                                                        method=self._dg_method)
             else:  # tuple
@@ -268,8 +271,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
     def _get_X11_palette_entry(self, name):
         from .color_tables import x11_color_map
         result = empty
-
-        try:            # decimal int strings, e.g.: ('1', '2', '3')
+        try:            # to decimal int strings, e.g.: ('1', '2', '3')
             color = x11_color_map[name.lower()]
         except KeyError:  # convert to AttributeError
             raise AttributeError(f'{name.lower()!r} not found in X11 palette.')
@@ -320,7 +322,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         return [str(index)]
 
     def clear(self):
-        ''' Cleanse the palette to free memory.
+        ''' "Cleanse the palette" to free memory.
             Useful for truecolor, perhaps.
         '''
         self.__dict__.clear()
@@ -341,13 +343,13 @@ class _LineWriter(object):
             return self.stream.write(data)
         else:
             bytes_written = 0
-            for line in data.splitlines(True):
-                nl = ''
+            for line in data.splitlines(True):  # keep ends: True
+                end = ''
                 if line.endswith('\n'):  # mv nl to end:
                     line = line[:-1]
-                    nl = '\n'
+                    end = '\n'
                 bytes_written += self.stream.write(
-                                    f'{self.start}{line}{self.default}{nl}'
+                                    f'{self.start}{line}{self.default}{end}'
                                  ) or 0  # in case None returned (on Windows)
             return bytes_written
 
@@ -356,7 +358,7 @@ class _LineWriter(object):
 
 
 class _PaletteEntry:
-    ''' Palette Entry Attribute
+    ''' Palette Entry Attribute, a.k.a. a "color"
 
         Enables:
 
@@ -371,6 +373,8 @@ class _PaletteEntry:
             code    - Associated ANSI code number.
             stream  - Stream to print to, when using a context manager.
     '''
+    _reset_code = ANSI_RESET
+
     def __init__(self, parent, name, code, stream=sys.stdout):
         self.parent = parent
         self.default = (parent.default if hasattr(parent, 'default')
@@ -383,37 +387,7 @@ class _PaletteEntry:
         ''' Add: self + other '''
         if isinstance(other, str):
             if other.startswith(CSI) and other.endswith('m'):
-                # This op is ambiguous and difficult to completely handle,
-                import warnings  # warn first
-                msg = string_plus_call_warning % (self, other)
-                warnings.warn(msg, SyntaxWarning)
-                log.debug(msg)
-                # Attempt to break up the other ansi string by lines,
-                # insert codes into each opening sequence, optionally fix end
-                try:
-                    lines = []
-                    for line in other.splitlines():
-                        tokens = []
-                        tokens.append(CSI)
-                        tokens.append(';'.join(self._codes))  # if multiple
-                        tokens.append(';')
-                        tokens.append(CSI.join(line.split(CSI)[1:-1]))
-
-                        # figure what end code will be:
-                        end_code = self.default._codes[0]
-                        if end_code == other[-3:-1]:    # same category
-                            tokens.append(end_code)
-                        else:                           # different
-                            tokens.append(ANSI_RESET)
-                        lines.append(''.join(tokens))
-
-                    lines = '\n'.join(lines)
-                    return lines
-                except IndexError as err:
-                    log.warn('Could not perform enhanced addition with operands'
-                             ': %r %r.  Falling back to str concatenation. %s',
-                              self, other, err)
-                    str(self) + other
+                return self._handle_ambiguous_op(other)
             else:
                 return str(self) + other
 
@@ -426,7 +400,7 @@ class _PaletteEntry:
             same_category = self.parent is other.parent  # color or style
 
             if not same_category:  # different, use instead of color default
-                attr.default = ANSI_RESET
+                attr.default = self._reset_code
 
             return attr
         else:
@@ -452,7 +426,7 @@ class _PaletteEntry:
         self._stream.write(str(self.default))  # just in case
 
     def __call__(self, text, *styles, original_length=False):
-        ''' Formats text.  Not appropriate for huge input strings.
+        ''' Formats text.  Not appropriate for *huge* input strings.
 
             Arguments:
                 text                Original text.
@@ -464,7 +438,7 @@ class _PaletteEntry:
                 Color sequences are terminated at newlines,
                 so that paging the output works correctly.
         '''
-        if not text:  # when an empty string is passed, don't emit codes.
+        if not text:  # when an empty string/None is passed, don't emit codes.
             return ''
 
         # if the category of styles is different,
@@ -472,14 +446,15 @@ class _PaletteEntry:
         for attr in styles:
             self += attr
 
+        # add and end styles per line, to facilitate paging:
         pos = text.find('\n', 0, MAX_NL_SEARCH)  # if '\n' in text, w/limit
-        if pos != -1:  # found
+        if pos == -1:  # not found
+            result = f'{self}{text}{self.default}'
+        else:
             lines = text.splitlines()
             for i, line in enumerate(lines):
                 lines[i] = f'{self}{line}{self.default}'  # add styles, see tip
             result = '\n'.join(lines)
-        else:
-            result = f'{self}{text}{self.default}'
 
         if original_length:
             return _LengthyString(len(text), result)
@@ -491,6 +466,49 @@ class _PaletteEntry:
 
     def __repr__(self):
         return repr(self.__str__())
+
+    def _handle_ambiguous_op(self, other):
+        ''' This operation is ambiguous and difficult to handle fully, e.g.::
+
+                pal.style1 + pal.style2('hello')
+
+            Attempts to break up the other ansi string by lines,
+            insert codes into each opening sequence, conditionally fix end.
+        '''
+        import warnings
+
+        msg = _string_plus_call_warning_template % (self, other)
+        warnings.warn(msg, SyntaxWarning)  # warn first
+        log.debug(msg)
+        try:
+            # do line by line to avoid doubling mem reqs
+            lines = other.splitlines()
+            for i, line in enumerate(lines):
+                tokens = [CSI]
+                tokens.append(';'.join(self._codes))            # if multiple
+                tokens.append(';')
+                tokens.append(CSI.join(line.split(CSI)[1:-1]))  # if multiple
+
+                # figure end code:
+                try:
+                    end_code = self.default._codes[0]
+                except AttributeError:  # already rendered
+                    end_code = self.default.strip('\x1b[m')
+                if end_code == other[-3:-1]:    # same category
+                    tokens.append(end_code)
+                else:                           # different
+                    tokens.append(self._reset_code)
+                # put back together:
+                lines[i] = ''.join(tokens)
+            result = '\n'.join(lines)
+
+        except IndexError as err:
+            log.warn('Could not perform enhanced addition with operands'
+                     ': %r %r.  Falling back to str concatenation. %s',
+                      self, other, err)
+            result = str(self) + other
+
+        return result
 
     def template(self, placeholder='{}'):
         ''' Returns a template string from this Entry with its attributes.
@@ -515,6 +533,8 @@ class _PaletteEntry:
 
 class _PaletteEntryFBTerm(_PaletteEntry):
     ''' Help fbterm show 256 colors. '''
+    _reset_code = ANSI_RESET_FB
+
     def __str__(self):
         return f'{CSI}{";".join(self._codes)}}}'  # note '}' at end not std 'm'
 

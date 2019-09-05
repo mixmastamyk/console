@@ -3,8 +3,6 @@
     | © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     TODO:
-        - bug: color downgrade and some tests not working on fbterm.
-        - clean up core.py
         - test on windows
 '''
 import sys
