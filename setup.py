@@ -14,6 +14,7 @@ if sys.version_info.major < 3:
 install_requires = (
     'ezenv',
     'future_fstrings;     python_version < "3.6" ',
+    'typing;              python_version < "3.5" ',  # seems future-fs related.
     'colorama;            os_name == "nt" and platform_version < "10.0.10586" ',
     'win_unicode_console; os_name == "nt" and python_version < "3.6" ',
 )

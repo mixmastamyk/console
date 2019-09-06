@@ -1,9 +1,6 @@
 '''
     | console - Comprehensive utility library for ANSI terminals.
     | © 2018, Mike Miller - Released under the LGPL, version 3+.
-
-    TODO:
-        - test on windows
 '''
 import sys
 
