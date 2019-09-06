@@ -342,7 +342,7 @@ Some examples:
 .. code-block:: python
 
     ProgressBar(theme='basic')
-    ProgressBar(theme='basic_color')
+    ProgressBar(theme='basic_color')  # default for Windows console
     ProgressBar(theme='shaded')
     ProgressBar(theme='warm_shaded')
     ProgressBar(theme='shaded', icons='faces')
@@ -357,6 +357,9 @@ Some examples:
     HiDefProgressBar(theme='dies', partial_chars='⚀⚁⚂⚃⚄⚅',
                                    partial_char_extra_style=None)
 
+(Windows console has very limited Unicode font support unfortunately,
+though Lucida Console seems a bit more comprehensive than Consolas.
+So it defaults to an ASCII representation.)
 
 A more robust use of the module is detailed below::
 

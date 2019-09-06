@@ -252,6 +252,7 @@ def detect_unicode_support():
         out.write(BS)
         out.flush()
 
+    log.debug(str(result))
     return result
 
 

@@ -140,7 +140,7 @@ def is_ansi_capable():
         result = True
     else:
         result = False
-    log.debug('Windows version: %s %s', CURRENT_VERS, result)
+    log.debug('%s (Windows version: %s)', result, CURRENT_VERS)
     return result
 
 

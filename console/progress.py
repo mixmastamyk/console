@@ -6,9 +6,10 @@
     Experimental Progress Bar functionality.
 
     TODO:
+        - move status icons to theme, see line 290
         - docstrings
         - gradients/rainbar
-        - More tests
+        - tests
 '''
 import time
 
@@ -16,30 +17,32 @@ from console import fg, bg, fx, _CHOSEN_PALETTE
 from console.screen import sc
 from console.utils import clear_line, len_stripped
 from console.detection import (detect_unicode_support, get_available_palettes,
-                               get_size)
+                               get_size, os_name)
 
-TIMEDELTA_1 = 60
+TIMEDELTA_1 = 60    # seconds
 TIMEDELTA_2 = 300
 
 # Theme-ing info:
 icons = dict(
-    # name:      first, complete, empty, last, error
-    ascii       = ('[', '#', '-', ']'),
-    blocks      = (' ', '▮', '▯', ' '),
-    bullets     = (' ', '•', '•', ' '),  # empty white bullet wrong size/align
-    dies        = (' ', '⚅', '⚀', ' '),
-    horns       = ('🤘', '⛧', '⛤', '🤘'),
-    segmented   = ('▕', '▉', '▉', '▏'),
-    faces       = (' ', '☻', '☹', ' '),
-    wide_faces  = (' ', '😎', '😞', ' '),
-    stars       = ('(', '★', '☆', ')'),
-    shaded      = ('▕', '▓', '░', '▏'),
-    triangles   = ('▕', '▶', '◁', '▏'),
-    spaces      = ('▕', ' ', ' ', '▏'),
+    # name:      first, complete, empty, last, done, err_lo, err_hi, err_lbl
+    ascii       = ('[', '#', '-', ']', '+', '<', '>', 'ERR'),
+    blocks      = (' ', '▮', '▯', ' ', '✓', '⏴', '⏵', '✗'),
+    # empty white bullet wrong size, breaks alignment:
+    bullets     = (' ', '•', '•', ' ', '✓', '⏴', '⏵', '✗'),
+    dies        = (' ', '⚅', '⚀', ' ', '✓', '⏴', '⏵', '✗'),
+    horns       = ('🤘', '⛧', '⛤', '🤘', '✓', '⏴', '⏵', '✗'),
+    segmented   = ('▕', '▉', '▉', '▏', '✓', '⏴', '⏵', '✗'),
+    faces       = (' ', '☻', '☹', ' ', '✓', '⏴', '⏵', '✗'),
+    wide_faces  = (' ', '😎', '😞', ' ', '✓', '⏴', '⏵', '✗'),
+    stars       = ('(', '★', '☆', ')', '✓', '⏴', '⏵', '✗'),
+    shaded      = ('▕', '▓', '░', '▏', '✓', '⏴', '⏵', '✗'),
+    triangles   = ('▕', '▶', '◁', '▏', '✓', '⏴', '⏵', '✗'),
+    spaces      = ('▕', ' ', ' ', '▏', '✓', '⏴', '⏵', '✗'),
 )
 
-# icon indexes
-_if, _ic, _ie, _il, _id, _ir = range(6)
+# icon/style indexes
+# 0    1    2    3    4     5     6     7
+_if, _ic, _ie, _il, _id, _iel, _ieh, _ieb = range(8)
 
 
 # default styles
@@ -115,10 +118,11 @@ styles = dict(
 
 # TODO: not sure if this is useful
 unicode_support = detect_unicode_support()
-if unicode_support:
+icons['default']  = icons['ascii']
+if os_name == 'nt':  # default to ascii on Windows
+    pass
+elif unicode_support:
     icons['default']  = icons['blocks']
-else:
-    icons['default']  = icons['ascii']
 
 # TODO: choose 256 color
 _pals = get_available_palettes(_CHOSEN_PALETTE)
@@ -210,7 +214,7 @@ class ProgressBar:
         self._comp_style = _styles[_ic]
         self._empt_style = _styles[_ie]
         self._last = _styles[_il](self.icons[_il])
-        self._err_style = _styles[_ir]
+        self._err_style = _styles[_iel]
 
     def __str__(self):
         ''' Renders the current state as a string. '''
@@ -262,6 +266,7 @@ class ProgressBar:
     def _update_status(self):
         ''' Check bounds for errors and update label accordingly. '''
         label = ''
+        label_mode = self.label_mode
         # label format, based on time - when slow, go to higher-res display
         delta = time.time() - self.start
         if delta > self.timedelta2:
@@ -270,47 +275,38 @@ class ProgressBar:
             self.label_fmt = '%4.1f%%'
 
         ratio = self.ratio
-        if 0 <= ratio < 1:
-            if self.label_mode:
+        if 0 <= ratio < 1:  # in progress
+            if label_mode:
                 label = self.label_fmt % (ratio * 100)
             if self.oob_error:  # now fixed, reset
                 self._first = self.styles[_if](self.icons[_if])
                 self._last = self.styles[_il](self.icons[_il])
-                self.oob_error = False
                 self._comp_style = self.styles[_ic]
+                self.oob_error = False
                 self.done = False
         else:
-            if ratio == 1:
+            if ratio == 1:  # done
                 self.done = True
                 self._comp_style = self.styles[_id]
                 self._last = self.styles[_if](self.icons[_il])
-                if self.label_mode:
-                    label = '✓' if self.unicode_support else '+'
+                if label_mode:
+                    label = self.icons[_id]
                 if self.oob_error:  # now fixed, reset
                     self._first = self.styles[_if](self.icons[_if])
                     self.oob_error = False
 
+            # error - out of bounds :-/
             elif ratio > 1:
                 self.done = True
                 self.oob_error = True
-                if self.unicode_support:
-                    self._last = self._err_style('⏵')
-                    if self.label_mode:
-                        label = '✗'
-                else:
-                    self._last = self._err_style('>')
-                    if self.label_mode:
-                        label = 'ERR'
+                self._last = self._err_style(self.icons[_ieh])
+                if label_mode and not label_mode == 'internal':
+                    label = self._err_style(self.icons[_ieb])
             else:  # < 0
                 self.oob_error = True
-                if self.unicode_support:
-                    self._first = self._err_style('⏴')
-                    if self.label_mode:
-                        label = '✗'
-                else:
-                    self._first = self._err_style('<')
-                    if self.label_mode:
-                        label = 'ERR'
+                self._first = self._err_style(self.icons[_iel])
+                if label_mode and not label_mode == 'internal':
+                    label = self._err_style(self.icons[_ieb])
         self._lbl = label
 
     def _render(self):
@@ -387,7 +383,8 @@ if __name__ == '__main__':
     ProgressBar.label_mode = '-l' in sys.argv
 
     bars = [
-        ('basic',       ProgressBar(theme='basic', clear_left=1, expand=True)),
+        ('basic, expanded:\n',
+                        ProgressBar(theme='basic', clear_left=1, expand=True)),
         ('basic clr',   ProgressBar(theme='basic_color')),
         ('* default',   ProgressBar()),
         ('shaded',      ProgressBar(theme='shaded')),
@@ -397,7 +394,8 @@ if __name__ == '__main__':
         ('hvy-metal',   ProgressBar(theme='heavy_metal')),
         ('segmented',   ProgressBar(icons='segmented')),
         ('triangles',   ProgressBar(theme='shaded', icons='triangles')),
-        ('solid',       ProgressBar(theme='solid', clear_left=True, expand=True)),
+        ('solid, expanded:\n',
+                        ProgressBar(theme='solid', clear_left=True, expand=True)),
         ('solid mono',  ProgressBar(theme='solid', styles='amber_mono')),
 
         ('partial',     HiDefProgressBar(styles='greyen')),
@@ -406,9 +404,8 @@ if __name__ == '__main__':
                                          partial_char_extra_style=None)),
     ]
 
-    from console.utils import cls
-
     # print each in progress
+    from console.utils import cls
     cls()
     with sc.hidden_cursor():
         try:
