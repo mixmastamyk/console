@@ -161,6 +161,8 @@ one may create palette builder objects yourself:
 Palette Downgrade
 ----------------------
 
+    *Get down, boogie oogie oogie…—A Taste of Honey*
+
 When using true or extended colors on a terminal that is not configured to
 support it,
 console will "downgrade" the colors to their nearest neighbors in the available
@@ -191,7 +193,7 @@ it doesn't seem worth the trouble for this application.
 Context Managers
 -------------------
 
-    *"I hope you know this violates my warranty!" — Twiki*
+    *"I hope you know this violates my warranty!"—Twiki*
 
 .. rubric:: Configuring Output
 
@@ -282,8 +284,6 @@ And off you go.
 Screen Stuff
 -------------------
 
-    *What's Happening, "Raj" !?!*
-
 The :mod:`console.screen` module is the one you're looking for,
 although there is a preconfigured convenience instance in the root of the
 package as well::
@@ -300,6 +300,8 @@ package as well::
 
 Progress Bars
 -------------------
+
+    *What's Happening, "Raj" !?!*
 
 A progress bar implementation is located in :mod:`console.progress` and may be
 demoed thusly:
@@ -359,20 +361,19 @@ Some examples:
 
 (Windows console has very limited Unicode font support unfortunately,
 though Lucida Console seems a bit more comprehensive than Consolas.
-So it defaults to an ASCII representation.)
+It defaults to an ASCII representation in that environment.)
 
 A more robust use of the module is detailed below::
 
     import time  # demo purposes only
 
     from console.screen import sc
-    from console.utils import clear_line
     from console.progress import ProgressBar
 
     with sc.hidden_cursor():
         bar = ProgressBar(clear_left=True)
 
-        for i in range(0, 101):
+        for i in range(0, 101):  # "Hey HEY, hey!"
             print(bar(i), flush=True, end='')
             time.sleep(.2)
         print()
@@ -385,8 +386,44 @@ To expand to the full line,
 See the source for more details.
 
 
+Environment Variables
+-----------------------
+
+The following standard variables are noted by ``console`` and affect its
+behavior:
+
+Operating System:
+
+    - ``TERM``, basic category of terminal, more info is often needed.
+    - ``SSH_CLIENT``, when remote, downgrade to simple support
+    - ``LANG``, is Unicode available?
+
+Color-specific:
+
+    - ``CLICOLOR``, 1/0 - Enable or disable ANSI sequences if on a tty
+    - ``CLICOLOR_FORCE`` - Force it on anyway
+    - ``COLORTERM`` - "truecolor" or "24bit" support
+    - ``NO_COLOR`` - None, dammit!
+    - ``COLORFGBG`` - Light or dark background?
+
+Windows:
+
+    - ``ANSICON``, shim to render ANSI on older Windows is available.
+
+MacOS:
+
+    - ``TERM_PROGRAM``, more specific program information
+
+Console itself:
+
+    - PY_CONSOLE_AUTODETECT, Enable or disable the detection routines
+
+
 Tips
 ------------
+
+    *"But I took them away from all that, and now they work for me.
+    My name is Charlie."*
 
 - The styles bold, italic, underline, and strike have one-letter shortcuts as
   they do in HTML,
@@ -415,6 +452,8 @@ Tips
 
 Troubleshooting
 ------------------
+
+    *"After an accidental overdose of gamma radiation…"*
 
 - Console performs auto-detection of the environment at startup to determine
   terminal capabilities.
@@ -461,11 +500,30 @@ Troubleshooting
     pal.style2(msg, pal.style1)
 
 
+- If console isn't working as you'd expect,
+  turn on DEBUG logging before loading it to see what it finds.
+  A sample script is below::
+
+    # load logging first to see all messages:
+    import logging
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='  %(levelname)-7.7s %(module)s/%(funcName)s:%(lineno)s '
+               '%(message)s'
+    )
+
+    from console import fg, bg, fx
+
+    dr_banner = fg.green + fx.bold
+
+    print('\n\t', dr_banner('--> Mr. McGee, don\'t make me angry… <--'))
+    print()
+
 
 Deeper Dive
 ------------
 
-    *Get down, boogie oogie oogie…---A Taste of Honey*
+    *"I'm so confused."—'Vinnie' Barbarino*
 
 Still interested?
 More than you wanted to know on the subject of terminals and escape codes can
@@ -530,7 +588,7 @@ Interesting knowledge rediscovered perhaps.
 
 |
 
-Signing off from the '79,
+Signing off from late '79,
 a new futuristic decade awaits!
 
     - *Keep On Truckin'*

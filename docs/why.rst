@@ -11,10 +11,12 @@
 
 .. container:: center
 
-    *"First I was afraid, I was petrified…"*
+    | *"In your satin tights,*
+    | *fighting for your rights,*
+    | *and the old red, white and blue…"*
+    | *—Wonder Woman*
 
 |
-
 
 Another One, eh 🤔?
 =======================
@@ -49,7 +51,7 @@ So ANSI escape codes have been standard on UNIX
 with the belt-and-suspenders crowd for several decades,
 and even saw use on DOS and BBSs back in the day.
 With the advent of macOS X,
-a whole new generation of lumber-sexuals have exposed themselves(?)
+a whole new generation of lumber-sexuals have also exposed themselves(?)
 to the terminal environment and command-line
 *and liked it*.
 
@@ -57,6 +59,7 @@ to the terminal environment and command-line
 "I'm a PC"
 ~~~~~~~~~~~~~~
 
+Not on Windows NT however.
 With recent versions of Windows 10
 the Ballmer/Suit barrier was finally breached,
 allowing *multi-decade-late*
@@ -83,13 +86,12 @@ We need great command-line tools and that's where ``console`` fits in.
     :align: center
     :figwidth: 60%
 
-    The Sunshine Band on Soul Train
-
-
-(Cue
-`KC and the Sunshine Band,
-<https://www.youtube.com/watch?v=OM7zRfHG0no>`_
-*uhh-huh, uhh-huh*)
+    (Cue
+    `KC and the Sunshine Band,
+    <https://www.youtube.com/watch?v=OM7zRfHG0no>`_
+    *uhh-huh, uhh-huh*
+    on
+    Soul Train…)
 
 
 Batteries Not Included
@@ -147,6 +149,8 @@ Looks to be a fun exercise and somewhat of a rite of passage to create one.
 Often Missing
 ~~~~~~~~~~~~~~~
 
+    *"First I was afraid, I was petrified…"—Gloria Gaynor*
+
 While many of the ANSI modules in the cheeseshop have plenty going for them in
 areas of focus,
 they generally aren't very comprehensive──\
@@ -178,17 +182,20 @@ one or more important items are often missing:
 Nice to haves
 ~~~~~~~~~~~~~~~~~
 
+.. container:: center
+
     | *"You've got to, know when to hold 'em,*
     | *know when to fold 'em…"*
+    | *—Kenny Rogers*
 
-Most have an easy to use design,
+Most are relatively easy to use,
 but may still miss one of these nice to haves:
 
     - Composable objects
     - Concise names
 
         - Avoidance of capital, mixed, or camel-case names on instances.
-        - Avoidance of punctuation requirements, parens, brackets, quotes, etc.
+        - Avoidance of extra punctuation, parens, brackets, quotes, etc.
 
 
 .. rubric:: Result
