@@ -203,7 +203,7 @@ class ProgressBar:
             else:
                 setattr(self, key, val)
 
-        padding = len(self.icons[_if]) + len(self.icons[-1])
+        padding = len(self.icons[_if]) + len(self.icons[_il])
         if self.width < self.min_width:
             self.width = self.min_width
         self.iwidth = self.width - padding  # internal width

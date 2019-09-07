@@ -96,7 +96,7 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
 
     proximity.build_color_tables(pal)
     log.debug('Basic palette: %r', pal)
-    log.debug('%r', result)
+    log.debug('%r is available', result)
     return result
 
 

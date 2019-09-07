@@ -656,7 +656,6 @@ if True:  # fold
     def test_progress_ascii():
 
         pb = ProgressBar(theme='basic', width=32)
-        raise RuntimeError(repr(str(pb(-7))))
         assert str(pb(-7))  == '<------------------------------] ERR'
         assert str(pb(0))   == '[------------------------------]  0%'
         assert str(pb(55))  == '[################--------------] 55%'
