@@ -5,11 +5,14 @@
 
     Experimental Progress Bar functionality.
 
+    A demo is available via command-line::
+
+        ▶ python3 -m console.progress [-l] [-d]  # label and debug modes
+
     TODO:
-        - move status icons to theme, see line 290
-        - docstrings
+        - include label in width calc  :-/
         - gradients/rainbar
-        - tests
+        - additional tests
 '''
 import time
 
@@ -19,8 +22,8 @@ from console.utils import clear_line, len_stripped
 from console.detection import (detect_unicode_support, get_available_palettes,
                                get_size, os_name)
 
-TIMEDELTA_1 = 60    # seconds
-TIMEDELTA_2 = 300
+# accuracy thresholds, in seconds
+TIMEDELTAS = (60, 300)  # one, five minutes
 
 # Theme-ing info:
 icons = dict(
@@ -45,7 +48,7 @@ icons = dict(
 _if, _ic, _ie, _il, _id, _iel, _ieh, _ieb = range(8)
 
 
-# default styles
+# styles
 _dim_green = fx.dim + fg.green
 _err_color = fg.lightred
 styles = dict(
@@ -116,7 +119,7 @@ styles = dict(
                   ),
 )
 
-# TODO: not sure if this is useful
+# figure default styles
 unicode_support = detect_unicode_support()
 icons['default']  = icons['ascii']
 if os_name == 'nt':  # default to ascii on Windows
@@ -124,7 +127,6 @@ if os_name == 'nt':  # default to ascii on Windows
 elif unicode_support:
     icons['default']  = icons['blocks']
 
-# TODO: choose 256 color
 _pals = get_available_palettes(_CHOSEN_PALETTE)
 if _pals and 'extended' in _pals:
     styles['default'] = styles['ocean8']
@@ -138,44 +140,76 @@ themes = dict(
     basic = dict(icons='ascii', styles='dumb'),
     dies = dict(icons='dies', styles='simple'),
     heavy_metal = dict(icons='horns', styles='reds'),
-    normal = dict(icons='ascii', styles='default'),
     shaded = dict(icons='shaded', styles='ocean'),
     solid = dict(icons='spaces', styles='greyen_bg'),
     warm_shaded = dict(icons='shaded', styles='amber'),
 )
-themes['default'] = themes['normal']
+themes['default'] = themes['basic_color']
 
 
 class ProgressBar:
     ''' A stylable bar graph for displaying the current progress of task
         completion.
 
+        Example::
+
+            import time  # demo purposes only
+            from console.screen import sc
+            from console.progress import ProgressBar
+
+            with sc.hidden_cursor():
+
+                items = range(256)      # example tasks
+
+                # set total if needed
+                bar = ProgressBar(total=len(items))
+
+                for i in items:
+                    print(bar(i), flush=True, end='')
+                    time.sleep(.1)
+
+                print()
+
         Arguments:
-            width: 10 or greater
+            clear_left: False       # True to clear at 0, or non-zero int offset
+            debug: None             # Turn on debug output
+            done: False             # True on completion, moderates style
+            expand: False           # Set width to full terminal width
+            label_fmt:  '%2.0f%%'   # Precision, defaults to no decimal places
+            label_mode:  True       # Turn on label
+            oob_error:  False       # Out of bounds error occurred
+            timedelta: (60, 300)    # Thresholds to add. label precision | None
+            total:  100             # Set the total number of items
+            unicode_support: bool   # Detection result, determines default icons
+            width: 32               # Width of bar plus start/end chars, not lbl
+
+        Theming Arguments:
+            icons:  (,,,)           # Tuple of chars
+            styles: (,,,)           # Tuple of ANSI styles
+            theme: 'name'           # String name of combined icon & style set
     '''
-    complete = 0
-    clear_left = False      # true to clear at 0, non-zero int for offset
     debug = None
     done = False
-    oob_error = False  # out of bounds
+    expand = False
     label_fmt = '%2.0f%%'
     label_mode = True
-    min_width = 12
-    remainder = 0
-    timedelta1 = TIMEDELTA_1
-    timedelta2 = TIMEDELTA_2
+    oob_error = False
+    timedelta = TIMEDELTAS
     total = 100
     unicode_support = unicode_support
     width = 32
-    _num_complete_chars = 0
 
     theme = 'default'
     icons = icons[theme]
     styles = styles[theme]
 
-    def __init__(self, **kwargs):
-        self.start = time.time()  # dynamic label fmt, set to None to disable
+    _clear_left = True
+    _min_width = 12
+    _num_complete_chars = 0
+    _remainder = 0
 
+    def __init__(self, **kwargs):
+        # configure instance
         for key, val in kwargs.items():
             if key == 'theme':
                 self.icons = icons[themes[val]['icons']]
@@ -190,31 +224,31 @@ class ProgressBar:
                     self.unicode_support = False
             elif key == 'styles':
                 self.styles = styles[val]
-            elif key == 'expand':
+            elif key == 'expand' and val:
                 width = get_size()[0]
                 if self.label_mode != 'internal':
-                    width -= len(self.label_fmt)
+                    width -= len(self.label_fmt % 100)
                 self.width = width
-            elif key == 'clear_left':  # convert to sequence
-                if val is True:
-                    val = 0
-                if type(val) is int:
-                    self.clear_left = f'{clear_line(1)}{sc.mv_x(val)}'
+                self.expand = val
             else:
                 setattr(self, key, val)
 
-        padding = len(self.icons[_if]) + len(self.icons[_il])
-        if self.width < self.min_width:
-            self.width = self.min_width
-        self.iwidth = self.width - padding  # internal width
+        _icons = self.icons
+        padding = len(_icons[_if]) + len(_icons[_il])
+        if self.width < self._min_width:
+            self.width = self._min_width
+        self.iwidth = self.width - padding      # internal width
 
         # configure styles
         _styles = self.styles
-        self._first = _styles[_if](self.icons[_if])
+        self._first = _styles[_if](_icons[_if])
         self._comp_style = _styles[_ic]
         self._empt_style = _styles[_ie]
-        self._last = _styles[_il](self.icons[_il])
+        self._last = _styles[_il](_icons[_il])
         self._err_style = _styles[_iel]
+
+        # dynamic label fmt, set to None to disable
+        self._start = time.time()
 
     def __str__(self):
         ''' Renders the current state as a string. '''
@@ -222,7 +256,7 @@ class ProgressBar:
             return self._cached_str
 
         # shall we clear the line to the left?
-        pieces = [self.clear_left if self.clear_left else '']
+        pieces = [self._clear_left if self._clear_left else '']
 
         if self.label_mode == 'internal':  # solid theme
             pieces.append(self._render_internal_label())
@@ -232,13 +266,16 @@ class ProgressBar:
         self._cached_str = rendered = ''.join(pieces)
         if self.debug:
             pieces.append(
-                f'r:{self.ratio:5.2f} ncc:{self._num_complete_chars:2d} '
-                f'rm:{self.remainder!r} '
+                f' r:{self.ratio:5.2f} ncc:{self._num_complete_chars:2d} '
+                f'rm:{self._remainder!r} '
                 f'nec:{self._num_empty_chars:2d} '
                 f'l:{len_stripped(rendered)}'
             )
             self._cached_str = rendered = ''.join(pieces)  # again :-/
         return rendered
+
+    def __repr__(self):
+        return repr(self.__str__())
 
     def __call__(self, complete):
         ''' Sets the value of the bar graph. '''
@@ -248,10 +285,10 @@ class ProgressBar:
         # find num complete and empty chars
         ncc = self._get_ncc(self.iwidth, ratio)  # for overriding
         if ncc < 0:  # restrict from 0 to iwidth
-            ncc = self.remainder = 0
+            ncc = self._remainder = 0
         if ncc > self.iwidth:
             ncc = self.iwidth
-            self.remainder = 0
+            self._remainder = 0
         self._num_complete_chars = ncc
         self._num_empty_chars = self.iwidth - ncc
 
@@ -263,16 +300,35 @@ class ProgressBar:
         ''' Get the number of completed whole characters. '''
         return round(self.iwidth * ratio)
 
+    @property
+    def clear_left(self):
+        return self._clear_left
+
+    @clear_left.setter
+    def clear_left(self, value):
+        ''' Converts a given integer to an escape sequence. '''
+        if value is True:
+            value = 0
+        if type(value) is int:
+            self._clear_left = f'{clear_line(1)}{sc.mv_x(value)}'
+        elif type(value) in (bool, type(None)):
+            self._clear_left = value
+        else:
+            raise TypeError('type %s not valid.' % type(value))
+
     def _update_status(self):
         ''' Check bounds for errors and update label accordingly. '''
+        # figure label
         label = ''
         label_mode = self.label_mode
-        # label format, based on time - when slow, go to higher-res display
-        delta = time.time() - self.start
-        if delta > self.timedelta2:
-            self.label_fmt = '%5.2f%%'
-        elif delta > self.timedelta1:
-            self.label_fmt = '%4.1f%%'
+
+        # change label fmt based on time - when slow, go to higher-res display
+        if self.timedelta:
+            delta = time.time() - self._start
+            if delta > self.timedelta[1]:
+                self.label_fmt = '%5.2f%%'
+            elif delta > self.timedelta[0]:
+                self.label_fmt = '%4.1f%%'
 
         ratio = self.ratio
         if 0 <= ratio < 1:  # in progress
@@ -331,11 +387,11 @@ class HiDefProgressBar(ProgressBar):
         Most useful in constrained environments, i.e. a small terminal window.
 
         Arguments:
-            width: 7 or greater
+            width: 8 or greater
             partial_chars - sequence of characters to show progress
     '''
     icons = icons['segmented']
-    min_width = 7
+    min_width = 8
     partial_chars = ('░', '▏', '▎', '▍', '▌', '▋', '▊', '▉')
     partial_chars_len = len(partial_chars)
     # matching bg helps partial char look a bit more natural:
@@ -349,16 +405,16 @@ class HiDefProgressBar(ProgressBar):
     def _get_ncc(self, width, ratio):
         ''' Get the number of complete chars.
 
-            This one figures the remainder for the partial char as well.
+            This one figures the _remainder for the partial char as well.
         '''
         sub_chars = round(width * ratio * self.partial_chars_len)
-        ncc, self.remainder = divmod(sub_chars, self.partial_chars_len)
+        ncc, self._remainder = divmod(sub_chars, self.partial_chars_len)
         return ncc
 
     def _render(self):
         ''' figure partial character '''
         p_char = ''
-        if not self.done and self.remainder:
+        if not self.done and self._remainder:
             p_style = self._comp_style
             if self.partial_char_extra_style:
                 if p_style is str:
@@ -366,7 +422,7 @@ class HiDefProgressBar(ProgressBar):
                 else:
                     p_style = p_style + self.partial_char_extra_style
 
-            p_char = p_style(self.partial_chars[self.remainder])
+            p_char = p_style(self.partial_chars[self._remainder])
             self._num_empty_chars -= 1
 
         cm_chars = self._comp_style(self.icons[_ic] * self._num_complete_chars)
@@ -381,43 +437,46 @@ if __name__ == '__main__':
     # set defaults
     ProgressBar.debug = '-d' in sys.argv
     ProgressBar.label_mode = '-l' in sys.argv
+    ProgressBar._clear_left = False  # class default
 
     bars = [
         ('basic, expanded:\n',
-                        ProgressBar(theme='basic', clear_left=1, expand=True)),
-        ('basic clr',   ProgressBar(theme='basic_color')),
-        ('* default',   ProgressBar()),
-        ('shaded',      ProgressBar(theme='shaded')),
-        ('warm-shaded', ProgressBar(theme='warm_shaded')),
-        ('faces',       ProgressBar(theme='shaded', icons='faces')),
-        #~ # ('wide faces',  ProgressBar(style='simple', icons='wide_faces')),
-        ('hvy-metal',   ProgressBar(theme='heavy_metal')),
-        ('segmented',   ProgressBar(icons='segmented')),
-        ('triangles',   ProgressBar(theme='shaded', icons='triangles')),
+                            ProgressBar(theme='basic', expand=True)),
+        ('basic clr:',      ProgressBar(theme='basic_color')),
+        ('* default:',      ProgressBar()),
+        ('shaded:',         ProgressBar(theme='shaded')),
+        ('bullets:',        ProgressBar(icons='bullets', style='ocean8')),
+        ('warm-shaded:',    ProgressBar(theme='warm_shaded')),
+        ('faces:',          ProgressBar(theme='shaded', icons='faces')),
+        # ('wide faces:',     ProgressBar(style='simple', icons='wide_faces')),
+        ('hvy-metal:',      ProgressBar(theme='heavy_metal')),
+        ('segmented:',      ProgressBar(icons='segmented')),
+        ('triangles:',      ProgressBar(theme='shaded', icons='triangles')),
         ('solid, expanded:\n',
-                        ProgressBar(theme='solid', clear_left=True, expand=True)),
-        ('solid mono',  ProgressBar(theme='solid', styles='amber_mono')),
+                            ProgressBar(theme='solid', expand=True)),
+        ('solid mono:',     ProgressBar(theme='solid', styles='amber_mono')),
 
-        ('partial',     HiDefProgressBar(styles='greyen')),
-        ('dies',        HiDefProgressBar(theme='dies',
-                                         partial_chars='⚀⚁⚂⚃⚄⚅',
-                                         partial_char_extra_style=None)),
+        ('high-def:',       HiDefProgressBar(styles='greyen')),
+        ('dies:',           HiDefProgressBar(theme='dies', # clear_left=4,
+                                             partial_chars='⚀⚁⚂⚃⚄⚅',
+                                             partial_char_extra_style=None)),
     ]
 
     # print each in progress
     from console.utils import cls
     cls()
+
     with sc.hidden_cursor():
         try:
             for i in range(0, 101):
                 print()
                 for label, bar in bars:
-                    print(f'  {label + ":":12}', bar(i))
+                    print(f' {label:12}', bar(i), sep='')
 
-                time.sleep(.2)
+                time.sleep(.1)
                 if i != 100:
                     cls()
-            time.sleep(1)
+            time.sleep(2)
         except KeyboardInterrupt:
             pass
 
@@ -432,8 +491,11 @@ if __name__ == '__main__':
             bar._last = bar.styles[_il](bar.icons[_il])
             bar.label_fmt = ProgressBar.label_fmt
 
-        print(label + ':')
+        print(label)
         #~ # for complete in (-2, 0, 51, 100, 150, 84, 100):
-        for complete in (-2, 0, 51, 100, 150):
-            print(' ', bar(complete))
+        for complete in (-2, 0, 51, 100, 155):
+            if bar.expand:
+                print(bar(complete))
+            else:
+                print(' ', bar(complete))
         print()

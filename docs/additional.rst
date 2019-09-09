@@ -343,9 +343,9 @@ Some examples:
 
 .. code-block:: python
 
-    ProgressBar(theme='basic')
-    ProgressBar(theme='basic_color')  # default for Windows console
-    ProgressBar(theme='shaded')
+    ProgressBar(theme='basic')          # ASCII
+    ProgressBar(theme='basic_color')    # default for Windows console
+    ProgressBar(theme='shaded')         # Unicode ← ↓
     ProgressBar(theme='warm_shaded')
     ProgressBar(theme='shaded', icons='faces')
     ProgressBar(theme='heavy_metal')
@@ -365,17 +365,19 @@ It defaults to an ASCII representation in that environment.)
 
 A more robust use of the module is detailed below::
 
-    import time  # demo purposes only
-
+    import time
     from console.screen import sc
     from console.progress import ProgressBar
 
     with sc.hidden_cursor():
-        bar = ProgressBar(clear_left=True)
 
-        for i in range(0, 101):  # "Hey HEY, hey!"
+        # example tasks, and set total if needed:
+        items = range(256)
+        bar = ProgressBar(total=len(items))
+
+        for i in items:         # "Hey HEY, hey!"
             print(bar(i), flush=True, end='')
-            time.sleep(.2)
+            time.sleep(.1)      # do work here
         print()
 
 Not all of this code is required, of course.
