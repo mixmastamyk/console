@@ -10,6 +10,7 @@
         ▶ python3 -m console.progress [-l] [-d]  # label and debug modes
 
     TODO:
+
         - include label in width calc  :-/
         - gradients/rainbar
         - additional tests
@@ -238,6 +239,8 @@ class ProgressBar:
         if self.width < self._min_width:
             self.width = self._min_width
         self.iwidth = self.width - padding      # internal width
+        if self._clear_left is True:
+            self.clear_left = self._clear_left  # render
 
         # configure styles
         _styles = self.styles

@@ -655,7 +655,7 @@ if True:  # fold
 
     def test_progress_ascii():
 
-        pb = ProgressBar(theme='basic', width=32)
+        pb = ProgressBar(clear_left=False, theme='basic', width=32)
         assert str(pb(-7))  == '<------------------------------] ERR'
         assert str(pb(0))   == '[------------------------------]  0%'
         assert str(pb(55))  == '[################--------------] 55%'

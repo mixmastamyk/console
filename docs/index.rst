@@ -91,3 +91,4 @@ Contents
 
 
 * :ref:`genindex`
+* Package docs: :mod:`console`
