@@ -35,7 +35,7 @@
 
     *faster…"*
 
-    (visit at `youtube instead. <https://youtu.be/0CPJ-AbCsT8?t=22>`_ 😔)
+    (visit at `youtube instead.¹ <https://youtu.be/0CPJ-AbCsT8?t=22>`_ 😔)
 
 
 |
@@ -50,6 +50,7 @@ Contents
     why
     additional
 
+.. ~ Modules <modules.rst>
 
 |
 |
@@ -85,10 +86,11 @@ Contents
 
 .. container:: center mt mb
 
-    (visit at `youtube instead. <https://youtu.be/DBj5ZdTpU_4?start=06>`_ 😔)
+    (visit at `youtube instead.² <https://youtu.be/DBj5ZdTpU_4?start=06>`_ 😔)
 
     .. ~ src="https://www.youtube-nocookie.com/embed/4Wd6IuVya4M?start=01"
 
 
 * :ref:`genindex`
-* Package docs: :mod:`console`
+* :ref:`modindex`
+* :ref:`search`
