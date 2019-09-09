@@ -144,7 +144,7 @@ if desired.
 
 To configure auto-detection, palette support,
 or detect other output streams besides stdout,
-one may create palette builder objects yourself:
+one may build palette objects yourself:
 
 .. code-block:: shell
 
