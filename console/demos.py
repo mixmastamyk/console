@@ -132,19 +132,19 @@ def run():
     from console.progress import ProgressBar, HiDefProgressBar
 
     print()
-    pb = ProgressBar(clear_left=False, label=True)
+    pb = ProgressBar(clear_left=False, label=True, width=36)
     print('    ', pb(0), end='')
     print('  ', pb(45), end='')
     print('  ', pb(100))
     print()
 
-    pb = ProgressBar(clear_left=False, theme='solid')
+    pb = ProgressBar(clear_left=False, theme='solid', width=32)
     print('    ', pb(0), end='')
     print('      ', pb(50), end='')
     print('      ', pb(100))
     print()
 
-    pb = HiDefProgressBar(clear_left=False, styles='greyen')
+    pb = HiDefProgressBar(clear_left=False, styles='greyen', width=36)
     print('    ', pb(0), end='')
     print('  ', pb(55), end='')
     print('  ', pb(100))

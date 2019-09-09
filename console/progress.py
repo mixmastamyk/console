@@ -11,7 +11,7 @@
 
     TODO:
 
-        - include label in width calc  :-/
+        - performance
         - gradients/rainbar
         - additional tests
 '''
@@ -25,6 +25,7 @@ from console.detection import (detect_unicode_support, get_available_palettes,
 
 # accuracy thresholds, in seconds
 TIMEDELTAS = (60, 300)  # one, five minutes
+MIN_WIDTH = 12
 
 # Theme-ing info:
 icons = dict(
@@ -33,11 +34,11 @@ icons = dict(
     blocks      = (' ', '▮', '▯', ' ', '✓', '⏴', '⏵', '✗'),
     # empty white bullet wrong size, breaks alignment:
     bullets     = (' ', '•', '•', ' ', '✓', '⏴', '⏵', '✗'),
-    dies        = (' ', '⚅', '⚀', ' ', '✓', '⏴', '⏵', '✗'),
+    dies        = (' ', '⚅', '⚀', '', '✓', '⏴', '⏵', '✗'),
     horns       = ('🤘', '⛧', '⛤', '🤘', '✓', '⏴', '⏵', '✗'),
-    segmented   = ('▕', '▉', '▉', '▏', '✓', '⏴', '⏵', '✗'),
-    faces       = (' ', '☻', '☹', ' ', '✓', '⏴', '⏵', '✗'),
-    wide_faces  = (' ', '😎', '😞', ' ', '✓', '⏴', '⏵', '✗'),
+    segmented   = ('▕', '▉', '▉', '▏', '✓', '⏴', '⏵', '✗ '),
+    faces       = (' ', '☻', '☹', '', '✓', '⏴', '⏵', '✗'),
+    wide_faces  = (' ', '😎', '😞', '', '✓', '⏴', '⏵', '✗'),
     stars       = ('(', '★', '☆', ')', '✓', '⏴', '⏵', '✗'),
     shaded      = ('▕', '▓', '░', '▏', '✓', '⏴', '⏵', '✗'),
     triangles   = ('▕', '▶', '◁', '▏', '✓', '⏴', '⏵', '✗'),
@@ -180,7 +181,7 @@ class ProgressBar:
             timedelta: (60, 300)    # Thresholds to add. label precision | None
             total:  100             # Set the total number of items
             unicode_support: bool   # Detection result, determines default icons
-            width: 32               # Width of bar plus start/end chars, not lbl
+            width: 32               # Full width of bar, padding, and labels
 
         Theming Arguments:
             icons:  (,,,)           # Tuple of chars
@@ -190,7 +191,8 @@ class ProgressBar:
     debug = None
     done = False
     expand = False
-    label_fmt = '%2.0f%%'
+    label_fmt = '%3.0f%%'
+    label_fmt_str = '%4s'
     label_mode = True
     oob_error = False
     timedelta = TIMEDELTAS
@@ -203,7 +205,7 @@ class ProgressBar:
     styles = styles[theme]
 
     _clear_left = True
-    _min_width = 12
+    _min_width = MIN_WIDTH
     _num_complete_chars = 0
     _remainder = 0
 
@@ -224,19 +226,19 @@ class ProgressBar:
             elif key == 'styles':
                 self.styles = styles[val]
             elif key == 'expand' and val:
-                width = get_size()[0]
-                if self.label_mode != 'internal':
-                    width -= len(self.label_fmt % 100)
-                self.width = width
+                self.width = get_size()[0]
                 self.expand = val
             else:
                 setattr(self, key, val)
 
+        # figure widths
         _icons = self.icons
-        padding = len(_icons[_if]) + len(_icons[_il])
         if self.width < self._min_width:
             self.width = self._min_width
-        self.iwidth = self.width - padding      # internal width
+        # padding: first, last bookends
+        self.padding = len(_icons[_if]) + len(_icons[_il])
+        # save bar width
+        self._bwidth = self._bwidth_orig = (self.width - self.padding)
         if self._clear_left is True:
             self.clear_left = self._clear_left  # render
 
@@ -259,15 +261,15 @@ class ProgressBar:
         # shall we clear the line to the left?
         pieces = [self._clear_left if self._clear_left else '']
 
-        if self.label_mode == 'internal':  # solid theme
-            pieces.append(self._render_internal_label())
+        if self.label_mode and self.label_mode == 'internal':  # solid theme
+            pieces.append(self._render_with_internal_label())
         else:
             pieces.append(self._render())
 
         self._cached_str = rendered = ''.join(pieces)
         if self.debug:
             pieces.append(
-                f' r:{self.ratio:5.2f} ncc:{self._num_complete_chars:2d} '
+                f'⇱ r:{self.ratio:5.2f} ncc:{self._num_complete_chars:2d} '
                 f'rm:{self._remainder!r} '
                 f'nec:{self._num_empty_chars:2d} '
                 f'l:{len_stripped(rendered)}'
@@ -282,24 +284,24 @@ class ProgressBar:
         ''' Sets the value of the bar graph. '''
         # convert ints to float from 0…1 per-one-tage
         self.ratio = ratio = complete / self.total
+        self._update_status(ratio)
 
         # find num complete and empty chars
-        ncc = self._get_ncc(self.iwidth, ratio)  # for overriding
-        if ncc < 0:  # restrict from 0 to iwidth
+        ncc = self._get_ncc(self._bwidth, ratio)  # for overriding
+        if ncc < 0:  # restrict from 0 to _bwidth
             ncc = self._remainder = 0
-        if ncc > self.iwidth:
-            ncc = self.iwidth
+        if ncc > self._bwidth:
+            ncc = self._bwidth
             self._remainder = 0
         self._num_complete_chars = ncc
-        self._num_empty_chars = self.iwidth - ncc
+        self._num_empty_chars = self._bwidth - ncc
 
-        self._update_status()
         self._cached_str = None  # clear cache
         return self
 
     def _get_ncc(self, width, ratio):
         ''' Get the number of completed whole characters. '''
-        return round(self.iwidth * ratio)
+        return round(self._bwidth * ratio)
 
     @property
     def clear_left(self):
@@ -317,10 +319,10 @@ class ProgressBar:
         else:
             raise TypeError('type %s not valid.' % type(value))
 
-    def _update_status(self):
+    def _update_status(self, ratio):
         ''' Check bounds for errors and update label accordingly. '''
         # figure label
-        label = ''
+        label = label_unstyled = ''
         label_mode = self.label_mode
 
         # change label fmt based on time - when slow, go to higher-res display
@@ -331,7 +333,6 @@ class ProgressBar:
             elif delta > self.timedelta[0]:
                 self.label_fmt = '%4.1f%%'
 
-        ratio = self.ratio
         if 0 <= ratio < 1:  # in progress
             if label_mode:
                 label = self.label_fmt % (ratio * 100)
@@ -347,7 +348,7 @@ class ProgressBar:
                 self._comp_style = self.styles[_id]
                 self._last = self.styles[_if](self.icons[_il])
                 if label_mode:
-                    label = self.icons[_id]
+                    label = self.label_fmt_str % self.icons[_id]
                 if self.oob_error:  # now fixed, reset
                     self._first = self.styles[_if](self.icons[_if])
                     self.oob_error = False
@@ -358,24 +359,30 @@ class ProgressBar:
                 self.oob_error = True
                 self._last = self._err_style(self.icons[_ieh])
                 if label_mode and not label_mode == 'internal':
-                    label = self._err_style(self.icons[_ieb])
+                    label_unstyled = self.label_fmt_str % self.icons[_ieb]
+                    label = self._err_style(label_unstyled)
             else:  # < 0
                 self.oob_error = True
                 self._first = self._err_style(self.icons[_iel])
                 if label_mode and not label_mode == 'internal':
-                    label = self._err_style(self.icons[_ieb])
+                    label_unstyled = self.label_fmt_str % self.icons[_ieb]
+                    label = self._err_style(label_unstyled)
+
         self._lbl = label
+        # dynamic resizing of the bar, depending on label length:
+        if label and label_mode != 'internal':
+            self._bwidth = self._bwidth_orig - len(label_unstyled or label)
 
     def _render(self):
         ''' Standard rendering of bar graph. '''
         cm_chars = self._comp_style(self.icons[_ic] * self._num_complete_chars)
         em_chars = self._empt_style(self.icons[_ie] * self._num_empty_chars)
-        return f'{self._first}{cm_chars}{em_chars}{self._last} {self._lbl}'
+        return f'{self._first}{cm_chars}{em_chars}{self._last}{self._lbl}'
 
-    def _render_internal_label(self):
+    def _render_with_internal_label(self):
         ''' Render with a label inside the bar graph. '''
         ncc = self._num_complete_chars
-        bar = self._lbl.center(self.iwidth)
+        bar = self._lbl.center(self._bwidth)
         cm_chars = self._comp_style(bar[:ncc])
         em_chars = self._empt_style(bar[ncc:])
         return f'{self._first}{cm_chars}{em_chars}{self._last}'
@@ -385,7 +392,8 @@ class HiDefProgressBar(ProgressBar):
     ''' A ProgressBar with increased, sub-character cell resolution,
         approx 8x.
 
-        Most useful in constrained environments, i.e. a small terminal window.
+        Most useful in constrained environments (a small terminal window)
+        and/or long-running tasks.
 
         Arguments:
             width: 8 or greater
@@ -428,7 +436,7 @@ class HiDefProgressBar(ProgressBar):
 
         cm_chars = self._comp_style(self.icons[_ic] * self._num_complete_chars)
         em_chars = self._empt_style(self.icons[_ie] * self._num_empty_chars)
-        return f'{self._first}{cm_chars}{p_char}{em_chars}{self._last} {self._lbl}'
+        return f'{self._first}{cm_chars}{p_char}{em_chars}{self._last}{self._lbl}'
 
 
 if __name__ == '__main__':
