@@ -161,9 +161,7 @@ class ProgressBar:
             with sc.hidden_cursor():
 
                 items = range(256)      # example tasks
-
-                # set total if needed
-                bar = ProgressBar(total=len(items))
+                bar = ProgressBar(total=len(items))  # set total
 
                 for i in items:
                     print(bar(i), flush=True, end='')

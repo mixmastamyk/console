@@ -1,16 +1,22 @@
 console package
 ===============
 
-Module contents
----------------
-
 .. automodule:: console
     :members:
     :undoc-members:
     :show-inheritance:
 
-Submodules
+
+Modules
 ----------
+
+console.color_tables module
+------------------------
+
+.. automodule:: console.color_tables
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 console.constants module
 ------------------------
@@ -58,6 +64,14 @@ console.disabled module
     :undoc-members:
     :show-inheritance:
 
+console.progress module
+------------------------
+
+.. automodule:: console.progress
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 console.proximity module
 ------------------------
 
@@ -82,7 +96,7 @@ console.style module
     :undoc-members:
     :show-inheritance:
 
-console.test\_suite module
+console.test_suite module
 --------------------------
 
 .. automodule:: console.test_suite

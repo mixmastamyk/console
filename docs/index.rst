@@ -50,7 +50,6 @@ Contents
     why
     additional
 
-.. ~ Modules <modules.rst>
 
 |
 |
