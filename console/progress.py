@@ -11,20 +11,18 @@
 
     TODO:
 
-        - performance
-        - gradients/rainbar
-        - additional tests
+        - Gradients/rainbar
+        - Additional tests
 '''
 import time
 
 from console import fg, bg, fx, _CHOSEN_PALETTE
 from console.screen import sc
-from console.utils import clear_line, len_stripped
+from console.utils import len_stripped
 from console.detection import (detect_unicode_support, get_available_palettes,
                                get_size, os_name)
 
-# accuracy thresholds, in seconds
-TIMEDELTAS = (60, 300)  # one, five minutes
+TIMEDELTAS = (60, 300)  # accuracy thresholds, in seconds, one and five minutes
 MIN_WIDTH = 12
 
 # Theme-ing info:
@@ -171,27 +169,31 @@ class ProgressBar:
                 print()
 
         Arguments:
-            clear_left: True        # True to clear and mv to 0, or int offset
-            debug: None             # Turn on debug output
-            done: False             # True on completion, moderates style
-            expand: False           # Set width to full terminal width
-            label_fmt:  '%2.0f%%'   # Precision, defaults to no decimal places
-            label_mode:  True       # Turn on label
-            oob_error:  False       # Out of bounds error occurred
-            timedelta: (60, 300)    # Thresholds to add. label precision | None
-            total:  100             # Set the total number of items
-            unicode_support: bool   # Detection result, determines default icons
-            width: 32               # Full width of bar, padding, and labels
+            clear_left: True        True to clear and mv to 0, or int offset
+            debug: None             Turn on debug output
+            done: False             True on completion, moderates style
+            expand: False           Set width to full terminal width
+            label_mode:  True       Turn on label
+            oob_error:  False       Out of bounds error occurred
+            timedelta: (60, 300)    Thresholds to add. label precision | None
+            total:  100             Set the total number of items
+            unicode_support: bool   Detection result, determines default icons
+            width: 32               Full width of bar, padding, and labels
+
+        Label Format:
+            label_fmt = ('%3.0f%%', '%4.1f%%', '%5.2f%%')
+                Precision—defaults to no decimal places.  After each timedelta,
+                precision is increased.
 
         Theming Arguments:
-            icons:  (,,,)           # Tuple of chars
-            styles: (,,,)           # Tuple of ANSI styles
-            theme: 'name'           # String name of combined icon & style set
+            icons:  (,,,)           Tuple of chars
+            styles: (,,,)           Tuple of ANSI styles
+            theme: 'name'           String name of combined icon & style set
     '''
     debug = None
     done = False
     expand = False
-    label_fmt = '%3.0f%%'
+    label_fmt = ('%3.0f%%', '%4.1f%%', '%5.2f%%')
     label_fmt_str = '%4s'
     label_mode = True
     oob_error = False
@@ -313,7 +315,8 @@ class ProgressBar:
         if value is True:
             value = 0
         if type(value) is int:
-            self._clear_left = f'{clear_line(1)}{sc.mv_x(value)}'
+            #~ self._clear_left = f'{clear_line(1)}{sc.mv_x(value)}'
+            self._clear_left = f'\r{sc.mv_x(value)}'
         elif type(value) in (bool, type(None)):
             self._clear_left = value
         else:
@@ -324,18 +327,19 @@ class ProgressBar:
         # figure label
         label = label_unstyled = ''
         label_mode = self.label_mode
+        label_fmt = self.label_fmt[0]
 
         # change label fmt based on time - when slow, go to higher-res display
         if self.timedelta:
             delta = time.time() - self._start
             if delta > self.timedelta[1]:
-                self.label_fmt = '%5.2f%%'
+                label_fmt = self.label_fmt[2]
             elif delta > self.timedelta[0]:
-                self.label_fmt = '%4.1f%%'
+                label_fmt = self.label_fmt[1]
 
         if 0 <= ratio < 1:  # in progress
             if label_mode:
-                label = self.label_fmt % (ratio * 100)
+                label = label_fmt % (ratio * 100)
             if self.oob_error:  # now fixed, reset
                 self._first = self.styles[_if](self.icons[_if])
                 self._last = self.styles[_il](self.icons[_il])
@@ -498,7 +502,6 @@ if __name__ == '__main__':
             bar.done = False
             bar._comp_style = bar.styles[_ic]
             bar._last = bar.styles[_il](bar.icons[_il])
-            bar.label_fmt = ProgressBar.label_fmt
 
         print(label)
         #~ # for complete in (-2, 0, 51, 100, 150, 84, 100):
