@@ -175,20 +175,19 @@ class ProgressBar:
             expand: False           Set width to full terminal width
             label_mode:  True       Turn on label
             oob_error:  False       Out of bounds error occurred
-            timedelta: (60, 300)    Thresholds to add. label precision | None
             total:  100             Set the total number of items
             unicode_support: bool   Detection result, determines default icons
             width: 32               Full width of bar, padding, and labels
 
-        Label Format:
-            label_fmt = ('%3.0f%%', '%4.1f%%', '%5.2f%%')
-                Precision—defaults to no decimal places.  After each timedelta,
-                precision is increased.
-
-        Theming Arguments:
             icons:  (,,,)           Tuple of chars
             styles: (,,,)           Tuple of ANSI styles
             theme: 'name'           String name of combined icon & style set
+
+            label_fmt: ('%3.0f%%', '%4.1f%%', '%5.2f%%')
+                Precision—defaults to no decimal places.  After each timedelta,
+                label precision is increased.
+            timedeltas:(60, 300) | None     Thresholds in seconds,
+                                            to increase label precision
     '''
     debug = None
     done = False
@@ -197,7 +196,7 @@ class ProgressBar:
     label_fmt_str = '%4s'
     label_mode = True
     oob_error = False
-    timedelta = TIMEDELTAS
+    timedeltas = TIMEDELTAS
     total = 100
     unicode_support = unicode_support
     width = 32
@@ -330,11 +329,11 @@ class ProgressBar:
         label_fmt = self.label_fmt[0]
 
         # change label fmt based on time - when slow, go to higher-res display
-        if self.timedelta:
+        if self.timedeltas:
             delta = time.time() - self._start
-            if delta > self.timedelta[1]:
+            if delta > self.timedeltas[1]:
                 label_fmt = self.label_fmt[2]
-            elif delta > self.timedelta[0]:
+            elif delta > self.timedeltas[0]:
                 label_fmt = self.label_fmt[1]
 
         if 0 <= ratio < 1:  # in progress
