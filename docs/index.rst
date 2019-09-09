@@ -62,7 +62,7 @@ Contents
         THE FOLLOWING INFORMATION 
         IS CLASSIFIED:
         <b>TOP SECRET</b><span style="font-size: smaller">
-        CLEARANCE AUTHORIZATION: LEVEL 6—"PYLADIES"
+        CLEARANCE AUTHORIZATION: LEVEL 6 — "PYLADIES"
         </span>
         </pre>
 
