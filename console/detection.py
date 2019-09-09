@@ -45,7 +45,7 @@ class TermStack:
 
                 with TermStack() as fd:
                     tty.setraw(fd)
-                    return sys.stdin.read(1)
+                    print(sys.stdin.read(1))
     '''
     def __init__(self, stream=sys.stdin):
         if not termios:

@@ -15,7 +15,9 @@ fg = bg = fx = defx = sc = _empty_bin
 
 
 def set_debug_mode(value):
-    ''' Provides for more detailed output via logging functionality. '''
+    ''' Provides for more detailed output via logging functionality.
+        Currently only used in the utils module.
+    '''
     _DEBUG.clear()
     if value:
         _DEBUG.append(1)

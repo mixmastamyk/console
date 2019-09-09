@@ -1,22 +1,19 @@
-console package
+console Package
 ===============
 
 .. automodule:: console
     :members:
-    :undoc-members:
-    :show-inheritance:
 
 
-Modules
-----------
 
 console.color_tables module
-------------------------
+----------------------------
 
 .. automodule:: console.color_tables
     :members:
     :undoc-members:
     :show-inheritance:
+
 
 console.constants module
 ------------------------
@@ -26,6 +23,7 @@ console.constants module
     :undoc-members:
     :show-inheritance:
 
+
 console.core module
 -------------------
 
@@ -34,6 +32,7 @@ console.core module
     :undoc-members:
     :show-inheritance:
 
+
 console.demos module
 --------------------
 
@@ -41,6 +40,7 @@ console.demos module
     :members:
     :undoc-members:
     :show-inheritance:
+
 
 console.detection module
 ------------------------
@@ -60,9 +60,12 @@ console.disabled module
 -----------------------
 
 .. automodule:: console.disabled
-    :members: empty, empty_bin
+    :members:
     :undoc-members:
     :show-inheritance:
+
+    .. autodata:: empty
+
 
 console.progress module
 ------------------------
@@ -72,13 +75,15 @@ console.progress module
     :undoc-members:
     :show-inheritance:
 
+
 console.proximity module
 ------------------------
 
 .. automodule:: console.proximity
     :members:
-    :undoc-members:
+    :undoc-members: styles
     :show-inheritance:
+
 
 console.screen module
 ---------------------
@@ -88,6 +93,7 @@ console.screen module
     :undoc-members:
     :show-inheritance:
 
+
 console.style module
 --------------------
 
@@ -95,6 +101,7 @@ console.style module
     :members:
     :undoc-members:
     :show-inheritance:
+
 
 console.test_suite module
 --------------------------

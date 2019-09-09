@@ -8,7 +8,10 @@
 
 
 class _EmptyAttribute(str):
-    ''' A passive, empty string.  https://youtu.be/sFacWGBJ_cs '''
+    ''' A passive, empty, and "falsey" string.
+
+        https://youtu.be/sFacWGBJ_cs
+    '''
     name = ''
 
     def __add__(self, other):  # empty, so return other
@@ -34,7 +37,7 @@ class _EmptyAttribute(str):
 
 
 class _EmptyBin:
-    '''  Collection that returns empties as attributes. '''
+    ''' Collection that returns EmptyAttributes on any attribute access. '''
     def __init__(self, an_empty):
         self.an_empty = an_empty
 

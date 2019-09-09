@@ -170,7 +170,7 @@ class ProgressBar:
                 print()
 
         Arguments:
-            clear_left: False       # True to clear at 0, or non-zero int offset
+            clear_left: True        # True to clear and mv to 0, or int offset
             debug: None             # Turn on debug output
             done: False             # True on completion, moderates style
             expand: False           # Set width to full terminal width
