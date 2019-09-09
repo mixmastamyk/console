@@ -47,6 +47,8 @@ Another One, eh 🤔?
 Background
 ---------------
 
+    *"First I was afraid, I was petrified…"—Gloria Gaynor*
+
 So ANSI escape codes have been standard on UNIX
 with the belt-and-suspenders crowd for several decades,
 and even saw use on DOS and BBSs back in the day.
@@ -58,6 +60,9 @@ to the terminal environment and command-line
 
 "I'm a PC"
 ~~~~~~~~~~~~~~
+
+    *“Oooh! Oooh! Oooh!”—Arnold Horshack*\
+    `† <https://www.vulture.com/2012/08/why-welcome-back-kotters-horshack-mattered.html>`_
 
 Not on Windows NT however.
 With recent versions of Windows 10
@@ -97,7 +102,7 @@ We need great command-line tools and that's where ``console`` fits in.
 Batteries Not Included
 ------------------------
 
-    *Jive Turkey…*
+    *"What'chu talkin' 'bout, Willis?"—Arnold Jackson*
 
 In the Python world,
 there hasn't been easy-to-use support for terminal sequences in the standard
@@ -149,7 +154,7 @@ Looks to be a fun exercise and somewhat of a rite of passage to create one.
 Often Missing
 ~~~~~~~~~~~~~~~
 
-    *"First I was afraid, I was petrified…"—Gloria Gaynor*
+    *"Them Dukes! Them Dukes…"—Sheriff Rosco P. Coltrane*
 
 While many of the ANSI modules in the cheeseshop have plenty going for them in
 areas of focus,
@@ -182,10 +187,7 @@ one or more important items are often missing:
 Nice to haves
 ~~~~~~~~~~~~~~~~~
 
-.. container:: center
-
-    | *"You've got to, know when to hold 'em,*
-    | *know when to fold 'em…"*
+    | *"You've got to, know when to hold 'em… know when to fold 'em…"*
     | *—Kenny Rogers*
 
 Most are relatively easy to use,

@@ -40,6 +40,8 @@
 Additional Topics
 =======================
 
+    *Can You Dig It?*
+
 .. rubric:: How do the styles work?
 
 Behind the scenes in
@@ -121,7 +123,7 @@ Well, more specifically empty strings.
 Custom Initialization
 ------------------------
 
-    *Can You Dig It?*
+    *“Kiss my grits.”—Flo*
 
 .. rubric:: Environment Variables
 
@@ -144,7 +146,7 @@ To configure auto-detection, palette support,
 or detect other output streams besides stdout,
 one may create palette builder objects yourself:
 
-::
+.. code-block:: shell
 
     ⏵ env PY_CONSOLE_AUTODETECT='0' script.py
 
@@ -284,6 +286,10 @@ And off you go.
 Screen Stuff
 -------------------
 
+    | *Wilma: I confess I thought the Princess had you beguiled.*
+    | *Buck: Well, she did have the nicest set of horns at the ball!*
+    | *Dr. Theopolis: Yes—it was an attractive hat.*
+
 The :mod:`console.screen` module is the one you're looking for,
 although there is a preconfigured convenience instance in the root of the
 package as well::
@@ -301,7 +307,7 @@ package as well::
 Progress Bars
 -------------------
 
-    *What's Happening, "Raj" !?!*
+    *"What's Happening, 'Raj' !?!"*
 
 A progress bar implementation is located in :mod:`console.progress` and may be
 demoed thusly:
@@ -317,7 +323,7 @@ Hello world looks like this:
 
     >>> from console.progress import ProgressBar
 
-    >>> bar = ProgressBar()
+    >>> bar = ProgressBar()  # "Hey HEY, hey!"
     >>> print(bar(50))
 
 .. raw:: html
@@ -344,7 +350,7 @@ Some examples:
 .. code-block:: python
 
     ProgressBar(theme='basic')          # ASCII
-    ProgressBar(theme='basic_color')    # default for Windows console
+    ProgressBar(theme='basic_color')    # default for Windows
     ProgressBar(theme='shaded')         # Unicode ← ↓
     ProgressBar(theme='warm_shaded')
     ProgressBar(theme='shaded', icons='faces')
@@ -360,24 +366,23 @@ Some examples:
                                    partial_char_extra_style=None)
 
 (Windows console has very limited Unicode font support unfortunately,
-though Lucida Console seems a bit more comprehensive than Consolas.
-It defaults to an ASCII representation in that environment.)
+though Lucida Console is a bit more comprehensive than Consolas.
+ProgressBar defaults to an ASCII representation in that environment.)
 
-A more robust use of the module is detailed below::
+A more robust use of the module is illustrated below::
 
     import time
     from console.screen import sc
     from console.progress import ProgressBar
 
-    with sc.hidden_cursor():
+    with sc.hidden_cursor():  # "Ooooohh, I'm tellin' Mama!"
 
-        # example tasks, and set total if needed:
-        items = range(256)
+        items = range(256)  # example tasks
         bar = ProgressBar(total=len(items))
 
-        for i in items:         # "Hey HEY, hey!"
+        for i in items:
             print(bar(i), flush=True, end='')
-            time.sleep(.1)      # do work here
+            time.sleep(.1)      # "Uh-Uhn"
         print()
 
 Not all of this code is required, of course.
@@ -424,8 +429,8 @@ Console itself:
 Tips
 ------------
 
-    *"But I took them away from all that, and now they work for me.
-    My name is Charlie."*
+    | *"But I took them away from all that, and now they work for me.*
+    | *My name is Charlie."*
 
 - The styles bold, italic, underline, and strike have one-letter shortcuts as
   they do in HTML,
@@ -510,22 +515,22 @@ Troubleshooting
     import logging
     logging.basicConfig(
         level=logging.DEBUG,
-        format='  %(levelname)-7.7s %(module)s/%(funcName)s:%(lineno)s '
-               '%(message)s'
+        format='  %(levelname)-7.7s %(module)s/%(funcName)s:'
+               '%(lineno)s %(message)s',
     )
 
     from console import fg, bg, fx
 
-    dr_banner = fg.green + fx.bold
+    dr_banner = fg.green + fx.bold + fx.italic
 
-    print('\n\t', dr_banner('--> Mr. McGee, don\'t make me angry… <--'))
+    print('\n\t', dr_banner('Mr. McGee, don\'t make me angry…'))
     print()
 
 
 Deeper Dive
 ------------
 
-    *"I'm so confused."—'Vinnie' Barbarino*
+    *"I'm so confused."—‘Vinnie' Barbarino*
 
 Still interested?
 More than you wanted to know on the subject of terminals and escape codes can
