@@ -17,6 +17,8 @@
       <https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters>`_
 '''
 from .core import _BasicPaletteBuilder, _HighColorPaletteBuilder
+from .constants import (ANSI_BG_LO_BASE, ANSI_BG_HI_BASE, ANSI_FG_LO_BASE,
+                        ANSI_FG_HI_BASE) # , ANSI_RESET, ANSI_RESET_FB)
 
 
 class ForegroundPalette(_HighColorPaletteBuilder):
@@ -51,6 +53,8 @@ class ForegroundPalette(_HighColorPaletteBuilder):
     lightwhite      = 97
 
     # extended      = 38
+    _offset_base   = ANSI_FG_LO_BASE   # fbterm transformation
+    _offset_base2  = ANSI_FG_HI_BASE   # fbterm transformation
     _start_codes_extended = '38;5'
     _start_codes_extended_fbterm = '1'
     _start_codes_true = '38;2'
@@ -88,6 +92,8 @@ class BackgroundPalette(_HighColorPaletteBuilder):
     lightwhite      = 107
 
     # extended      = 48
+    _offset_base    = ANSI_BG_LO_BASE   # fbterm transformation
+    _offset_base2   = ANSI_BG_HI_BASE   # fbterm transformation
     _start_codes_extended = '48;5'
     _start_codes_extended_fbterm = '2'
     _start_codes_true = '48;2'
