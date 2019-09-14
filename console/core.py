@@ -395,6 +395,7 @@ class _PaletteEntry:
             stream  - Stream to print to, when using a context manager.
     '''
     _reset_code = ANSI_RESET
+    _end_code = 'm'
 
     def __init__(self, parent, name, code, stream=sys.stdout):
         self.parent = parent
@@ -407,7 +408,7 @@ class _PaletteEntry:
     def __add__(self, other):
         ''' Add: self + other '''
         if isinstance(other, str):
-            if other.startswith(CSI) and other.endswith('m'):
+            if other.startswith(CSI) and other.endswith(self._end_code):
                 return self._handle_ambiguous_op(other)
             else:
                 return str(self) + other
@@ -555,6 +556,15 @@ class _PaletteEntry:
 class _PaletteEntryFBTerm(_PaletteEntry):
     ''' Help fbterm show 256 colors. '''
     _reset_code = ANSI_RESET_FB
+    _end_code = '}'
+
+    def __add__(self, other):
+        ''' Add: self + other '''
+        # these are not able to mix unfortunately, convert to string:
+        if isinstance(other, _PaletteEntry):
+            return super().__add__(str(other))
+        else:
+            return super().__add__(other)
 
     def __str__(self):
         return f'{CSI}{";".join(self._codes)}}}'  # note '}' at end not std 'm'
