@@ -99,30 +99,10 @@ class _BasicPaletteBuilder:
                 if type(value) is int:
                     if 'basic' in self._palette_support:
                         display_name = name.upper()
-                        if is_fbterm:
-                            attr = self._get_fbterm_attr(display_name, value)
-                        else:
-                            attr = _PaletteEntry(self, display_name, value)
+                        attr = _PaletteEntry(self, display_name, value)
                     else:
                         attr = empty
                     setattr(self, name, attr)
-
-    def _get_fbterm_attr(self, name, value):
-        ''' Need to calculate proper attribute for fbterm. :-/ '''
-        try:  # Effects palettes don't need this, check:
-            self._offset_base
-        except AttributeError:
-            return _PaletteEntry(self, name, value)  # nope, std entry
-
-        # first, reduce value by base so offset starts at zero, the first 16:
-        if value < 70:
-            value = value - self._offset_base   # subtract 30 or 40
-        else:
-            value = value - self._offset_base2  # subtract 90 or 100
-
-        # should happen inside pal obj:
-        str_values = ';'.join([self._start_codes_extended_fbterm, str(value)])
-        return _PaletteEntryFBTerm(self, name, str_values)
 
     def __repr__(self):
         return f'{self.__class__.__name__}(palettes={self._palette_support})'
@@ -413,6 +393,9 @@ class _PaletteEntry:
             else:
                 return str(self) + other
 
+        elif type(other) is _PaletteEntryFBTerm:  # not! isinstance
+            return str(self) + str(other)
+
         elif isinstance(other, _PaletteEntry):
             # Make a copy, so codes don't pile up after each addition
             # Render initial values once as string and place as first code:
@@ -561,7 +544,7 @@ class _PaletteEntryFBTerm(_PaletteEntry):
     def __add__(self, other):
         ''' Add: self + other '''
         # these are not able to mix unfortunately, convert to string:
-        if isinstance(other, _PaletteEntry):
+        if type(other) is _PaletteEntry:  # not! isinstance
             return super().__add__(str(other))
         else:
             return super().__add__(other)
