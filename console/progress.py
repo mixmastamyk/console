@@ -16,11 +16,11 @@
 '''
 import time
 
-from console import fg, bg, fx, _CHOSEN_PALETTE
-from .constants import ANSI_RESET
-from console.screen import sc
-from console.utils import len_stripped
-from console.detection import (detect_unicode_support, get_available_palettes,
+from . import fg, bg, fx, _CHOSEN_PALETTE
+from .disabled import empty as _empty
+from .screen import sc
+from .utils import len_stripped
+from .detection import (detect_unicode_support, get_available_palettes,
                                get_size, os_name)
 
 TIMEDELTAS = (60, 300)  # accuracy thresholds, in seconds, one and five minutes
@@ -53,7 +53,7 @@ _if, _ic, _ie, _il, _id, _iel, _ieh, _ieb = range(8)
 _dim_green = fx.dim + fg.green
 _err_color = fg.lightred
 styles = dict(
-    dumb        = (str,) * 6,
+    dumb        = (_empty,) * 6,
     amber       = (
                     fx.dim + fg.i208,   # first
                     fg.i208,            # complete
@@ -249,12 +249,11 @@ class ProgressBar:
         self._comp_style = _styles[_ic]
         self._empt_style = _styles[_ie]
         self._err_style = _styles[_iel]
-        try:  # fbterm :-/
-            self._first = _styles[_if](_icons[_if])
-            self._last = _styles[_il](_icons[_il])
-        except TypeError:  # str not callable
-            self._first = _styles[_if] + _icons[_if] + ANSI_RESET
-            self._last = _styles[_il] + _icons[_il] + ANSI_RESET
+        if type(self._err_style) is type:  # no idea why this is necessary
+            self._err_style = self._err_style()
+        # fbterm - can't use call():
+        self._first = _styles[_if] + _icons[_if] + fx.end
+        self._last = _styles[_il] + _icons[_il] + fx.end
 
         # dynamic label fmt, set to None to disable
         self._start = time.time()
@@ -332,6 +331,7 @@ class ProgressBar:
         label = label_unstyled = ''
         label_mode = self.label_mode
         label_fmt = self.label_fmt[0]
+        _END = str(fx.end)
 
         # change label fmt based on time - when slow, go to higher-res display
         if self.timedeltas:
@@ -345,8 +345,9 @@ class ProgressBar:
             if label_mode:
                 label = label_fmt % (ratio * 100)
             if self.oob_error:  # now fixed, reset
-                self._first = self.styles[_if](self.icons[_if])
-                self._last = self.styles[_il](self.icons[_il])
+                # fbterm - can't use call():
+                self._first = self.styles[_if] + self.icons[_if] + _END
+                self._last = self.styles[_il] + self.icons[_il] + _END
                 self._comp_style = self.styles[_ic]
                 self.oob_error = False
                 self.done = False
@@ -354,27 +355,32 @@ class ProgressBar:
             if ratio == 1:  # done
                 self.done = True
                 self._comp_style = self.styles[_id]
-                self._last = self.styles[_if](self.icons[_il])
+                # fbterm - can't use call():
+                self._last = self.styles[_if] + self.icons[_il] + _END
                 if label_mode:
                     label = self.label_fmt_str % self.icons[_id]
                 if self.oob_error:  # now fixed, reset
-                    self._first = self.styles[_if](self.icons[_if])
+                    # fbterm - can't use call():
+                    self._first = self.styles[_if] + self.icons[_if] + _END
                     self.oob_error = False
 
             # error - out of bounds :-/
             elif ratio > 1:
                 self.done = True
                 self.oob_error = True
-                self._last = self._err_style(self.icons[_ieh])
+                # fbterm - can't use call():
+                self._last = self._err_style + self.icons[_ieh] + _END
                 if label_mode and not label_mode == 'internal':
                     label_unstyled = self.label_fmt_str % self.icons[_ieb]
-                    label = self._err_style(label_unstyled)
+                # fbterm - can't use call():
+                    label = self._err_style + label_unstyled + _END
             else:  # < 0
                 self.oob_error = True
                 self._first = self._err_style(self.icons[_iel])
                 if label_mode and not label_mode == 'internal':
                     label_unstyled = self.label_fmt_str % self.icons[_ieb]
-                    label = self._err_style(label_unstyled)
+                    # fbterm - can't use call():
+                    label = self._err_style + label_unstyled + _END
 
         self._lbl = label
         # dynamic resizing of the bar, depending on label length:
