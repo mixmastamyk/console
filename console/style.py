@@ -18,7 +18,7 @@
 '''
 from .core import _BasicPaletteBuilder, _HighColorPaletteBuilder
 from .constants import (ANSI_BG_LO_BASE, ANSI_BG_HI_BASE, ANSI_FG_LO_BASE,
-                        ANSI_FG_HI_BASE) # , ANSI_RESET, ANSI_RESET_FB)
+                        ANSI_FG_HI_BASE)
 
 
 class ForegroundPalette(_HighColorPaletteBuilder):

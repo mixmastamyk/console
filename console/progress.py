@@ -17,6 +17,7 @@
 import time
 
 from console import fg, bg, fx, _CHOSEN_PALETTE
+from .constants import ANSI_RESET
 from console.screen import sc
 from console.utils import len_stripped
 from console.detection import (detect_unicode_support, get_available_palettes,
@@ -245,11 +246,15 @@ class ProgressBar:
 
         # configure styles
         _styles = self.styles
-        self._first = _styles[_if](_icons[_if])
         self._comp_style = _styles[_ic]
         self._empt_style = _styles[_ie]
-        self._last = _styles[_il](_icons[_il])
         self._err_style = _styles[_iel]
+        try:  # fbterm :-/
+            self._first = _styles[_if](_icons[_if])
+            self._last = _styles[_il](_icons[_il])
+        except TypeError:  # str not callable
+            self._first = _styles[_if] + _icons[_if] + ANSI_RESET
+            self._last = _styles[_il] + _icons[_il] + ANSI_RESET
 
         # dynamic label fmt, set to None to disable
         self._start = time.time()

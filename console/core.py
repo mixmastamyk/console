@@ -13,7 +13,7 @@ import re
 
 from . import _CHOSEN_PALETTE
 from .constants import (CSI, ANSI_BG_LO_BASE, ANSI_BG_HI_BASE, ANSI_FG_LO_BASE,
-                        ANSI_FG_HI_BASE, ANSI_RESET, ANSI_RESET_FB)
+                        ANSI_FG_HI_BASE, ANSI_RESET)
 from .disabled import empty_bin, empty
 from .detection import get_available_palettes, is_fbterm
 from .meta import defaults
@@ -374,7 +374,6 @@ class _PaletteEntry:
             code    - Associated ANSI code number.
             stream  - Stream to print to, when using a context manager.
     '''
-    _reset_code = ANSI_RESET
     _end_code = 'm'
 
     def __init__(self, parent, name, code, stream=sys.stdout):
@@ -405,7 +404,7 @@ class _PaletteEntry:
             same_category = self.parent is other.parent  # color or style
 
             if not same_category:  # different, use instead of color default
-                attr.default = self._reset_code
+                attr.default = ANSI_RESET
 
             return attr
         else:
@@ -499,10 +498,11 @@ class _PaletteEntry:
                     end_code = self.default._codes[0]
                 except AttributeError:  # already rendered
                     end_code = self.default.strip('\x1b[m')
+
                 if end_code == other[-3:-1]:    # same category
-                    tokens.append(end_code)
+                    tokens.append(str(self.default))
                 else:                           # different
-                    tokens.append(self._reset_code)
+                    tokens.append(ANSI_RESET)
                 # put back together:
                 lines[i] = ''.join(tokens)
             result = '\n'.join(lines)
@@ -538,7 +538,6 @@ class _PaletteEntry:
 
 class _PaletteEntryFBTerm(_PaletteEntry):
     ''' Help fbterm show 256 colors. '''
-    _reset_code = ANSI_RESET_FB
     _end_code = '}'
 
     def __add__(self, other):
