@@ -25,6 +25,7 @@ from .detection import (detect_unicode_support, get_available_palettes,
 
 TIMEDELTAS = (60, 300)  # accuracy thresholds, in seconds, one and five minutes
 MIN_WIDTH = 12
+_END = str(fx.end)  # fbterm support
 
 # Theme-ing info:
 icons = dict(
@@ -249,9 +250,7 @@ class ProgressBar:
         self._comp_style = _styles[_ic]
         self._empt_style = _styles[_ie]
         self._err_style = _styles[_iel]
-        if type(self._err_style) is type:  # no idea why this is necessary
-            self._err_style = self._err_style()
-        # fbterm - can't use call():
+        # fbterm - can't use call() if combined:
         self._first = _styles[_if] + _icons[_if] + fx.end
         self._last = _styles[_il] + _icons[_il] + fx.end
 
@@ -326,12 +325,16 @@ class ProgressBar:
             raise TypeError('type %s not valid.' % type(value))
 
     def _update_status(self, ratio):
-        ''' Check bounds for errors and update label accordingly. '''
+        ''' Check bounds for errors and update label accordingly.
+
+            fbterm support: can't use call() if combined with other styles
+                            since they get rendered as strings due to differing
+                            escape sequences.  See _END for locations.
+        '''
         # figure label
         label = label_unstyled = ''
         label_mode = self.label_mode
         label_fmt = self.label_fmt[0]
-        _END = str(fx.end)
 
         # change label fmt based on time - when slow, go to higher-res display
         if self.timedeltas:
@@ -345,7 +348,6 @@ class ProgressBar:
             if label_mode:
                 label = label_fmt % (ratio * 100)
             if self.oob_error:  # now fixed, reset
-                # fbterm - can't use call():
                 self._first = self.styles[_if] + self.icons[_if] + _END
                 self._last = self.styles[_il] + self.icons[_il] + _END
                 self._comp_style = self.styles[_ic]
@@ -355,12 +357,10 @@ class ProgressBar:
             if ratio == 1:  # done
                 self.done = True
                 self._comp_style = self.styles[_id]
-                # fbterm - can't use call():
                 self._last = self.styles[_if] + self.icons[_il] + _END
                 if label_mode:
                     label = self.label_fmt_str % self.icons[_id]
                 if self.oob_error:  # now fixed, reset
-                    # fbterm - can't use call():
                     self._first = self.styles[_if] + self.icons[_if] + _END
                     self.oob_error = False
 
@@ -368,18 +368,16 @@ class ProgressBar:
             elif ratio > 1:
                 self.done = True
                 self.oob_error = True
-                # fbterm - can't use call():
+                # fbterm - can't use call() if combined:
                 self._last = self._err_style + self.icons[_ieh] + _END
                 if label_mode and not label_mode == 'internal':
                     label_unstyled = self.label_fmt_str % self.icons[_ieb]
-                # fbterm - can't use call():
                     label = self._err_style + label_unstyled + _END
             else:  # < 0
                 self.oob_error = True
                 self._first = self._err_style(self.icons[_iel])
                 if label_mode and not label_mode == 'internal':
                     label_unstyled = self.label_fmt_str % self.icons[_ieb]
-                    # fbterm - can't use call():
                     label = self._err_style + label_unstyled + _END
 
         self._lbl = label
@@ -389,16 +387,20 @@ class ProgressBar:
 
     def _render(self):
         ''' Standard rendering of bar graph. '''
-        cm_chars = self._comp_style(self.icons[_ic] * self._num_complete_chars)
-        em_chars = self._empt_style(self.icons[_ie] * self._num_empty_chars)
+        cm_chars = (
+            self._comp_style + (self.icons[_ic] * self._num_complete_chars) + _END
+        )
+        em_chars = (
+            self._empt_style + (self.icons[_ie] * self._num_empty_chars) + _END
+        )
         return f'{self._first}{cm_chars}{em_chars}{self._last}{self._lbl}'
 
     def _render_with_internal_label(self):
         ''' Render with a label inside the bar graph. '''
         ncc = self._num_complete_chars
         bar = self._lbl.center(self._bwidth)
-        cm_chars = self._comp_style(bar[:ncc])
-        em_chars = self._empt_style(bar[ncc:])
+        cm_chars = self._comp_style + bar[:ncc] + _END
+        em_chars = self._empt_style + bar[ncc:] + _END
         return f'{self._first}{cm_chars}{em_chars}{self._last}'
 
 
@@ -444,8 +446,8 @@ class HiDefProgressBar(ProgressBar):
                     p_style = self.partial_char_extra_style
                 else:
                     p_style = p_style + self.partial_char_extra_style
-
-            p_char = p_style(self.partial_chars[self._remainder])
+            # call form below if no fbterm:
+            p_char = p_style + self.partial_chars[self._remainder] + _END
             self._num_empty_chars -= 1
 
         cm_chars = self._comp_style(self.icons[_ic] * self._num_complete_chars)
