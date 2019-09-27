@@ -173,3 +173,15 @@ todo_include_todos = True
 
 #~ def setup(app):                           # Alabaster does this automatically
     #~ app.add_stylesheet('css/custom.css')  # may also be an URL
+
+
+rst_prolog = u'''
+.. |br-all| raw:: html
+
+    <br style="clear: both"/>
+
+.. |nbsp| raw:: html
+
+    &nbsp;
+
+'''

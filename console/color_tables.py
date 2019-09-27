@@ -483,7 +483,8 @@ index_to_rgb8 = {
 
 
 # X11 full color values from '/usr/share/X11/rgb.txt'
-#   Entries given as strings here since no calculation needs to be done on them.
+#   ! $Xorg: rgb.txt,v 1.3 2000/08/17 19:54:00 cpqbld Exp $
+#   Entries recorded here as strings as no calculations need to be done.
 #   Strings are what they'll be on output.
 x11_color_map = {
     'snow':                 ('255', '250', '250'),

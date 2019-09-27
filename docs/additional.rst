@@ -460,7 +460,7 @@ Tips
 Troubleshooting
 ------------------
 
-    *"After an accidental overdose of gamma radiation…"*
+    *"Goddammit, I'd piss on a spark plug if I thought it'd do any good!"—General Beringer*
 
 - Console performs auto-detection of the environment at startup to determine
   terminal capabilities.
@@ -503,9 +503,12 @@ Troubleshooting
     # create a new anonymous style, apply it:
     (pal.style1 + pal.style2)(msg)
 
-    # or add it in via "mixins"
+    # or add it in via a "mixin" style
     pal.style2(msg, pal.style1)
 
+|
+
+*"After an accidental overdose of gamma radiation…"*
 
 - If console isn't working as you'd expect,
   turn on DEBUG logging before loading it to see what it finds.
@@ -515,16 +518,18 @@ Troubleshooting
     import logging
     logging.basicConfig(
         level=logging.DEBUG,
-        format='  %(levelname)-7.7s %(module)s/%(funcName)s:'
-               '%(lineno)s %(message)s',
+        format='  %(levelname)-7.7s %(module)s/'
+               '%(funcName)s:%(lineno)s %(message)s',
     )
 
+    # logs autodetection messages
     from console import fg, bg, fx
 
     dr_banner = fg.green + fx.bold + fx.italic
 
-    print('\n\t', dr_banner('Mr. McGee, don\'t make me angry…'))
-    print()
+    print('\n\t',
+          dr_banner("Mr. McGee, don't make me angry…"),
+    )
 
 
 Deeper Dive
@@ -589,7 +594,7 @@ Interesting knowledge rediscovered perhaps.
     :align: right
     :figwidth: 33%
 
-    *"I'm B. J. McKay and this is my best friend Bear."*\
+    *"I'm B. J. McKay, and this is my best friend Bear."*\
     `🖺 <https://www.memorabletv.com/tv/b-j-bear-nbc-1979-1981-greg-evigan-claude-akins/>`_\
     `🖹 <http://www.lyricsondemand.com/tvthemes/bjandthebearlyrics.html>`_
 
@@ -602,6 +607,30 @@ a new futuristic decade awaits!
     - *Catch you on the flip-side*
     - *Good night, John-boy*
     - and… *Goodbye Seventies*
+
+
+
+|br-all|
+
+…
+
+::
+
+    LOGON: Joshua
+
+
+    Greetings, Professor Falken.
+
+    Would you like to play a game?
+
+    ⏵ How about Global Thermonuclear War?
+
+    Wouldn't you prefer a nice game of chess?
+
+    ⏵ Later. Right now let's play Global Thermonuclear War.
+
+    Fine…
+
 
 
 .. raw:: html
