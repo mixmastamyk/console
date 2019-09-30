@@ -617,7 +617,7 @@ a new futuristic decade awaits!
 
             `Goodbye Seventies… <https://www.youtube.com/watch?v=yFimHGt2Nco>`_
 
-…
+|br-all|
 
 |br-all|
 
