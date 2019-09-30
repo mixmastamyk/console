@@ -14,7 +14,7 @@
     | *"In your satin tights,*
     | *fighting for your rights,*
     | *and the old red, white and blue…"*
-    | *—Wonder Woman*
+    | *—Wonder Woman theme*
 
 |
 
@@ -52,10 +52,11 @@ Background
 So ANSI escape codes have been standard on UNIX
 with the belt-and-suspenders crowd for several decades,
 and even saw use on DOS and BBSs back in the day.
-With the advent of macOS X,
-a whole new generation of lumber-sexuals have also exposed themselves(?)
+With the advent of macOS X (ten),
+a whole new generation of lumber-sexuals have exposed themselves(?)
 to the terminal environment and command-line
 *and liked it*.
+ 🤔
 
 
 "I'm a PC"
@@ -65,7 +66,8 @@ to the terminal environment and command-line
     `† <https://www.vulture.com/2012/08/why-welcome-back-kotters-horshack-mattered.html>`_
 
 Not on Windows NT however.
-With recent versions of Windows 10
+Amazingly,
+with recent versions of Windows 10
 the Ballmer/Suit barrier was finally breached,
 allowing *multi-decade-late*
 `improvements
@@ -79,7 +81,7 @@ But now, it's supercharged.
 So, all the top platforms support ANSI escape sequences now.
 Again!
 What's old is new again.
-Add Unicode and millions of colors and it's now better than ever.
+Add Unicode and millions of colors and it's now better than it's ever been.
 
 We need great command-line tools and that's where ``console`` fits in.
 
@@ -93,7 +95,7 @@ We need great command-line tools and that's where ``console`` fits in.
 
     (Cue
     `KC and the Sunshine Band,
-    <https://www.youtube.com/watch?v=OM7zRfHG0no>`_
+    <https://www.youtube.com/watch?v=R9DjX6JBpHI>`_
     *uhh-huh, uhh-huh*
     on
     Soul Train…)

@@ -23,16 +23,17 @@ moving cursors,
 setting title bars,
 and detecting capabilities.
 
-How is it different?
-It's highly composable and more comprehensive than most.
+How is this one different?
+Well,
+it's highly composable and more comprehensive than most.
 And how does it work?
-Oh, a piece of cake.
+It's a piece of cake.
 
     *"Piece of cake?
     Oh, I wish somebody would tell me what that means." —Dr. Huer*
 
 
-␛\ [1;3m\ *Hello World* ␛\ [0m
+␛\ [1;3m *Hello World* ␛\ [0m
 ----------------------------------------------------------
 
 There are a number of flexible ways to use console's styling functionality.
@@ -45,16 +46,17 @@ Most simply, adding a little color with console might look like this:
     >>> fg.green + 'Hello World!' + fg.default
     '\x1b[32mHello World!\x1b[39m'
 
-But there are better ways.
+But there are even more convenient ways,
+read on.
 
 FYI, the string  ``'\x1b'`` represents the ASCII Escape character
-(27 in decimal, ``1b`` hex).
+(``27`` in decimal or ``1b`` hex).
 Command 32 turns the text green
-and 39 back to the default color,
-but there's no need to worry about that.
+and 39 back to the default color.
+But, there's no need to worry about any of that.
 That's why you're here.
 
-Printing to a supporting terminal from Python might look like this:
+Printing to a supporting terminal from Python might also look like this:
 
 .. note::
 
@@ -105,7 +107,7 @@ some of which may be installed automatically if needed:
 
 .. code-block:: shell
 
-    webcolors             # More color names
+    webcolors             # Moar! color names
     future_fstrings       # Needed: Python Version < 3.6
 
     colorama              # Needed: Windows Version < 10
@@ -126,7 +128,7 @@ under the lame (no-ANSI support) versions of Windows < 10.
     for experimental support under Python versions 3.5 and 3.4,
     perhaps earlier.
     Keep an eye peeled for oddities under older Pythons.
-    Sorry, neither 2.X or 1.X is supported. ``:-P``
+    Sorry, neither 2.X or 1.X is supported.  ``:-P``
 
 
 Der ``console`` package has recently been tested on:
@@ -154,7 +156,7 @@ Der ``console`` package has recently been tested on:
 Overview
 ------------------
 
-    *"Ayyyyyy… 👍👍"—The Fonz*
+    *"👍 Ayyyyyy… 👍"—The Fonz*
 
 As mentioned,
 console handles lots more than color and styles.
@@ -175,7 +177,7 @@ includes a number of nifty functions:
 It can also ``strip_ansi`` from strings,
 wait for keypresses,
 clear a line or the screen (with or without scrollback),
-and easily ``pause`` a script like the old DOS commands of yesteryear.
+and easily ``pause`` a script like the old ``DOS`` commands of yesteryear.
 
 .. rubric:: **Screen Module**
 
@@ -191,9 +193,9 @@ compatible context managers are also available for full-screen fun.
 
 .. code-block:: python
 
-    >>> from console import screen
+    >>> from console.screen import sc
 
-    >>> with screen.location(40, 20):
+    >>> with sc.location(40, 20):
     ...     print('Hello, Woild.')
 
 
@@ -219,8 +221,9 @@ Console does its best to figure out what your terminal supports on startup
 and will configure its convenience objects
 (we imported above)
 to do the right thing.
-They will deactivate themselves at startup when output is redirected into a
-pipe, for example.
+They will deactivate themselves automatically at startup when output is
+redirected into a pipe,
+for example.
 
 Detection can be bypassed and handled manually when needed however.
 Simply use the detection functions in the module or write your own as desired,
@@ -228,6 +231,7 @@ then create your own objects from the classes in the
 `console.style` and
 `console.screen`
 modules.
+(See the Environment Variables section for full probe deactivation.)
 
 There's also logging done—\
 enable the debug level before loading the console package and you'll see the
@@ -250,8 +254,8 @@ You can:
     print(f'Ring my {BEL}… Ring my {BEL}')  # ring-a-ling-a-ling…
 
 
-Extended Palettes
-~~~~~~~~~~~~~~~~~~~
+Palettes
+~~~~~~~~~
 
     *"Hey, Mr. Kot-tair!"—Freddie "Boom Boom" Washington*
 
@@ -286,7 +290,7 @@ For example:
     fg.navyblue           # Webcolors takes precedence, if installed
 
 
-Additional palettes are selected via a prefix letter and a number of
+Specific palettes are selected via a prefix letter and a number of
 digits (or name) to specify the color.
 For example:
 
@@ -301,16 +305,19 @@ For example:
     bg.x_navyblue  x_NM   # Force an X11 color name, if available
     bg.w_bisque    w_NM   # Force Webcolors, if installed
 
-Note: The underscores are optional.
-
+The underscores are optional.
 Choose depending whether brevity or readability are more important to you.
+
 The assorted true color forms are useful to choose one explicitly without
 ambiguity.
-(X11 and Webcolors
+X11 and Webcolors
 `differ <https://en.wikipedia.org/wiki/X11_color_names#Clashes_between_web_and_X11_colors_in_the_CSS_color_scheme>`_
-on a few obscure colors.)
-Be aware,
-an unrecognized color name or index will result in an ``AttributeError``.
+on a few obscure colors.
+
+.. note::
+
+    Be aware,
+    an unrecognized color name or index will result in an ``AttributeError``.
 
 
 Composability++
@@ -347,6 +354,7 @@ No sirree!  ↓
 .. code-block:: python
 
     '\x1b[37;1;41;4m¡AHORITA!\x1b[0m'
+    # See  ^ ^ ^ ^
 
 Styles can be built on the fly as well:
 
@@ -375,6 +383,9 @@ with (or instead of) text:
 
 Other template formats are no problem either, ``%s`` or ``${}``.
 
+
+.. rubric:: **Performance**
+
 Console is lightweight,
 but perhaps you'd like a pre-rendered string to be used in a tight loop for
 performance reasons.
@@ -387,6 +398,8 @@ Simply use ``str()`` to finalize the output then use it in the loop.
     >>> for i in range(100000000):
     ...     print(msg)  # rapidinho, por favor
 
+
+.. rubric:: **Misc**
 
 Palette entries work as context-managers as well:
 
@@ -402,7 +415,7 @@ Palette entries work as context-managers as well:
 
                                 ⚾
     ¸¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.⫽⫽¸¸.·´¯`·.¸¸¸.·´¯`·.¸¸¸
-                              ⫻⫻
+                              ⫻⫻    Tok!
 
 
 Demos and Tests

@@ -55,7 +55,7 @@ A collection object holding a large number of Palettes and their associated
 Entries, e.g.:
 
     - ``fg``, ``bg``, ``fx``
-    - ``defx`` (for deactivating styles)
+    - ``defx`` (for deactivating styles in a highly specific manner)
 
 While the simplest palettes
 (original and effects)
@@ -64,10 +64,10 @@ the rest are built up as needed,
 on demand.
 Like a traffic cop,
 palettes direct attribute access to the appropriate code to initialize each
-Entry.
+palette Entry.
 
 Once created,
-Entry attributes are cached and available for future use.
+palette Entry attributes are cached and available for future use.
 This namespace cache may also be cleared in uncommon scenarios using huge
 palettes,
 with the ``clear()`` method.
@@ -183,8 +183,9 @@ even with numpy loaded,
 which is also slow to import.
 
 Fast and inaccurate it is!
-Unless someone would like to write a highly optimized C implementation for kicks,
-it doesn't seem worth the trouble for this application.
+Unless someone would like to write a highly optimized C implementation for
+kicks,
+it doesn't seem worth the trouble for this library.
 
 ::
 
@@ -280,6 +281,8 @@ For example::
         sys.stdout.write(f'{CSI}6n')  # fire!
         sys.stdout.flush()
 
+    # Back to normal
+
 And off you go.
 
 
@@ -307,7 +310,8 @@ package as well::
 Progress Bars
 -------------------
 
-    *"What's Happening, 'Raj' !?!"*
+    | *"What's Happening, 'Raj' !?!"*
+    | *"What's Happening, Duh-wayne!?"*
 
 A progress bar implementation is located in :mod:`console.progress` and may be
 demoed thusly:
@@ -606,16 +610,21 @@ a new futuristic decade awaits!
     - *Keep On Truckin'*
     - *Catch you on the flip-side*
     - *Good night, John-boy*
-    - and… *Goodbye Seventies*
 
+    and…
 
+    - *Whoah-oh Woah…*
 
-|br-all|
+            `Goodbye Seventies… <https://www.youtube.com/watch?v=yFimHGt2Nco>`_
 
 …
 
-::
+|br-all|
 
+
+.. raw:: html
+
+    <pre style="color: #6ab">
     LOGON: Joshua
 
 
@@ -623,13 +632,17 @@ a new futuristic decade awaits!
 
     Would you like to play a game?
 
+
     ⏵ How about Global Thermonuclear War?
 
     Wouldn't you prefer a nice game of chess?
 
+
     ⏵ Later. Right now let's play Global Thermonuclear War.
 
     Fine…
+
+    </pre>
 
 
 
