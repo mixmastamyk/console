@@ -86,6 +86,7 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
     result = None
     pal = basic_palette
     log.debug('console version: %s', __version__)
+    log.debug('os.name/sys.platform: %s/%s', os_name, sys.platform)
 
     # TODO: clumsy, refactor
     if color_is_forced():
@@ -493,8 +494,12 @@ def get_color(name, number=None):
         elif os_name == 'posix':
             if sys.platform.startswith('freebsd'):
                 pass
-            elif env.TERM and env.TERM.startswith('xterm'):
-                colors = _get_color_xterm(name, number)
+            elif env.TERM:
+                if env.TERM.startswith('xterm'):
+                    if env.TERM_PROGRAM == 'vscode':
+                        pass
+                    else:
+                        colors = _get_color_xterm(name, number)
 
     return tuple(colors)
 
