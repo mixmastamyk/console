@@ -13,15 +13,12 @@ import env
 
 from . import color_tables, proximity
 from .constants import BS, BEL, CSI, ESC, OSC, RS, ST, ALL_PALETTES
-from .meta import __version__
+from .meta import __version__, defaults
 
 
 log = logging.getLogger(__name__)
 os_name = os.name  # frequent use
 is_fbterm = termios = tty = None
-TERM_SIZE_FALLBACK = (80, 24)
-CURSOR_POS_FALLBACK = (0, 0)
-READ_TO = .250  # select read timeout in float secs
 
 
 if os_name == 'posix':  # Linux, FreeBSD, MacOS, etc
@@ -381,7 +378,8 @@ def _getch():
         return sys.stdin.read(1)
 
 
-def _read_until_select(infile=sys.stdin, maxchars=20, end=RS, timeout=READ_TO):
+def _read_until_select(infile=sys.stdin, maxchars=20, end=RS,
+                       timeout=defaults.READ_TIMEOUT):
     ''' Read a terminal response of up to a given max characters from stdin,
         with timeout.  POSIX only, files not compat with select on Windows.
     '''
@@ -391,13 +389,15 @@ def _read_until_select(infile=sys.stdin, maxchars=20, end=RS, timeout=READ_TO):
     if not isinstance(end, tuple):
         end = (end,)
 
-    if select((infile,), (), (), timeout)[0]:  # wait until timeout
-        while maxchars:  # count down, stopping at 0
+    if select((infile,), (), (), timeout)[0]:  # wait until response or timeout
+        while maxchars:  # response: count down chars, stopping at 0
             char = read(1)
             if char in end:
                 break
             chars.append(char)
             maxchars -= 1
+    else:  # timeout
+        log.debug('response not received in time, %s secs.', timeout)
 
     return ''.join(chars)
 
@@ -510,7 +510,7 @@ def get_color(name, number=None):
     return tuple(colors)
 
 
-def get_position(fallback=CURSOR_POS_FALLBACK):
+def get_position(fallback=defaults.CURSOR_POS_FALLBACK):
     ''' Return the current column number of the terminal cursor.
         Used to figure out if we need to print an extra newline.
 
@@ -547,7 +547,7 @@ def get_position(fallback=CURSOR_POS_FALLBACK):
     return values
 
 
-def get_size(fallback=TERM_SIZE_FALLBACK):
+def get_size(fallback=defaults.TERM_SIZE_FALLBACK):
     ''' Convenience copy of `shutil.get_terminal_size
         <https://docs.python.org/3/library/shutil.html#shutil.get_terminal_size>`_
         for use here.

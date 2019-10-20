@@ -8,7 +8,7 @@ from time import localtime as _localtime
 
 
 pkgname         = 'console'
-__version__     = version = '0.97a2'
+__version__     = version = '0.97a3'
 __author__      = authors = ', '.join([
                                 'Mike Miller',
                                 #~ 'and contributors',
@@ -44,5 +44,7 @@ trove_classifiers = [
 ]
 
 class defaults:
+    CURSOR_POS_FALLBACK = (0, 0)
     MAX_NL_SEARCH = 4096
-
+    READ_TIMEOUT = .200  # select read timeout in float secs
+    TERM_SIZE_FALLBACK = (80, 24)

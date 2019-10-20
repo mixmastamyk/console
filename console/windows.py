@@ -27,7 +27,7 @@ STD_INPUT_HANDLE = -10
 STD_OUTPUT_HANDLE = -11
 STD_ERROR_HANDLE = -12
 
-BUILD_ANSI_AVAIL = 10586  # Win10 TH2
+BUILD_ANSI_AVAIL = 10586  # Win10 TH2, Nov 2015
 _mask_map = dict(
     foreground=0x000f,
     fg=0x000f,
