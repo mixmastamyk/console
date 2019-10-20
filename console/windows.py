@@ -150,6 +150,8 @@ def is_colorama_initialized():
         import sys, colorama
         if isinstance(sys.stdout, colorama.ansitowin32.StreamWrapper):
             result = True
+        else:
+            result = False
     except ImportError:
         pass
     log.debug('%s', result)
