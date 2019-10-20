@@ -25,16 +25,16 @@ from .detection import (detect_unicode_support, get_available_palettes,
 
 TIMEDELTAS = (60, 300)  # accuracy thresholds, in seconds, one and five minutes
 MIN_WIDTH = 12
-_END = str(fx.end)  # fbterm support
+_END = str(fx.end)      # fbterm support
 
 # Theme-ing info:
 icons = dict(
     # name:      first, complete, empty, last, done, err_lo, err_hi, err_lbl
     ascii       = ('[', '#', '-', ']', '+', '<', '>', 'ERR'),
     blocks      = (' ', '▮', '▯', ' ', '✓', '⏴', '⏵', '✗'),
-    # empty white bullet wrong size, breaks alignment:
+    # empty white bullet is the wrong size, breaks alignment:
     bullets     = (' ', '•', '•', ' ', '✓', '⏴', '⏵', '✗'),
-    dies        = (' ', '⚅', '⚀', '', '✓', '⏴', '⏵', '✗'),
+    dies        = (' ', '⚅', '⚀', ' ', '✓', '⏴', '⏵', '✗'),
     horns       = ('🤘', '⛧', '⛤', '🤘', '✓', '⏴', '⏵', '✗'),
     segmented   = ('▕', '▉', '▉', '▏', '✓', '⏴', '⏵', '✗ '),
     faces       = (' ', '☻', '☹', '', '✓', '⏴', '⏵', '✗'),
@@ -79,8 +79,8 @@ styles = dict(
                     fg.red,             # done
                     _err_color,         # error
                   ),
-    simple      = (
-                    str,                # first
+    simple      = ( # str no longer works, call broke fbterm, so using ''
+                    str,                # first,
                     str,                # complete
                     fx.dim,             # empty
                     str,                # last
@@ -250,9 +250,8 @@ class ProgressBar:
         self._comp_style = _styles[_ic]
         self._empt_style = _styles[_ie]
         self._err_style = _styles[_iel]
-        # fbterm - can't use call() if combined:
-        self._first = _styles[_if] + _icons[_if] + fx.end
-        self._last = _styles[_il] + _icons[_il] + fx.end
+        self._first = _styles[_if](_icons[_if])
+        self._last = _styles[_il](_icons[_il])
 
         # dynamic label fmt, set to None to disable
         self._start = time.time()
@@ -348,8 +347,8 @@ class ProgressBar:
             if label_mode:
                 label = label_fmt % (ratio * 100)
             if self.oob_error:  # now fixed, reset
-                self._first = self.styles[_if] + self.icons[_if] + _END
-                self._last = self.styles[_il] + self.icons[_il] + _END
+                self._first = self.styles[_if](self.icons[_if])
+                self._last = self.styles[_il](self.icons[_il])
                 self._comp_style = self.styles[_ic]
                 self.oob_error = False
                 self.done = False
@@ -357,7 +356,7 @@ class ProgressBar:
             if ratio == 1:  # done
                 self.done = True
                 self._comp_style = self.styles[_id]
-                self._last = self.styles[_if] + self.icons[_il] + _END
+                self._last = self.styles[_if](self.icons[_il])
                 if label_mode:
                     label = self.label_fmt_str % self.icons[_id]
                 if self.oob_error:  # now fixed, reset
@@ -446,8 +445,8 @@ class HiDefProgressBar(ProgressBar):
                     p_style = self.partial_char_extra_style
                 else:
                     p_style = p_style + self.partial_char_extra_style
-            # call form below if no fbterm:
-            p_char = p_style + self.partial_chars[self._remainder] + _END
+
+            p_char = p_style(self.partial_chars[self._remainder])
             self._num_empty_chars -= 1
 
         cm_chars = self._comp_style(self.icons[_ic] * self._num_complete_chars)

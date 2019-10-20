@@ -393,7 +393,7 @@ class _PaletteEntry:
                 return str(self) + other
 
         elif type(other) is _PaletteEntryFBTerm:  # not! isinstance
-            return str(self) + str(other)
+            return _CallableFBString(str(self) + str(other))
 
         elif isinstance(other, _PaletteEntry):
             # Make a copy, so codes don't pile up after each addition
@@ -542,14 +542,35 @@ class _PaletteEntryFBTerm(_PaletteEntry):
 
     def __add__(self, other):
         ''' Add: self + other '''
-        # these are not able to mix unfortunately, convert to string:
+        # these are not able to mix unfortunately, convert to callable string:
         if type(other) is _PaletteEntry:  # not! isinstance
-            return super().__add__(str(other))
+            return _CallableFBString(str(self) + str(other))
         else:
             return super().__add__(other)
 
     def __str__(self):
         return f'{CSI}{";".join(self._codes)}}}'  # note '}' at end not std 'm'
+
+
+class _CallableFBString(str):
+    ''' String that is callable, only needed in the very specific instance of
+        running under fbterm and combining extended color Palettes with other
+        Palettes of a different category.  :-/
+    '''
+    def __call__(self, text, *styles, original_length=False):
+        if not text:  # when an empty string/None is passed, don't emit codes.
+            return ''
+
+        # add and end styles per line, to facilitate paging:
+        pos = text.find('\n', 0, MAX_NL_SEARCH)  # if '\n' in text, w/limit
+        if pos == -1:  # not found
+            result = f'{self}{text}{ANSI_RESET}'
+        else:
+            lines = text.splitlines()
+            for i, line in enumerate(lines):
+                lines[i] = f'{self}{line}{ANSI_RESET}'  # add styles, see tip
+            result = '\n'.join(lines)
+        return result
 
 
 class _LengthyString(str):
