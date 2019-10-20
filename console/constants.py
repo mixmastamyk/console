@@ -13,8 +13,8 @@ LF  = '\n'          #:  10   012   0x0A    ^J     Linefeed (newline)
 VT  = '\v'          #:  11   013   0x0B    ^K     Vertical TAB
 FF  = '\f'          #:  12   014   0x0C    ^L     Formfeed (also: New page NP)
 CR  = '\r'          #:  13   015   0x0D    ^M     Carriage return
-ESC = '\x1b'        #:  27   033           ^[     Escape character
 
+ESC = '\x1b'        #:  27   033           ^[     Escape character
 FS  = '\x1c'        #:  28   034                  Field Separator
 GS  = '\x1d'        #:  29   035                  Group Separator
 RS  = '\x1e'        #:  30   036                  Record Separator
@@ -24,15 +24,15 @@ DEL = '\177'        #: 127   177   0x7F           Delete character
 CSI = ESC + '['     #: Control Sequence Introducer
 OSC = ESC + ']'     #: Operating System Command
 RIS = ESC + 'c'     #: Reset to Initial State, aka clear screen (see utils)
-ST = '\\'           #: Sequence terminator, (ESC precedes)
+ST  = '\\'          #: Sequence terminator, (ESC precedes)
 
 # some C1 codes
 CSI_C1 = '\x9b'
 OSC_C1 = '\x9d'
-ST_C1= '\x9c'
+ST_C1  = '\x9c'
 
 
-# where ansi codes start, floor values
+# Where ANSI codes start, floor values:
 ANSI_FG_LO_BASE = 30
 ANSI_FG_HI_BASE = 90
 ANSI_BG_LO_BASE = 40
