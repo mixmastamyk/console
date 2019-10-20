@@ -270,7 +270,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         return (self._create_entry(name, values) if values else empty)
 
     def _get_X11_palette_entry(self, name):
-        from .color_tables import x11_color_map
+        from .color_tables_x11 import x11_color_map
         result = empty
         try:            # to decimal int strings, e.g.: ('1', '2', '3')
             color = x11_color_map[name.lower()]
