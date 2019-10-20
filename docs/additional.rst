@@ -127,7 +127,11 @@ Custom Initialization
 
 .. rubric:: Environment Variables
 
-On rare posix terminals color detection may hang and need to be disabled.
+On rare POSIX terminals color detection may hang and need to be disabled.
+(Recent versions of console implement a timeout to alleviate this.
+If you notice that startup stutters briefly at console init,
+you might be affected.
+See troubleshooting below to enable DEBUG logging.)
 
 To disable automatic detection of terminal capabilities at import time the
 environment variable
@@ -468,12 +472,11 @@ Troubleshooting
 
 - Console performs auto-detection of the environment at startup to determine
   terminal capabilities.
-  This could hang obscure terminals that advertise xterm on posix compatibility
-  without a full implementation.
+  This could *momentarily* hang obscure terminals that advertise xterm on posix
+  compatibility without a full implementation.
   To disable this,
   set the environment variable:
-  ``PY_CONSOLE_AUTODETECT='0'``
-  to disable it.
+  ``PY_CONSOLE_AUTODETECT='0'``.
   You'll now have to create the palette and screen objects
   (and possibly configure them)
   yourself.
@@ -488,17 +491,18 @@ Troubleshooting
   Well, the left operand is a palette entry object,
   while the second reduces to an ANSI escaped string.
   Did you mean to add a sequence just to the beginning of the string,
-  or every line?  Remember paging?
+  or every line of it?
+  Remember paging?
   Also, what about the ending sequence?
   Should it reset the foreground, background, styles, or everything?
-  Hard to know because there's not enough information to decide.
+  Hard to know because there's not enough information here to decide.
 
   Console warns you about this.
   It also does its best to divvy up the string,
   add the first operand to every line,
   and fix the reset-to-default sequence at the end.
   So it *might* work as expected,
-  maybe not.
+  possibly not.
   It's not very efficient either.
   Best to use one of these explicit forms instead:
 

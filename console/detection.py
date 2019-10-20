@@ -21,6 +21,7 @@ os_name = os.name  # frequent use
 is_fbterm = termios = tty = None
 TERM_SIZE_FALLBACK = (80, 24)
 CURSOR_POS_FALLBACK = (0, 0)
+READ_TO = .250  # select read timeout in float secs
 
 
 if os_name == 'posix':  # Linux, FreeBSD, MacOS, etc
@@ -305,16 +306,17 @@ def _find_basic_palette(name):
                 # This can be dangerous, as it could potentially hang:
                 else:
                     try:  # TODO: this comparison could be much better:
-                        if get_color('index', 2)[0][:2] == '85':
+                        colors = get_color('index', 2)
+                        if colors[0][:2] == '85':
                             pal_name = 'solarized'
                             basic_palette = color_tables.solarized_dark_palette4
-                        elif get_color('index', 2)[0][:2] == '4e':
+                        elif colors[0][:2] == '4e':
                             pal_name = 'tango'
                             basic_palette = color_tables.tango_palette4
                         else:
-                            raise RuntimeError('not the color scheme.')
+                            raise RuntimeError('not a known color scheme.')
                     except (IndexError, RuntimeError, termios.error) as err:
-                        log.debug(str(err))
+                        log.debug('get_color return value failed: %s', err)
         else:  # Amiga/Atari :-P
             log.warn('Unexpected OS: os.name: %s', os_name)
 
@@ -379,20 +381,23 @@ def _getch():
         return sys.stdin.read(1)
 
 
-def _read_until(infile=sys.stdin, maxchars=20, end=RS):
-    ''' Read a terminal response of up to a given max characters from stdin.  '''
+def _read_until_select(infile=sys.stdin, maxchars=20, end=RS, timeout=READ_TO):
+    ''' Read a terminal response of up to a given max characters from stdin,
+        with timeout.  POSIX only, files not compat with select on Windows.
+    '''
+    from select import select
     chars = []
     read = infile.read
     if not isinstance(end, tuple):
         end = (end,)
 
-    # count down, stopping at 0
-    while maxchars:
-        char = read(1)
-        if char in end:
-            break
-        chars.append(char)
-        maxchars -= 1
+    if select((infile,), (), (), timeout)[0]:  # wait until timeout
+        while maxchars:  # count down, stopping at 0
+            char = read(1)
+            if char in end:
+                break
+            chars.append(char)
+            maxchars -= 1
 
     return ''.join(chars)
 
@@ -413,12 +418,13 @@ def _get_color_xterm(name, number=None):
                 tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
                 sys.stdout.write(query_sequence)
                 sys.stdout.flush()
-                resp = _read_until(maxchars=26, end=(BEL, ST)).rstrip(ESC)
+                log.debug('about to read get_color_xterm response…')
+                resp = _read_until_select(maxchars=26, end=(BEL, ST)).rstrip(ESC)
         except AttributeError:  # no .fileno()
             pass # return colors
         else:  # parse response
             colors = resp.partition(':')[2].split('/')
-            if colors == ['']:
+            if colors == ['']:  # nuttin
                 colors = []  # empty on failure
 
     return colors
@@ -511,7 +517,6 @@ def get_position(fallback=CURSOR_POS_FALLBACK):
         Returns:
             tuple(int): (x, y), (,)  - empty, if an error occurred.
 
-        TODO: needs non-ansi mode for Windows
         Note:
             Checks is_a_tty() first, since function would block if i/o were
             redirected through a pipe.
@@ -527,7 +532,8 @@ def get_position(fallback=CURSOR_POS_FALLBACK):
                 tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
                 sys.stdout.write(CSI + '6n')            # screen.dsr, avoid import
                 sys.stdout.flush()
-                resp = _read_until(maxchars=10, end='R')
+                log.debug('about to read get_position response…')
+                resp = _read_until_select(maxchars=10, end='R')
         except AttributeError:  # no .fileno()
             return values
 
@@ -535,7 +541,7 @@ def get_position(fallback=CURSOR_POS_FALLBACK):
         resp = resp.lstrip(CSI)
         try:  # reverse
             values = tuple( int(token) for token in resp.partition(';')[::-2] )
-        except Exception as err:
+        except (ValueError, IndexError) as err:
             log.error('parse error: %s on %r', err, resp)
 
     return values
@@ -599,7 +605,8 @@ def get_title(mode='title'):
 
                 sys.stdout.write(query_sequence)
                 sys.stdout.flush()
-                resp = _read_until(maxchars=100, end=ST)
+                log.debug('about to read get_title response…')
+                resp = _read_until_select(maxchars=100, end=ST)
         except AttributeError:  # no .fileno()
             return title
 
