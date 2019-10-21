@@ -37,8 +37,8 @@ icons = dict(
     dies        = (' ', '⚅', '⚀', ' ', '✓', '⏴', '⏵', '✗'),
     horns       = ('🤘', '⛧', '⛤', '🤘', '✓', '⏴', '⏵', '✗'),
     segmented   = ('▕', '▉', '▉', '▏', '✓', '⏴', '⏵', '✗ '),
-    faces       = (' ', '☻', '☹', '', '✓', '⏴', '⏵', '✗'),
-    wide_faces  = (' ', '😎', '😞', '', '✓', '⏴', '⏵', '✗'),
+    faces       = (' ', '☻', '☹', ' ', '✓', '⏴', '⏵', '✗'),
+    wide_faces  = (' ', '😎', '😞', ' ', '✓', '⏴', '⏵', '✗'),
     stars       = ('(', '★', '☆', ')', '✓', '⏴', '⏵', '✗'),
     shaded      = ('▕', '▓', '░', '▏', '✓', '⏴', '⏵', '✗'),
     triangles   = ('▕', '▶', '◁', '▏', '✓', '⏴', '⏵', '✗'),
@@ -165,16 +165,20 @@ class ProgressBar:
                 bar = ProgressBar(total=len(items))  # set total
 
                 for i in items:
-                    print(bar(i), flush=True, end='')
+                    print('Caption:', bar(i), end='', flush=True)
                     time.sleep(.1)
-
                 print()
+
+                # or use as a tqdm-style iterable wrapper:
+                for i in ProgressBar(range(100)):
+                    sleep(.1)
 
         Arguments:
             clear_left: True        True to clear and mv to 0, or int offset
             debug: None             Turn on debug output
             done: False             True on completion, moderates style
             expand: False           Set width to full terminal width
+            iterable: object        An object to iterate on.
             label_mode:  True       Turn on label
             oob_error:  False       Out of bounds error occurred
             total:  100             Set the total number of items
@@ -199,7 +203,7 @@ class ProgressBar:
     label_mode = True
     oob_error = False
     timedeltas = TIMEDELTAS
-    total = 100
+    total = None
     unicode_support = unicode_support
     width = 32
 
@@ -211,8 +215,9 @@ class ProgressBar:
     _min_width = MIN_WIDTH
     _num_complete_chars = 0
     _remainder = 0
+    _iter_n = 0
 
-    def __init__(self, **kwargs):
+    def __init__(self, iterable=None, **kwargs):
         # configure instance
         for key, val in kwargs.items():
             if key == 'theme':
@@ -255,6 +260,29 @@ class ProgressBar:
 
         # dynamic label fmt, set to None to disable
         self._start = time.time()
+
+        # tqdm-style iterable interface
+        if iterable and not self.total:
+            try:
+                self.total = len(iterable)
+            except (TypeError, AttributeError):
+                self.total = None
+            self.iterable = iterable
+            self(self._iter_n)  # call() set initial
+        else:
+            self.total = 100
+
+    def __len__(self):
+        return self.total
+
+    def __iter__(self):
+        ''' tqdm-style iterable interface: https://tqdm.github.io/ '''
+        for obj in self.iterable:
+            yield obj
+            self._iter_n += 1
+            self(self._iter_n)
+            print(self, end='')
+        print()
 
     def __str__(self):
         ''' Renders the current state as a string. '''

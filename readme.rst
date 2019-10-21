@@ -46,7 +46,7 @@ Most simply, adding a little color with console might look like this:
     >>> fg.green + 'Hello World!' + fg.default
     '\x1b[32mHello World!\x1b[39m'
 
-But there are even more convenient ways,
+But there are more convenient ways,
 read on.
 
 FYI, the string  ``'\x1b'`` represents the ASCII Escape character
@@ -177,7 +177,8 @@ includes a number of nifty functions:
 It can also ``strip_ansi`` from strings,
 wait for keypresses,
 clear a line or the screen (with or without scrollback),
-and easily ``pause`` a script like the old ``DOS`` commands of yesteryear.
+print stylish progress bars,
+or easily ``pause`` a script like the old ``DOS`` commands of yesteryear.
 
 .. rubric:: **Screen Module**
 

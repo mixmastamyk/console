@@ -332,7 +332,7 @@ Hello world looks like this:
     >>> from console.progress import ProgressBar
 
     >>> bar = ProgressBar()  # "Hey HEY, hey!"
-    >>> print(bar(50))
+    >>> print(bar(50))       # out of 100
 
 .. raw:: html
 
@@ -379,26 +379,31 @@ ProgressBar defaults to an ASCII representation in that environment.)
 
 A more robust use of the module is illustrated below::
 
-    import time
+    from time import sleep
     from console.screen import sc
     from console.progress import ProgressBar
 
     with sc.hidden_cursor():  # "Ooooohh, I'm tellin' Mama!"
 
-        items = range(256)  # example tasks
+        items = range(256)    # example tasks
         bar = ProgressBar(total=len(items))
 
         for i in items:
-            print(bar(i), flush=True, end='')
-            time.sleep(.1)      # "Uh-Uhn"
+            print('Caption:', bar(i), end='', flush=True)
+            sleep(.1)         # "Uh-Uhn"
         print()
+
+        # or use as a tqdm-style iterable wrapper:
+        for i in ProgressBar(range(100)):
+            sleep(.1)
+
 
 Not all of this code is required, of course.
 For example, you may not want to hide the cursor or clear the line each time,
 but often will.
 To expand to the full line,
 ``expand=True`` is available as well.
-See the source for more details.
+See the docs (:mod:`console.progress`) and source for more details.
 
 
 Environment Variables

@@ -226,5 +226,6 @@ Looked at and picked a few design cues from several of these:
     - termcolor
 
     - ptpython, urwid
+    - tqdm
 
 etc.
