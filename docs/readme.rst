@@ -23,14 +23,18 @@
 Console
 ============
 
-.. sidebar:: Console Testimonials
+.. sidebar:: Testimonials
 
-    | *"There is nothing we won't try…"*
-    |     *—Laverne and Shirley*
-    | *"Fightin' the system like a true modern day Robin Hood"*
-    |     *—Waylon Jennings*
-    | *“Better, stronger, faster”*
-    |     *—Oscar Goldman*
+    - *"👍 Ayyyyyy… 👍"—The Fonz*
+    - *"DYN-O-MITE!!" — J.J. from Good Times*
+    - *"So hot, totally hot…"—Olivia Newton-John*
+    - *“Better, stronger, faster”—Oscar Goldman*
+    - *"There is nothing we won't try…"—Laverne and Shirley*
+    - *"Fightin' the system like a true modern day Robin Hood" —Waylon Jennings*
+
+
+
+..    - *"Suddenly, the wheels are in motion…"—Olivia Newton-John*
 
 Yet another package that makes it easy to generate the inline codes used to
 display colors and character styles in ANSI-compatible terminals and emulators,
@@ -38,6 +42,7 @@ as well as other functionality such clearing screens,
 moving cursors,
 setting title bars,
 and detecting capabilities.
+
 
 How is this one different?
 Well,
@@ -339,7 +344,7 @@ on a few obscure colors.
 Composability++
 ~~~~~~~~~~~~~~~~
 
-    *DYN-O-MITE!! — J.J. from Good Times*
+    *"DYN-O-MITE!!"—J.J. from Good Times*
 
 Console's palette entry objects are meant to be highly composable and useful in
 multiple ways.
@@ -477,11 +482,11 @@ Can you help?
 Legalese
 ----------------
 
-    *"Stickin' it to the Man"*
+*"Stickin' it to the Man"*
 
-    - Copyright 2018-2019, Mike Miller
-    - Released under the LGPL, version 3+.
-    - Enterprise Pricing:
+- Copyright 2018-2019, Mike Miller
+- Released under the LGPL, version 3+.
+- Enterprise Pricing:
 
-      | 6 MEEllion dollars…  *Bwah-haha-ha!*
-      | (only have to sell *one* copy!)
+  | 6 MEEllion dollars…  *Bwah-haha-ha!*
+  | (only have to sell *one* copy!)
