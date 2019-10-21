@@ -23,6 +23,15 @@
 Console
 ============
 
+.. sidebar:: Console Testimonials
+
+    | *"There is nothing we won't try…"*
+    |     *—Laverne and Shirley*
+    | *"Fightin' the system like a true modern day Robin Hood"*
+    |     *—Waylon Jennings*
+    | *“Better, stronger, faster”*
+    |     *—Oscar Goldman*
+
 Yet another package that makes it easy to generate the inline codes used to
 display colors and character styles in ANSI-compatible terminals and emulators,
 as well as other functionality such clearing screens,
