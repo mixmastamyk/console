@@ -146,6 +146,8 @@ if desired.
 
 .. rubric:: Initializing Your Own
 
+*"I love the smell of napalm in the morning."—Lt. Col. Kilgore*
+
 To configure auto-detection, palette support,
 or detect other output streams besides stdout,
 one may build palette objects yourself:
