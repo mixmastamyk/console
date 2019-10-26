@@ -21,7 +21,6 @@
         :copyright: Copyright 2006-2017 by the Pygments team, see AUTHORS.
         :license: BSD, see LICENSE for details.
 
-
     Note:
         An experiment was done using a more accurate CIELAB distance algorithm,
         but the solution was quite heavy and therefore removed.

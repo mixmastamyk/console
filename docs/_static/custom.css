@@ -26,6 +26,11 @@ div.body h6 { font-size:  90% }
 div.body p  { line-height: 1.6}
 
 div.body ul li { margin-bottom: .6em }
+/* fix alabaster bullet outside sidebar */
+@media screen and (max-width: 870px) {
+    ul { margin-left: 2em !important }
+    li > ul { margin-left: 0 }
+}
 
 /*
     sphinxsidebar

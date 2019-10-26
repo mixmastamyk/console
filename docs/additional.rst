@@ -123,7 +123,7 @@ Well, more specifically empty strings.
 Custom Initialization
 ------------------------
 
-    *“Kiss my grits.”—Flo*
+    *"I hope you know this violates my warranty!"—Twiki*
 
 .. rubric:: Environment Variables
 
@@ -200,7 +200,7 @@ it doesn't seem worth the trouble for this library.
 Context Managers
 -------------------
 
-    *"I hope you know this violates my warranty!"—Twiki*
+    *“Kiss my grits.”—Flo*
 
 .. rubric:: Configuring Output
 
@@ -409,6 +409,9 @@ See the docs (:mod:`console.progress`) and source for more details.
 Environment Variables
 -----------------------
 
+    | *"But I took them away from all that, and now they work for me.*
+    | *My name is Charlie."*
+
 The following standard variables are noted by ``console`` and affect its
 behavior:
 
@@ -442,8 +445,7 @@ Console itself:
 Tips
 ------------
 
-    | *"But I took them away from all that, and now they work for me.*
-    | *My name is Charlie."*
+    *"Easy Miss, I’ve got you." "You’ve got ME? Who’s got YOU?"—Superman*
 
 - The styles bold, italic, underline, and strike have one-letter shortcuts as
   they do in HTML,
@@ -519,9 +521,6 @@ Troubleshooting
     # or add it in via a "mixin" style
     pal.style2(msg, pal.style1)
 
-|
-
-*"After an accidental overdose of gamma radiation…"*
 
 - If console isn't working as you'd expect,
   turn on DEBUG logging before loading it to see what it finds.
@@ -535,9 +534,10 @@ Troubleshooting
                '%(funcName)s:%(lineno)s %(message)s',
     )
 
-    # logs autodetection messages
+    # now logs autodetection messages:
     from console import fg, bg, fx
 
+    # After an accidental overdose of gamma radiation…
     dr_banner = fg.green + fx.bold + fx.italic
 
     print('\n\t',
@@ -613,12 +613,13 @@ Interesting knowledge rediscovered perhaps.
 
 |
 
-Signing off from late '79,
-a new futuristic decade awaits!
+Signing off from late '79.
+ A new futuristic decade awaits!
 
     - *Keep On Truckin'*
     - *Catch you on the flip-side*
     - *Good night, John-boy*
+    - *"This is Ripley, last survivor of the Nostromo, signing off."*
 
     and…
 

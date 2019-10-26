@@ -128,10 +128,10 @@ def strip_ansi(text, c1=False, osc=False):
             c1:  bool  - include C1 commands in the strippage.
 
         Notes:
-            Enabling c1 and osc stripping is less efficient and the two options
-            can mildly conflict with one another.
-            The less problematic order was chosen, so there may still be rare
-            C1 OSC fragments left over.
+            Enabling both c1 and osc stripping is less efficient and the two
+            options can mildly conflict with one another.
+            The less problematic order was chosen,
+            but there may still be rare C1 OSC fragments left over.
     '''
     text = ansi_csi0_finder.sub('', text)
     if osc:
@@ -151,7 +151,7 @@ def len_stripped(text):
     return len(strip_ansi(text))
 
 
-# convenience, compatibility
+# shortcuts for convenience, compatibility:
 clear = clear_screen
 cls = reset_terminal
 
@@ -165,10 +165,9 @@ elif os_name == 'posix':
 
 def wait_key(keys=None):
     ''' Waits for a keypress at the console and returns it.
-        "Where's the any key?"
 
         Arguments:
-            keys - if passed, wait for this specific key, e.g. ESC.
+            keys - if passed, wait for this specific key, e.g. 'Q', 'ESC'.
                    may be a tuple.
         Returns:
             char or ESC - depending on key hit.
@@ -189,7 +188,9 @@ def wait_key(keys=None):
 def pause(message='Press any key to continue…'):
     ''' Analogous to the ancient
         `DOS pause <https://en.wikipedia.org/wiki/List_of_DOS_commands#PAUSE>`_
-        command, with a modifiable message.
+        command from olden times,
+        with a modifiable message.
+        *"Where's the any key?"*
 
         Arguments:
             message:  str

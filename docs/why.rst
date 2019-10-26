@@ -13,7 +13,7 @@
 
     | *"In your satin tights,*
     | *fighting for your rights,*
-    | *and the old red, white and blue…"*
+    | *and the old red, white, and blue…"*
     | *—Wonder Woman theme*
 
 |
@@ -21,6 +21,7 @@
 Another One, eh 🤔?
 =======================
 
+    *"First I was afraid, I was petrified…"—Gloria Gaynor*
 
 .. raw:: html
 
@@ -47,7 +48,7 @@ Another One, eh 🤔?
 Background
 ---------------
 
-    *"First I was afraid, I was petrified…"—Gloria Gaynor*
+    *"CHARLIE DON'T SURF!"—Lt. Col. Kilgore*
 
 So ANSI escape codes have been standard on UNIX
 with the belt-and-suspenders crowd for several decades,
@@ -131,7 +132,7 @@ and is not included by default on Windows.
 Meanwhile, over at the Cheeseshop…
 ------------------------------------
 
-    *"Not much of a cheese shop really, is it?"*
+    *"Not much of a cheese shop really, is it?"—Monty Python*
 
 And so, now there are ad-hoc ANSI codes being generated in every command-line
 app and eleventy micro-libs on "the" PyPI doing the same.

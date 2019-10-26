@@ -10,7 +10,7 @@
     composable with the core._PaletteEntry due to the fact that many of them
     need parameters.  This may change in the future.
 
-    Context-managers with contextlib inspired and derived from:
+    Context-managers with contextlib inspired by:
 
     .. code-block:: text
 

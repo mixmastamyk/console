@@ -16,12 +16,12 @@
 Console
 ============
 
-.. sidebar:: Testimonials
+.. sidebar:: **Testimonials**
 
     - *"👍 Ayyyyyy… 👍"—The Fonz*
     - *"DYN-O-MITE!!" — J.J. from Good Times*
+    - *“Better… Stronger… Faster”—Oscar Goldman*
     - *"So hot, totally hot…"—Olivia Newton-John*
-    - *“Better, stronger, faster”—Oscar Goldman*
     - *"There is nothing we won't try…"—Laverne and Shirley*
     - *"Fightin' the system like a true modern day Robin Hood" —Waylon Jennings*
 
@@ -60,15 +60,17 @@ Most simply, adding a little color with console might look like this:
     >>> fg.green + 'Hello World!' + fg.default
     '\x1b[32mHello World!\x1b[39m'
 
-But there are more convenient ways,
-read on.
+But wait!  There's a shitload,^H^H^H^H^H, crapton,^H^H^H^H^H
+err…
+*lot more!*  Kindly read on.
+
 
 FYI, the string  ``'\x1b'`` represents the ASCII Escape character
-(``27`` in decimal or ``1b`` hex).
-Command 32 turns the text green
-and 39 back to the default color.
+(``27`` in decimal, ``1b`` hex).
+Command ``[32m`` turns the text green
+and ``[39m`` back to the default color.
 But, there's no need to worry about any of that.
-That's why you're here.
+That's why you're here, right?
 
 Printing to a supporting terminal from Python might also look like this:
 
@@ -79,7 +81,8 @@ Printing to a supporting terminal from Python might also look like this:
     Try the*
     `Sphinx docs <https://mixmastamyk.bitbucket.io/console/>`_
     *instead.
-    When you see "😉" in a comment, that's a reminder.*
+    When you see "😉" in a comment, that's a reminder you're not getting
+    the full monty.*
 
 .. code-block:: python
 
@@ -100,13 +103,9 @@ where
 
 .. code-block:: python
 
-    fg.yellow('Woot!')  # --> '\x1b[33mWoot!\x1b[39m'
+    fg.yellow('Far Out!')  # --> '\x1b[33mFar Out!\x1b[39m'
 
 More on that later.
-
-But wait!  There's a shitload,^H^H^H^H^H, crapton,^H^H^H^H^H
-err…
-*lot* more!
 
 
 Installen-Sie, Bitte
@@ -170,7 +169,7 @@ Der ``console`` package has recently been tested on:
 Overview
 ------------------
 
-    *"👍 Ayyyyyy… 👍"—The Fonz*
+    *"Hey, Mr. Kot-tair!"—Freddie "Boom Boom" Washington*
 
 As mentioned,
 console handles lots more than color and styles.
@@ -272,7 +271,7 @@ You can:
 Palettes
 ~~~~~~~~~
 
-    *"Hey, Mr. Kot-tair!"—Freddie "Boom Boom" Washington*
+    *"Looo-king Gooood!"—Chico and the Man*
 
 The palettes break down into three main categories.
 Unleash your inner
@@ -338,7 +337,8 @@ on a few obscure colors.
 Composability++
 ~~~~~~~~~~~~~~~~
 
-    *"DYN-O-MITE!!"—J.J. from Good Times*
+    *"East bound and down, loaded up and truckin'
+    We gonna do what they say can't be done…"—Smokey and the Bandit*
 
 Console's palette entry objects are meant to be highly composable and useful in
 multiple ways.
@@ -401,6 +401,8 @@ Other template formats are no problem either, ``%s`` or ``${}``.
 
 .. rubric:: **Performance**
 
+*Outta Sight!*
+
 Console is lightweight,
 but perhaps you'd like a pre-rendered string to be used in a tight loop for
 performance reasons.
@@ -436,7 +438,7 @@ Palette entries work as context-managers as well:
 Demos and Tests
 ------------------
 
-    *Outta Sight!*
+    *"I got chills, they're multiplyin'…"—Danny Zuko*
 
 A series of positively jaw-dropping demos (haha, ok maybe not) may be run at
 the command-line with::
@@ -455,6 +457,8 @@ The Makefile in the repo at github has more details on such topics.
 
 Contributions
 ------------------
+
+    *"Use the Source, Luke!"—'Ben' Kenobi*
 
 Could use some help testing on Windows and MacOS as my daily driver is a 🐧 Tux
 racer.

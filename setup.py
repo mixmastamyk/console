@@ -2,6 +2,8 @@ import sys
 from os.path import dirname, join
 from setuptools import setup
 
+
+assert sys.version_info >= (3, 4, 0), "This package requires Python 3.4+"
 # avoid starting console detection:
 import imp
 meta = imp.load_source('meta', 'console/meta.py')
