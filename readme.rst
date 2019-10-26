@@ -337,8 +337,8 @@ on a few obscure colors.
 Composability++
 ~~~~~~~~~~~~~~~~
 
-    *"East bound and down, loaded up and truckin'
-    We gonna do what they say can't be done…"—Smokey and the Bandit*
+    | *"East bound and down, loaded up and truckin'…*
+    | *We gonna do what they say can't be done"—Smokey and the Bandit*
 
 Console's palette entry objects are meant to be highly composable and useful in
 multiple ways.
