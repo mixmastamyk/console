@@ -170,22 +170,24 @@ def detect_palette_support(basic_palette=None):
                 name:       None or str: 'basic', 'extended', 'truecolor'
                 palette:    len 16 tuple of colors (len 3 tuple)
     '''
-    name = colorama_init = win_enabled = None
+    name = ansicon = colorama_init = win_enabled = None
     TERM = env.TERM or ''
-    if os_name == 'nt':  # Windows is complicated
+    if os_name == 'nt':  # Windows is complicated :-/
         from .windows import (is_ansi_capable, enable_vt_processing,
                               is_colorama_initialized)
-        if is_ansi_capable():
-            win_enabled = all(enable_vt_processing())
-        colorama_init = is_colorama_initialized()
+        if is_ansi_capable() and all(enable_vt_processing()):
+            win_enabled = True
+        else:
+            colorama_init = is_colorama_initialized()
+            ansicon = env.ANSICON
 
-    # linux, older Windows + colorama
+    # linux, older Windows w/ colorama
     if TERM.startswith('xterm') or (TERM == 'linux') or colorama_init:
         name = 'basic'
 
     # upgrades
     # xterm, fbterm, older Windows + ansicon
-    if ('256color' in TERM) or is_fbterm or env.ANSICON:
+    if ('256color' in TERM) or is_fbterm or ansicon:
         name = 'extended'
 
     # https://bugzilla.redhat.com/show_bug.cgi?id=1173688 - obsolete?
@@ -203,7 +205,7 @@ def detect_palette_support(basic_palette=None):
         webcolors = None
 
     log.debug(
-        f'Term support: {name!r} ({os_name}, TERM={env.TERM or ""}, '
+        f'Term support: {name!r} ({os_name}, TERM={env.TERM}, '
         f'COLORTERM={env.COLORTERM or ""}, ANSICON={env.ANSICON}, '
         f'webcolors={bool(webcolors)}, basic_palette={pal_name})'
     )
@@ -290,8 +292,8 @@ def _find_basic_palette(name):
                 pal_name = 'vtrgb'
                 basic_palette = parse_vtrgb()
             elif env.TERM.startswith('xterm'):
-                # fix: LOW64 - Python on Linux on Windows!
-                if 'Microsoft' in os.uname().release:
+                # LOW64 - Python on Linux on Windows!
+                if ('WSLENV' in env) or ('Microsoft' in os.uname().release):
                     pal_name = 'cmd_1709'
                     basic_palette = color_tables.cmd1709_palette4
                     name = 'truecolor'  # override

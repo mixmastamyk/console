@@ -42,7 +42,8 @@ setup(
     license             = 'LGPL 3',
     long_description    = slurp('readme.rst'),
     packages            = (meta.pkgname,),
-    url                 = meta.repo_url,
+    url                 = meta.home_url,
+    project_urls        = meta.project_urls,
     version             = meta.version,
 
     extras_require      = extras_require,
