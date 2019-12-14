@@ -5,6 +5,9 @@
 
     This module contains capability detection routines for use under ANSI
     compatible terminals.
+
+    TODO: not entirely sure what to do over ssh, currently downgrades
+          capabilities somewhat.
 '''
 import sys, os
 import logging
@@ -12,7 +15,7 @@ import logging
 import env
 
 from . import color_tables, proximity
-from .constants import BS, BEL, CSI, ESC, OSC, RS, ST, ALL_PALETTES
+from .constants import BS, BEL, CSI, ESC, ENQ, OSC, RS, ST, ALL_PALETTES
 from .meta import __version__, defaults
 
 
@@ -291,13 +294,13 @@ def _find_basic_palette(name):
             if env.TERM in ('linux', 'fbterm'):
                 pal_name = 'vtrgb'
                 basic_palette = parse_vtrgb()
-            elif env.TERM.startswith('xterm'):
+            elif env.TERM.startswith('xterm'):   # TODO: factor, get_theme
                 # LOW64 - Python on Linux on Windows!
                 if ('WSLENV' in env) or ('Microsoft' in os.uname().release):
                     pal_name = 'cmd_1709'
                     basic_palette = color_tables.cmd1709_palette4
                     name = 'truecolor'  # override
-                elif sys.platform.startswith('freebsd'):  # vga console :-/
+                elif sys.platform.startswith('freebsd'):  # TODO: is valid?  vga console
                     pal_name = 'vga'
                     basic_palette = color_tables.vga_palette4
 
@@ -380,8 +383,7 @@ def _getch():
         return sys.stdin.read(1)
 
 
-def _read_until_select(infile=sys.stdin, maxchars=20, end=RS,
-                       timeout=defaults.READ_TIMEOUT):
+def _read_until_select(infile=sys.stdin, maxbytes=20, end=RS, timeout=None):
     ''' Read a terminal response of up to a given max characters from stdin,
         with timeout.  POSIX only, files not compat with select on Windows.
     '''
@@ -390,14 +392,16 @@ def _read_until_select(infile=sys.stdin, maxchars=20, end=RS,
     read = infile.read
     if not isinstance(end, tuple):
         end = (end,)
+    log.debug('maxbytes=%s, end=%r, timeout %s…', maxbytes, end, timeout)
 
     if select((infile,), (), (), timeout)[0]:  # wait until response or timeout
-        while maxchars:  # response: count down chars, stopping at 0
+        log.debug('select start')
+        while maxbytes:  # response: count down chars, stopping at 0
             char = read(1)
             if char in end:
                 break
             chars.append(char)
-            maxchars -= 1
+            maxbytes -= 1
     else:  # timeout
         log.debug('response not received in time, %s secs.', timeout)
 
@@ -405,10 +409,10 @@ def _read_until_select(infile=sys.stdin, maxchars=20, end=RS,
 
 
 _color_code_map = dict(foreground='10', fg='10', background='11', bg='11')
-def _get_color_xterm(name, number=None):
+def _get_color_xterm(name, number=None, timeout=None):
     ''' Query xterm for color settings.
 
-        Warning: likely to block on incompatible terminals.
+        Warning: likely to block on incompatible terminals, use timeout.
     '''
     colors = ()
     color_code = _color_code_map.get(name)
@@ -421,7 +425,9 @@ def _get_color_xterm(name, number=None):
                 sys.stdout.write(query_sequence)
                 sys.stdout.flush()
                 log.debug('about to read get_color_xterm response…')
-                resp = _read_until_select(maxchars=26, end=(BEL, ST)).rstrip(ESC)
+                resp = _read_until_select(
+                            maxbytes=26, end=(BEL, ST), timeout=timeout
+                        ).rstrip(ESC)
         except AttributeError:  # no .fileno()
             pass # return colors
         else:  # parse response
@@ -432,14 +438,35 @@ def _get_color_xterm(name, number=None):
     return colors
 
 
-def get_color(name, number=None):
+def get_answerback(maxbytes=100, end=(), timeout=defaults.READ_TIMEOUT):
+    ''' Returns the "answerback" string.
+
+        Note: Hangs unless maxbytes is a subset of string *or* an explicit
+              end character is given, due to inability to find end.
+              https://unix.stackexchange.com/a/312991/159110
+    '''
+    try:
+        with TermStack() as fd:
+            termios.tcflush(fd, termios.TCIFLUSH)   # clear input
+            tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
+            sys.stdout.write(ENQ)
+            sys.stdout.flush()
+            log.debug('about to read answerback response…')
+            return _read_until_select(
+                        maxbytes=maxbytes, end=end, timeout=timeout
+                    )
+    except AttributeError:  # no .fileno()
+        pass
+
+
+def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
     ''' Query the default terminal, for colors, etc.
 
         Direct queries supported on xterm, iTerm, perhaps others.
 
         Arguments:
-            str:  name,  one of ('foreground', 'fg', 'background', 'bg',
-                                 or 'index')  # index grabs a palette index
+            str:  name, one of ('foreground', 'fg', 'background', 'bg',
+                                or 'index')  # index grabs a palette index
             int:  or a "dynamic color number of (4, 10-19)," see links below.
             str:  number - if name is index, number should be an int from 0…255
 
@@ -456,7 +483,7 @@ def get_color(name, number=None):
             tuple[int]: 
                 A tuple of four-digit hex strings after parsing,
                 the last two digits are the least significant and can be
-                chopped if needed:
+                chopped when needed:
 
                 ``('DEAD', 'BEEF', 'CAFE')``
 
@@ -470,10 +497,13 @@ def get_color(name, number=None):
             >>> get_color('index', 2)       # second color in indexed
             ... ('4e4d', '9a9a', '0605')    # palette, 2 aka 32 in basic
 
-        Note:
-            Blocks if terminal does not support the function.
+        Notes:
             Checks is_a_tty() first, since function would also block if i/o
             were redirected through a pipe.
+
+            Query blocks until timeout if terminal does not support the function.
+            Many don't.  Timeout can be disabled with None or set to a higher
+            number for a slow terminal.
 
             On Windows, only able to find palette defaults,
             which may be different if they were customized.
@@ -481,11 +511,11 @@ def get_color(name, number=None):
             see ``windows.get_color``.
     '''
     colors = ()
-    if is_a_tty() and not env.SSH_CLIENT:
+    if is_a_tty():
         if not 'index' in _color_code_map:
             _color_code_map['index'] = '4;' + str(number or '')
 
-        if os_name == 'nt':
+        if os_name == 'nt':  # TODO: This may no longer apply on Windows Terminal
             from .windows import get_color
             color_id = get_color(name)
             if sys.getwindowsversion()[2] > 16299:  # Win10 FCU, new palette
@@ -497,17 +527,17 @@ def get_color(name, number=None):
         elif sys.platform == 'darwin':
             if env.TERM_PROGRAM == 'iTerm.app':
                 # supports, though returns two chars per
-                colors = _get_color_xterm(name, number)
+                colors = _get_color_xterm(name, number, timeout=timeout)
 
         elif os_name == 'posix':
-            if sys.platform.startswith('freebsd'):
+            if sys.platform.startswith('freebsd'):  # TODO, may not be console
                 pass
             elif env.TERM:
                 if env.TERM.startswith('xterm'):
-                    if env.TERM_PROGRAM == 'vscode':
+                    if env.TERM_PROGRAM == 'vscode':  # vscode on Linux, foo'
                         pass
                     else:
-                        colors = _get_color_xterm(name, number)
+                        colors = _get_color_xterm(name, number, timeout=timeout)
 
     return tuple(colors)
 
@@ -535,7 +565,7 @@ def get_position(fallback=defaults.CURSOR_POS_FALLBACK):
                 sys.stdout.write(CSI + '6n')            # screen.dsr, avoid import
                 sys.stdout.flush()
                 log.debug('about to read get_position response…')
-                resp = _read_until_select(maxchars=10, end='R')
+                resp = _read_until_select(maxbytes=10, end='R')
         except AttributeError:  # no .fileno()
             return values
 
@@ -608,7 +638,7 @@ def get_title(mode='title'):
                 sys.stdout.write(query_sequence)
                 sys.stdout.flush()
                 log.debug('about to read get_title response…')
-                resp = _read_until_select(maxchars=100, end=ST)
+                resp = _read_until_select(maxbytes=100, end=ST)
         except AttributeError:  # no .fileno()
             return title
 
@@ -619,7 +649,7 @@ def get_title(mode='title'):
     return title
 
 
-def get_theme():
+def get_theme(timeout=defaults.READ_TIMEOUT):
     ''' Checks terminal for theme "lightness" information.
 
         First checks for the environment variable COLORFGBG.
@@ -640,18 +670,22 @@ def get_theme():
             color_id = _get_color('background')
             theme = 'dark' if color_id < 8 else 'light'
 
-        elif os_name == 'posix':
+        elif os_name == 'posix':  # TODO: factor, same as _find_basic_pal
             if env.TERM in ('linux', 'fbterm'):  # default
                 theme = 'dark'
             elif sys.platform.startswith('freebsd'):  # vga console :-/
                 theme = 'dark'
-            else:
-                # try xterm - find average across rgb
-                colors = get_color('background')  # bg wins
-                if colors:
-                    colors = tuple(int(cm[:2], 16) for cm in colors)
-                    avg = sum(colors) / len(colors)
-                    theme = 'dark' if avg < 128 else 'light'
+            elif env.TERM.startswith('xterm'):
+                # LOW64 - Python on Linux on Windows!
+                if ('WSLENV' in env) or ('Microsoft' in os.uname().release):
+                    pass
+                else:
+                    # try xterm query- find average across rgb
+                    colors = get_color('background', timeout=timeout)  # bg wins
+                    if colors:
+                        colors = tuple(int(cm[:2], 16) for cm in colors)
+                        avg = sum(colors) / len(colors)
+                        theme = 'dark' if avg < 128 else 'light'
 
     log.debug('%r', theme)
     return theme

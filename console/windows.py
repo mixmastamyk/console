@@ -134,14 +134,17 @@ def is_ansi_capable():
     ''' Check to see whether this version of Windows is recent enough to
         support "ANSI VT"" processing.
     '''
-    CURRENT_VERS = sys.getwindowsversion()[:3]
+    try:
+        CURRENT_VERS = sys.getwindowsversion()[:3]  # not avail off windows
 
-    if CURRENT_VERS[2] > BUILD_ANSI_AVAIL:
-        result = True
-    else:
-        result = False
-    log.debug('%s (Windows version: %s)', result, CURRENT_VERS)
-    return result
+        if CURRENT_VERS[2] > BUILD_ANSI_AVAIL:
+            result = True
+        else:
+            result = False
+        log.debug('%s (Windows version: %s)', result, CURRENT_VERS)
+        return result
+    except AttributeError:
+        pass
 
 
 def is_colorama_initialized():

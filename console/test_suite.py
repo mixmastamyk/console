@@ -501,8 +501,11 @@ if True:  # fold
             detection.env = Environment(environ=dict(TERM=name))
             assert detection.detect_palette_support(basic_palette=pal) == (result, pal)
 
+        orig_os_name = detection.os_name    # patch os
+        detection.os_name = 'nt'
         detection.env = Environment(environ=dict(ANSICON='1'))
         assert detection.detect_palette_support(basic_palette=pal) == ('extended', pal)
+        detection.os_name = orig_os_name    # fix
 
         detection.env = Environment(environ=dict(COLORTERM='24bit'))
         assert detection.detect_palette_support(basic_palette=pal) == ('truecolor', pal)

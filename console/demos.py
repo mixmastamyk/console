@@ -212,9 +212,9 @@ def run():
 
     if is_a_tty():
         try:
-            print('       theme:', get_theme(), '\n')
-            print('       color scheme:', get_color('fg'), 'on',
-                                          get_color('bg'), end=' ')
+            print('       theme:', get_theme(timeout=1), '\n')
+            print('       color scheme:', get_color('fg', timeout=1), 'on',
+                                          get_color('bg', timeout=1), end=' ')
         except ModuleNotFoundError:
             pass  # termios - Windows
 
