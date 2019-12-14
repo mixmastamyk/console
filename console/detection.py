@@ -4,7 +4,8 @@
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     This module contains capability detection routines for use under ANSI
-    compatible terminals.
+    compatible terminals.  Most functions return None when not able to detect
+    requested information.
 
     TODO: not entirely sure what to do over ssh, currently downgrades
           capabilities somewhat.
@@ -50,8 +51,8 @@ class TermStack:
     '''
     def __init__(self, stream=sys.stdin):
         if not termios:
-            raise RuntimeError('The termios module was not loaded, is this a '
-                               'POSIX environment?')
+            raise EnvironmentError('The termios module was not loaded, is '
+                                   'this a POSIX environment?')
         self.fd = stream.fileno()
 
     def __enter__(self):
@@ -428,8 +429,10 @@ def _get_color_xterm(name, number=None, timeout=None):
                 resp = _read_until_select(
                             maxbytes=26, end=(BEL, ST), timeout=timeout
                         ).rstrip(ESC)
-        except AttributeError:  # no .fileno()
-            pass # return colors
+        except AttributeError:
+            log.debug('warning - no .fileno() attribute was found on the stream.')
+        except EnvironmentError:  # Winders
+            log.debug('get_color not yet implemented by Windows.')
         else:  # parse response
             colors = resp.partition(':')[2].split('/')
             if colors == ['']:  # nuttin
@@ -438,12 +441,13 @@ def _get_color_xterm(name, number=None, timeout=None):
     return colors
 
 
-def get_answerback(maxbytes=100, end=(), timeout=defaults.READ_TIMEOUT):
-    ''' Returns the "answerback" string.
+def get_answerback(maxbytes=32, end=(), timeout=defaults.READ_TIMEOUT):
+    ''' Returns the "answerback" string which is often empty,
+        None if not available.
 
-        Note: Hangs unless maxbytes is a subset of string *or* an explicit
-              end character is given, due to inability to find end.
-              https://unix.stackexchange.com/a/312991/159110
+        Warning: Hangs unless maxbytes is a subset of the answer string *or* an
+                 explicit end character(s) given, due to inability to find end.
+                 https://unix.stackexchange.com/a/312991/159110
     '''
     try:
         with TermStack() as fd:
@@ -455,8 +459,10 @@ def get_answerback(maxbytes=100, end=(), timeout=defaults.READ_TIMEOUT):
             return _read_until_select(
                         maxbytes=maxbytes, end=end, timeout=timeout
                     )
-    except AttributeError:  # no .fileno()
-        pass
+    except AttributeError:  # 
+        log.debug('warning - no .fileno() attribute was found on the stream.')
+    except EnvironmentError:  # Winders
+        log.debug('answerback not yet implemented by Windows.')
 
 
 def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
@@ -515,7 +521,7 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
         if not 'index' in _color_code_map:
             _color_code_map['index'] = '4;' + str(number or '')
 
-        if os_name == 'nt':  # TODO: This may no longer apply on Windows Terminal
+        if os_name == 'nt':  # still applies to Windows Terminal
             from .windows import get_color
             color_id = get_color(name)
             if sys.getwindowsversion()[2] > 16299:  # Win10 FCU, new palette

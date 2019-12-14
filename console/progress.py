@@ -124,8 +124,10 @@ styles = dict(
 # figure default styles
 unicode_support = detect_unicode_support()
 icons['default']  = icons['ascii']
-if os_name == 'nt':  # default to ascii on Windows
-    pass
+if os_name == 'nt':
+    import locale   # else default to ascii
+    if locale.getpreferredencoding() == 'cp65001':  # utf8
+        icons['default']  = icons['blocks']
 elif unicode_support:
     icons['default']  = icons['blocks']
 
