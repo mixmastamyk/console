@@ -161,6 +161,12 @@ def is_colorama_initialized():
     return result
 
 
+def get_code_page():
+    '''  Return the code page for this console/terminal instance. '''
+    from locale import getpreferredencoding
+    return getpreferredencoding()
+
+
 def get_color(name, stream=STD_OUTPUT_HANDLE):
     ''' Returns current colors of console.
 

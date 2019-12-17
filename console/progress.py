@@ -21,7 +21,7 @@ from .disabled import empty as _empty
 from .screen import sc
 from .utils import len_stripped
 from .detection import (detect_unicode_support, get_available_palettes,
-                               get_size, os_name)
+                               get_size)
 
 TIMEDELTAS = (60, 300)  # accuracy thresholds, in seconds, one and five minutes
 MIN_WIDTH = 12
@@ -122,13 +122,9 @@ styles = dict(
 )
 
 # figure default styles
-unicode_support = detect_unicode_support()
 icons['default']  = icons['ascii']
-if os_name == 'nt':
-    import locale   # else default to ascii
-    if locale.getpreferredencoding() == 'cp65001':  # utf8
-        icons['default']  = icons['blocks']
-elif unicode_support:
+unicode_support = detect_unicode_support()
+if unicode_support:
     icons['default']  = icons['blocks']
 
 _pals = get_available_palettes(_CHOSEN_PALETTE)

@@ -66,8 +66,8 @@ class TermStack:
 
 
 def choose_palette(stream=sys.stdout, basic_palette=None):
-    ''' Make a best effort to automatically determine whether to enable
-        ANSI sequences, and if so, which color palettes are available.
+    ''' Make a best effort to automatically determine whether to enable ANSI
+        sequences, and if so, which color palettes are available.
 
         This is the main function of the module—meant to be used unless
         something more specific is needed.
@@ -75,8 +75,8 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
         Takes the following factors into account:
 
         - Whether output stream is a TTY.
-        - ``TERM``, ``ANSICON`` environment variables
-        - ``CLICOLOR``, ``NO_COLOR`` environment variables
+        - ``TERM``, ``ANSICON`` environment variables, among others.
+        - ``CLICOLOR``, ``CLICOLOR_FORCE``, NO_COLOR`` environment variables
 
         Arguments:
             stream:             Which output file to check: stdout, stderr
@@ -90,14 +90,11 @@ def choose_palette(stream=sys.stdout, basic_palette=None):
     log.debug('console version: %s', __version__)
     log.debug('os.name/sys.platform: %s/%s', os_name, sys.platform)
 
-    # TODO: clumsy, refactor
-    if color_is_forced():
-        result, pal = detect_palette_support(basic_palette=pal) or 'basic'
-
-    elif is_a_tty(stream=stream) and not color_is_disabled():
+    if color_is_forced() or (not color_is_disabled() and is_a_tty(stream=stream)):
+        # detecten Sie, bitte
         result, pal = detect_palette_support(basic_palette=pal)
+        proximity.build_color_tables(pal)
 
-    proximity.build_color_tables(pal)
     log.debug('Basic palette: %r', pal)
     log.debug('%r is available', result)
     return result
@@ -143,8 +140,8 @@ def color_is_forced(**envars):
         - https://bixense.com/clicolors/
 
         Arguments:
-            envars:     Additional environment variables to check for
-                        equality, i.e. ``MYAPP_COLOR_FORCED='1'``
+            envars:     Additional environment variables as keyword arguments
+                        to check for equality, i.e. ``MYAPP_COLOR_FORCED='1'``
         Returns:
             Bool:  Forced
     '''
@@ -163,7 +160,7 @@ def color_is_forced(**envars):
 
 def detect_palette_support(basic_palette=None):
     ''' Returns whether we think the terminal supports basic, extended, or
-        truecolor.  None if not able to tell.
+        truecolor; None if not able to tell.
 
         Arguments:
             basic_palette   A custom 16 color palette.
@@ -175,7 +172,9 @@ def detect_palette_support(basic_palette=None):
                 palette:    len 16 tuple of colors (len 3 tuple)
     '''
     name = ansicon = colorama_init = win_enabled = None
-    TERM = env.TERM or ''
+    TERM = env.TERM or ''  # shortcut
+    pal_name = 'Unknown'
+
     if os_name == 'nt':  # Windows is complicated :-/
         from .windows import (is_ansi_capable, enable_vt_processing,
                               is_colorama_initialized)
@@ -185,7 +184,7 @@ def detect_palette_support(basic_palette=None):
             colorama_init = is_colorama_initialized()
             ansicon = env.ANSICON
 
-    # linux, older Windows w/ colorama
+    # xterm, linux console, older Windows w/ colorama
     if TERM.startswith('xterm') or (TERM == 'linux') or colorama_init:
         name = 'basic'
 
@@ -199,7 +198,6 @@ def detect_palette_support(basic_palette=None):
         name = 'truecolor'
 
     # find the platform-dependent 16-color basic palette
-    pal_name = 'Unknown'
     if name and not basic_palette:
         name, pal_name, basic_palette = _find_basic_palette(name)
 
@@ -219,12 +217,11 @@ def detect_palette_support(basic_palette=None):
 def detect_unicode_support():
     ''' Try to detect unicode (utf8?) support in the terminal.
 
-        Experimental, implementation idea is from the link below:
-           https://unix.stackexchange.com/questions/184345/detect-how-much-of-unicode-my-terminal-supports-even-through-screen
+        Checks the ``LANG`` environment variable or Windows code page,
+        falls back to an experimental method.
+        Implementation idea is from the link below:
 
-        TODO:
-            needs improvement.
-            # should return None or True on redirection?
+           https://unix.stackexchange.com/q/184345/
 
         Returns:
             Boolean | None if not a TTY
@@ -234,7 +231,12 @@ def detect_unicode_support():
     if env.LANG and env.LANG.endswith('UTF-8'):  # approximation
         result = True
 
-    elif is_a_tty():
+    elif os_name == 'nt':
+        from .windows import get_code_page
+        if get_code_page() == 'cp65001':  # aka utf8
+            result = True
+
+    elif is_a_tty():  # kludge
         if os_name == 'nt':
             from .windows import get_position as _get_position
         else:
@@ -393,10 +395,10 @@ def _read_until_select(infile=sys.stdin, maxbytes=20, end=RS, timeout=None):
     read = infile.read
     if not isinstance(end, tuple):
         end = (end,)
-    log.debug('maxbytes=%s, end=%r, timeout %s…', maxbytes, end, timeout)
+    log.debug('maxbytes=%s, end=%r, timeout %s …', maxbytes, end, timeout)
 
     if select((infile,), (), (), timeout)[0]:  # wait until response or timeout
-        log.debug('select start')
+        log.debug('select start reading:')
         while maxbytes:  # response: count down chars, stopping at 0
             char = read(1)
             if char in end:
