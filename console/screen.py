@@ -23,18 +23,19 @@
         :copyright: Copyright 2011-2018, Erik Rose
         :license: MIT License (MIT)
 
+    TODO:  These objects don't compose like the core objects.
 '''
 import sys
 from contextlib import contextmanager
 
 from . import _CHOSEN_PALETTE
-from .constants import CSI, ESC
+from .constants import CSI, ESC, RIS
 from .disabled import empty_bin
 
 
 class _TemplateString(str):
     ''' A template string that renders itself with default arguments when
-        created, and may also be called with another argument.
+        created, and may also be called with other arguments.
     '''
     def __new__(cls, endcode, arg='%d'):
         self = str.__new__(cls, CSI + arg + endcode)
@@ -75,7 +76,7 @@ class Screen:
     scroll_up   = su = 'S'
     scroll_down = sd = 'T'
 
-    save_title = ('t', '22;%d')
+    save_title  = ('t', '22;%d')
     restore_title = ('t', '23;%d')
 
     # These don't need parameter wrapping.  All start with ESC
@@ -83,7 +84,7 @@ class Screen:
     auxon       = CSI + '5i'
     dsr         = loc = CSI + '6n'          # device status rpt, see detection
 
-    reset       = ESC + 'c'
+    reset       = RIS                       # Esc + c
 
     # cursor config
     save_pos    = ESC + '7'                 # position
