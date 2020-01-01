@@ -4,11 +4,12 @@
     This module *should not* import anything from the project or third-party
     modules, to avoid dependencies in setup.py or circular import issues.
 '''
+from os.path import join as _join
 from time import localtime as _localtime
 
 
 pkgname         = 'console'
-__version__     = version = '0.99a1'
+__version__     = version = '0.990a1'
 __author__      = authors = ', '.join([
                                 'Mike Miller',
                                 #~ 'and contributors',
@@ -26,7 +27,7 @@ repo_account    = 'mixmastamyk'
 repo_name       = pkgname
 repo_provider   = 'github.com'
 repo_url        = 'https://%s/%s/%s' % (repo_provider, repo_account, repo_name)
-project_urls    = {'Repository': repo_url, 'Issues': repo_url + '/issues'}
+project_urls    = {'Repository': repo_url, 'Issues': _join(repo_url, 'issues')}
 home_url        = 'https://mixmastamyk.bitbucket.io/console/'
 
 trove_classifiers = [
