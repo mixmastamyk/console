@@ -383,7 +383,7 @@ if True:  # fold
     txt = ('\x1b[30m-C0-TEXT-\x1b[0m | \x9b30m-C1-Text-\x9bm | '
            '\x1b]L-OSC-C0-\x1b\\ | \x1b]L-OSC-C0-7-\a | \x9bL-OSC-C1-\x9d END')
 
-    def test_utiles_clear_line():
+    def test_utils_clear_line():
         utils.sc = sc
         end = 'K'
         for i in range(3):
@@ -394,7 +394,13 @@ if True:  # fold
             text = utils.clear_line(mode)
             assert text == CSI + str(i) + end
 
-    def test_utiles_clear_screen():
+    def test_utils_clear_lines():
+        utils.sc = sc
+        result = utils.clear_lines(3)
+                          # 1A   1B     # 2A   2B     # 3A   3B
+        assert result == '\x1b[2K\x1b[1A\x1b[2K\x1b[1A\x1b[2K\x1b[1A'
+
+    def test_utils_clear_screen():
         utils.sc = sc
         end = 'J'
         for i in range(3):
