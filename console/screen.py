@@ -34,6 +34,7 @@ from .disabled import empty_bin
 
 
 class _TemplateString(str):
+    # Callable[[str], str]
     ''' A template string that renders itself with default arguments when
         created, and may also be called with other arguments.
     '''

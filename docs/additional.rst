@@ -481,14 +481,22 @@ Troubleshooting
 
 - Console performs auto-detection of the environment at startup to determine
   terminal capabilities.
-  This could *momentarily* hang obscure terminals that advertise xterm on posix
-  compatibility without a full implementation.
-  To disable this,
-  set the environment variable:
-  ``PY_CONSOLE_AUTODETECT='0'``.
-  You'll now have to create the palette and screen objects
-  (and possibly configure them)
-  yourself.
+
+  - If you'd like to see, check the results with this command:
+
+    .. code-block:: shell
+
+            ⏵ python -m console.detection
+
+  - Note: This could *momentarily* hang obscure terminals that advertise xterm
+    on posix compatibility without a full implementation.
+    To disable this,
+    set the environment variable:
+    ``PY_CONSOLE_AUTODETECT='0'``.
+    Unfortunately,
+    you'll now have to create the palette and screen objects
+    (and possibly configure them)
+    yourself.
 
 - Try to avoid this type of ambiguous addition operation:
 

@@ -49,3 +49,14 @@ if env.PY_CONSOLE_AUTODETECT != '0':
         from .screen import sc
 
         fg, bg, fx, defx, sc, TermStack  # quiet pyflakes
+
+
+from enum import Enum
+
+class PALETTE_SUPPORT(Enum):
+    DUMB = 0
+    BASIC = 1       # 3,4 Bit color
+    EXTENDED = 2    # 8 bit
+    TRUECOLOR = 3   # 24 bit
+
+

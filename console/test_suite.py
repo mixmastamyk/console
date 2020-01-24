@@ -383,6 +383,14 @@ if True:  # fold
     txt = ('\x1b[30m-C0-TEXT-\x1b[0m | \x9b30m-C1-Text-\x9bm | '
            '\x1b]L-OSC-C0-\x1b\\ | \x1b]L-OSC-C0-7-\a | \x9bL-OSC-C1-\x9d END')
 
+    def test_utils_as_hyperlink():
+        result = utils.as_hyperlink('ftp://netscape.com/…/navigator.tar.gz', 'Blast from the past!')
+
+        assert result == (
+            '\x1b]8;;ftp://netscape.com/…/navigator.tar.gz'
+            '\x1b\\Blast from the past!\x1b]8;;\x1b\\'
+        )
+
     def test_utils_clear_line():
         utils.sc = sc
         end = 'K'

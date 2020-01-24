@@ -43,6 +43,9 @@ def run():
 
         'Text wrap: ' + fg.purple('Fill my eyes with that Double Vision…'
                             + BEL, fx.underline, fx.italic, fx.overline),
+
+        'hyper-link: ' + as_hyperlink('http://www.coolsiteoftheday.com/',
+                                      'Cool Site of the Day!'),
     ]
 
     if not _SHORT:
@@ -276,6 +279,6 @@ if __name__ == '__main__':
     from .constants import BEL, ALL_PALETTES
     from .detection import is_a_tty, get_color, get_theme
     from .screen import sc
-    from .utils import set_title, strip_ansi, cls
+    from .utils import set_title, strip_ansi, cls, as_hyperlink
 
     run()

@@ -13,7 +13,7 @@
 import logging
 import re
 
-from .constants import OSC, BEL
+from .constants import BEL, ESC, OSC
 from .screen import sc
 from .detection import is_a_tty, os_name
 from . import _DEBUG, _CHOSEN_PALETTE
@@ -49,6 +49,32 @@ if _DEBUG:
 else:
     def _write(message):
         print(message, end='', flush=True)
+
+
+def as_hyperlink(target, caption=None):
+    ''' Returns a terminal hyperlink, given a link and caption text.
+
+        Arguments:
+
+            target:     Link to the destination, 'http://foo.bar/baz'
+            caption:    Optional descriptive text, defaults to target, e.g.
+                        'Click-en Sie hier!'
+
+        Example::
+
+            from console import fg
+            from console.utils import as_hyperlink
+
+            link = as_hyperlink('ftp://netscape.com/…/navigator.tar.gz',
+                                'Blast from the past!')
+            print(fg.blue(link))  # in full effect
+
+        Note: experimental, see below for details:
+            https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
+    '''
+    if caption is None:
+        caption = target
+    return f'{OSC}8;;{target}{ESC}\\{caption}{OSC}8;;{ESC}\\'
 
 
 def clear_line(mode=2):

@@ -697,3 +697,13 @@ def get_theme(timeout=defaults.READ_TIMEOUT):
 
     log.debug('%r', theme)
     return theme
+
+
+if __name__ == '__main__':
+
+    print()  # space from warning
+
+    fmt = '  %(levelname)-7.7s %(module)s/%(funcName)s:%(lineno)s %(message)s'
+    logging.basicConfig(level=logging.DEBUG, format=fmt)
+
+    choose_palette()
