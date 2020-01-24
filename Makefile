@@ -54,6 +54,7 @@ publish: test check_readme docs
 	python3 setup.py sdist bdist_wheel --universal upload
 
 	pip3 install --user -e .  # fix bug on next invocation
+	cd ../../mixmastamyk.bitbucket.org/console/ && git add . && git commit -m . && git push
 
 
 test:

@@ -387,8 +387,15 @@ if True:  # fold
         result = utils.as_hyperlink('ftp://netscape.com/…/navigator.tar.gz', 'Blast from the past!')
 
         assert result == (
-            '\x1b]8;;ftp://netscape.com/…/navigator.tar.gz'
+            '\x1b]8;;ftp://netscape.com/%E2%80%A6/navigator.tar.gz'
             '\x1b\\Blast from the past!\x1b]8;;\x1b\\'
+        )
+
+    def test_utils_as_hyperlink_params_and_low_encode():
+        result = utils.as_hyperlink('foo://n\x1bt.org/', 'cap', id='2', bar='z')
+
+        assert result == (
+            '\x1b]8;id=2:bar=z;foo://n%1Bt.org/\x1b\\cap\x1b]8;;\x1b\\'
         )
 
     def test_utils_clear_line():

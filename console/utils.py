@@ -51,7 +51,7 @@ else:
         print(message, end='', flush=True)
 
 
-def as_hyperlink(target, caption=None, url_encode=False, **params):
+def as_hyperlink(target, caption=None, **params):
     ''' Returns a terminal hyperlink, given a link and caption text.
 
         Arguments:
@@ -59,7 +59,6 @@ def as_hyperlink(target, caption=None, url_encode=False, **params):
             target:     Link to the destination, 'http://foo.bar/baz'
             caption:    Optional descriptive text, defaults to target, e.g.
                         'Click-en Sie hier!'
-            url_encode: Whether to encode, needed by spec, broken by impls.
             params:     Optional key word args, to be formatted as:
                         'id=xyz123:foo=bar:baz=quux'
                         (See note below.)
@@ -76,8 +75,13 @@ def as_hyperlink(target, caption=None, url_encode=False, **params):
         Note: experimental, see below for details:
             https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
     '''
+    from urllib.parse import quote  # TODO: move to module globals
     MAX_URL = 2083
     MAX_VAL = 250
+    SAFE_CHARS = (  # ''.join([ chr(n) for n in range(32, 126) ])
+        ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        '[\\]^_`abcdefghijklmnopqrstuvwxyz{|}'
+    )
 
     # sanity & security checks
     if caption is None:
@@ -95,9 +99,7 @@ def as_hyperlink(target, caption=None, url_encode=False, **params):
     if len(target) > MAX_URL:  # security limits
         target = target[:MAX_URL]
 
-    if url_encode:
-        from urllib.parse import quote
-        target = quote(target)  # url encode
+    target = quote(target, safe=SAFE_CHARS)  # url encode
 
     return f'{OSC}8;{params or ""};{target}{ST}{caption}{OSC}8;;{ST}'
 
