@@ -24,9 +24,9 @@ DEL = '\177'        #: 127   177   0x7F           Delete character
 CSI = ESC + '['     #: Control Sequence Introducer
 OSC = ESC + ']'     #: Operating System Command
 RIS = ESC + 'c'     #: Reset to Initial State, aka clear screen (see utils)
-ST  = '\\'          #: Sequence terminator, (ESC precedes)
+ST  = ESC + '\\'    #: Sequence terminator
 
-# some C1 codes
+# some C1 codes, use is problematic under UTF-8 encoding
 CSI_C1 = '\x9b'
 OSC_C1 = '\x9d'
 ST_C1  = '\x9c'

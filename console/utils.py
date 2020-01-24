@@ -13,7 +13,7 @@
 import logging
 import re
 
-from .constants import BEL, ESC, OSC
+from .constants import BEL, OSC, ST
 from .screen import sc
 from .detection import is_a_tty, os_name
 from . import _DEBUG, _CHOSEN_PALETTE
@@ -51,7 +51,7 @@ else:
         print(message, end='', flush=True)
 
 
-def as_hyperlink(target, caption=None):
+def as_hyperlink(target, caption=None, url_encode=False, **params):
     ''' Returns a terminal hyperlink, given a link and caption text.
 
         Arguments:
@@ -59,22 +59,47 @@ def as_hyperlink(target, caption=None):
             target:     Link to the destination, 'http://foo.bar/baz'
             caption:    Optional descriptive text, defaults to target, e.g.
                         'Click-en Sie hier!'
+            url_encode: Whether to encode, needed by spec, broken by impls.
+            params:     Optional key word args, to be formatted as:
+                        'id=xyz123:foo=bar:baz=quux'
+                        (See note below.)
 
         Example::
 
             from console import fg
             from console.utils import as_hyperlink
 
-            link = as_hyperlink('ftp://netscape.com/…/navigator.tar.gz',
+            link = as_hyperlink('ftp://ftp.netscape.com/…/navigator.tar.gz',
                                 'Blast from the past!')
             print(fg.blue(link))  # in full effect
 
         Note: experimental, see below for details:
             https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
     '''
+    MAX_URL = 2083
+    MAX_VAL = 250
+
+    # sanity & security checks
     if caption is None:
         caption = target
-    return f'{OSC}8;;{target}{ESC}\\{caption}{OSC}8;;{ESC}\\'
+    if params:
+        tokens = []
+        for key, val in params.items():
+            if len(val) > MAX_VAL:
+                val = val[:MAX_VAL]
+            if (':' in val) or ('=' in val) or (';' in val):
+                raise ValueError(f'illegal chars in val: {val!r}')
+            tokens.append(f'{key}={val}')
+        params = ':'.join(tokens)
+
+    if len(target) > MAX_URL:  # security limits
+        target = target[:MAX_URL]
+
+    if url_encode:
+        from urllib.parse import quote
+        target = quote(target)  # url encode
+
+    return f'{OSC}8;{params or ""};{target}{ST}{caption}{OSC}8;;{ST}'
 
 
 def clear_line(mode=2):
