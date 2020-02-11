@@ -3,8 +3,8 @@
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
-    This module contains utility and convenience functions for use under ANSI
-    compatible terminals.
+    This module contains cross-platform utility and convenience functions for
+    use under ANSI-compatible terminals.
 
     See also:
 
@@ -51,7 +51,7 @@ else:
         print(message, end='', flush=True)
 
 
-def as_hyperlink(target, caption=None, **params):
+def make_hyperlink(target, caption=None, **params):
     ''' Returns a terminal hyperlink, given a link and caption text.
 
         Arguments:
@@ -65,44 +65,49 @@ def as_hyperlink(target, caption=None, **params):
 
         Example::
 
-            from console import fg
-            from console.utils import as_hyperlink
+            from console import fg, fx
+            from console.utils import make_hyperlink
 
-            link = as_hyperlink('ftp://ftp.netscape.com/…/navigator.tar.gz',
-                                'Blast from the past!')
-            print(fg.blue(link))  # in full effect
+            link = make_hyperlink('ftp://ftp.netscape.com/…/navigator.tar.gz',
+                                  'Blast from the past!')
+            link_style = fg.blue + fx.underline
+            print(link_style(link))  # in full effect
 
         Note: experimental, see below for details:
             https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
     '''
-    from urllib.parse import quote  # TODO: move to module globals
-    MAX_URL = 2083
-    MAX_VAL = 250
-    SAFE_CHARS = (  # ''.join([ chr(n) for n in range(32, 126) ])
-        ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        '[\\]^_`abcdefghijklmnopqrstuvwxyz{|}'
-    )
+    if _CHOSEN_PALETTE:
+        from urllib.parse import quote  # TODO: move to module globals
+        MAX_URL = 2083  # spec recommendations
+        MAX_VAL = 250
+        SAFE_CHARS = (  # ''.join([ chr(n) for n in range(32, 126) ])
+            ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            '[\\]^_`abcdefghijklmnopqrstuvwxyz{|}'
+        )
 
-    # sanity & security checks
-    if caption is None:
-        caption = target
-    if params:
-        tokens = []
-        for key, val in params.items():
-            if len(val) > MAX_VAL:
-                val = val[:MAX_VAL]
-            if (':' in val) or ('=' in val) or (';' in val):
-                raise ValueError(f'illegal chars in val: {val!r}')
-            tokens.append(f'{key}={val}')
-        params = ':'.join(tokens)
+        # sanity & security checks
+        if caption is None:
+            caption = target
+        if params:
+            tokens = []
+            for key, val in params.items():
+                if len(val) > MAX_VAL:
+                    val = val[:MAX_VAL]
+                for char in val:
+                    if char in ('=', ':', ';'):
+                        raise ValueError(f'illegal chars in val: {key}={val!r}')
+                tokens.append(f'{key}={val}')
+            params = ':'.join(tokens)
 
-    if len(target) > MAX_URL:  # security limits
-        target = target[:MAX_URL]
+        if len(target) > MAX_URL:  # security limits
+            target = target[:MAX_URL]
 
-    target = quote(target, safe=SAFE_CHARS)  # url encode
+        target = quote(target, safe=SAFE_CHARS)  # url encode
 
-    return f'{OSC}8;{params or ""};{target}{ST}{caption}{OSC}8;;{ST}'
+        return f'{OSC}8;{params or ""};{target}{ST}{caption}{OSC}8;;{ST}'
 
+    else:  # don't bother if redirected or ANSI disabled.
+        return caption or ''
 
 def clear_line(mode=2):
     ''' Clear the current line.

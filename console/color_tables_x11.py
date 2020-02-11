@@ -671,3 +671,17 @@ x11_color_map = {
     'darkred':              ('139', '0', '0'),
     'lightgreen':           ('144', '238', '144'),
 }
+
+
+if __name__ == '__main__':
+
+    import sys
+
+    # do a search
+    args = [ arg.casefold() for arg in sys.argv[1:] ]
+
+    for name in x11_color_map:
+        for arg in args:
+            if arg in name:
+                print(name, tuple(int(n) for n in x11_color_map[name]))
+

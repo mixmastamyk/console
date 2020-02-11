@@ -112,12 +112,9 @@ class EffectsPalette(_BasicPaletteBuilder):
     end = default   = 0  # reset all
 
     bold            = 1
-    b               = 1  # short
     dim             = 2
     italic          = 3
-    i               = 3  # short
     underline       = 4
-    u               = 4  # short
     blink           = 5
     slowblink       = blink
     fastblink       = 6
@@ -126,11 +123,16 @@ class EffectsPalette(_BasicPaletteBuilder):
     hide            = conceal
     crossed         = 9
     strike          = crossed
-    s               = crossed
 
     frame           = 51
     encircle        = 52
     overline        = 53
+
+    # word processor/html shortcuts
+    b               = bold
+    i               = italic
+    s               = crossed
+    u               = underline
 
     # Rarely used codes to change fonts, unlikely to be supported:
     font10          = 10
@@ -174,18 +176,20 @@ class EffectsTerminator(_BasicPaletteBuilder):
     bg              = BackgroundPalette.default
 
     bold            = 21
-    b               = 21  # short
     intensity       = 22  # bold, dim (maybe color) ---> norm
     italic = font   = 23
-    i               = 23  # short
     underline       = 24
-    u               = 24  # short
     blink           = 25
     reverse         = 27
     reveal          = 28
     crossed         = 29
     strike          = crossed
+
+    # word processor/html shortcuts
+    b               = bold
+    i               = italic
     s               = crossed
+    u               = underline
 
     frame           = 54
     encircle        = frame

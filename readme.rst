@@ -146,9 +146,10 @@ under the lame (no-ANSI support) versions of Windows < 10.
 
 Der ``console`` package has recently been tested on:
 
-- Ubuntu 19.04 - Python 3.7
+- Ubuntu 19.10 - Python 3.7
 
   - xterm, mate-terminal, linux, fbterm
+  - Very occasionally on kitty, guake
 
 - FreeBSD 11 - Python 3.7
 - MacOS 10.13 - Python 3.6
@@ -159,7 +160,7 @@ Der ``console`` package has recently been tested on:
 - Windows 7 - Python 3.6 - 32 bit + colorama
 - Windows 10 - Python 3.7 - 64bit
 
-  - Conhost, WSL
+  - Conhost, WSL, Windows Terminal
 
 ::
 
