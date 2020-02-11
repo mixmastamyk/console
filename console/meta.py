@@ -9,7 +9,7 @@ from time import localtime as _localtime
 
 
 pkgname         = 'console'
-__version__     = version = '0.990a3'
+__version__     = version = '0.990a5'
 __author__      = authors = ', '.join([
                                 'Mike Miller',
                                 #~ 'and contributors',
