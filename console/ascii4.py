@@ -1,0 +1,273 @@
+#!/usr/bin/env python3
+'''
+    ascii4.py - "Þe Auld" Four-Column ASCII Table, FTW!
+'''
+help_text = __doc__ + '''
+    This table format in four groups of thirty-two helps illustrate the
+    relationships between characters and control codes:
+
+        • To find the binary representation of a character, concatenate the
+          two digit group code above its column, with its five digit row code:
+
+          Optional 8th bit →  {}  {}  {}        ⇒  {}
+                     Group code ↗      ↑ Row code       ↑ Full byte, aka "H"
+
+        • To generate a control code, a key is pressed then AND-ed with the
+          control key group code of 00, forcing the sixth and seventh bits
+          to zero.  This is why, for example:
+
+          • BEL, the Bell may be activated with {} (look to right columns)
+          • BS, the Backspace key is represented by {}
+          • ESC, the Escape key is represented by {}
+
+        • This is also why one can add 32/20h to the index of a capital letter
+          to find the corresponding lower case.
+'''
+import os, sys
+from console import fg, bg, fx, defx
+from console.detection import get_theme
+from console.utils import make_hyperlink
+
+
+__version__ = '0.80'
+_wp_base_url = 'https://en.wikipedia.org/wiki/'
+ASCII_MODE = 1
+UNICODE_MODE = 2
+
+
+# A range of 0…128, rendered in a table with four columns of 32 rows
+index_table = (
+    ( 0, 32, 64,  96),
+    ( 1, 33, 65,  97),
+    ( 2, 34, 66,  98),
+    ( 3, 35, 67,  99),
+    ( 4, 36, 68, 100),
+    ( 5, 37, 69, 101),
+    ( 6, 38, 70, 102),
+    ( 7, 39, 71, 103),
+    ( 8, 40, 72, 104),
+    ( 9, 41, 73, 105),
+    (10, 42, 74, 106),
+    (11, 43, 75, 107),
+    (12, 44, 76, 108),
+    (13, 45, 77, 109),
+    (14, 46, 78, 110),
+    (15, 47, 79, 111),
+    (16, 48, 80, 112),
+    (17, 49, 81, 113),
+    (18, 50, 82, 114),
+    (19, 51, 83, 115),
+    (20, 52, 84, 116),
+    (21, 53, 85, 117),
+    (22, 54, 86, 118),
+    (23, 55, 87, 119),
+    (24, 56, 88, 120),
+    (25, 57, 89, 121),
+    (26, 58, 90, 122),
+    (27, 59, 91, 123),
+    (28, 60, 92, 124),
+    (29, 61, 93, 125),
+    (30, 62, 94, 126),
+    (31, 63, 95, 127),
+)
+
+
+ctrl_symbols = (
+    ('00000', 'NUL', '␀', 'Null_character'),
+    ('00001', 'SOH', '␁', 'C0_and_C1_control_codes#SOH'),
+    ('00010', 'STX', '␂', 'C0_and_C1_control_codes#STX'),
+    ('00011', 'ETX', '␃', 'C0_and_C1_control_codes#ETX'),
+    ('00100', 'EOT', '␄', 'C0_and_C1_control_codes#EOT'),
+    ('00101', 'ENQ', '␅', 'C0_and_C1_control_codes#ENQ'),
+    ('00110', 'ACK', '␆', 'C0_and_C1_control_codes#ACK'),
+    ('00111', 'BEL', '␇', 'C0_and_C1_control_codes#BEL'),
+    ('01000', 'BS',  '␈', 'C0_and_C1_control_codes#BS'),
+    ('01001', 'HT',  '␉', 'C0_and_C1_control_codes#HT'),
+    ('01010', 'LF',  '␊', 'C0_and_C1_control_codes#LF'),
+    ('01011', 'VT',  '␋', 'C0_and_C1_control_codes#VT'),
+    ('01100', 'FF',  '␌', 'C0_and_C1_control_codes#FF'),
+    ('01101', 'CR',  '␍', 'C0_and_C1_control_codes#CR'),
+    ('01110', 'SO',  '␎', 'C0_and_C1_control_codes#SO'),
+    ('01111', 'SI',  '␏', 'C0_and_C1_control_codes#SI'),
+    ('10000', 'DLE', '␐', 'C0_and_C1_control_codes#DLE'),
+    ('10001', 'DC1', '␑', 'C0_and_C1_control_codes#DC1'),
+    ('10010', 'DC2', '␒', 'C0_and_C1_control_codes#DC2'),
+    ('10011', 'DC3', '␓', 'C0_and_C1_control_codes#DC3'),
+    ('10100', 'DC4', '␔', 'C0_and_C1_control_codes#DC4'),
+    ('10101', 'NAK', '␕', 'C0_and_C1_control_codes#NAK'),
+    ('10110', 'SYN', '␖', 'C0_and_C1_control_codes#SYN'),
+    ('10111', 'ETB', '␗', 'C0_and_C1_control_codes#ETB'),
+    ('11000', 'CAN', '␘', 'C0_and_C1_control_codes#CAN'),
+    ('11001', 'EM',  '␙', 'C0_and_C1_control_codes#EM'),
+    ('11010', 'SUB', '␚', 'C0_and_C1_control_codes#SUB'),
+    ('11011', 'ESC', '␛', 'C0_and_C1_control_codes#ESC'),
+    ('11100', 'FS',  '␜', 'C0_and_C1_control_codes#FS'),
+    ('11101', 'GS',  '␝', 'C0_and_C1_control_codes#GS'),
+    ('11110', 'RS',  '␞', 'C0_and_C1_control_codes#RS'),
+    ('11111', 'US',  '␟', 'C0_and_C1_control_codes#US'),
+    (None,    ' ',   '␠', 'Space_(punctuation)'),
+    (None,    'DEL', '␡', 'Delete_character'),  # aka index -1
+)
+
+
+class SilentString(str):
+    # Used when output is redirected.  Shouldn't be necessary, but here we are.
+    def __call__(self, source):  # shaddup a ya face!
+        return source
+
+
+def setup():
+    ''' Parse command-line and validate. '''
+    from argparse import ArgumentParser, RawTextHelpFormatter
+
+    parser = ArgumentParser(description=help_text,
+                            formatter_class=RawTextHelpFormatter,
+                            add_help=False,  # avoids early exit
+                            )
+    parser.add_argument('-l', '--make-links', action='store_true',
+                        help='Add hyperlinks, not often supported.')
+    parser.add_argument('-n', '--skip-headers', action='store_false',
+                        dest='print_headers',
+                        help='Skip headers for filtering output.')
+    parser.add_argument('-u', '--unicode', action='store_const',
+                        dest='character_mode',
+                        default=ASCII_MODE, const=UNICODE_MODE,
+                        help='Use Unicode symbols for control characters.')
+    parser.add_argument('-h', '--help', action='store_true', dest='print_help',
+                        help='Print out help text.')
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s ' + __version__)
+    # parse and validate
+    args = parser.parse_args()
+    if args.print_help:
+        group_style = fg.red + fx.bold
+        parser.description = help_text.format(
+            fg.red('0'),
+            group_style('10'),
+            fg.red('01000'),
+            fg.red('0') + group_style('10') + fg.red('01000'),
+            fx.italic('^G'),
+            fx.italic('^H'),
+            fx.italic('^['),
+        )
+        parser.print_help()
+        print()
+    return args
+
+
+def main(args):
+
+    status = os.EX_OK
+    mode = args.character_mode
+    try:
+        # Get theme - defaults
+        bin_clr = dec_clr = hex_clr = hdr_style = SilentString()
+        evn_bg_clr = odd_bg_clr = ''
+
+        theme = get_theme()
+        if theme == 'dark':
+            bin_clr = fg.darkred
+            dec_clr = fg.darkorange3
+            hex_clr = fg.purple
+            hdr_style = bg.black + fx.dim
+
+            evn_bg_clr = str(bg.i235)
+            odd_bg_clr = str(bg.i233)
+
+        elif theme == 'light':
+            bin_clr = fg.blue
+            dec_clr = fg.green
+            hex_clr = fg.cyan
+            hdr_style = bg.i255 + fx.dim
+
+            evn_bg_clr = str(bg.i253)
+            odd_bg_clr = str(bg.i255)
+
+        if args.print_headers:
+            ASCII = 'ASCII'
+            if args.make_links:
+                ASCII = make_hyperlink(_wp_base_url + 'ASCII', ASCII)
+            print(fx.bold(
+                    f'                        Four-Column Grouped {ASCII} Table'
+                ), '\n'
+            )
+            bc = bin_clr('Bin')
+            dc = dec_clr('Dc')
+            dec = dec_clr('Dec')
+            hx = hex_clr('Hx')
+            print(hdr_style(
+                f'  {bc}    {dc} {hx}  {bin_clr("00")} Ctrl     '
+                f'{dc} {hx}  {bin_clr("01")} Punct.   '
+                f'{dc} {hx}  {bin_clr("10")} Upper   '
+                f'{dec} {hx} {bin_clr("11")} Lower'
+            ))
+
+        # print each row
+        for row in index_table:
+            columns = []
+            row_num = row[0]
+            if (row_num % 2) == 0:  # even
+                columns.append(evn_bg_clr)
+            else:  # odd
+                columns.append(odd_bg_clr)
+
+            for i in row:
+                binary = ' '
+                if mode is UNICODE_MODE:
+                    padding = 2
+                else:
+                    padding = 3
+
+                if i < 32:  # control chars + space
+                    sinfo = ctrl_symbols[i]
+                    binary = bin_clr(sinfo[0])
+                    symbol = f'{sinfo[mode]:<{padding}}'
+                    if mode is ASCII_MODE:  # add italic
+                        symbol = fx.italic + symbol + defx.italic
+                    if args.make_links:
+                        symbol = make_hyperlink(_wp_base_url + sinfo[3], symbol)
+                    if mode is UNICODE_MODE:  # short chars, add margin
+                        symbol += ' '
+
+                elif i == 32:  # space is unique
+                    padding = 2  # always
+                    sinfo = ctrl_symbols[i]
+                    symbol = f'{sinfo[mode]:<{padding}}'
+                    if args.make_links:
+                        symbol = make_hyperlink(_wp_base_url + sinfo[3], symbol)
+                        symbol += ' '
+
+                elif i == 127:  # delete is unique
+                    symbol = ctrl_symbols[-1][mode]
+                    symbol = f'{symbol:<{padding}}'
+                    if mode is ASCII_MODE:  # add italic
+                        symbol = fx.italic + symbol + defx.italic
+                    if args.make_links:
+                        symbol = make_hyperlink(_wp_base_url + ctrl_symbols[-1][2],
+                                                symbol)
+                else:  # other groups
+                    symbol =  f'{i:<3c}'
+
+                record = (
+                    f'  {binary} {dec_clr}{i:>3} '
+                    f'{hex_clr}{i:02x}{fg.default}  {symbol:<3}    '
+                )
+                columns.append(record)
+
+            columns.append(str(bg.default))
+            print(''.join(columns), end='')
+            print(bg.default)
+
+        if args.print_headers:
+            print()
+
+    except Exception as err:
+        print(err)
+        status = os.EX_SOFTWARE
+
+    return status
+
+
+if __name__ == '__main__':
+
+    sys.exit(main(setup()))

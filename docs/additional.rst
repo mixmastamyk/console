@@ -40,7 +40,7 @@
 Additional Topics
 =======================
 
-    *Can You Dig It?*
+    *"Can You Dig It?"*
 
 .. rubric:: How do the styles work?
 
@@ -64,7 +64,7 @@ the rest are built up as needed,
 on demand.
 Like a traffic cop,
 palettes direct attribute access to the appropriate code to initialize each
-palette Entry.
+palette entry.
 
 Once created,
 palette Entry attributes are cached and available for future use.
@@ -169,7 +169,7 @@ one may build palette objects yourself:
 Palette Downgrade
 ----------------------
 
-    *Get down, boogie oogie oogie…—A Taste of Honey*
+    *"Get down, boogie oogie oogie…"—A Taste of Honey*
 
 When using true or extended colors on a terminal that is not configured to
 support it,
@@ -177,14 +177,14 @@ console will "downgrade" the colors to their nearest neighbors in the available
 palette.
 
 Neat, huh?
-It does this using a Euclidian 3D distance method which is quite fast but only
-somewhat accurate,
+It does this using a "Euclidian 3D" distance method which is quite fast but
+only somewhat accurate,
 due to the fact that the RGB color space is not uniform.
 
 That lead to some experimentation with
 `CIEDE2000 <https://en.wikipedia.org/wiki/Color_difference#CIEDE2000>`_
 libraries like colormath and colorzero.
-Unfortunately they were both heavy and slow as molasses,
+Unfortunately they were both quite heavy and slow as molasses,
 even with numpy loaded,
 which is also slow to import.
 
@@ -195,101 +195,44 @@ it doesn't seem worth the trouble for this library.
 
 ::
 
-    ¸¸,ø¤º°`°º¤ø,¸¸,ø¤º°`°º¤ø,¸,ø¤°º¤ø,¸¸,ø¤º°`°º¤ø,¸¸
+    ¸¸¸¸,ø¤º°`°º¤ø,¸¸,ø¤º°`°º¤ø,¸,ø¤°º¤ø,¸¸,ø¤º°`°º¤ø,¸¸¸¸
 
 
+Environment Variables
+-----------------------
 
-Context Managers
--------------------
+    | *"But I took them away from all that, and now they work for me.*
+    | *My name is Charlie."*
 
-    *“Kiss my grits.”—Flo*
+The following standard variables are noted by ``console`` and affect its
+behavior:
 
-.. rubric:: Configuring Output
+Operating System:
 
-Console's Palette Entry objects can be used as context managers as well.
-We saw this in the readme previously.
-An output file may also be set if it needs to be changed from stdout and not
-able to be redirected outside the process::
+    - ``TERM``, basic category of terminal, more info is often needed.
+    - ``TERM_PROGRAM``, for hints on what it supports
+    - ``SSH_CLIENT``, when remote, downgrade to simple support
+    - ``LANG``, is Unicode available?
 
-    dodgers = bg.w_dodgerblue
-    dodgers.set_output(sys.stderr)
+Color-specific:
 
-    with dodgers:
-        print('Infield: Garvey, Lopes, Russel, Cey, Yeager')
-        print('Outfield: Baker, Monday, Smith')
+    - ``CLICOLOR``, 1/0 - Enable or disable ANSI sequences if on a tty
+    - ``CLICOLOR_FORCE`` - Force it on anyway
+    - ``COLORTERM`` - "truecolor" or "24bit" support
+    - ``NO_COLOR`` - None, dammit!
+    - ``COLORFGBG`` - Light or dark background?
 
-(This feature is somewhat experimental for now. ;-)
+Windows:
 
+    - ``ANSICON``, shim to render ANSI on older Windows is available.
 
-.. rubric:: Fullscreen Apps, a la Blessings
+MacOS:
 
-Here's a short script to show off console's full-screen abilities::
+    - ``TERM_PROGRAM_*``, more specific program information
 
-    from console import fg, fx, defx
-    from console.screen import sc as screen
-    from console.utils import wait_key, set_title
-    from console.constants import ESC
+Console itself:
 
-    exit_keys = (ESC, 'q', 'Q')
-
-    with screen:  # or screen.fullscreen():
-
-        set_title(' 🤓 Hi, from console!')
-        with screen.location(5, 4):
-            print(
-                fg.lightgreen('** Hi from a '
-                              f'{fx.i}fullscreen{defx.i} app! **'),
-                screen.mv_x(5),  # back up, then down
-                screen.down(5),
-                fg.yellow(f'(Hit the {fx.reverse}ESC{defx.reverse}'
-                           ' key to exit): '),
-                end='', flush=True,
-            )
-
-        with screen.hidden_cursor():
-            wait_key(exit_keys)
-
-The text below should appear.
-Check the title too!
-After hitting the ESC key your terminal shall be restored:
-
-.. raw:: html
-
-    <pre>
-
-    <div style="color: green; ">
-     * Hi, from a <i>fullscreen</i> app! **
-    </div>
-
-
-
-    <div style="color: #ba0; ">
-      (Hit the <span style="background: #ba0; color: black">ESC</span> key to exit):
-    </div>
-    </pre>
-
-
-.. rubric:: TermStack
-
-TermStack is a content-manager for making temporary modifications to the
-terminal via termios,
-that copies the original settings and restores them when finished.
-
-It's in the detection module because that's where it's used,
-but also aliased to the package namespace.
-For example::
-
-    from console import TermStack
-
-    with TermStack() as fd:
-        # shut off echo
-        tty.setcbreak(fd, termios.TCSANOW)
-        sys.stdout.write(f'{CSI}6n')  # fire!
-        sys.stdout.flush()
-
-    # Back to normal
-
-And off you go.
+    - PY_CONSOLE_AUTODETECT, Enable or disable the detection routines
 
 
 Screen Stuff
@@ -301,7 +244,9 @@ Screen Stuff
 
 The :mod:`console.screen` module is the one you're looking for,
 although there is a preconfigured convenience instance in the root of the
-package as well::
+package as well:
+
+.. code-block:: python
 
     >>> from console import sc
 
@@ -408,46 +353,140 @@ To expand to the full line,
 See the docs (:mod:`console.progress`) and source for more details.
 
 
-Environment Variables
------------------------
+Experimental Stuff
+-------------------
 
-    | *"But I took them away from all that, and now they work for me.*
-    | *My name is Charlie."*
+    *“Well, kiss my grits.”—Flo*
 
-The following standard variables are noted by ``console`` and affect its
-behavior:
 
-Operating System:
+Hyperlinks
+~~~~~~~~~~~~~~~~~~~
 
-    - ``TERM``, basic category of terminal, more info is often needed.
-    - ``SSH_CLIENT``, when remote, downgrade to simple support
-    - ``LANG``, is Unicode available?
+Real hyperlinks in the terminal, eh?
+Sounds cool.
+This feature is experimental and more information can be
+`found here. <https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda>`_
 
-Color-specific:
+.. code-block:: python
 
-    - ``CLICOLOR``, 1/0 - Enable or disable ANSI sequences if on a tty
-    - ``CLICOLOR_FORCE`` - Force it on anyway
-    - ``COLORTERM`` - "truecolor" or "24bit" support
-    - ``NO_COLOR`` - None, dammit!
-    - ``COLORFGBG`` - Light or dark background?
+    >>> from console.utils import make_hyperlink
 
-Windows:
+    >>> make_hyperlink('ftp://netscape.com/', 'Blast from the FUTURE!')
+    '\x1b]8;;ftp://netscape.com/\x1b\\Blast from the FUTURE!\x1b]8;;\x1b\\'
 
-    - ``ANSICON``, shim to render ANSI on older Windows is available.
+    >>> print(_)
 
-MacOS:
+.. raw:: html
 
-    - ``TERM_PROGRAM``, more specific program information
+    <pre style="margin-top: -13px; border-radius: 0 0 1em 1em;">
+    <span style="border-bottom: 1px dashed">Blast from the FUTURE!</span>
+    </pre>
 
-Console itself:
 
-    - PY_CONSOLE_AUTODETECT, Enable or disable the detection routines
+
+Context Managers
+~~~~~~~~~~~~~~~~~~~
+
+.. rubric:: Configuring Output
+
+Console's Palette Entry objects can be used as context managers as well.
+We saw this in the readme previously.
+An output file may also be set if it needs to be changed from stdout and not
+able to be redirected outside the process:
+
+.. code-block:: python
+
+    dodgers = bg.dodgerblue + fx.bold
+    dodgers.set_output(sys.stderr)
+
+    with dodgers:
+        print('Infield: Garvey, Lopes, Russel, Cey, Yeager')
+        print('Outfield: Baker, Monday, Smith')
+
+(This feature is somewhat experimental for now. ;-)
+
+
+.. rubric:: Fullscreen Apps, a la Blessings
+
+Here's a short script to show off console's full-screen abilities:
+
+.. code-block:: python
+
+    from console import fg, fx, defx
+    from console.screen import sc as screen
+    from console.utils import wait_key, set_title
+    from console.constants import ESC
+
+    exit_keys = (ESC, 'q', 'Q')
+
+    with screen:  # or screen.fullscreen():
+
+        set_title(' 🤓 Hi, from console!')
+        with screen.location(5, 4):
+            print(
+                fg.lightgreen('** Hi from a '
+                              f'{fx.i}fullscreen{defx.i} app! **'),
+                screen.mv_x(5),  # back up, then down
+                screen.down(5),
+                fg.yellow(f'(Hit the {fx.reverse}ESC{defx.reverse}'
+                           ' key to exit): '),
+                end='', flush=True,
+            )
+
+        with screen.hidden_cursor():
+            wait_key(exit_keys)
+
+The text below should appear.
+Check the title too!
+After hitting the ESC key your terminal shall be restored:
+
+.. raw:: html
+
+    <pre>
+
+    <div style="color: green; ">
+     * Hi, from a <i>fullscreen</i> app! **
+    </div>
+
+
+
+    <div style="color: #ba0; ">
+      (Hit the <span style="background: #ba0; color: black">ESC</span> key to exit):
+    </div>
+    </pre>
+
+
+.. rubric:: TermStack, this one *not* experimental. ;-)
+
+TermStack is a content-manager for making temporary modifications to the
+terminal via termios,
+that copies the original settings and restores them when finished.
+
+It's in the detection module because that's where it's used,
+but also aliased to the package namespace.
+For example:
+
+.. code-block:: python
+
+    from console import TermStack
+
+    with TermStack() as fd:
+        # shut off echo
+        tty.setcbreak(fd, termios.TCSANOW)
+        sys.stdout.write(f'{CSI}6n')  # fire!
+        sys.stdout.flush()
+
+    # Back to normal
+
+And off you go.
 
 
 Tips
 ------------
 
-    *"Easy Miss, I’ve got you." "You’ve got ME? Who’s got YOU?"—Superman*
+    *"Easy Miss, I’ve got you."*
+
+    *"You’ve got ME? Who’s got YOU?"—Superman*
 
 - The styles bold, italic, underline, and strike have one-letter shortcuts as
   they do in HTML,
@@ -466,7 +505,46 @@ Tips
   (Console does acknowledge several environment variables like ``COLORFGBG``
   as well.)
 
-- ANSI support can be enabled on Windows 10 with the following incantation::
+- ANSI constants in Python syntax can be printed via:
+
+  .. code-block:: shell
+
+        ⏵ python3 -m console.constants
+        CSI = '\x1b['
+        ESC = '\x1b'
+        LF = '\n'
+        OSC = '\x1b]'
+        ST = '\x1b\\'
+        VT = '\x0b'
+        # etc…
+
+- For more information,
+  a four-column grouped ASCII table in fruity colors,
+  including the full set of control characters and their relationships,
+  may be summoned with this incantation:
+
+  ::
+
+      ⏵ p3 -m console.ascii4 -h
+
+      00000   0 00  NUL       32 20          64 40  @       96 60  `
+      00001   1 01  SOH       33 21  !       65 41  A       97 61  a
+      00010   2 02  STX       34 22  "       66 42  B       98 62  b
+      …
+
+- X11 color names may be searched with this command:
+
+  .. code-block:: shell
+
+        ⏵ python3 -m console.color_tables_x11 darkorange
+        darkorange (255, 140, 0)
+        darkorange1 (255, 127, 0)
+        darkorange2 (238, 118, 0)
+        darkorange3 (205, 102, 0)
+        darkorange4 (139, 69, 0)
+
+- ANSI support may be enabled on Windows 10 legacy console via the following
+  incantation::
 
     >>> import console.windows as cw
 
@@ -644,7 +722,7 @@ Signing off from late '79.
 
 .. raw:: html
 
-    <pre style="color: #6ab">
+    <pre style="color: #6bc; background: #111">
     LOGON: Joshua
 
 
