@@ -106,7 +106,7 @@ def make_hyperlink(target, caption=None, **params):
 
         return f'{OSC}8;{params or ""};{target}{ST}{caption}{OSC}8;;{ST}'
 
-    else:  # don't bother if redirected or ANSI disabled.
+    else:  # don't bother if redirected and/or ANSI disabled.
         return caption or ''
 
 def clear_line(mode=2):

@@ -322,7 +322,7 @@ def _find_basic_palette(name):
                             raise RuntimeError('not a known color scheme.')
                     except (IndexError, RuntimeError, termios.error) as err:
                         log.debug('get_color return value failed: %s', err)
-        else:  # Amiga/Atari :-P
+        else:  # Amiga/Atari - The Wonder Computer of the 1980s :-P
             log.warn('Unexpected OS: os.name: %s', os_name)
 
     return name, pal_name, basic_palette
