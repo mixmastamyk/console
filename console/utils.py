@@ -51,7 +51,7 @@ else:
         print(message, end='', flush=True)
 
 
-def make_hyperlink(target, caption=None, **params):
+def make_hyperlink(target, caption=None, icon='🔗', **params):
     ''' Returns a terminal hyperlink, given a link and caption text.
 
         Arguments:
@@ -59,6 +59,7 @@ def make_hyperlink(target, caption=None, **params):
             target:     Link to the destination, 'http://foo.bar/baz'
             caption:    Optional descriptive text, defaults to target, e.g.
                         'Click-en Sie hier!'
+            icon:       Add link icon to end of text.
             params:     Optional key word args, to be formatted as:
                         'id=xyz123:foo=bar:baz=quux'
                         (See note below.)
@@ -104,7 +105,7 @@ def make_hyperlink(target, caption=None, **params):
 
         target = quote(target, safe=SAFE_CHARS)  # url encode
 
-        return f'{OSC}8;{params or ""};{target}{ST}{caption}{OSC}8;;{ST}'
+        return f'{OSC}8;{params or ""};{target}{ST}{caption}{icon}{OSC}8;;{ST}'
 
     else:  # don't bother if redirected and/or ANSI disabled.
         return caption or ''

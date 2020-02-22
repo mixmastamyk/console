@@ -124,10 +124,6 @@ class EffectsPalette(_BasicPaletteBuilder):
     crossed         = 9
     strike          = crossed
 
-    frame           = 51
-    encircle        = 52
-    overline        = 53
-
     # word processor/html shortcuts
     b               = bold
     i               = italic
@@ -149,6 +145,13 @@ class EffectsPalette(_BasicPaletteBuilder):
 
     primary         = font10
     fraktur         = font20
+
+    dunder           = 21       # originally disable bold
+    double_underline = dunder
+
+    frame           = 51        # rarely, if ever implemented
+    encircle        = 52
+    overline        = 53
 
     # should these ideogram codes be enabled?
     # ideogram_ul     = 60
@@ -175,13 +178,14 @@ class EffectsTerminator(_BasicPaletteBuilder):
     fg              = ForegroundPalette.default
     bg              = BackgroundPalette.default
 
-    bold            = 21
-    intensity       = 22  # bold, dim (maybe color) ---> norm
+    bold            = 22  # to norm intensity, not bold or dim
+    dim             = bold
     italic = font   = 23
     underline       = 24
     blink           = 25
     reverse         = 27
-    reveal          = 28
+    conceal         = 28
+    hide            = conceal
     crossed         = 29
     strike          = crossed
 
