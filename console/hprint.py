@@ -61,7 +61,7 @@ class LiteHTMLParser(HTMLParser):
             tokens = self.tokens
             if data.startswith('\n'):  # at the end of each line
                 data = data.lstrip()
-                if tokens and not tokens[-1].endswith('\n'):  # breathing room
+                if tokens and not tokens[-1].endswith('\n'):  # breathing room
                     data = ' ' + data
                 if not data:
                     return
