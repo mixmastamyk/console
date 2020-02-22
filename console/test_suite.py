@@ -386,14 +386,15 @@ if True:  # fold
     def test_utils_mk_hyperlink():
         utils._CHOSEN_PALETTE = ALL_PALETTES  # force, need a better way
         result = utils.make_hyperlink('ftp://netscape.com/…/navigator.tar.gz',
-                                      'Blast from the past!')
+                                      'Blast from the past!', icon='')
         assert result == (
             '\x1b]8;;ftp://netscape.com/%E2%80%A6/navigator.tar.gz'
             '\x1b\\Blast from the past!\x1b]8;;\x1b\\'
         )
 
     def test_utils_mk_hyperlink_params_and_low_encode():
-        result = utils.make_hyperlink('foo://n\x1bt.org/', 'cap', id='2', bar='z')
+        result = utils.make_hyperlink('foo://n\x1bt.org/', 'cap', id='2',
+                                      bar='z', icon='')
 
         assert result == (
             '\x1b]8;id=2:bar=z;foo://n%1Bt.org/\x1b\\cap\x1b]8;;\x1b\\'

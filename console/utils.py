@@ -51,6 +51,63 @@ else:
         print(message, end='', flush=True)
 
 
+def clear_line(mode=2):
+    ''' Clear the current line.
+
+        Arguments:
+
+            mode:  | 0 | 'forward'  | 'right' - Clear cursor to end of line.
+                   | 1 | 'backward' | 'left'  - Clear cursor to beginning of line.
+                   | 2 | 'full'               - Clear entire line.
+
+        Note:
+            Cursor position does not change.
+    '''
+    text = sc.erase_line(_mode_map.get(mode, mode))
+    _write(text)
+    return text  # for testing
+
+
+def clear_lines(lines, mode=2):
+    ''' Clear the given number of lines above.
+
+        Arguments:
+            lines: number of lines above to clear.
+            mode:  | 0 | 'forward'  | 'right' - Clear cursor to end of line.
+                   | 1 | 'backward' | 'left'  - Clear cursor to beginning of line.
+                   | 2 | 'full'               - Clear entire line.
+    '''
+    mode = _mode_map.get(mode, mode)
+    erase_cmd = sc.erase_line(mode)
+    up_cmd = sc.up(1)
+    commands = []
+
+    for line in range(lines):
+        commands.append(erase_cmd)
+        commands.append(up_cmd)
+
+    text = ''.join(commands)
+    _write(text)
+
+    return text  # for testing
+
+
+def clear_screen(mode=2):
+    ''' Clear the terminal/console screen. (Also aliased to clear.)
+
+        Arguments:
+
+            mode:  | 0 | 'forward'   - Clear cursor to end of screen, cursor stays.
+                   | 1 | 'backward'  - Clear cursor to beginning of screen, ""
+                   | 2 | 'full'      - Clear entire visible screen, cursor to 1,1.
+                   | 3 | 'history'   - Clear entire visible screen and scrollback
+                                       buffer (xterm).
+    '''
+    text = sc.erase(_mode_map.get(mode, mode))
+    _write(text)
+    return text  # for testing
+
+
 def make_hyperlink(target, caption=None, icon='🔗', **params):
     ''' Returns a terminal hyperlink, given a link and caption text.
 
@@ -109,62 +166,6 @@ def make_hyperlink(target, caption=None, icon='🔗', **params):
 
     else:  # don't bother if redirected and/or ANSI disabled.
         return caption or ''
-
-def clear_line(mode=2):
-    ''' Clear the current line.
-
-        Arguments:
-
-            mode:  | 0 | 'forward'  | 'right' - Clear cursor to end of line.
-                   | 1 | 'backward' | 'left'  - Clear cursor to beginning of line.
-                   | 2 | 'full'               - Clear entire line.
-
-        Note:
-            Cursor position does not change.
-    '''
-    text = sc.erase_line(_mode_map.get(mode, mode))
-    _write(text)
-    return text  # for testing
-
-
-def clear_lines(lines, mode=2):
-    ''' Clear the given number of lines above.
-
-        Arguments:
-            lines: number of lines above to clear.
-            mode:  | 0 | 'forward'  | 'right' - Clear cursor to end of line.
-                   | 1 | 'backward' | 'left'  - Clear cursor to beginning of line.
-                   | 2 | 'full'               - Clear entire line.
-    '''
-    mode = _mode_map.get(mode, mode)
-    erase_cmd = sc.erase_line(mode)
-    up_cmd = sc.up(1)
-    commands = []
-
-    for line in range(lines):
-        commands.append(erase_cmd)
-        commands.append(up_cmd)
-
-    text = ''.join(commands)
-    _write(text)
-
-    return text  # for testing
-
-
-def clear_screen(mode=2):
-    ''' Clear the terminal/console screen. (Also aliased to clear.)
-
-        Arguments:
-
-            mode:  | 0 | 'forward'   - Clear cursor to end of screen, cursor stays.
-                   | 1 | 'backward'  - Clear cursor to beginning of screen, ""
-                   | 2 | 'full'      - Clear entire visible screen, cursor to 1,1.
-                   | 3 | 'history'   - Clear entire visible screen and scrollback
-                                       buffer (xterm).
-    '''
-    text = sc.erase(_mode_map.get(mode, mode))
-    _write(text)
-    return text  # for testing
 
 
 def reset_terminal():
