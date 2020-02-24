@@ -108,7 +108,7 @@ def clear_screen(mode=2):
     return text  # for testing
 
 
-def make_hyperlink(target, caption=None, icon='🔗', **params):
+def make_hyperlink(target, caption=None, icon='', **params):
     ''' Returns a terminal hyperlink, given a link and caption text.
 
         Arguments:
@@ -116,7 +116,7 @@ def make_hyperlink(target, caption=None, icon='🔗', **params):
             target:     Link to the destination, 'http://foo.bar/baz'
             caption:    Optional descriptive text, defaults to target, e.g.
                         'Click-en Sie hier!'
-            icon:       Add link icon to end of text.
+            icon:       Add link icon to end of text, e.g. icon='🔗'
             params:     Optional key word args, to be formatted as:
                         'id=xyz123:foo=bar:baz=quux'
                         (See note below.)

@@ -18,10 +18,10 @@ help_text = __doc__ + '''
 
           • BEL, the Bell may be activated with {} (look to right columns)
           • BS, the Backspace key is represented by {}
-          • ESC, the Escape key is represented by {}
+          • ESC, the Escape key is represented by {}  etc.
 
-        • This is also why one can add 32/20h to the index of a capital letter
-          to find the corresponding lower case.
+        • This is also why one can add 32/20h to the index of a capital to
+          find the corresponding lower case letter.
 '''
 import os, sys
 from console import fg, bg, fx, defx

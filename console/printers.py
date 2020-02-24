@@ -217,7 +217,7 @@ class LiteHTMLParser(HTMLParser):
 
             elif tag == 'a':
                 self._set_fg_color('lightblue')
-                self.tokens.append(make_hyperlink(*self.anchor))
+                self.tokens.append(make_hyperlink(*self.anchor, icon='🔗'))
                 self._set_fg_color_default()
                 self.anchor = None
 
