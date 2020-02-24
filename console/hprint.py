@@ -37,7 +37,7 @@ class StringCache(dict):
         return val
 
 import re
-whitespace = re.compile(r'\s+')
+whitespace = re.compile(r'\s\s+')
 
 class LiteHTMLParser(HTMLParser):
     ''' Parses simple HTML tags, returns as text and ANSI sequences. '''
@@ -59,13 +59,18 @@ class LiteHTMLParser(HTMLParser):
             self.anchor.append(data)  # caption
         else:
             tokens = self.tokens
+            new_paragraph = tokens and tokens[-1].endswith('\n')
             if data.startswith('\n'):  # at the end of each line
                 data = data.lstrip()
-                if tokens and not tokens[-1].endswith('\n'):  # breathing room
-                    data = ' ' + data
-                if not data:
+                if tokens and not new_paragraph:
+                    data = ' ' + data  # give breathing room
+                elif not data:
                     return
                 debug('data1: %r', data)
+
+            if new_paragraph:
+                data = data.lstrip()
+                debug('data2: %r', data)
 
             # consolidate remaining whitespace to a single space:
             data = whitespace.sub(' ', data)
@@ -98,7 +103,7 @@ class LiteHTMLParser(HTMLParser):
             elif last.endswith('\n'):   # ends with
                 tokens.append('\n')
             else:
-                tokens.append('\n\n')
+                tokens.append('\n\n')   # in full effect
         else:
             tokens.append('\n')
         debug('%s tokens1: %s', desc, tokens)
@@ -190,7 +195,7 @@ parser = LiteHTMLParser()
 
 def hprint(*args, **kwargs):
     ''' Print function for terminals with limited HTML support. '''
-    end = kwargs.pop('end', '')
+    end = kwargs.pop('end', None)
 
     for arg in args:
         result = ''
@@ -235,9 +240,11 @@ if __name__ == '__main__':
     <i>(c/color tag, web/X11 color names)</i>
     <c orange>l'orange</c>
     <c black on bisque3>bisque3</c>
-    <c #b0b>B0B</c> -&gt; <a href="http://example.com/">click here!</a><p>
+    <c #b0b>B0B</c> -&gt; <a href="http://example.com/">click here!</a>
+    <p>
     A bit of text in its own paragraph.</p>
-    <!-- comments should not be seen, correct? -->
+    <!-- nothing in this comment should be shown -->
+    Hello <h1>world!</h1> ;-)
     '''
     #~ <!--
     #~ -->
