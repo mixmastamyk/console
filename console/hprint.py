@@ -46,37 +46,6 @@ class LiteHTMLParser(HTMLParser):
     setting_bg_color = False
     setting_fg_color = False
 
-    def handle_data(self, data):
-        ''' Deals with text between and outside the tags.  Cases:
-            ' '
-            ' word\n    '
-            '\n    '
-            '\n    word'
-            'word', 'word ', ' word'
-        '''
-        debug('data0: %r', data)
-        if self.anchor:
-            self.anchor.append(data)  # caption
-        else:
-            tokens = self.tokens
-            new_paragraph = tokens and tokens[-1].endswith('\n')
-            if data.startswith('\n'):  # at the end of each line
-                data = data.lstrip()
-                if tokens and not new_paragraph:
-                    data = ' ' + data  # give breathing room
-                elif not data:
-                    return
-                debug('data1: %r', data)
-
-            if new_paragraph:
-                data = data.lstrip()
-                debug('data2: %r', data)
-
-            # consolidate remaining whitespace to a single space:
-            data = whitespace.sub(' ', data)
-            tokens.append(data)
-        debug('tokens: %r\n', self.tokens)
-
     def _set_fg_color(self, val):
         self.tokens.append(fg_cache[val])
         self.setting_fg_color = True
@@ -107,6 +76,37 @@ class LiteHTMLParser(HTMLParser):
         else:
             tokens.append('\n')
         debug('%s tokens1: %s', desc, tokens)
+
+    def handle_data(self, data):
+        ''' Deals with text between and outside the tags.  Cases:
+            ' '
+            ' word\n    '
+            '\n    '
+            '\n    word'
+            'word', 'word ', ' word'
+        '''
+        debug('data0: %r', data)
+        if self.anchor:
+            self.anchor.append(data)  # caption
+        else:
+            tokens = self.tokens
+            new_paragraph = tokens and tokens[-1].endswith('\n')
+            if data.startswith('\n'):  # at the end of each line
+                data = data.lstrip()
+                if tokens and not new_paragraph:
+                    data = ' ' + data  # give breathing room
+                elif not data:
+                    return
+                debug('data1: %r', data)
+
+            if new_paragraph:
+                data = data.lstrip()
+                debug('data2: %r', data)
+
+            # consolidate remaining whitespace to a single space:
+            data = whitespace.sub(' ', data)
+            tokens.append(data)
+        debug('tokens: %r\n', self.tokens)
 
     def handle_starttag(self, tag, attrs):
         debug('start tag: %s', tag)
