@@ -5,11 +5,11 @@
 .. raw:: html
 
     <pre id='logo' class='center'>
-    <span style="color:#729fcf">&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span><span style="color:#3465a4">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;</span>
-    <span style="color:#729fcf">&#9474;</span>&#160;&#160;&#160;<span style="color:#729fcf">&#9487;&#9473;&#9592;&#9487;</span><span style="color:#3465a4">&#9473;&#9491;&#9487;&#9491;&#9595;&#9487;&#9473;&#9491;&#9487;&#9473;&#9491;&#9595;</span>&#160;&#160;</span><span style="color:#3465a4">&#9487;&#9473;</span><span style="color:#b4b8b0">&#9592;</span>&#160;&#160;&#160;<span style="color:#b4b8b0">&#9474;</span>
-    <span style="color:#3465a4">&#9474;</span>&#160;&#160;&#160;<span style="color:#3465a4">&#9475;</span>&#160;&#160;</span><span style="color:#3465a4">&#9475;</span>&#160;</span><span style="color:#3465a4">&#9475;&#9475;&#9495;&#9515;&#9495;&#9473;&#9491;</span><span style="color:#b4b8b0">&#9475;</span>&#160;</span><span style="color:#b4b8b0">&#9475;&#9475;</span>&#160;&#160;<span style="color:#b4b8b0">&#9507;&#9592;</span>&#160;&#160;&#160;&#160;</span><span style="color:#b4b8b0">&#9474;</span>
-    <span style="color:#3465a4">&#9474;</span>&#160;&#160;&#160;<span style="color:#3465a4">&#9495;&#9473;&#9592;&#9495;</span><span style="color:#b4b8b0">&#9473;&#9499;&#9593;</span>&#160;</span><span style="color:#b4b8b0">&#9593;&#9495;&#9473;&#9499;&#9495;&#9473;&#9499;&#9495;&#9473;&#9592;&#9495;&#9473;</span><span style="color:#555">&#9592;</span>&#160;&#160;&#160;<span style="color:#555">&#9474;</span>
-    <span style="color:#b4b8b0">&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span><span style="color:#555">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;</span>
+    <span style="color:#729fcf">&#9484;───────────────</span><span style="color:#3465a4">────────────&#9488;</span>
+    <span style="color:#729fcf">│</span>   <span style="color:#729fcf">&#9487;&#9473;&#9592;&#9487;</span><span style="color:#3465a4">&#9473;&#9491;&#9487;&#9491;&#9595;&#9487;&#9473;&#9491;&#9487;&#9473;&#9491;&#9595;</span>  </span><span style="color:#3465a4">&#9487;&#9473;</span><span style="color:#b4b8b0">&#9592;</span>   <span style="color:#b4b8b0">│</span>
+    <span style="color:#3465a4">│</span>   <span style="color:#3465a4">&#9475;</span>  </span><span style="color:#3465a4">&#9475;</span> </span><span style="color:#3465a4">&#9475;&#9475;&#9495;&#9515;&#9495;&#9473;&#9491;</span><span style="color:#b4b8b0">&#9475;</span> </span><span style="color:#b4b8b0">&#9475;&#9475;</span>  <span style="color:#b4b8b0">&#9507;&#9592;</span>    </span><span style="color:#b4b8b0">│</span>
+    <span style="color:#3465a4">│</span>   <span style="color:#3465a4">&#9495;&#9473;&#9592;&#9495;</span><span style="color:#b4b8b0">&#9473;&#9499;&#9593;</span> </span><span style="color:#b4b8b0">&#9593;&#9495;&#9473;&#9499;&#9495;&#9473;&#9499;&#9495;&#9473;&#9592;&#9495;&#9473;</span><span style="color:#555">&#9592;</span>   <span style="color:#555">│</span>
+    <span style="color:#b4b8b0">&#9492;───────────────</span><span style="color:#555">────────────&#9496;</span>
     </pre>
 
 .. container:: center
@@ -49,22 +49,22 @@ Behind the scenes in
 you've been working with the two main parent classes of those in
 :mod:`console.style`:
 
-.. rubric:: Palette Collection:
+.. rubric:: Palette Collections:
 
-A collection object holding a large number of Palettes and their associated
-Entries, e.g.:
+A Palette is a collection object holding a large number of associated Entries,
+available as attributes, e.g.:
 
     - ``fg``, ``bg``, ``fx``
-    - ``defx`` (for deactivating styles in a highly specific manner)
+    - ``defx`` (for deactivating specific styles)
 
-While the simplest palettes
-(original and effects)
+While the simplest palette entries
+(original and effects, such as ``fg.blue`` or ``fx.bold``)
 are created up front,
-the rest are built up as needed,
-on demand.
+the rest, such as indexed or truecolor,
+are built up on demand.
 Like a traffic cop,
-palettes direct attribute access to the appropriate code to initialize each
-palette entry.
+palettes objects direct attribute access to the appropriate code to initialize
+each palette entry.
 
 Once created,
 palette Entry attributes are cached and available for future use.
@@ -74,16 +74,17 @@ with the ``clear()`` method.
 
 .. rubric:: Palette Entries:
 
-Entry objects are what actually produce the escape sequences---\
-they are accessed as attributes of a palette collection, e.g.:
+Entry objects are what actually produce the escape sequences and other
+functionality.
+They are accessed as attributes of a palette collection, e.g.:
 
     - ``.red``
     - ``.i22``
     - ``.cornflowerblue``
 
-The Entries provide much of the functionality.  They
+Entries:
 
-    - Keep track of their ANSI codes and those they've been added to.
+    - Keep track of their ANSI codes and others they've been added to.
     - Can be called and "mixed in" with other attributes to render
       themselves, then end the style when finished.
     - Can be used as a context-manager.
@@ -125,13 +126,14 @@ Custom Initialization
 
     *"I hope you know this violates my warranty!"—Twiki*
 
-.. rubric:: Environment Variables
 
-On rare POSIX terminals color detection may hang and need to be disabled.
-(Recent versions of console implement a timeout to alleviate this.
-If you notice that startup stutters briefly at console init,
+On terminals advertising xterm compatibility (though incomplete) color
+detection may hang and need to be disabled.
+Recent versions of console implement a blacklist and timeout to
+alleviate/mitigate this.
+If you notice that console startup stutters briefly at import time,
 you might be affected.
-See troubleshooting below to enable DEBUG logging.)
+See troubleshooting below to enable DEBUG logging.
 
 To disable automatic detection of terminal capabilities at import time the
 environment variable
@@ -189,8 +191,8 @@ even with numpy loaded,
 which is also slow to import.
 
 Fast and inaccurate it is!
-Unless someone would like to write a highly optimized C implementation for
-kicks,
+Unless someone would like to write a highly optimized implementation in
+C or Assembler for kicks,
 it doesn't seem worth the trouble for this library.
 
 ::
@@ -224,7 +226,7 @@ Color-specific:
 
 Windows:
 
-    - ``ANSICON``, shim to render ANSI on older Windows is available.
+    - ``ANSICON``, shim to render ANSI on older Windows is recognized.
 
 MacOS:
 
@@ -332,6 +334,7 @@ A more robust use of the module is illustrated below::
 
     with sc.hidden_cursor():  # "Ooooohh, I'm tellin' Mama!"
 
+        # conventional usage:
         items = range(256)    # example tasks
         bar = ProgressBar(total=len(items))
 
@@ -379,7 +382,7 @@ This feature is experimental and more information can be
 .. raw:: html
 
     <pre style="margin-top: -13px; border-radius: 0 0 1em 1em;">
-    <span style="border-bottom: 1px dashed">Blast from the FUTURE!</span>
+    <a style="border-bottom: 1px dashed" href="ftp://netscape.com/">Blast from the FUTURE!</a>
     </pre>
 
 
@@ -430,7 +433,7 @@ Here's a short script to show off console's full-screen abilities:
                 screen.down(5),
                 fg.yellow(f'(Hit the {fx.reverse}ESC{defx.reverse}'
                            ' key to exit): '),
-                end='', flush=True,
+                end='', flush=True,  # optional
             )
 
         with screen.hidden_cursor():
@@ -468,12 +471,13 @@ For example:
 
 .. code-block:: python
 
+    import tty, termios
     from console import TermStack
 
     with TermStack() as fd:
         # shut off echo
         tty.setcbreak(fd, termios.TCSANOW)
-        sys.stdout.write(f'{CSI}6n')  # fire!
+        sys.stdout.write(f'{CSI}6n')  # do something
         sys.stdout.flush()
 
     # Back to normal
@@ -484,9 +488,8 @@ And off you go.
 Tips
 ------------
 
-    *"Easy Miss, I’ve got you."*
-
-    *"You’ve got ME? Who’s got YOU?"—Superman*
+    | *"Easy Miss, I’ve got you."*
+    | *"You’ve got ME? Who’s got YOU?"—Superman*
 
 - The styles bold, italic, underline, and strike have one-letter shortcuts as
   they do in HTML,
@@ -521,16 +524,18 @@ Tips
 - For more information,
   a four-column grouped ASCII table in fruity colors,
   including the full set of control characters and their relationships,
-  may be summoned with this incantation:
+  may be summoned with the following incantation.
+  This format is great for spotting Control key correspondence with letters,
+  e.g.: Ctrl+M=Enter, Ctrl+H=Backspace, etc:
+
 
   ::
 
       ⏵ p3 -m console.ascii4 -h
 
-      00000   0 00  NUL       32 20          64 40  @       96 60  `
-      00001   1 01  SOH       33 21  !       65 41  A       97 61  a
-      00010   2 02  STX       34 22  "       66 42  B       98 62  b
-      …
+        0 00  NUL       32 20            64 40  @        96 60  `
+        7 07  BEL       39 27  '         71 47  G        103 67  g
+        …  # 😉
 
 - X11 color names may be searched with this command:
 
@@ -548,8 +553,8 @@ Tips
 
     >>> import console.windows as cw
 
-    >>> cw.enable_vt_processing()
-    (0, 0)  # status for (stdout, stderr)
+    >>> cw.enable_vt_processing()  # status for (stdout, stderr)
+    (0, 0)
 
 
 Troubleshooting
@@ -657,7 +662,9 @@ Did you know that thirty years before
 `f.lux <https://en.wikipedia.org/wiki/F.lux>`_
 and
 `redshift <https://en.wikipedia.org/wiki/Redshift_(software)>`_
-debuted that Amber Monochrome monitors on a dark background were known as the
+debuted that
+`Amber Monochrome monitors <https://www.google.com/search?q=amber+monochrome+monitor&tbm=isch>`_
+with a dark background were known as the
 "ergonomic" choice?
 
 Easier on the eyes for extended periods (i.e. late nights) they said.
@@ -693,10 +700,11 @@ Interesting knowledge rediscovered perhaps.
 
 .. figure:: _static/bjandbear.jpg
     :align: right
-    :figwidth: 33%
+    :figwidth: 40%
 
-    *"I'm B. J. McKay, and this is my best friend Bear."*\
-    `🖺 <https://www.memorabletv.com/tv/b-j-bear-nbc-1979-1981-greg-evigan-claude-akins/>`_\
+    *"I'm B. J. McKay,*
+    *and this is my best friend Bear."*
+    `🖺 <https://www.memorabletv.com/tv/b-j-bear-nbc-1979-1981-greg-evigan-claude-akins/>`_
     `🖹 <http://www.lyricsondemand.com/tvthemes/bjandthebearlyrics.html>`_
 
 |

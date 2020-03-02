@@ -2,11 +2,11 @@
 .. raw:: html
 
     <pre id='logo' class='center'>
-    <span style="color:#729fcf">&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span><span style="color:#3465a4">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;</span>
-    <span style="color:#729fcf">&#9474;</span>&#160;&#160;&#160;<span style="color:#729fcf">&#9487;&#9473;&#9592;&#9487;</span><span style="color:#3465a4">&#9473;&#9491;&#9487;&#9491;&#9595;&#9487;&#9473;&#9491;&#9487;&#9473;&#9491;&#9595;</span>&#160;&#160;</span><span style="color:#3465a4">&#9487;&#9473;</span><span style="color:#b4b8b0">&#9592;</span>&#160;&#160;&#160;<span style="color:#b4b8b0">&#9474;</span>
-    <span style="color:#3465a4">&#9474;</span>&#160;&#160;&#160;<span style="color:#3465a4">&#9475;</span>&#160;&#160;</span><span style="color:#3465a4">&#9475;</span>&#160;</span><span style="color:#3465a4">&#9475;&#9475;&#9495;&#9515;&#9495;&#9473;&#9491;</span><span style="color:#b4b8b0">&#9475;</span>&#160;</span><span style="color:#b4b8b0">&#9475;&#9475;</span>&#160;&#160;<span style="color:#b4b8b0">&#9507;&#9592;</span>&#160;&#160;&#160;&#160;</span><span style="color:#b4b8b0">&#9474;</span>
-    <span style="color:#3465a4">&#9474;</span>&#160;&#160;&#160;<span style="color:#3465a4">&#9495;&#9473;&#9592;&#9495;</span><span style="color:#b4b8b0">&#9473;&#9499;&#9593;</span>&#160;</span><span style="color:#b4b8b0">&#9593;&#9495;&#9473;&#9499;&#9495;&#9473;&#9499;&#9495;&#9473;&#9592;&#9495;&#9473;</span><span style="color:#555">&#9592;</span>&#160;&#160;&#160;<span style="color:#555">&#9474;</span>
-    <span style="color:#b4b8b0">&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span><span style="color:#555">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;</span>
+    <span style="color:#729fcf">&#9484;───────────────</span><span style="color:#3465a4">────────────&#9488;</span>
+    <span style="color:#729fcf">│</span>   <span style="color:#729fcf">&#9487;&#9473;&#9592;&#9487;</span><span style="color:#3465a4">&#9473;&#9491;&#9487;&#9491;&#9595;&#9487;&#9473;&#9491;&#9487;&#9473;&#9491;&#9595;</span>  </span><span style="color:#3465a4">&#9487;&#9473;</span><span style="color:#b4b8b0">&#9592;</span>   <span style="color:#b4b8b0">│</span>
+    <span style="color:#3465a4">│</span>   <span style="color:#3465a4">&#9475;</span>  </span><span style="color:#3465a4">&#9475;</span> </span><span style="color:#3465a4">&#9475;&#9475;&#9495;&#9515;&#9495;&#9473;&#9491;</span><span style="color:#b4b8b0">&#9475;</span> </span><span style="color:#b4b8b0">&#9475;&#9475;</span>  <span style="color:#b4b8b0">&#9507;&#9592;</span>    </span><span style="color:#b4b8b0">│</span>
+    <span style="color:#3465a4">│</span>   <span style="color:#3465a4">&#9495;&#9473;&#9592;&#9495;</span><span style="color:#b4b8b0">&#9473;&#9499;&#9593;</span> </span><span style="color:#b4b8b0">&#9593;&#9495;&#9473;&#9499;&#9495;&#9473;&#9499;&#9495;&#9473;&#9592;&#9495;&#9473;</span><span style="color:#555">&#9592;</span>   <span style="color:#555">│</span>
+    <span style="color:#b4b8b0">&#9492;───────────────</span><span style="color:#555">────────────&#9496;</span>
     </pre>
 
 .. container:: center
@@ -50,14 +50,20 @@ Background
 
     *"CHARLIE DON'T SURF!"—Lt. Col. Kilgore*
 
-So ANSI escape codes have been standard on UNIX
-with the belt-and-suspenders crowd for several decades,
-and even saw use on DOS and BBSs back in the day.
+So ANSI escape codes for terminals have been standard on UNIX
+with the belt-and-suspenders crowd since the late seventies,
+and even saw use on DOS, the Amiga, and BBSs back in the day.
 With the advent of macOS X (ten),
 a whole new generation of lumber-sexuals have exposed themselves(?)
 to the terminal environment and command-line
 *and liked it*.
  🤔
+
+.. figure:: _static/dilbert_95-06-24.png
+    :align: center
+    :figwidth: 80%
+
+    Dilbert, on `1995-06-24 <https://dilbert.com/strip/1995-06-24>`_
 
 
 "I'm a PC"
@@ -66,25 +72,25 @@ to the terminal environment and command-line
     *“Oooh! Oooh! Oooh!”—Arnold Horshack*\
     `† <https://www.vulture.com/2012/08/why-welcome-back-kotters-horshack-mattered.html>`_
 
-Not on Windows NT however.
+Not on Windows NT, tho'.
 Amazingly,
 with recent versions of Windows 10
 the Ballmer/Suit barrier was finally breached,
 allowing *multi-decade-late*
 `improvements
-<http://www.nivot.org/blog/post/2016/02/04/Windows-10-TH2-(v1511)-Console-Host-Enhancements>`_
+<https://devblogs.microsoft.com/commandline/windows-10-creators-update-whats-new-in-bashwsl-windows-console/>`_
 to be made to its until-now pathetic "console."
-Often still known as the "DOS Prompt" since it has been frozen since then.
+Often still known as the "DOS Prompt" since it has been frozen that long.
 Vaguely analogous to today's virtual terminals,
 as a Yugo might compare to a classic BMW.
-But now, it's supercharged.
+But now, it's supercharged with VT power.
 
-So, all the top platforms support ANSI escape sequences now.
+So, now all the top/extant platforms support ANSI escape sequences.
 Again!
 What's old is new again.
-Add Unicode and millions of colors and it's now better than it's ever been.
+Add in Unicode and millions of colors and it's now better than ever.
 
-We need great command-line tools and that's where ``console`` fits in.
+We need great command-line/TUI tools and that's where ``console`` fits in.
 
 .. container:: center
 
@@ -168,7 +174,7 @@ Unfortunately,
 one or more important items are often missing:
 
     - Styles, cursor movements, clearing the screen,
-      setting titles, full-screen, etc.
+      setting titles, bracketed paste, full-screen, etc.
 
     - Multiple Palettes:
 
@@ -180,10 +186,7 @@ one or more important items are often missing:
       - Standard color names, like X11 & Webcolors - rarest
 
     - Querying the terminal, auto-detection, support and deactivation.
-
-    - Python3 support
-
-    - Still maintained
+    - Python3 support/still maintained
     - Has tests
 
 
@@ -202,21 +205,26 @@ but may still miss one of these nice to haves:
         - Avoidance of capital, mixed, or camel-case names on instances.
         - Avoidance of extra punctuation, parens, brackets, quotes, etc.
 
+    - Nearest neighbor downgrade for unsupported palettes.
+    - Progress Bars
+    - Hyperlinks
+
 
 .. rubric:: Result
 
 Looking over at PyPI with the criteria above finds many interesting pieces but
 far from the full Monty.
 So, had some fun building my own of course.
-Looked at and picked a few design cues from several of these:
+Looked at and picked out a few design cues from several of these:
 
     - ansi
     - ansicolors
     - blessed
-    - `blessings <https://pypi.org/project/blessings/>`_ - Context Managers
-    - click.style and utilities (reminded of pause)
+    - `blessings <https://pypi.org/project/blessings/>`_ (context managers)
+    - click.style and utilities (reminded me of pause)
     - colorama.ansi (palette collection objects)
     - `colorful <https://tuxtimo.me/posts/colorful-python>`_
+      (why terminfo is a bust)
     - colorize
     - escape
     - fabric.colors
@@ -225,8 +233,8 @@ Looked at and picked a few design cues from several of these:
     - pygments (nearest indexed color)
     - style
     - termcolor
-
     - ptpython, urwid
+    - rich
     - tqdm
 
 etc.

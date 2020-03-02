@@ -177,7 +177,7 @@ class Screen:
         ''' Context Manager that enters full-screen mode and restores normal
             mode on exit.
 
-            ::
+            .. code-block:: python
 
                 with screen.fullscreen():
                     print('Hello, world!')
@@ -197,7 +197,7 @@ class Screen:
     def hidden_cursor(self):
         ''' Context Manager that hides the cursor and restores it on exit.
 
-            ::
+            .. code-block:: python
 
                 with screen.hidden_cursor():
                     print('Clandestine activity…')
@@ -211,6 +211,25 @@ class Screen:
             stream.write(self.show_cursor)
             stream.flush()
 
+    @contextmanager
+    def bracketed_paste(self):
+        ''' Context Manager that brackets-the-paste.
+            https://cirw.in/blog/bracketed-paste
+            https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Bracketed-Paste-Mode
+
+            .. code-block:: python
+
+                with screen.bracketed_paste():
+                    print('Hit me with your best shot…')
+        '''
+        stream = self._stream
+        stream.write(self.bracketedpaste_enable)
+        stream.flush()
+        try:
+            yield self
+        finally:
+            stream.write(self.bracketedpaste_disable)
+            stream.flush()
 
 # It's Automatic:  https://youtu.be/y5ybok6ZGXk
 sc = Screen()

@@ -212,7 +212,7 @@ def strip_ansi(text, c1=False, osc=False):
             c1:  bool  - include C1 commands in the strippage.
 
         Notes:
-            Enabling both c1 and osc stripping is less efficient and the two
+            Enabling both C1 and OSC stripping is less efficient and the two
             options can mildly conflict with one another.
             The less problematic order was chosen,
             but there may still be rare C1 OSC fragments left over.

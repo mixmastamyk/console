@@ -15,6 +15,24 @@ console.color_tables module
     :show-inheritance:
 
 
+console.ascii4 module
+------------------------
+
+.. automodule:: console.constants
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+console.beep module
+------------------------
+
+.. automodule:: console.beep
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 console.constants module
 ------------------------
 
@@ -65,6 +83,18 @@ console.disabled module
     :show-inheritance:
 
     .. autodata:: empty
+
+
+console.printers module
+------------------------
+
+.. automodule:: console.printers
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :exclude-members:
+
+    .. autoclass:: LiteHTMLParser
 
 
 console.progress module

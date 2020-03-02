@@ -2,9 +2,10 @@
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2020, Mike Miller - Released under the LGPL, version 3+.
 
-    This module contains an HTML to ANSI sequence printer,
-    inspired by the "rich" project.
-    It supports quick scripting applications for those familiar with HTML.
+    This module contains an HTML to ANSI sequence printer.
+    It supports quick rich text in scripting applications for those familiar
+    with HTML.
+    Why invent another styling language?
 
     No CSS class support yet,
     but many inline styles that correspond to terminal capabilities work.
@@ -54,7 +55,15 @@ class StringCache(dict):
 
 
 class LiteHTMLParser(HTMLParser):
-    ''' Parses simple HTML tags, returns as text and ANSI sequences. '''
+    ''' Parses simple HTML tags, returns as text and ANSI sequences.
+
+        Exmaple:
+
+            parser = LiteHTMLParser()
+            parser.feed(text)
+            result = ''.join(parser.tokens)  # build and return final string
+            parser.tokens.clear()
+    '''
     anchor = []
     tokens = []
     _setting_bg_color = None
@@ -176,6 +185,7 @@ class LiteHTMLParser(HTMLParser):
                         self._setting_fg_color_dim = True
                     elif fore:
                         self._set_fg_color(key)  # <-- key, not val!
+                        fore = False  # 'on' not needed
                     else:
                         self._set_bg_color(key)  # <-- key, not val!
 
@@ -197,10 +207,10 @@ class LiteHTMLParser(HTMLParser):
             if tag.startswith('h'):
                 self._new_paragraph(desc='  end')
         else:
-            if tag == 'span':
+            if tag == 'span':  # no elifs, could be multiple
                 if self._setting_fg_color:
                     self._set_fg_color_default()
-                if self._setting_bg_color:  # no elif, could be multiple
+                if self._setting_bg_color:
                     self._set_bg_color_default()
                 if self._setting_font_style:
                     self.tokens.append(dx_cache['i'])
@@ -263,8 +273,13 @@ def hprint(*args, **kwargs):
             result = arg
 
         debug('called with: %r %s', result, kwargs)
-        print(result, end='', **kwargs)
-    print(end=end)
+        _print(result, end='', **kwargs)
+    _print(end=end)
+
+
+# aliases
+_print = print
+print = hprint  # default
 
 
 if __name__ == '__main__':
@@ -277,11 +292,11 @@ if __name__ == '__main__':
             out.configure(level='debug')
         except ImportError:
             logging.basicConfig(level='DEBUG',
-                format=f'%(levelname)s {fx.dim}%(funcName)s:{fg.green}%(lineno)s{fg.default}{defx.dim} %(message)s'
+                format=('%(levelname)s '
+                f'{fx.dim}%(funcName)s:{fg.green}%(lineno)s{fg.default}{defx.dim}'
+                ' %(message)s'),
             )
 
-    #~ <!--
-    #~ -->
     html = '''
     <h1>HTML Print Test:</h1>
     <c dim>fx:</c> <b>bold</b> <i>italic</i><em>/em</em> <s>strike</s>
@@ -302,8 +317,9 @@ if __name__ == '__main__':
     <c black on bisque3>bisque3</c>
     <c #b0b>B0B</c> -&gt; <a href="http://example.com/">click here!</a>
     <p>
-    A bit of <q>plain text</q> in its own paragraph.</p>
+        A bit of <q>plain text</q> in its own paragraph.
+    </p>
     <!-- nothing in this comment should be shown -->
     Hello <h2>world!</h2> ;-)
     '''
-    hprint(html)
+    print(html)
