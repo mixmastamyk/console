@@ -387,6 +387,64 @@ This feature is experimental and more information can be
 
 
 
+HTML Printer
+~~~~~~~~~~~~~~~~~~~
+
+Would you like to print some rich text to the terminal,
+but would rather put styles inline and not have to fiddle with objects?
+Maybe you have some existing HTML laying around?
+
+.. code-block:: python
+
+    >>> from console.printers import print
+    >>> print(html_doc)
+
+
+The HTML Printer function takes the same parameters as the standard ``print``
+function.
+For example,
+output can be saved to a file by passing a ``file=`` parameter.
+It implements a small subset of tags that makes sense in the terminal,
+but has quite a few features,
+collapses whitespace,
+and converts entities:
+
+- a *(see above)*
+- br *(+newline)*
+- b, strong
+- hr *(+newlines)*
+- h1, h2, h3 *(+newlines)*
+- i, em
+- p *(+newlines)*
+- q "fancy quotes"
+- span
+- s, strike
+- u
+
+It handles a few inline style attributes as well:
+
+.. code-block:: html
+
+    <span style="color: red">text</span>
+    <span style=background:green>text</span>
+    <span style="font-style:italic; font-weight:bold">text</span>
+    <span style="text-decoration:overline; text-decoration:underline">…
+
+As you can see,
+setting text color is *very* verbose,
+so unfortunately broke down and implemented a ``c`` tag for color.
+Like the inline-CSS above,
+it handles X11 or Webcolors (if installed) color names, hex digits,
+and the word "dim":
+
+.. code-block:: html
+
+    <c orange>l'orange</c>
+    <c black on bisque3>bisque3</c>
+    <c #b0b>deadbeefcafe</c>
+    <c dim>text</c>
+
+
 Context Managers
 ~~~~~~~~~~~~~~~~~~~
 
@@ -399,10 +457,10 @@ able to be redirected outside the process:
 
 .. code-block:: python
 
-    dodgers = bg.dodgerblue + fx.bold
-    dodgers.set_output(sys.stderr)
+    Dodgers = bg.dodgerblue + fx.bold
+    Dodgers.set_output(sys.stderr)
 
-    with dodgers:
+    with Dodgers:
         print('Infield: Garvey, Lopes, Russel, Cey, Yeager')
         print('Outfield: Baker, Monday, Smith')
 
@@ -710,12 +768,13 @@ Interesting knowledge rediscovered perhaps.
 |
 
 Signing off from late '79.
- A new futuristic decade awaits!
+A new futuristic decade awaits,
+with an actor as President!
 
     - *Keep On Truckin'*
-    - *Catch you on the flip-side*
-    - *Good night, John-boy*
+    - *Catch you on the flip-side!*
     - *"This is Ripley, last survivor of the Nostromo, signing off."*
+    - *Good night, John-boy*
 
     and…
 

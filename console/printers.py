@@ -9,6 +9,8 @@
 
     No CSS class support yet,
     but many inline styles that correspond to terminal capabilities work.
+
+    TODO: maybe lists
 '''
 import re
 import logging
@@ -22,6 +24,8 @@ from html.parser import HTMLParser
 log = logging.getLogger(__name__)
 debug = log.debug
 fx_tags = ('b', 'i', 's', 'u', 'em', 'h1', 'h2', 'h3', 'strong')
+skip_data_tags = ('script', 'style', 'title')
+hr_txt = str(fx.dim('∙' * 72))
 multi_whitespace_hunter = re.compile(r'\s\s+')
 
 
@@ -64,12 +68,13 @@ class LiteHTMLParser(HTMLParser):
             result = ''.join(parser.tokens)  # build and return final string
             parser.tokens.clear()
     '''
-    anchor = []
+    _anchor = []
     tokens = []
     _setting_bg_color = None
     _setting_fg_color = _setting_fg_color_dim = None
     _setting_font_style = _setting_font_weight = None
     _setting_text_decoration_u = _setting_text_decoration_o = None
+    _skip_data = None
 
     def _set_fg_color(self, val):
         self.tokens.append(fg_cache[val])
@@ -135,8 +140,10 @@ class LiteHTMLParser(HTMLParser):
             'word', 'word ', ' word'
         '''
         debug('data0: %r', data)
-        if self.anchor:
-            self.anchor.append(data)  # caption
+        if self._skip_data:
+            pass
+        elif self._anchor:
+            self._anchor.append(data)  # caption
         else:
             tokens = self.tokens
             new_line = tokens and tokens[-1].endswith('\n')
@@ -170,7 +177,7 @@ class LiteHTMLParser(HTMLParser):
             elif tag == 'a':
                 for key, val in attrs:
                     if key == 'href':
-                        self.anchor.append(val)  # target
+                        self._anchor.append(val)  # target
 
             elif tag == 'br':
                 self.tokens.append('\n')
@@ -200,6 +207,14 @@ class LiteHTMLParser(HTMLParser):
             elif tag == 'q':
                 self.tokens.append('“')
 
+            elif tag == 'hr':
+                self._new_paragraph()
+                self.tokens.append(hr_txt)
+                self._new_paragraph()
+
+            elif tag in skip_data_tags:
+                self._skip_data = True
+
     def handle_endtag(self, tag):
         debug('end tag: %s', tag)
         if tag in fx_tags:
@@ -227,9 +242,9 @@ class LiteHTMLParser(HTMLParser):
 
             elif tag == 'a':
                 self._set_fg_color('lightblue')
-                self.tokens.append(make_hyperlink(*self.anchor, icon='🔗'))
+                self.tokens.append(make_hyperlink(*self._anchor, icon='🔗'))
                 self._set_fg_color_default()
-                self.anchor.clear()
+                self._anchor.clear()
 
             elif tag == 'c':
                 if self._setting_fg_color:
@@ -250,6 +265,8 @@ class LiteHTMLParser(HTMLParser):
             elif tag == 'q':
                 self.tokens.append('”')
 
+            elif tag in skip_data_tags:
+                self._skip_data = False
 
 fg_cache = StringCache(fg)
 bg_cache = StringCache(bg)
@@ -298,6 +315,8 @@ if __name__ == '__main__':
             )
 
     html = '''
+    <script> var Mr_Bill = "Oh No!"; // nothing to see here </script>
+    <style foo=bar>Dad { how-bout-you: "shut yer big YAPPER" !important; }</style>
     <h1>HTML Print Test:</h1>
     <c dim>fx:</c> <b>bold</b> <i>italic</i><em>/em</em> <s>strike</s>
     <u>undy</u><br>
@@ -315,11 +334,12 @@ if __name__ == '__main__':
     <c dim>(c/color tag, with web/X11 color names)</c>
     <c orange>l'orange</c>
     <c black on bisque3>bisque3</c>
+    <hr>
     <c #b0b>B0B</c> -&gt; <a href="http://example.com/">click here!</a>
     <p>
         A bit of <q>plain text</q> in its own paragraph.
     </p>
-    <!-- nothing in this comment should be shown -->
+    <!-- nothing in this comment should be shown, Buh-BYE ! -->
     Hello <h2>world!</h2> ;-)
     '''
     print(html)

@@ -91,6 +91,7 @@ div.sidebar {
     font-size: smaller;
     opacity: .8;
 }
+div.line-block { line-height: 1.5 }
 p.sidebar-title {
     background: inherit !important;
     font-size: larger;
