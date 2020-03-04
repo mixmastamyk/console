@@ -23,6 +23,8 @@ install_requires = (
 tests_require = ('pyflakes', 'pytest', 'readme_renderer'),
 extras_require = dict(
     webcolors=('webcolors',),
+    tones=('pyaudio',),
+    audio=('boombox',),
 )
 
 def slurp(filename):

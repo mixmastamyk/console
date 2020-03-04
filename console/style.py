@@ -2,7 +2,7 @@
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
-        Module inspired by: colorama.ansi.py © Jonathan Hartley 2013.
+    .. Module inspired by: colorama.ansi.py © Jonathan Hartley 2013.
 
     This module is focused on the escape codes concerning character styles and
     colors interpreted by terminals, sometimes called
