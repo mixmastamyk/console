@@ -5,16 +5,15 @@
     Cross-platform beep and tone functions.
 '''
 import logging
-import sys
+import sys, os
 from sys import stdout
 
 from console.detection import os_name
 from console.constants import BEL
+from console.meta import version
 
 
 log = logging.getLogger(__name__)
-__version__ = '0.50'
-log.info('beepin version: %r', __version__)
 
 
 try:
@@ -39,13 +38,19 @@ try:
 
         if sample_rate < (frequency * 2):
             log.warn('Warning: sample_rate must be at least double the '
-                    f'frequency to accurately represent it:\n    sample_rate '
+                     'frequency to accurately represent it:\n    sample_rate '
                     f'{sample_rate} ≯ {frequency*2} (frequency {frequency}*2)')
 
         num_samples = int(sample_rate * duration)
         rest_frames = num_samples % sample_rate
 
-        pa = PyAudio()
+        # hide diag output on stderr
+        with open(os.devnull, 'w') as devnull:
+            orig_stdout_fno = os.dup(sys.stderr.fileno())
+            os.dup2(devnull.fileno(), 2)
+            pa = PyAudio()  # <-- lots of output here :-(
+            os.dup2(orig_stdout_fno, 2)
+
         stream = pa.open(
             format=paUInt8,
             channels=1,  # mono
@@ -79,7 +84,7 @@ def beep_windows(**kwargs):
     winsound.MessageBeep()  # the standard windows bell
 
 
-def beep_macos(posix=False):
+def beep_macos(posix=False, **kwargs):
     ''' Simple system beep for MacOS. '''
     if posix:
         beep_posix()
@@ -128,8 +133,7 @@ def beep_play(sound_file, **kwargs):
     ''' Play audio files for beeps, requires boombox to be installed. '''
     from boombox import play
 
-    boombox = play(sound_file, **kwargs)
-    return boombox
+    return play(sound_file, **kwargs)
 
 
 # ----------------------------------------------------------------------------
@@ -144,7 +148,7 @@ if os_name == 'nt':             # I'm a PC
 
 elif sys.platform == 'darwin':  # Think different
     try:
-        import AppKit;  AppKit  # pyflakes
+        import AppKit
         beep = beep_macos
     except ImportError:
         AppKit = None
@@ -180,36 +184,34 @@ if __name__ == '__main__':
                 ' %(message)s'),
             )
 
-    if os_name == 'nt':
-        sound_file = 'c:/Windows/Media/Alarm08.wav'
-
-    elif sys.platform == 'darwin':
-        if not AppKit:
-            log.warning('Note: pyobjc not installed: pip install pyobjc')
-        sound_file = '/System/Library/Sounds/Ping.aiff'
-
-    elif os_name == 'posix':
-        sound_file = '/usr/share/sounds/ubuntu/stereo/phone-outgoing-busy.ogg'
-
-    # Try all three
-    log.info('beepin version: %r', __version__)
+    log.debug('console version: %r', version)
     log.info('System Beep…')
     beep()
     log.debug('sleeping…')
     time.sleep(2)
     print()
 
-    log.info('Generate Tone…')
+    log.info('Generating Tone…')
     beep_tone(frequency_hz=500, duration_ms=1000, volume=.1)
     log.debug('sleeping…')
     time.sleep(2)
     print()
 
+    # define an example file to play for each OS
+    if os_name == 'nt':
+        sound_file = 'c:/Windows/Media/Alarm08.wav'
+    elif sys.platform == 'darwin':
+        if not AppKit:
+            log.warning('Note: pyobjc not installed: pip install pyobjc')
+        sound_file = '/System/Library/Sounds/Ping.aiff'
+    elif os_name == 'posix':  # ubuntu
+        sound_file = '/usr/share/sounds/ubuntu/stereo/desktop-login.ogg'
+
     log.info('Sound File… %r', sound_file)
     boombox = beep_play(
         sound_file=sound_file,
         duration_ms=2_000,
-        #~ wait=True,
+        # wait=True,
         wait=False,
     )
     log.debug('cutting short…')
@@ -222,7 +224,7 @@ if __name__ == '__main__':
     time.sleep(2)
     print()
 
-    if True and os_name == 'nt':
+    if os_name == 'nt':
         log.info('Trying Alias…')
         beep_play(
             #~ sound_file='SystemAsterisk',
