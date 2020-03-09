@@ -5,8 +5,7 @@
 
     This module contains an HTML to ANSI sequence printer.
     It supports quick rich text in scripting applications for those familiar
-    with HTML.
-    Why invent another styling language?
+    with HTML.  Why invent another styling language?
 
     No CSS class support yet,
     but many inline styles that correspond to terminal capabilities work.

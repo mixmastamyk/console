@@ -215,7 +215,7 @@ def strip_ansi(text, c1=False, osc=False):
             Enabling both C1 and OSC stripping is less efficient and the two
             options can mildly conflict with one another.
             The less problematic order was chosen,
-            but there may still be rare C1 OSC fragments left over.
+            but there may still be rare C1/OSC fragments left over.
     '''
     text = ansi_csi0_finder.sub('', text)
     if osc:

@@ -26,6 +26,10 @@ extras_require = dict(
     tones=('pyaudio',),
     audio=('boombox',),
 )
+# build entry for all extras:
+from itertools import chain
+extras_require['all'] = tuple(chain.from_iterable(extras_require.values()))
+
 
 def slurp(filename):
     try:
