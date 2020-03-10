@@ -1,4 +1,6 @@
 '''
+    .. © 2018-2020, Mike Miller - Released under the LGPL, version 3+.
+
     Project metadata is specified here.
 
     This module *should not* import anything from the project or third-party
