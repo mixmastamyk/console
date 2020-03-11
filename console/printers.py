@@ -277,7 +277,7 @@ parser = LiteHTMLParser()
 
 
 def hprint(*args, **kwargs):
-    ''' Print function for terminals with limited HTML support. '''
+    ''' Print function for terminals, with limited HTML support. '''
     end = kwargs.pop('end', None)
 
     for arg in args:

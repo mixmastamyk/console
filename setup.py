@@ -23,12 +23,7 @@ install_requires = (
 tests_require = ('pyflakes', 'pytest', 'readme_renderer'),
 extras_require = dict(
     webcolors=('webcolors',),
-    tones=('pyaudio',),
-    audio=('boombox',),
 )
-# build entry for all extras:
-from itertools import chain
-extras_require['all'] = tuple(chain.from_iterable(extras_require.values()))
 
 
 def slurp(filename):

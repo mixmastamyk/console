@@ -142,7 +142,6 @@ def make_hyperlink(target, caption=None, icon='', **params):
             ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ'
             '[\\]^_`abcdefghijklmnopqrstuvwxyz{|}'
         )
-
         # sanity & security checks
         if caption is None:
             caption = target
