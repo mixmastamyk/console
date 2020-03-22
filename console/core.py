@@ -47,8 +47,8 @@ _hd = r'[0-9A-Fa-f]'  # hex digits
 _index_finder = re.compile(r'^i_?\d{1,3}$', re.A)                   # i_DDD
 _nearest_finder = re.compile(f'^n_?{_hd}{{3}}$', re.A)              # n_HHH
 _true_finder = re.compile(f'^t_?({_hd}{{3}}|{_hd}{{6}})$', re.A)    # t_HHH+
-_x11_finder = re.compile(r'^x\w{4,64}$', re.A)                      # x_NAME
-_web_finder = re.compile(r'^w\w{4,64}$', re.A)                      # x_NAME
+_x11_finder = re.compile(r'^x_\w{4,64}$', re.A)                     # x_NAME
+_web_finder = re.compile(r'^w_\w{4,64}$', re.A)                     # w_NAME
 
 
 class _BasicPaletteBuilder:
@@ -574,8 +574,8 @@ class _CallableFBString(str):
 
 
 class _LengthyString(str):
-    ''' String that returns the length of its bare string, before escape
-        sequences were added.
+    ''' String that saves and returns the length of its bare string, before
+        escape sequences were added.
     '''
     def __new__(cls, original_length, content):
         self = str.__new__(cls, content)

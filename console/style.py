@@ -162,7 +162,7 @@ class EffectsPalette(_BasicPaletteBuilder):
 
 
 class EffectsTerminator(_BasicPaletteBuilder):
-    ''' "I'll be baaahhhck."
+    ''' *"I'll be baaahhhck."*
 
         Rarely used codes to turn off *specific* style features, not supported
         at times.  Generally, use of EffectsPalette.end is simpler and more
