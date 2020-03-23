@@ -678,6 +678,14 @@ if True:  # fold
             assert issubclass(w[-1].category, SyntaxWarning)
             assert "Ambiguous" in str(w[-1].message)
 
+    def test_raise_on_call_default_defx():
+        '''  Prevent calling on default or defx. '''
+        with pytest.raises(NotImplementedError):
+            fg.default('foo')
+
+        with pytest.raises(NotImplementedError):
+            defx.italic('foo')
+
 
 # Progress
 # ----------------------------------------------------------------------------
