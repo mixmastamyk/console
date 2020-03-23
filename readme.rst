@@ -16,6 +16,10 @@
 Console
 ============
 
+.. ~ Need to be up here for readme check:
+..    - *"So hot, totally hot…"—Olivia Newton-John*
+..    - *"Suddenly, the wheels are in motion…"—Olivia Newton-John*
+
 .. sidebar:: **Testimonials**
 
     - *"👍 Ayyyyyy… 👍"—The Fonz*
@@ -26,9 +30,6 @@ Console
     - *"Fightin' the system like a true modern day Robin Hood" —Waylon Jennings*
 
 |
-..    - *"So hot, totally hot…"—Olivia Newton-John*
-..    - *"Suddenly, the wheels are in motion…"—Olivia Newton-John*
-
 
 Yet another package that makes it easy to generate the inline codes used to
 display colors and character styles in ANSI-compatible terminals and emulators,
