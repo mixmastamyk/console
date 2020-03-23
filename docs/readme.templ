@@ -134,9 +134,14 @@ where
 
 .. code-block:: python
 
-    >>> fg.yellow('Far Out!')
+    >>> fg.yellow('Far Out!')  # <-- ends fg color only
     '\x1b[33mFar Out!\x1b[39m'
 
+    >>> fx.italic('Up your nose with a rubber hose!')  # italic only
+    '\x1b[3mUp your nose with a rubber hose!\x1b[23m'
+
+This is neat because call-form will end specific colors/styles and not
+interfere with others.
 
 There's also a rich-text printer that handles basic HTML
 (and even hyperlinks if your terminal supports it):

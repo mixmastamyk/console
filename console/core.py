@@ -92,11 +92,12 @@ class _BasicPaletteBuilder:
         return self
 
     def __init__(self, **kwargs):
-        # look for integer attributes to wrap as a basic palette:
-        for name in ['default'] + dir(self):        # default needs to go 1st!
+        # look for attributes to wrap as a basic palette:
+        attributes = ['default'] + dir(self)  # default needs to go first
+        for name in attributes:
             if not name.startswith('_'):
-                value = getattr(self, name)
-                if type(value) is int:
+                value = getattr(self, name, None)  # fx man not have default
+                if type(value) in (int, str, tuple):  # skip methods, default²
                     if 'basic' in self._palette_support:
                         display_name = name.upper()
                         attr = _PaletteEntry(self, display_name, value)
@@ -190,8 +191,9 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                 pass  # nada
 
             # Emerald city
-            raise AttributeError(f'{name!r} is not a recognized attribute name'
-                                 ' or format.')
+            cname = self.__class__.__name__
+            raise AttributeError(f'{cname} - {name!r} is not a attribute name'
+                                 ' or recognized format.')
         return result
 
     def _get_extended_palette_entry(self, name, index, is_hex=False):
@@ -378,11 +380,21 @@ class _PaletteEntry:
 
     def __init__(self, parent, name, code, stream=sys.stdout):
         self.parent = parent
-        self.default = (parent.default if hasattr(parent, 'default')
-                                       else parent.end)  # style
         self.name = name
-        self._codes = [str(code)]           # the initial code
         self._stream = stream               # for redirection
+
+        # find initial code and default
+        default = None
+        if type(code) in (int, str):
+            self._codes = [str(code)]
+        elif type(code) is tuple:
+            self._codes = [str(code[0])]
+            default = f'{CSI}{code[1]}m'    # pre-render
+        else:
+            TypeError('code not valid: %r' % code)
+
+        self.default = default or (parent.default if hasattr(parent, 'default')
+                                                  else parent.end)  # style
 
     def __add__(self, other):
         ''' Add: self + other '''
@@ -399,14 +411,13 @@ class _PaletteEntry:
             # Make a copy, so codes don't pile up after each addition
             # Render initial values once as string and place as first code:
             newcodes = self._codes + other._codes
-            attr = _PaletteEntry(self.parent, self.name,
+            new_entry = _PaletteEntry(self.parent, self.name,
                                  ';'.join(newcodes))
-            same_category = self.parent is other.parent  # color or style
 
-            if not same_category:  # different, use instead of color default
-                attr.default = ANSI_RESET
+            if not self.default == other.default:   # not alike,
+                new_entry.default = ANSI_RESET      # switch to full reset
 
-            return attr
+            return new_entry
         else:
             raise TypeError(f'Addition to type {type(other)} not supported.')
 
@@ -440,13 +451,13 @@ class _PaletteEntry:
 
             Note:
                 Color sequences are terminated at newlines,
-                so that paging the output works correctly.
+                so that paging of output works correctly.
         '''
         if not text:  # when an empty string/None is passed, don't emit codes.
             return ''
 
-        # if the category of styles is different,
-        # copy uses fx.end instead of palette.default, see addition:
+        # if the defaults of mixins are different,
+        # uses fx.end instead of palette.default, see addition:
         for attr in styles:
             self += attr
 

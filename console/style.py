@@ -13,8 +13,6 @@
     - `ANSI escape codes
       <https://en.wikipedia.org/wiki/ANSI_escape_code>`_
       and section 5:
-    - `Select Graphic Rendition params
-      <https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters>`_
 '''
 from .core import _BasicPaletteBuilder, _HighColorPaletteBuilder
 from .constants import (ANSI_BG_LO_BASE, ANSI_BG_HI_BASE, ANSI_FG_LO_BASE,
@@ -28,6 +26,9 @@ class ForegroundPalette(_HighColorPaletteBuilder):
             autodetect          - Attempt to detect palette support.
             palettes            - If autodetect disabled, set palette support
                                   explicitly.  str, seq, or None
+
+        See:
+            https://en.wikipedia.org/wiki/ANSI_escape_code#3/4_bit
     '''
     default         = 39    # must be first :-D
 
@@ -67,6 +68,9 @@ class BackgroundPalette(_HighColorPaletteBuilder):
             autodetect          - Attempt to detect palette support.
             palettes            - If autodetect disabled, set palette support
                                   explicitly.  str, seq, or None
+
+        See:
+            https://en.wikipedia.org/wiki/ANSI_escape_code#3/4_bit
     '''
     default         = 49
 
@@ -99,68 +103,6 @@ class BackgroundPalette(_HighColorPaletteBuilder):
     _start_codes_true = '48;2'
 
 
-class EffectsPalette(_BasicPaletteBuilder):
-    ''' Container for text style codes.
-
-        Bold, italic, underline, blink, reverse, strike, fonts, etc.
-
-        Arguments:
-            autodetect          - Attempt to detect palette support.
-            palettes            - If autodetect disabled, set palette support
-                                  explicitly.  str, seq, or None
-    '''
-    end = default   = 0  # reset all
-
-    bold            = 1
-    dim             = 2
-    italic          = 3
-    underline       = 4
-    blink           = 5
-    slowblink       = blink
-    fastblink       = 6
-    reverse         = 7
-    conceal         = 8
-    hide            = conceal
-    crossed         = 9
-    strike          = crossed
-
-    # word processor/html shortcuts
-    b               = bold
-    i               = italic
-    s               = crossed
-    u               = underline
-
-    # Rarely used codes to change fonts, unlikely to be supported:
-    font10          = 10
-    font11          = 11
-    font12          = 12
-    font13          = 13
-    font14          = 14
-    font15          = 15
-    font16          = 16
-    font17          = 17
-    font18          = 18
-    font19          = 19
-    font20          = 20
-
-    primary         = font10
-    fraktur         = font20
-
-    dunder           = 21       # originally disable bold
-    double_underline = dunder
-
-    frame           = 51        # rarely, if ever implemented
-    encircle        = 52
-    overline        = 53
-
-    # should these ideogram codes be enabled?
-    # ideogram_ul     = 60
-    # ideogram_du     = 61
-    # ideogram_ol     = 62
-    # ideogram_do     = 63
-    # ideogram_sm     = 64
-
-
 class EffectsTerminator(_BasicPaletteBuilder):
     ''' *"I'll be baaahhhck."*
 
@@ -172,15 +114,19 @@ class EffectsTerminator(_BasicPaletteBuilder):
             autodetect          - Attempt to detect palette support.
             palettes            - If autodetect disabled, set palette support
                                   explicitly.  str, seq, or None
+
+        See:
+            https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters
     '''
     # convenience:
     default = end   = 0
     fg              = ForegroundPalette.default
     bg              = BackgroundPalette.default
 
+    font            = 10
     bold            = 22  # to norm intensity, not bold or dim
     dim             = bold
-    italic = font   = 23
+    italic          = 23
     underline       = 24
     blink           = 25
     reverse         = 27
@@ -199,6 +145,71 @@ class EffectsTerminator(_BasicPaletteBuilder):
     encircle        = frame
     overline        = 55
     ideogram        = 65
+
+
+class EffectsPalette(_BasicPaletteBuilder):
+    ''' Container for text style codes.
+
+        Bold, italic, underline, blink, reverse, strike, fonts, etc.
+
+        Arguments:
+            autodetect          - Attempt to detect palette support.
+            palettes            - If autodetect disabled, set palette support
+                                  explicitly.  str, seq, or None
+
+        See:
+            https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters
+    '''
+    end             = 0  # reset all
+
+    bold            = (1, EffectsTerminator.bold)
+    dim             = (2, EffectsTerminator.dim)
+    italic          = (3, EffectsTerminator.italic)
+    underline       = (4, EffectsTerminator.underline)
+    blink           = (5, EffectsTerminator.blink)
+    slowblink       = blink
+    fastblink       = (6, EffectsTerminator.blink)
+    reverse         = (7, EffectsTerminator.reverse)
+    conceal         = (8, EffectsTerminator.conceal)
+    hide            = conceal
+    crossed         = (9, EffectsTerminator.crossed)
+    strike          = crossed
+
+    # word processor/html shortcuts
+    b               = bold
+    i               = italic
+    s               = crossed
+    u               = underline
+
+    # Rarely used codes to change fonts, unlikely to be supported:
+    #~ font10          = (10, EffectsTerminator.font)  # own terminator?
+    #~ font11          = (11, EffectsTerminator.font)
+    #~ font12          = (12, EffectsTerminator.font)
+    #~ font13          = (13, EffectsTerminator.font)
+    #~ font14          = (14, EffectsTerminator.font)
+    #~ font15          = (15, EffectsTerminator.font)
+    #~ font16          = (16, EffectsTerminator.font)
+    #~ font17          = (17, EffectsTerminator.font)
+    #~ font18          = (18, EffectsTerminator.font)
+    #~ font19          = (19, EffectsTerminator.font)
+    #~ font20          = (20, EffectsTerminator.font)
+    #~ primary         = font10
+    #~ fraktur         = font20
+
+    dunder           = (21, EffectsTerminator.underline)  # orig. disable bold
+    double_underline = dunder
+
+    # rarely, if ever implemented
+    frame           = (51, EffectsTerminator.frame)
+    encircle        = (52, EffectsTerminator.frame)
+    overline        = (53, EffectsTerminator.overline)
+
+    # should these ideogram codes be enabled?
+    # ideogram_ul     = (60, EffectsTerminator.ideogram)  # own terminator?
+    # ideogram_du     = (61, EffectsTerminator.ideogram)
+    # ideogram_ol     = (62, EffectsTerminator.ideogram)
+    # ideogram_do     = (63, EffectsTerminator.ideogram)
+    # ideogram_sm     = (64, EffectsTerminator.ideogram)
 
 
 # It's Automatic:  https://youtu.be/y5ybok6ZGXk
