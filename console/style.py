@@ -160,7 +160,7 @@ class EffectsPalette(_BasicPaletteBuilder):
         See:
             https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters
     '''
-    end             = (0, EffectsTerminator.end)  # reset all
+    default = end   = (0, EffectsTerminator.end)  # reset all
 
     bold            = (1, EffectsTerminator.bold)
     dim             = (2, EffectsTerminator.dim)

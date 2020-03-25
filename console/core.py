@@ -454,7 +454,7 @@ class _PaletteEntry:
                 so that paging of output works correctly.
         '''
         if (self.parent.__class__.__name__ == 'EffectsTerminator' or
-            self.name == 'DEFAULT'):
+            self.name in ('DEFAULT', 'END')):
             raise NotImplementedError("call form undefined for "
                                       "EffectsTerminator or 'default'.")
         if not text:  # when an empty string/None is passed, don't emit codes.
