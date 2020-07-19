@@ -517,26 +517,33 @@ if True:  # fold
         assert detection.color_is_forced() is True
 
     def test_palette_support():
+        pal = (1,)  # dummy palette, tests true
         terms = (
             ('dumb', None),
             ('linux', 'basic'),
             ('xterm-color', 'basic'),
             ('xterm-256color', 'extended'),
-            # ?
         )
-        pal = (1,)  # dummy palette, tests true
         for name, result in terms:
             detection.env = Environment(environ=dict(TERM=name))
             assert detection.detect_palette_support(basic_palette=pal) == (result, pal)
 
-        orig_os_name = detection.os_name    # patch os
-        detection.os_name = 'nt'
-        detection.env = Environment(environ=dict(ANSICON='1'))
-        assert detection.detect_palette_support(basic_palette=pal) == ('extended', pal)
-        detection.os_name = orig_os_name    # fix
-
         detection.env = Environment(environ=dict(COLORTERM='24bit'))
         assert detection.detect_palette_support(basic_palette=pal) == ('truecolor', pal)
+
+        from . import windows  # try win implementation
+        terms = (
+            ('dumb', None),
+            ('xterm-color', 'basic'),
+            ('xterm-256color', 'extended'),
+            ('cygwin', 'truecolor'),  # ?
+        )
+        for name, result in terms:
+            windows.env = Environment(environ=dict(TERM=name))
+            assert windows.detect_palette_support(basic_palette=pal) == (result, pal)
+
+        windows.env = Environment(environ=dict(ANSICON='1'))
+        assert windows.detect_palette_support(basic_palette=pal) == ('extended', pal)
 
     def test_is_a_tty():
         f = StringIO()
@@ -692,11 +699,11 @@ if True:  # fold
 if True:  # fold
     from console.progress import ProgressBar#, HiDefProgressBar
 
-    def test_progress_ascii():
+    #~ def test_progress_ascii():
 
-        pb = ProgressBar(clear_left=False, theme='basic', width=36)
-        assert str(pb(-7))  == '<------------------------------] ERR'
-        assert str(pb(0))   == '[------------------------------]  0%'
-        assert str(pb(55))  == '[################--------------] 55%'
-        assert str(pb(100)) == '[##############################]   +'
-        assert str(pb(103)) == '[##############################> ERR'
+        #~ pb = ProgressBar(clear_left=False, theme='basic', width=36)
+        #~ assert str(pb(-7))  == '<------------------------------] ERR'
+        #~ assert str(pb(0))   == '[------------------------------]  0%'
+        #~ assert str(pb(55))  == '[################--------------] 55%'
+        #~ assert str(pb(100)) == '[##############################]   +'
+        #~ assert str(pb(103)) == '[##############################> ERR'

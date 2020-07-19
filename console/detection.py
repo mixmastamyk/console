@@ -16,7 +16,8 @@ import logging
 import env
 
 from . import color_tables, proximity
-from .constants import BS, BEL, CSI, ESC, ENQ, OSC, RS, ST, ALL_PALETTES
+from .constants import (BS, BEL, CSI, ESC, ENQ, OSC, RS, ST, ALL_PALETTES,
+                        _color_code_map)
 from .meta import __version__, defaults
 
 
@@ -25,7 +26,7 @@ os_name = os.name  # frequent use
 is_fbterm = termios = tty = None
 
 
-if os_name == 'posix':  # Linux, FreeBSD, MacOS, etc
+if os_name == 'posix':  # Tron leotards
     import termios, tty
     is_fbterm = (env.TERM == 'fbterm')
 
@@ -169,46 +170,36 @@ def detect_palette_support(basic_palette=None):
         Returns:
             Tuple of:
                 name:       None or str: 'basic', 'extended', 'truecolor'
-                palette:    len 16 tuple of colors (len 3 tuple)
+                palette:    16 * 3 tuple of colors
     '''
-    name = ansicon = colorama_init = win_enabled = None
+    name = webcolors = None
     TERM = env.TERM or ''  # shortcut
     pal_name = 'Unknown'
 
-    if os_name == 'nt':  # Windows is complicated :-/
-        from .windows import (is_ansi_capable, enable_vt_processing,
-                              is_colorama_initialized)
-        if is_ansi_capable() and all(enable_vt_processing()):
-            win_enabled = True
-        else:
-            colorama_init = is_colorama_initialized()
-            ansicon = env.ANSICON
-
-    # xterm, linux console, older Windows w/ colorama
-    if TERM.startswith('xterm') or (TERM == 'linux') or colorama_init:
+    if TERM.startswith('xterm') or (TERM == 'linux'):
         name = 'basic'
 
     # upgrades
-    # xterm, fbterm, older Windows + ansicon
-    if ('256color' in TERM) or is_fbterm or ansicon:
+    if ('256color' in TERM) or is_fbterm:
         name = 'extended'
 
     # https://bugzilla.redhat.com/show_bug.cgi?id=1173688 - obsolete?
-    if env.COLORTERM in ('truecolor', '24bit') or win_enabled:
+    if env.COLORTERM in ('truecolor', '24bit'):
         name = 'truecolor'
 
     # find the platform-dependent 16-color basic palette
     if name and not basic_palette:
         name, pal_name, basic_palette = _find_basic_palette(name)
 
-    try:
-        import webcolors
-    except ImportError:
-        webcolors = None
+    if name == 'truecolor':
+        try:
+            import webcolors
+        except ImportError:
+            pass
 
     log.debug(
         f'Term support: {name!r} ({os_name}, TERM={env.TERM}, '
-        f'COLORTERM={env.COLORTERM or ""}, ANSICON={env.ANSICON}, '
+        f'COLORTERM={env.COLORTERM or ""}, '
         f'webcolors={bool(webcolors)}, basic_palette={pal_name})'
     )
     return (name, basic_palette)
@@ -228,32 +219,22 @@ def detect_unicode_support():
     '''
     result = None
 
-    if env.LANG and env.LANG.endswith('UTF-8'):  # approximation
+    if env.LANG and env.LANG.endswith('UTF-8'):  # first approximation
         result = True
 
-    elif os_name == 'nt':
-        from .windows import get_code_page
-        if get_code_page() == 'cp65001':  # aka utf8
-            result = True
-
     elif is_a_tty():  # kludge
-        if os_name == 'nt':
-            from .windows import get_position as _get_position
-        else:
-            _get_position = get_position
 
         out = sys.stdout
-        # what if cursor is not at beginning of line?
-        x, _ = _get_position()
+        x, _ = get_position()
         out.write('é')
         out.flush()
-        x2, _ = _get_position()
+        x2, _ = get_position()
 
         difference = x2 - x
         if difference == 1:
             result = True
         else:
-            result = False  # 0, 2 - no
+            result = False
 
         # clean up
         out.write(BS)
@@ -264,7 +245,7 @@ def detect_unicode_support():
 
 
 def _find_basic_palette(name):
-    ''' Find the platform-dependent 16-color basic palette.
+    ''' Find the platform-dependent 16-color basic palette—posix version.
 
         This is used for "downgrading to the nearest color" support.
 
@@ -274,56 +255,39 @@ def _find_basic_palette(name):
     '''
     pal_name = 'default (xterm)'
     basic_palette = color_tables.xterm_palette4
+
     if env.SSH_CLIENT:  # fall back to xterm over ssh, info often wrong
         pal_name = 'ssh (xterm)'
     else:
-        if os_name == 'nt':  # I'm a PC
-            if sys.getwindowsversion()[2] > 16299: # Win10 FCU, new palette
+        if env.TERM in ('linux', 'fbterm'):
+            pal_name = 'vtrgb'
+            basic_palette = parse_vtrgb()
+
+        elif env.TERM.startswith('xterm'):   # TODO: factor, get_theme
+            # LOW64 - Python on Linux on Windows!
+            if 'WSLENV' in env: # or ('Microsoft' in os.uname().release):
                 pal_name = 'cmd_1709'
                 basic_palette = color_tables.cmd1709_palette4
+                name = 'truecolor'  # override
+            elif sys.platform.startswith('freebsd'):
+                pal_name = 'vga'  # TODO: is valid?  vga console
+                basic_palette = color_tables.vga_palette4
+
+            # Look harder by querying terminal.
+            # This can be dangerous, as get_color could potentially hang:
             else:
-                pal_name = 'cmd_legacy'
-                basic_palette = color_tables.cmd_palette4
-
-        elif sys.platform == 'darwin':  # Think different
-            if env.TERM_PROGRAM == 'Apple_Terminal':
-                pal_name = 'termapp'
-                basic_palette = color_tables.termapp_palette4
-            elif env.TERM_PROGRAM == 'iTerm.app':
-                pal_name = 'iterm'
-                basic_palette = color_tables.iterm_palette4
-
-        elif os_name == 'posix':  # Tron leotards
-            if env.TERM in ('linux', 'fbterm'):
-                pal_name = 'vtrgb'
-                basic_palette = parse_vtrgb()
-            elif env.TERM.startswith('xterm'):   # TODO: factor, get_theme
-                # LOW64 - Python on Linux on Windows!
-                if ('WSLENV' in env) or ('Microsoft' in os.uname().release):
-                    pal_name = 'cmd_1709'
-                    basic_palette = color_tables.cmd1709_palette4
-                    name = 'truecolor'  # override
-                elif sys.platform.startswith('freebsd'):  # TODO: is valid?  vga console
-                    pal_name = 'vga'
-                    basic_palette = color_tables.vga_palette4
-
-                # Look harder: query terminal.
-                # This can be dangerous, as it could potentially hang:
-                else:
-                    try:  # TODO: this comparison could be much better:
-                        colors = get_color('index', 2)
-                        if colors[0][:2] == '85':
-                            pal_name = 'solarized'
-                            basic_palette = color_tables.solarized_dark_palette4
-                        elif colors[0][:2] == '4e':
-                            pal_name = 'tango'
-                            basic_palette = color_tables.tango_palette4
-                        else:
-                            raise RuntimeError('not a known color scheme.')
-                    except (IndexError, RuntimeError, termios.error) as err:
-                        log.debug('get_color return value failed: %s', err)
-        else:  # Amiga/Atari - The Wonder Computer of the 1980s :-P
-            log.warn('Unexpected OS: os.name: %s', os_name)
+                try:  # TODO: this comparison could be much better:
+                    colors = get_color('index', 2)
+                    if colors[0][:2] == '85':
+                        pal_name = 'solarized'
+                        basic_palette = color_tables.solarized_dark_palette4
+                    elif colors[0][:2] == '4e':
+                        pal_name = 'tango'
+                        basic_palette = color_tables.tango_palette4
+                    else:
+                        raise RuntimeError('not a known color scheme.')
+                except (IndexError, RuntimeError, termios.error) as err:
+                    log.debug('get_color return value failed: %s', err)
 
     return name, pal_name, basic_palette
 
@@ -379,7 +343,7 @@ def parse_vtrgb(path='/etc/vtrgb'):
 
 # -- tty, termios ------------------------------------------------------------
 
-def _getch():
+def _get_char():
     ''' POSIX implementation of get char/key. '''
     with TermStack() as fd:
         tty.setraw(fd)
@@ -394,14 +358,14 @@ def _read_until_select(infile=sys.stdin, maxbytes=20, end=RS, timeout=None):
     chars = []
     read = infile.read
     if not isinstance(end, tuple):
-        end = (end,)
+        end = tuple(end)
     log.debug('maxbytes=%s, end=%r, timeout %s …', maxbytes, end, timeout)
 
     if select((infile,), (), (), timeout)[0]:  # wait until response or timeout
         log.debug('select start reading:')
         while maxbytes:  # response: count down chars, stopping at 0
             char = read(1)
-            if char in end:
+            if char in end:  # simple search, doesn't consider sequence
                 break
             chars.append(char)
             maxbytes -= 1
@@ -411,7 +375,6 @@ def _read_until_select(infile=sys.stdin, maxbytes=20, end=RS, timeout=None):
     return ''.join(chars)
 
 
-_color_code_map = dict(foreground='10', fg='10', background='11', bg='11')
 def _get_color_xterm(name, number=None, timeout=None):
     ''' Query xterm for color settings.
 
@@ -523,16 +486,7 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
         if not 'index' in _color_code_map:
             _color_code_map['index'] = '4;' + str(number or '')
 
-        if os_name == 'nt':  # still applies to Windows Terminal
-            from .windows import get_color
-            color_id = get_color(name)
-            if sys.getwindowsversion()[2] > 16299:  # Win10 FCU, new palette
-                basic_palette = color_tables.cmd1709_palette4
-            else:
-                basic_palette = color_tables.cmd_palette4
-            colors = (f'{i:02x}' for i in basic_palette[color_id]) # compat
-
-        elif sys.platform == 'darwin':
+        if sys.platform == 'darwin':
             if env.TERM_PROGRAM == 'iTerm.app':
                 # supports, though returns two chars per
                 colors = _get_color_xterm(name, number, timeout=timeout)
@@ -542,7 +496,7 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
                 pass
             elif env.TERM:
                 if env.TERM.startswith('xterm'):
-                    if env.TERM_PROGRAM == 'vscode':  # vscode on Linux, foo'
+                    if env.TERM_PROGRAM == 'vscode':  # vscode on Linux hangs
                         pass
                     else:
                         colors = _get_color_xterm(name, number, timeout=timeout)
@@ -563,10 +517,6 @@ def get_position(fallback=defaults.CURSOR_POS_FALLBACK):
     '''
     values = fallback
     if is_a_tty():
-        if os_name == 'nt':
-            from .windows import get_position
-            return get_position()
-
         try:
             with TermStack() as fd:
                 tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
@@ -617,25 +567,16 @@ def get_title(mode='title'):
             title string, or None if not able to be found.
 
         Note:
-            Experimental, few terms outside xterm support this correctly.
-            MATE Terminal returns "Terminal".
-            iTerm returns "".
+            Few terms besides xterm support this, for security reasons.
+            iTerm returns "".  MATE Terminal returns "Terminal".
     '''
     title = None
-    if is_a_tty() and not env.SSH_CLIENT:
-        if os_name == 'nt':
-            from .windows import get_title
-            return get_title()
+    if is_a_tty(): # and not env.SSH_CLIENT:
+        if sys.platform == 'darwin':
+            if env.TERM_PROGRAM != 'iTerm.app':
+                return title
 
-        elif sys.platform == 'darwin':
-            if env.TERM_PROGRAM and env.TERM_PROGRAM == 'iTerm.app':
-                pass
-            else:
-                return
-        elif os_name == 'posix':
-            pass
-
-        # xterm (maybe iterm) only support
+        # xterm only support
         mode = _query_mode_map.get(mode, mode)
         query_sequence = f'{CSI}{mode}t'
         try:
@@ -646,7 +587,7 @@ def get_title(mode='title'):
                 sys.stdout.write(query_sequence)
                 sys.stdout.flush()
                 log.debug('about to read get_title response…')
-                resp = _read_until_select(maxbytes=100, end=ST)
+                resp = _read_until_select(maxbytes=100, end=ST, timeout=.2)
         except AttributeError:  # no .fileno()
             return title
 
@@ -658,7 +599,7 @@ def get_title(mode='title'):
 
 
 def get_theme(timeout=defaults.READ_TIMEOUT):
-    ''' Checks terminal for theme "lightness" information.
+    ''' Checks terminal for light/dark theme information.
 
         First checks for the environment variable COLORFGBG.
         Next, queries terminal, supported on Windows and xterm, perhaps others.
@@ -672,38 +613,86 @@ def get_theme(timeout=defaults.READ_TIMEOUT):
     if env.COLORFGBG:
         FG, _, BG = env.COLORFGBG.partition(';')
         theme = 'dark' if BG < '8' else 'light'  # background wins
-    else:
-        if os_name == 'nt':
-            from .windows import get_color as _get_color  # avoid Unbound Local
-            color_id = _get_color('background')
-            theme = 'dark' if color_id < 8 else 'light'
 
-        elif os_name == 'posix':  # TODO: factor, same as _find_basic_pal
-            if env.TERM in ('linux', 'fbterm'):  # default
-                theme = 'dark'
-            elif sys.platform.startswith('freebsd'):  # vga console :-/
-                theme = 'dark'
-            elif env.TERM.startswith('xterm'):
-                # LOW64 - Python on Linux on Windows!
-                if ('WSLENV' in env) or ('Microsoft' in os.uname().release):
-                    pass
-                else:
-                    # try xterm query- find average across rgb
-                    colors = get_color('background', timeout=timeout)  # bg wins
-                    if colors:
-                        colors = tuple(int(cm[:2], 16) for cm in colors)
-                        avg = sum(colors) / len(colors)
-                        theme = 'dark' if avg < 128 else 'light'
+    else:  # TODO: factor, same as _find_basic_pal
+        if env.TERM in ('linux', 'fbterm'):  # default
+            theme = 'dark'
+        elif sys.platform.startswith('freebsd'):  # vga console :-/
+            theme = 'dark'
+        elif env.TERM.startswith('xterm'):
+            # LOW64 - Python on Linux on Windows!
+            if 'WSLENV' in env: # or ('Microsoft' in os.uname().release):
+                pass  # don't know for sure.
+            else:
+                # try xterm query - find average across rgb
+                colors = get_color('background', timeout=timeout)  # bg wins
+                if colors:
+                    colors = tuple(int(hexclr[:2], 16) for hexclr in colors)
+                    avg = sum(colors) / len(colors)
+                    theme = 'dark' if avg < 128 else 'light'
 
     log.debug('%r', theme)
     return theme
 
 
+# Override default implementations
+
+if os_name == 'nt':  # I'm a PC
+
+    from .windows import (
+        detect_unicode_support,
+        detect_palette_support,
+        _find_basic_palette,
+        get_color,
+        get_position,
+        get_title,
+        get_theme,
+    )
+
+elif sys.platform == 'darwin':  # Think different
+
+    def _find_basic_palette_macos(name):
+        ''' Find the platform-dependent 16-color basic palette—macOS version.
+
+            This is used for "downgrading to the nearest color" support.
+
+            Arguments:
+                name        This is passed on the possibility it may need to be
+                            overridden, due to WSL oddities.
+        '''
+        pal_name = 'default (xterm)'
+        basic_palette = color_tables.xterm_palette4
+
+        if env.SSH_CLIENT:  # fall back to xterm over ssh, info often wrong
+            pal_name = 'ssh (xterm)'
+        else:
+            if env.TERM_PROGRAM == 'Apple_Terminal':
+                pal_name = 'termapp'
+                basic_palette = color_tables.termapp_palette4
+            elif env.TERM_PROGRAM == 'iTerm.app':
+                pal_name = 'iterm'
+                basic_palette = color_tables.iterm_palette4
+
+        return name, pal_name, basic_palette
+
+
+elif os_name == 'posix':  # Tron leotards
+    pass
+
+else:  # Amiga/Atari - The Wonder Computer of the 1980s :-D
+    log.warn('Unexpected OS: os.name: %s', os_name)
+
+
 if __name__ == '__main__':
 
-    print()  # space from warning
+    # logs the detection information sequence
+    print()  # space from warnings
 
-    fmt = '  %(levelname)-7.7s %(module)s/%(funcName)s:%(lineno)s %(message)s'
-    logging.basicConfig(level=logging.DEBUG, format=fmt)
+    try:
+        import out
+        out.configure(level='debug')
+    except ImportError:
+        fmt = '  %(levelname)-7.7s %(module)s/%(funcName)s:%(lineno)s %(message)s'
+        logging.basicConfig(level=logging.DEBUG, format=fmt)
 
     choose_palette()

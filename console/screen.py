@@ -213,9 +213,10 @@ class Screen:
 
     @contextmanager
     def bracketed_paste(self):
-        ''' Context Manager that brackets-the-paste.
-            https://cirw.in/blog/bracketed-paste
-            https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Bracketed-Paste-Mode
+        ''' Context Manager that brackets-the-paste:
+
+            - https://cirw.in/blog/bracketed-paste
+            - https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Bracketed-Paste-Mode
 
             .. code-block:: python
 

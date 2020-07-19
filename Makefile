@@ -33,7 +33,7 @@ check_readme: readme.rst
 
 clean:
 	git gc
-	rm -rf readme.html .pytest_cache build dist .eggs
+	rm -rf readme.html .pytest_cache build dist .eggs htmlcov
 	make -C docs clean
 
 	-find -type d -name __pycache__ -exec rm -rf '{}' \;

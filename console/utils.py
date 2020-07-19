@@ -241,9 +241,9 @@ cls = reset_terminal
 
 # -- wait key implementations ------------------------------------------------
 if os_name == 'nt':
-    from msvcrt import getwch as _getch
+    from msvcrt import getwch as _get_char
 elif os_name == 'posix':
-    from .detection import _getch
+    from .detection import _get_char
 
 
 def wait_key(keys=None):
@@ -261,11 +261,11 @@ def wait_key(keys=None):
             if not isinstance(keys, tuple):
                 keys = (keys,)
             while True:
-                key = _getch()
+                key = _get_char()
                 if key in keys:
                     return key
         else:
-            return _getch()
+            return _get_char()
 
 
 def pause(message='Press any key to continue…'):
