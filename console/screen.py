@@ -23,7 +23,10 @@
         :copyright: Copyright 2011-2018, Erik Rose
         :license: MIT License (MIT)
 
-    TODO:  These objects don't compose like the core objects.
+    Note: these could probably be loaded from curses/terminfo,
+          but haven't yet found a need.
+
+    TODO:  These objects don't compose as well as the core objects.
 '''
 import sys
 from contextlib import contextmanager

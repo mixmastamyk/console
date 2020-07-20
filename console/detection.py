@@ -365,7 +365,7 @@ def _read_until_select(infile=sys.stdin, maxbytes=20, end=RS, timeout=None):
         log.debug('select start reading:')
         while maxbytes:  # response: count down chars, stopping at 0
             char = read(1)
-            if char in end:  # simple search, doesn't consider sequence
+            if char in end:  # TODO: simple search, doesn't consider sequence
                 break
             chars.append(char)
             maxbytes -= 1
@@ -488,7 +488,7 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
 
         if sys.platform == 'darwin':
             if env.TERM_PROGRAM == 'iTerm.app':
-                # supports, though returns two chars per
+                # supports, though returns only two chars per
                 colors = _get_color_xterm(name, number, timeout=timeout)
 
         elif os_name == 'posix':
@@ -571,7 +571,7 @@ def get_title(mode='title'):
             iTerm returns "".  MATE Terminal returns "Terminal".
     '''
     title = None
-    if is_a_tty(): # and not env.SSH_CLIENT:
+    if is_a_tty():
         if sys.platform == 'darwin':
             if env.TERM_PROGRAM != 'iTerm.app':
                 return title
@@ -651,7 +651,7 @@ if os_name == 'nt':  # I'm a PC
 
 elif sys.platform == 'darwin':  # Think different
 
-    def _find_basic_palette_macos(name):
+    def _find_basic_palette(name):
         ''' Find the platform-dependent 16-color basic palette—macOS version.
 
             This is used for "downgrading to the nearest color" support.

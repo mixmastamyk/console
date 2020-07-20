@@ -3,6 +3,9 @@
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     Constants needed cross-package.
+
+    Note: these could probably be loaded from curses/terminfo,
+          but haven't yet found a need.
 '''
                     #  DEC   OCT    HEX   CTL     DESC
 ENQ = '\x05'        #:   5   005           ^E     Enquiry
