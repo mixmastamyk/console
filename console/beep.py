@@ -63,6 +63,8 @@ elif os_name == 'posix':        # Tron leotards
 if __name__ == '__main__':
 
     import sys
+    from time import sleep
+
     from console import fg, fx, defx
 
     if '-d' in sys.argv:
@@ -71,10 +73,11 @@ if __name__ == '__main__':
             out.configure(level='debug')
         except ImportError:
             logging.basicConfig(level='DEBUG',
-                format=('%(levelname)s '
+                format=('%(levelname)-7.7s '
                 f'{fx.dim}%(funcName)s:{fg.green}%(lineno)s{fg.default}{defx.dim}'
                 ' %(message)s'),
             )
 
     log.debug('console version: %r', version)
     beep()
+    sleep(.5)
