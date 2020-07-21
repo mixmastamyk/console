@@ -244,7 +244,7 @@ def is_colorama_initialized(stream=sys.stdout):
     '''  Detect if the colorama stream wrapper has been installed. '''
     result = None
     try:
-        import sys, colorama
+        import colorama
         if isinstance(stream, colorama.ansitowin32.StreamWrapper):
             result = True
         else:

@@ -12,6 +12,8 @@
 '''
 import logging
 import re
+import sys
+from time import sleep
 
 from .constants import BEL, OSC, ST
 from .screen import sc
@@ -108,6 +110,55 @@ def clear_screen(mode=2):
     return text  # for testing
 
 
+def flash(seconds=.1):
+    ''' Flash screen,
+        i.e. turn on reverse video and back again,
+        given a delay in floating-point seconds.
+        This can be useful as a visible bell.
+    '''
+    _write(sc.reverse_video)
+    sleep(seconds)
+    _write(sc.normal_video)
+    return sc.reverse_video + sc.normal_video  # for testing
+
+
+def set_clipboard(data, destination='c', max_len=65536):
+    ''' Write string or byte data to the clipboard.
+
+        Arguments:
+            data:  str
+            destination:  {c, p, q, s, 0-7}
+                (clipboard, primary, secondary, selection, buffers 0-7)
+            max_len: a minor impediment to sending too much text, 64k by default.
+
+        Note:
+            https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+            #h3-Operating-System-Commands
+    '''
+    if len(data) > max_len:
+        raise RuntimeError('clipboard data too large!')
+
+    from base64 import b64encode
+
+    if isinstance(data, str):
+        data = data.encode('utf8')
+    if not isinstance(data, bytes):
+        raise TypeError('data was not string or bytes: %s' % type(data))
+
+    # all this needs to be in bytes
+    payload = b64encode(data)
+    envelope = f'{OSC}52;{destination};%b{ST}'.encode('ascii')
+    text = envelope % payload
+
+    # https://stackoverflow.com/a/908440/450917
+    if hasattr(sys.stdout, 'buffer'):
+        sys.stdout.buffer.write(text)
+        sys.stdout.flush()
+    else:
+        _write(text.decode('ascii'))
+    return text  # for testing
+
+
 def make_hyperlink(target, caption=None, icon='', **params):
     ''' Returns a terminal hyperlink, given a link and caption text.
 
@@ -134,7 +185,7 @@ def make_hyperlink(target, caption=None, icon='', **params):
         Note: experimental, see below for details:
             https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
     '''
-    if _CHOSEN_PALETTE:
+    if _CHOSEN_PALETTE:  # TODO: alls functions here should probably do this
         from urllib.parse import quote  # TODO: move to module globals
         MAX_URL = 2083  # spec recommendations
         MAX_VAL = 250

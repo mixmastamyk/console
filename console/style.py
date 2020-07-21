@@ -198,6 +198,9 @@ class EffectsPalette(_BasicPaletteBuilder):
 
     dunder           = (21, EffectsTerminator.underline)  # orig. disable bold
     double_underline = dunder
+    # kitty extensions - https://sw.kovidgoyal.net/kitty/protocol-extensions.html
+    # experimental - subject to change
+    curly_underline  = ('4:3', EffectsTerminator.underline)
 
     # rarely, if ever implemented
     frame           = (51, EffectsTerminator.frame)

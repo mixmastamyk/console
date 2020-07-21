@@ -36,8 +36,7 @@ from .constants import CSI, ESC, RIS
 from .disabled import empty_bin
 
 
-class _TemplateString(str):
-    # Callable[[str], str]
+class _TemplateString(str):  # Callable[[str], str]
     ''' A template string that renders itself with default arguments when
         created, and may also be called with other arguments.
     '''
@@ -83,7 +82,7 @@ class Screen:
     save_title  = ('t', '22;%d')
     restore_title = ('t', '23;%d')
 
-    # These don't need parameter wrapping.  All start with ESC
+    # The following don't need parameter wrapping.  All start with ESC
     auxoff      = CSI + '4i'
     auxon       = CSI + '5i'
     dsr         = loc = CSI + '6n'          # device status rpt, see detection
@@ -95,8 +94,14 @@ class Screen:
     rest_pos    = ESC + '8'
     save_pos2   = scp = CSI + 's'
     rest_pos2   = rcp = CSI + 'u'
-    hide_cursor = CSI + '?25l'
+
+    # DEC Private Mode Set (DECSET)
+    # https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
     show_cursor = CSI + '?25h'
+    hide_cursor = CSI + '?25l'
+
+    reverse_video = CSI + '?5h'  # "flash" screen
+    normal_video = CSI + '?5l'
 
     # https://cirw.in/blog/bracketed-paste
     bracketedpaste_enable = bpon = CSI + '?2004h'
