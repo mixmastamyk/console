@@ -103,6 +103,31 @@ class BackgroundPalette(_HighColorPaletteBuilder):
     _start_codes_true = '48;2'
 
 
+class UnderlinePalette(_HighColorPaletteBuilder):
+    ''' Container for color codes specific to underlines.
+        EXPERIMENTAL, see notes.
+
+        This palette supports extended and true color sequences only.
+        However the first 16 colors of extended coincide with standard colors,
+        so are available there, e.g.:  `ul.i_0 to ul.i_15`
+
+        Arguments:
+            autodetect          - Attempt to detect palette support.
+            palettes            - If autodetect disabled, set palette support
+                                  explicitly.  str, seq, or None
+
+        Notes:
+            https://sw.kovidgoyal.net/kitty/protocol-extensions.html
+                #colored-and-styled-underlines
+            https://en.wikipedia.org/wiki/ANSI_escape_code#3/4_bit
+    '''
+    default         = 59
+
+    _start_codes_extended = '58;5'
+    _start_codes_extended_fbterm = '2'
+    _start_codes_true = '58;2'
+
+
 class EffectsTerminator(_BasicPaletteBuilder):
     ''' *"I'll be baaahhhck."*
 
@@ -218,6 +243,7 @@ class EffectsPalette(_BasicPaletteBuilder):
 # It's Automatic:  https://youtu.be/y5ybok6ZGXk
 fg = ForegroundPalette()
 bg = BackgroundPalette()
+ul = UnderlinePalette()
 
 fx = EffectsPalette()
 defx = EffectsTerminator()

@@ -22,12 +22,12 @@ Console
 
 .. sidebar:: **Testimonials**
 
-    - *"👍 Ayyyyyy… 👍"—The Fonz*
-    - *"DYN-O-MITE!!" — J.J. from Good Times*
-    - *“Better… Stronger… Faster”—Oscar Goldman*
-    - *"There is nothing we won't try…" —Laverne and Shirley*
-    - *"Nothin' can stand in our way…" —Olivia Newton-John*
-    - *"Fightin' the system like a true modern day Robin Hood" —Waylon Jennings*
+    - *"👍 Ayyyyyy… 👍"—The Fonz*
+    - *"DYN-O-MITE!!" —J.J. from Good Times*
+    - *“Better… Stronger… Faster” —Oscar Goldman*
+    - *"There is nothing we won't try…" —Laverne and Shirley*
+    - *"Nothin' can stand in our way…" —Olivia Newton-John*
+    - *"Fightin' the system like a true modern day Robin Hood" —Waylon Jennings*
 
 |
 
@@ -92,13 +92,15 @@ That's why you're here, right?
     When you see "😉" in a comment, that's a reminder you're not getting
     the full monty.*
 
+**Call Form**
 
 Above, ``fx.end`` is a convenient object to note---\
 it ends all styles and fore/background colors at once,
 where as ``fg.default`` or ``bg.default`` for example,
 resets only the fore or background to its default color.
 To avoid that responsibility,
-one may also use the call form instead,
+and automate higher specificity (in what styles are deactivated),
+one may also use the call-form instead,
 where
 `it's automatic <https://youtu.be/y5ybok6ZGXk>`_:
 

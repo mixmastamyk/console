@@ -29,6 +29,8 @@ def make_header(i):
 
 def run():
     ''' Run the demos. '''
+    import time
+
     print('\nConsole - ANSI lib demos, here we go:\n')
     hello_world = f'''Greetings: {fx.bold + fg.blue}Hello {fx.reverse +
                     fg.yellow}World{fg.default + defx.reverse}!{fx.end}'''
@@ -114,8 +116,10 @@ def run():
     print('      ╭' + '─' * 86, '╮\n      │', sep='', end='')   # RED
     for val in range(0, 256, step):
         code = format(val, '02x')
-        print(getattr(bg, 't%s0000' % code), fx.end, end='')
-    print('│')
+        # probably don't need to end here every time:
+        #~ print(getattr(bg, 't%s0000' % code), fx.end, end='')
+        print(getattr(bg, 't%s0000' % code), end=' ')
+    print(fx.end, '│', sep='')
 
     print('      │', sep='', end='')                            # GREEN
     for val in range(255, -1, -step):
@@ -217,11 +221,10 @@ def run():
         try:
             print('       theme:', get_theme(timeout=1), '\n')
             print('       color scheme:', get_color('fg', timeout=1), 'on',
-                                          get_color('bg', timeout=1), end=' ')
+                                          get_color('bg', timeout=1), end='\n\n')
         except ModuleNotFoundError:
             pass  # termios - Windows
 
-        import time
         try:
             print('       About to clear terminal, check title above. ☝  '
                   ' (Ctrl+C exits first.) ', end='', flush=True)

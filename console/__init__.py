@@ -11,7 +11,7 @@ from .disabled import empty_bin as _empty_bin
 
 _DEBUG = []  # mutable reference
 _CHOSEN_PALETTE = None
-fg = bg = fx = defx = sc = _empty_bin
+fg = bg = ul = fx = defx = sc = _empty_bin
 
 
 def set_debug_mode(value):
@@ -45,10 +45,10 @@ if env.PY_CONSOLE_AUTODETECT != '0':
 
     if _CHOSEN_PALETTE:
         # may now import other modules
-        from .style import fg, bg, fx, defx
+        from .style import fg, bg, ul, fx, defx
         from .screen import sc
 
-        fg, bg, fx, defx, sc, TermStack  # quiet pyflakes
+        fg, bg, ul, fx, defx, sc, TermStack  # quiet pyflakes
 
 
 #~ from enum import Enum  # not ready

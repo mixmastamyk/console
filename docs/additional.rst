@@ -386,6 +386,38 @@ This feature is experimental and more information can be
     </pre>
 
 
+Underline Hijinks
+~~~~~~~~~~~~~~~~~~~
+
+Curly, dunder, and/or colored underlines are supported in a number of terminals
+now,
+in addition to the standard ``fx.u(…)``:
+
+.. code-block:: python
+
+    >>> from console import fx, ul
+
+    >>> bad_grammar = fx.curly_underline + ul.i2
+    >>> bad_spelling = fx.curly_underline + ul.i1
+
+    >>> print('I', bad_grammar('not'), bad_spelling('mizpelled.'))
+
+.. raw:: html
+
+    <pre style="margin-top: -13px; border-radius: 0 0 1em 1em;">
+    I <span style="text-decoration: underline wavy green">not</span> <span style="text-decoration: underline wavy red">mizpelled.</span>
+    </pre>
+
+.. code-block:: python
+
+    >>> print(fx.dunder, ul.goldenrod('WOOT!'), sep='')  # X, Webcolors
+
+.. raw:: html
+
+    <pre style="margin-top: -13px; border-radius: 0 0 1em 1em;">
+    <span style="border-bottom: 3px double goldenrod">WOOT!</span>
+    </pre>
+
 
 HTML Printer
 ~~~~~~~~~~~~~~~~~~~

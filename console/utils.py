@@ -17,7 +17,8 @@ from time import sleep
 
 from .constants import BEL, OSC, ST
 from .screen import sc
-from .detection import is_a_tty, os_name
+from .detection import is_a_tty, os_name, _read_clipboard
+from .meta import defaults
 from . import _DEBUG, _CHOSEN_PALETTE
 
 
@@ -122,26 +123,48 @@ def flash(seconds=.1):
     return sc.reverse_video + sc.normal_video  # for testing
 
 
-def set_clipboard(data, destination='c', max_len=65536):
-    ''' Write string or byte data to the clipboard.
+def get_clipboard(source='c', encoding='utf8',
+                  max_bytes=defaults.MAX_CLIPBOARD_SIZE, timeout=.2):
+    ''' Read string or byte data from the clipboard.
 
         Arguments:
             data:  str
+            source:  {c, p, q, s, 0-7}
+                (clipboard, primary, secondary, selection, buffers 0-7)
+            encoding: decode to unicode or pass None for bytes.
+            max_bytes: minor impediment to sending too much text.
+
+        Note:
+            https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+            #h3-Operating-System-Commands
+            Works on xterm, hterm.
+    '''  # functionality in detection module:
+    return _read_clipboard(source=source, encoding=encoding,
+                           max_bytes=max_bytes, timeout=timeout)
+
+
+def set_clipboard(data, destination='c', encoding='utf8',
+                  max_bytes=defaults.MAX_CLIPBOARD_SIZE):
+    ''' Write string or byte data to the clipboard.
+
+        Arguments:
+            data: str or bytes
             destination:  {c, p, q, s, 0-7}
                 (clipboard, primary, secondary, selection, buffers 0-7)
-            max_len: a minor impediment to sending too much text, 64k by default.
+            encoding: if string is passed, encode to bytes
+            max_bytes: minor impediment to sending too much text.
 
         Note:
             https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
             #h3-Operating-System-Commands
     '''
-    if len(data) > max_len:
-        raise RuntimeError('clipboard data too large!')
+    if len(data) > max_bytes:
+        raise RuntimeError(f'clipboard data too large! ({len(data)} bytes)')
 
     from base64 import b64encode
 
     if isinstance(data, str):
-        data = data.encode('utf8')
+        data = data.encode(encoding)
     if not isinstance(data, bytes):
         raise TypeError('data was not string or bytes: %s' % type(data))
 

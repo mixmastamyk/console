@@ -350,25 +350,29 @@ def _get_char():
         return sys.stdin.read(1)
 
 
-def _read_until_select(infile=sys.stdin, maxbytes=20, end=RS, timeout=None):
+def _read_until_select(infile=sys.stdin, max_bytes=20, end=RS, timeout=None):
     ''' Read a terminal response of up to a given max characters from stdin,
         with timeout.  POSIX only, files not compat with select on Windows.
     '''
     from select import select
     chars = []
-    read = infile.read
+    read = infile.read  # shortcut
+    last_char = ''
     if not isinstance(end, tuple):
         end = tuple(end)
-    log.debug('maxbytes=%s, end=%r, timeout %s …', maxbytes, end, timeout)
+    log.debug('max_bytes=%s, end=%r, timeout %s …', max_bytes, end, timeout)
 
     if select((infile,), (), (), timeout)[0]:  # wait until response or timeout
         log.debug('select start reading:')
-        while maxbytes:  # response: count down chars, stopping at 0
-            char = read(1)
-            if char in end:  # TODO: simple search, doesn't consider sequence
+        while max_bytes:  # response: count down chars, stopping at 0
+            char = read(1)  # TODO: this could probably be better than 1 char
+            if char in end:  # simple comparison
+                break
+            elif (last_char + char) in end:  # consider two char sequence
                 break
             chars.append(char)
-            maxbytes -= 1
+            last_char = char
+            max_bytes -= 1
     else:  # timeout
         log.debug('response not received in time, %s secs.', timeout)
 
@@ -392,7 +396,7 @@ def _get_color_xterm(name, number=None, timeout=None):
                 sys.stdout.flush()
                 log.debug('about to read get_color_xterm response…')
                 resp = _read_until_select(
-                            maxbytes=26, end=(BEL, ST), timeout=timeout
+                            max_bytes=26, end=(BEL, ST), timeout=timeout
                         ).rstrip(ESC)
         except AttributeError:
             log.debug('warning - no .fileno() attribute was found on the stream.')
@@ -406,11 +410,47 @@ def _get_color_xterm(name, number=None, timeout=None):
     return colors
 
 
-def get_answerback(maxbytes=32, end=(), timeout=defaults.READ_TIMEOUT):
+def _read_clipboard(
+        source='c', encoding=None, max_bytes=defaults.MAX_CLIPBOARD_SIZE,
+        timeout=.2
+    ):
+    ''' Query xterm for clipboard data.
+
+        Warning: likely to block on incompatible terminals, use timeout.
+    '''
+    query_sequence = f'{OSC}52;{source};?{ST}'
+    try:
+        with TermStack() as fd:
+            termios.tcflush(fd, termios.TCIFLUSH)   # clear input
+            tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
+            sys.stdout.write(query_sequence)
+            sys.stdout.flush()
+            log.debug('about to read get_color_xterm response…')
+            resp = _read_until_select(
+                        max_bytes=max_bytes, end=(BEL, ST), timeout=timeout
+                    ).rstrip(BEL + ST)
+    except AttributeError:
+        log.debug('warning - no .fileno() attribute was found on the stream.')
+    except EnvironmentError:  # Winders
+        log.debug('_read_clipboard not yet implemented by Windows.')
+    else:
+        if resp:  # parse response
+            from base64 import b64decode
+            resp = b64decode(resp.split(';', 3)[-1])
+            if encoding:
+                resp = resp.decode(encoding)
+        else:
+            resp = None  # don't bother
+
+    return resp
+
+
+
+def get_answerback(max_bytes=32, end=(), timeout=defaults.READ_TIMEOUT):
     ''' Returns the "answerback" string which is often empty,
         None if not available.
 
-        Warning: Hangs unless maxbytes is a subset of the answer string *or* an
+        Warning: Hangs unless max_bytes is a subset of the answer string *or* an
                  explicit end character(s) given, due to inability to find end.
                  https://unix.stackexchange.com/a/312991/159110
     '''
@@ -422,7 +462,7 @@ def get_answerback(maxbytes=32, end=(), timeout=defaults.READ_TIMEOUT):
             sys.stdout.flush()
             log.debug('about to read answerback response…')
             return _read_until_select(
-                        maxbytes=maxbytes, end=end, timeout=timeout
+                        max_bytes=max_bytes, end=end, timeout=timeout
                     )
     except AttributeError:  # 
         log.debug('warning - no .fileno() attribute was found on the stream.')
@@ -523,7 +563,7 @@ def get_position(fallback=defaults.CURSOR_POS_FALLBACK):
                 sys.stdout.write(CSI + '6n')            # screen.dsr, avoid import
                 sys.stdout.flush()
                 log.debug('about to read get_position response…')
-                resp = _read_until_select(maxbytes=10, end='R')
+                resp = _read_until_select(max_bytes=10, end='R')
         except AttributeError:  # no .fileno()
             return values
 
@@ -587,7 +627,7 @@ def get_title(mode='title'):
                 sys.stdout.write(query_sequence)
                 sys.stdout.flush()
                 log.debug('about to read get_title response…')
-                resp = _read_until_select(maxbytes=100, end=ST, timeout=.2)
+                resp = _read_until_select(max_bytes=100, end=ST, timeout=.2)
         except AttributeError:  # no .fileno()
             return title
 
