@@ -143,45 +143,6 @@ def get_clipboard(source='c', encoding='utf8',
                            max_bytes=max_bytes, timeout=timeout)
 
 
-def set_clipboard(data, destination='c', encoding='utf8',
-                  max_bytes=defaults.MAX_CLIPBOARD_SIZE):
-    ''' Write string or byte data to the clipboard.
-
-        Arguments:
-            data: str or bytes
-            destination:  {c, p, q, s, 0-7}
-                (clipboard, primary, secondary, selection, buffers 0-7)
-            encoding: if string is passed, encode to bytes
-            max_bytes: minor impediment to sending too much text.
-
-        Note:
-            https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
-            #h3-Operating-System-Commands
-    '''
-    if len(data) > max_bytes:
-        raise RuntimeError(f'clipboard data too large! ({len(data)} bytes)')
-
-    from base64 import b64encode
-
-    if isinstance(data, str):
-        data = data.encode(encoding)
-    if not isinstance(data, bytes):
-        raise TypeError('data was not string or bytes: %s' % type(data))
-
-    # all this needs to be in bytes
-    payload = b64encode(data)
-    envelope = f'{OSC}52;{destination};%b{ST}'.encode('ascii')
-    text = envelope % payload
-
-    # https://stackoverflow.com/a/908440/450917
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout.buffer.write(text)
-        sys.stdout.flush()
-    else:
-        _write(text.decode('ascii'))
-    return text  # for testing
-
-
 def make_hyperlink(target, caption=None, icon='', **params):
     ''' Returns a terminal hyperlink, given a link and caption text.
 
@@ -254,6 +215,45 @@ def reset_terminal():
         text = sc.reset
         _write(text)
         return text  # for testing
+
+
+def set_clipboard(data, destination='c', encoding='utf8',
+                  max_bytes=defaults.MAX_CLIPBOARD_SIZE):
+    ''' Write string or byte data to the clipboard.
+
+        Arguments:
+            data: str or bytes
+            destination:  {c, p, q, s, 0-7}
+                (clipboard, primary, secondary, selection, buffers 0-7)
+            encoding: if string is passed, encode to bytes
+            max_bytes: minor impediment to sending too much text.
+
+        Note:
+            https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+            #h3-Operating-System-Commands
+    '''
+    if len(data) > max_bytes:
+        raise RuntimeError(f'clipboard data too large! ({len(data)} bytes)')
+
+    from base64 import b64encode
+
+    if isinstance(data, str):
+        data = data.encode(encoding)
+    if not isinstance(data, bytes):
+        raise TypeError('data was not string or bytes: %s' % type(data))
+
+    # all this needs to be in bytes
+    payload = b64encode(data)
+    envelope = f'{OSC}52;{destination};%b{ST}'.encode('ascii')
+    text = envelope % payload
+
+    # https://stackoverflow.com/a/908440/450917
+    if hasattr(sys.stdout, 'buffer'):
+        sys.stdout.buffer.write(text)
+        sys.stdout.flush()
+    else:
+        _write(text.decode('ascii'))
+    return text  # for testing
 
 
 def set_title(title, mode=0):

@@ -49,17 +49,17 @@ docs: docs/readme.rst readme.rst
 	rsync --recursive --human-readable --delete-before  --update docs/_build/html/ ../../mixmastamyk.bitbucket.org/console/
 
 
-publish: test check_readme docs
+publish: test docs check_readme
 	rm -rf build  # possible wheel bug
 	python3 setup.py sdist bdist_wheel --universal upload
 
-	pip3 install --user -e .  # fix bug on next invocation
+	python3 -m pip install --user -e .  # fix bug on next invocation
 	cd ../../mixmastamyk.bitbucket.org/console/ && git add . && git commit -m . && git push
 
 
 test:
 	clear
-	pyflakes *.py */*.py
+	-pyflakes *.py */*.py  # need better tool, flake8?
 	tput reset  # clear screen, scrollback
 	pytest --capture=no --color=no
 
