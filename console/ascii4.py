@@ -25,7 +25,7 @@ help_text = __doc__ + '''
 '''
 import os, sys
 from console import fg, bg, fx, defx
-from console.detection import get_theme
+from console.detection import get_theme, os_name
 from console.utils import make_hyperlink
 
 
@@ -156,6 +156,8 @@ def setup():
 
 
 def main(args):
+    if os_name == 'nt':  # :-/
+        os.EX_OK, os.EX_SOFTWARE = 0, 70
 
     status = os.EX_OK
     mode = args.character_mode
