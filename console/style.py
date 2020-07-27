@@ -105,7 +105,7 @@ class BackgroundPalette(_HighColorPaletteBuilder):
 
 class UnderlinePalette(_HighColorPaletteBuilder):
     ''' Container for color codes specific to underlines.
-        EXPERIMENTAL, see notes.
+        EXPERIMENTAL, see notes.  Supported by libvte and kitty.
 
         This palette supports extended and true color sequences only.
         However the first 16 colors of extended coincide with standard colors,
@@ -224,7 +224,7 @@ class EffectsPalette(_BasicPaletteBuilder):
     dunder           = (21, EffectsTerminator.underline)  # orig. disable bold
     double_underline = dunder
     # kitty extensions - https://sw.kovidgoyal.net/kitty/protocol-extensions.html
-    # experimental - subject to change
+    # experimental - subject to change, vte also:
     curly_underline  = ('4:3', EffectsTerminator.underline)
 
     # rarely, if ever implemented

@@ -184,7 +184,7 @@ def detect_palette_support(basic_palette=None):
         name = 'extended'
 
     # https://bugzilla.redhat.com/show_bug.cgi?id=1173688 - obsolete?
-    if env.COLORTERM in ('truecolor', '24bit'):
+    if env.COLORTERM in ('truecolor', '24bit') or TERM == 'xterm-direct':
         name = 'truecolor'
 
     # find the platform-dependent 16-color basic palette

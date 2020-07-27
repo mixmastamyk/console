@@ -21,11 +21,13 @@ from .disabled import empty as _empty
 from .screen import sc
 from .utils import len_stripped
 from .detection import (detect_unicode_support, get_available_palettes,
-                               get_size)
+                        get_size, is_fbterm, os_name)
 
 TIMEDELTAS = (60, 300)  # accuracy thresholds, in seconds, one and five minutes
 MIN_WIDTH = 12
-_END = str(fx.end)      # fbterm support
+#~ _END = str(fx.end) if is_fbterm else ''
+_END = str(fx.end)
+term_width = _term_width_orig = get_size()[0]
 
 # Theme-ing info:
 icons = dict(
@@ -151,6 +153,15 @@ class ProgressBar:
     ''' A stylable bar graph for displaying the current progress of task
         completion.
 
+        The call flow goes like this:
+
+            - init()
+            - called() by code to set parameters
+                - _update_status()  # check errors and set label
+
+            - str() when printed
+                - render()
+
         Example::
 
             import time  # demo purposes only
@@ -210,6 +221,7 @@ class ProgressBar:
     styles = styles[theme]
 
     _clear_left = True
+    _cached_str = None
     _min_width = MIN_WIDTH
     _num_complete_chars = 0
     _remainder = 0
@@ -232,8 +244,9 @@ class ProgressBar:
             elif key == 'styles':
                 self.styles = styles[val]
             elif key == 'expand' and val:
-                self.width = get_size()[0]
+                self.width = term_width
                 self.expand = val
+                install_resize_handler()
             else:
                 setattr(self, key, val)
 
@@ -241,10 +254,8 @@ class ProgressBar:
         _icons = self.icons
         if self.width < self._min_width:
             self.width = self._min_width
-        # padding: first, last bookends
-        self.padding = len(_icons[_if]) + len(_icons[_il])
-        # save bar width
-        self._bwidth = self._bwidth_orig = (self.width - self.padding)
+        self.padding = len(_icons[_if]) + len(_icons[_il])  # bookends
+        self._bwidth = self._set_bar_width()
         if self._clear_left is True:
             self.clear_left = self._clear_left  # render
 
@@ -270,6 +281,19 @@ class ProgressBar:
         else:
             self.total = 100
 
+    def _set_bar_width(self, width=None):
+        ''' Determine the width of the bar only, without labels. '''
+        if not width:  # determine
+            if self.expand:
+                width = term_width
+            else:
+                width = self.width
+        if width < self._min_width:
+            width = self._min_width
+
+        self._bwidth_base = width - self.padding - 1  # for cursor
+        return self._bwidth_base
+
     def __len__(self):
         return self.total
 
@@ -278,7 +302,7 @@ class ProgressBar:
         for obj in self.iterable:
             yield obj
             self._iter_n += 1
-            self(self._iter_n)
+            self(self._iter_n)  # call complete
             print(self, end='')
         print()
 
@@ -293,7 +317,7 @@ class ProgressBar:
         if self.label_mode and self.label_mode == 'internal':  # solid theme
             pieces.append(self._render_with_internal_label())
         else:
-            pieces.append(self._render())
+            pieces.append(self._render())  # external
 
         self._cached_str = rendered = ''.join(pieces)
         if self.debug:
@@ -313,6 +337,11 @@ class ProgressBar:
         ''' Sets the value of the bar graph. '''
         # convert ints to float from 0…1 per-one-tage
         self.ratio = ratio = complete / self.total
+        if self.expand:
+            if term_width != _term_width_orig:  # unix change
+                self._set_bar_width()
+            elif os_name == 'nt':  # need to explicitly check
+                self._set_bar_width(get_size()[0])
         self._update_status(ratio)
 
         # find num complete and empty chars
@@ -371,7 +400,7 @@ class ProgressBar:
 
         if 0 <= ratio < 1:  # in progress
             if label_mode:
-                label = label_fmt % (ratio * 100)
+                label = label_unstyled = label_fmt % (ratio * 100)
             if self.oob_error:  # now fixed, reset
                 self._first = self.styles[_if](self.icons[_if])
                 self._last = self.styles[_il](self.icons[_il])
@@ -384,7 +413,7 @@ class ProgressBar:
                 self._comp_style = self.styles[_id]
                 self._last = self.styles[_if](self.icons[_il])
                 if label_mode:
-                    label = self.label_fmt_str % self.icons[_id]
+                    label = label_unstyled = self.label_fmt_str % self.icons[_id]
                 if self.oob_error:  # now fixed, reset
                     self._first = self.styles[_if] + self.icons[_if] + _END
                     self.oob_error = False
@@ -408,7 +437,9 @@ class ProgressBar:
         self._lbl = label
         # dynamic resizing of the bar, depending on label length:
         if label and label_mode != 'internal':
-            self._bwidth = self._bwidth_orig - len(label_unstyled or label)
+            self._bwidth = self._bwidth_base - len(label_unstyled) # or label)
+        else:
+            self._bwidth = self._bwidth_base
 
     def _render(self):
         ''' Standard rendering of bar graph. '''
@@ -480,9 +511,25 @@ class HiDefProgressBar(ProgressBar):
         return f'{self._first}{cm_chars}{p_char}{em_chars}{self._last}{self._lbl}'
 
 
+def install_resize_handler():
+    ''' Signal handling code - handles the situation when full-width bars are
+        created via expand = True, and the virtual terminal width changes.
+
+        Note: Unix only
+    '''
+    import signal
+
+    def _window_resize_handler(sig, frame):
+        global term_width
+        term_width = get_size()[0]
+
+    signal.signal(signal.SIGWINCH, _window_resize_handler)
+
+
 if __name__ == '__main__':
 
     import sys
+    from time import sleep
 
     # set defaults
     ProgressBar.debug = '-d' in sys.argv
@@ -498,7 +545,7 @@ if __name__ == '__main__':
         ('bullets:',        ProgressBar(icons='bullets', style='ocean8')),
         ('warm-shaded:',    ProgressBar(theme='warm_shaded')),
         ('faces:',          ProgressBar(theme='shaded', icons='faces')),
-        # ('wide faces:',     ProgressBar(style='simple', icons='wide_faces')),
+        ('wide faces:',     ProgressBar(style='simple', icons='wide_faces')),
         ('hvy-metal:',      ProgressBar(theme='heavy_metal')),
         ('segmented:',      ProgressBar(icons='segmented')),
         ('triangles:',      ProgressBar(theme='shaded', icons='triangles')),
@@ -521,12 +568,12 @@ if __name__ == '__main__':
             for i in range(0, 101):
                 print()
                 for label, bar in bars:
-                    print(f' {label:12}', bar(i), sep='')
+                    print(f' {label:12}', bar(i), sep='')  #, end='', flush=True)
 
-                time.sleep(.1)
+                sleep(.1)
                 if i != 100:
                     cls()
-            time.sleep(2)
+            sleep(2)
         except KeyboardInterrupt:
             pass
 
@@ -541,8 +588,7 @@ if __name__ == '__main__':
             bar._last = bar.styles[_il](bar.icons[_il])
 
         print(label)
-        #~ # for complete in (-2, 0, 51, 100, 150, 84, 100):
-        for complete in (-2, 0, 51, 100, 155):
+        for complete in (-2, 0, 51, 100, 123):
             if bar.expand:
                 print(bar(complete))
             else:
