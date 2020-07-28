@@ -395,6 +395,10 @@ if True:  # fold
         text = sc.bpoff
         assert repr(text) == bpoff
 
+    def test_reverse_screen():
+        assert sc.reverse_video == '\x1b[?5h'
+        assert sc.normal_video == '\x1b[?5l'
+
     def test_screen_cursor():
         for val in (2,3,5):
             for name in ('up', 'down', 'left', 'right'):
