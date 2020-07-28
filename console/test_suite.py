@@ -23,6 +23,7 @@ proximity.build_color_tables(base=color_tables.xterm_palette4)
 fg = style.ForegroundPalette(palettes=ALL_PALETTES)
 bg = style.BackgroundPalette(palettes=ALL_PALETTES)
 fx = style.EffectsPalette(palettes=ALL_PALETTES)
+ul = style.UnderlinePalette(palettes=ALL_PALETTES)
 defx = style.EffectsTerminator(palettes=ALL_PALETTES)
 sc = screen.Screen(force=True)
 
@@ -103,6 +104,32 @@ if True:  # fold
         assert str(fx.frame)        ==  CSI + '51m'
         assert str(fx.encircle)     ==  CSI + '52m'
         assert str(fx.overline)     ==  CSI + '53m'
+        assert str(fx.curly_underline) ==  CSI + '4:3m'
+
+    def test_debasic():
+        dx = defx
+        assert str(dx.end)          ==  CSI + '0m'
+        assert str(dx.bold)         ==  CSI + '22m'
+        assert str(dx.b)            ==  CSI + '22m'
+        assert str(dx.dim)          ==  CSI + '22m'
+        assert str(dx.italic)       ==  CSI + '23m'
+        assert str(dx.i)            ==  CSI + '23m'
+        assert str(dx.underline)    ==  CSI + '24m'
+        assert str(dx.u)            ==  CSI + '24m'
+        assert str(dx.reverse)      ==  CSI + '27m'
+        assert str(dx.conceal)      ==  CSI + '28m'
+        assert str(dx.hide)         ==  CSI + '28m'
+        assert str(dx.crossed)      ==  CSI + '29m'
+        assert str(dx.strike)       ==  CSI + '29m'
+        assert str(dx.frame)        ==  CSI + '54m'
+        assert str(dx.encircle)     ==  CSI + '54m'
+        assert str(dx.overline)     ==  CSI + '55m'
+
+    def test_ulbasic():
+        assert str(ul.red)          ==  CSI + '58;2;255;0;0m'
+        assert str(ul.i3)           ==  CSI + '58;5;3m'
+        assert str(ul.t_123)        ==  CSI + '58;2;17;34;51m'
+        assert str(ul.bisque)       ==  CSI + '58;2;255;228;196m'
 
     def test_basic_wrong_name():
         with pytest.raises(AttributeError):
@@ -258,7 +285,6 @@ if True:  # fold
         if webcolors:
             with pytest.raises(AttributeError):  # as err:
             #~ assert 'recognized' in err.value.args[0]
-
                 bg.w_xyzzyx
 
 
@@ -464,9 +490,15 @@ if True:  # fold
             # iterm2, sigh:
             text + ' (fish)', text + ' (bash)', text + ' (Python)'
         )
-
         # best effort test
         assert detection.get_title() in possible_results
+
+    def test_set_clipboard():
+        data = 'collywobbles'
+        result = utils.set_clipboard(data)
+        # best effort test, may not be allowed to succeed:
+        assert utils.get_clipboard() in (None, data)
+        assert result == b'\x1b]52;c;Y29sbHl3b2JibGVz\x1b\\'
 
     # wait_key
     # pause
