@@ -104,6 +104,8 @@ if True:  # fold
         assert str(fx.frame)        ==  CSI + '51m'
         assert str(fx.encircle)     ==  CSI + '52m'
         assert str(fx.overline)     ==  CSI + '53m'
+        assert str(fx.dunder)       ==  CSI + '21m'
+        assert str(fx.double_underline) ==  CSI + '21m'
         assert str(fx.curly_underline) ==  CSI + '4:3m'
 
     def test_debasic():
