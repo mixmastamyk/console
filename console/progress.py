@@ -21,11 +21,11 @@ from .disabled import empty as _empty
 from .screen import sc
 from .utils import len_stripped
 from .detection import (detect_unicode_support, get_available_palettes,
-                        get_size, is_fbterm, os_name)
+                        get_size, os_name)
 
 TIMEDELTAS = (60, 300)  # accuracy thresholds, in seconds, one and five minutes
 MIN_WIDTH = 12
-#~ _END = str(fx.end) if is_fbterm else ''
+#~ _END = str(fx.end) if is_fbterm else ''  # TODO: simplify this
 _END = str(fx.end)
 term_width = _term_width_orig = get_size()[0]
 
@@ -517,13 +517,14 @@ def install_resize_handler():
 
         Note: Unix only
     '''
-    import signal
+    if os_name != 'nt':
+        import signal
 
-    def _window_resize_handler(sig, frame):
-        global term_width
-        term_width = get_size()[0]
+        def _window_resize_handler(sig, frame):
+            global term_width
+            term_width = get_size()[0]
 
-    signal.signal(signal.SIGWINCH, _window_resize_handler)
+        signal.signal(signal.SIGWINCH, _window_resize_handler)
 
 
 if __name__ == '__main__':

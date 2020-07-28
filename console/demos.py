@@ -53,7 +53,7 @@ def run():
     if not _SHORT:
         demos.append(build_demos('FG:   ', fg))
         demos.append(build_demos('Bold: ', fg, extra_style=fx.bold))
-        demos.append(build_demos('BG:   ', bg))
+        demos.append(build_demos('BG:   ', bg, extra_style=fg.black))
         demos.append(build_demos('FX:   ', fx))
         demos.append('Stripped: %r' % strip_ansi(hello_world))
 
@@ -64,6 +64,7 @@ def run():
 
     if _SHORT:
         sys.exit()
+
     print()
     print(make_header(i+1), 'with bg:')
     try:

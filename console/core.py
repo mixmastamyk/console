@@ -438,6 +438,7 @@ class _PaletteEntry:
 
     def __exit__(self, type, value, traceback):
         sys.stdout = sys.stdout.stream
+        log.debug(repr(str(self.default)))
         self._stream.write(str(self.default))  # just in case
 
     def __call__(self, text, *styles, original_length=False):
