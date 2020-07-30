@@ -12,8 +12,9 @@
 '''
 import logging
 import re
-import sys
+import sys, os
 from time import sleep
+from urllib.parse import quote
 
 from .constants import BEL, OSC, ST
 from .screen import sc
@@ -63,12 +64,15 @@ def clear_line(mode=2):
                    | 1 | 'backward' | 'left'  - Clear cursor to beginning of line.
                    | 2 | 'full'               - Clear entire line.
 
+        Returns: text sequence to be written, for testing.
+
         Note:
             Cursor position does not change.
     '''
     text = sc.erase_line(_mode_map.get(mode, mode))
-    _write(text)
-    return text  # for testing
+    if _CHOSEN_PALETTE:
+        _write(text)
+    return text
 
 
 def clear_lines(lines, mode=2):
@@ -79,6 +83,8 @@ def clear_lines(lines, mode=2):
             mode:  | 0 | 'forward'  | 'right' - Clear cursor to end of line.
                    | 1 | 'backward' | 'left'  - Clear cursor to beginning of line.
                    | 2 | 'full'               - Clear entire line.
+
+        Returns: text sequence to be written, for testing.
     '''
     mode = _mode_map.get(mode, mode)
     erase_cmd = sc.erase_line(mode)
@@ -90,9 +96,9 @@ def clear_lines(lines, mode=2):
         commands.append(up_cmd)
 
     text = ''.join(commands)
-    _write(text)
-
-    return text  # for testing
+    if _CHOSEN_PALETTE:
+        _write(text)
+    return text
 
 
 def clear_screen(mode=2):
@@ -105,10 +111,13 @@ def clear_screen(mode=2):
                    | 2 | 'full'      - Clear entire visible screen, cursor to 1,1.
                    | 3 | 'history'   - Clear entire visible screen and scrollback
                                        buffer (xterm).
+
+        Returns: text sequence to be written, for testing.
     '''
     text = sc.erase(_mode_map.get(mode, mode))
-    _write(text)
-    return text  # for testing
+    if _CHOSEN_PALETTE:
+        _write(text)
+    return text
 
 
 def flash(seconds=.1):
@@ -116,11 +125,17 @@ def flash(seconds=.1):
         i.e. turn on reverse video and back again,
         given a delay in floating-point seconds.
         This can be useful as a visible bell.
+
+        Arguments:
+            float seconds:  how long to wait in reverse video
+
+        Returns: text sequence to be written, for testing.
     '''
-    _write(sc.reverse_video)
-    sleep(seconds)
-    _write(sc.normal_video)
-    return sc.reverse_video + sc.normal_video  # for testing
+    if _CHOSEN_PALETTE:
+        _write(sc.reverse_video)
+        sleep(seconds)
+        _write(sc.normal_video)
+        return sc.reverse_video + sc.normal_video  # for testing
 
 
 def get_clipboard(source='c', encoding='utf8',
@@ -134,13 +149,16 @@ def get_clipboard(source='c', encoding='utf8',
             encoding: decode to unicode or pass None for bytes.
             max_bytes: minor impediment to sending too much text.
 
+        Returns: data found
+
         Note:
             https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
             #h3-Operating-System-Commands
             Works on xterm, hterm.
     '''  # functionality in detection module:
-    return _read_clipboard(source=source, encoding=encoding,
-                           max_bytes=max_bytes, timeout=timeout)
+    if _CHOSEN_PALETTE:
+        return _read_clipboard(source=source, encoding=encoding,
+                               max_bytes=max_bytes, timeout=timeout)
 
 
 def make_hyperlink(target, caption=None, icon='', **params):
@@ -156,6 +174,8 @@ def make_hyperlink(target, caption=None, icon='', **params):
                         'id=xyz123:foo=bar:baz=quux'
                         (See note below.)
 
+        Returns: text sequence to be written, caption, or empty string.
+
         Example::
 
             from console import fg, fx
@@ -169,8 +189,7 @@ def make_hyperlink(target, caption=None, icon='', **params):
         Note: experimental, see below for details:
             https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
     '''
-    if _CHOSEN_PALETTE:  # TODO: alls functions here should probably do this
-        from urllib.parse import quote  # TODO: move to module globals
+    if _CHOSEN_PALETTE:
         MAX_URL = 2083  # spec recommendations
         MAX_VAL = 250
         SAFE_CHARS = (  # ''.join([ chr(n) for n in range(32, 126) ])
@@ -202,6 +221,32 @@ def make_hyperlink(target, caption=None, icon='', **params):
         return caption or ''
 
 
+def notify_cwd(path=None):
+    ''' Notify the terminal of the current working directory.
+
+        Arguments:
+            path:  str
+
+        Returns: text sequence to be written, for testing.
+
+        Notes:
+            https://gitlab.freedesktop.org/terminal-wg/specifications/-/issues/20
+            https://gitlab.com/gnachman/iterm2/-/issues/3939
+    '''
+    if not path:
+        path = os.getcwd()
+
+    # encode as url
+    scheme = 'file://'
+    if not path.startswith(scheme):
+        path = scheme + path
+    path = quote(path)
+    text = f'{OSC}7;{path}{ST}'
+    if _CHOSEN_PALETTE:
+        _write(text)
+    return text
+
+
 def reset_terminal():
     ''' Reset the terminal/console screen. (Also aliased to cls.)
 
@@ -213,7 +258,8 @@ def reset_terminal():
         cls()
     else:
         text = sc.reset
-        _write(text)
+        if _CHOSEN_PALETTE:
+            _write(text)
         return text  # for testing
 
 
@@ -228,32 +274,35 @@ def set_clipboard(data, destination='c', encoding='utf8',
             encoding: if string is passed, encode to bytes
             max_bytes: minor impediment to sending too much text.
 
+        Returns: text sequence to be written or None, for testing.
+
         Note:
             https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
             #h3-Operating-System-Commands
     '''
-    if len(data) > max_bytes:
-        raise RuntimeError(f'clipboard data too large! ({len(data)} bytes)')
+    if _CHOSEN_PALETTE:
+        if len(data) > max_bytes:
+            raise RuntimeError(f'clipboard data too large! ({len(data)} bytes)')
 
-    from base64 import b64encode
+        from base64 import b64encode
 
-    if isinstance(data, str):
-        data = data.encode(encoding)
-    if not isinstance(data, bytes):
-        raise TypeError('data was not string or bytes: %s' % type(data))
+        if isinstance(data, str):
+            data = data.encode(encoding)
+        if not isinstance(data, bytes):
+            raise TypeError('data was not string or bytes: %s' % type(data))
 
-    # all this needs to be in bytes
-    payload = b64encode(data)
-    envelope = f'{OSC}52;{destination};%b{ST}'.encode('ascii')
-    text = envelope % payload
+        # all this needs to be in bytes
+        payload = b64encode(data)
+        envelope = f'{OSC}52;{destination};%b{ST}'.encode('ascii')
+        text = envelope % payload
 
-    # https://stackoverflow.com/a/908440/450917
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout.buffer.write(text)
-        sys.stdout.flush()
-    else:
-        _write(text.decode('ascii'))
-    return text  # for testing
+        # https://stackoverflow.com/a/908440/450917
+        if hasattr(sys.stdout, 'buffer'):  # slightly more direct route
+            sys.stdout.buffer.write(text)
+            sys.stdout.flush()
+        else:
+            _write(text.decode('ascii'))  # bytes --> unicode --> bytes
+        return text
 
 
 def set_title(title, mode=0):
@@ -264,15 +313,17 @@ def set_title(title, mode=0):
             mode:  | 0 | 'both'   - Set icon/taskbar and window/tab title
                    | 1 | 'icon'   - Set only icon/taskbar title
                    | 2 | 'title'  - Set only window/tab title
+
+        Returns: text sequence to be written or None, for testing.
     '''
     if os_name == 'nt':
         from .windows import set_title
         return set_title(title)
     else:
         if _CHOSEN_PALETTE:
-            text = f'{OSC}{_title_mode_map.get(mode, mode)};{title}{BEL}'
+            text = f'{OSC}{_title_mode_map.get(mode, mode)};{title}{BEL}' # ST?
             _write(text)
-            return text  # for testing
+        return text
 
 
 def strip_ansi(text, c1=False, osc=False):
@@ -282,7 +333,9 @@ def strip_ansi(text, c1=False, osc=False):
         Arguments:
             line: str
             osc: bool  - include OSC commands in the strippage.
-            c1:  bool  - include C1 commands in the strippage.
+            c1:  bool  - include C1 based commands in the strippage.
+
+        Returns: stripped text
 
         Notes:
             Enabling both C1 and OSC stripping is less efficient and the two
@@ -301,7 +354,7 @@ def strip_ansi(text, c1=False, osc=False):
 
 
 def len_stripped(text):
-    ''' Return the length of a string minus its ANSI escape sequences.
+    ''' Convenience - returns the length of a string minus escape sequences.
 
         Useful to find if a string will fit inside a given length on screen.
     '''

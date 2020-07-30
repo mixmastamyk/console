@@ -11,7 +11,7 @@ from time import localtime as _localtime
 
 
 pkgname         = 'console'
-__version__     = version = '0.9901'
+__version__     = version = '0.9902a1'
 __author__      = authors = ', '.join([
                                 'Mike Miller',
                                 #~ 'and contributors',
@@ -28,9 +28,11 @@ keywords        = ('ansi color detection escape terminal console sequence '
 repo_account    = 'mixmastamyk'
 repo_name       = pkgname
 repo_provider   = 'github.com'
+doc_url         = 'https://mixmastamyk.bitbucket.io/console/'
 repo_url        = 'https://%s/%s/%s' % (repo_provider, repo_account, repo_name)
-project_urls    = {'Repository': repo_url, 'Issues': _join(repo_url, 'issues')}
-home_url        = 'https://mixmastamyk.bitbucket.io/console/'
+project_urls    = {'Repository': repo_url, 'Issues': _join(repo_url, 'issues'),
+                    'Documentation': doc_url}
+home_url = repo_url
 
 trove_classifiers = [
     'Development Status :: 4 - Beta',

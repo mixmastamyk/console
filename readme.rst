@@ -27,7 +27,7 @@ Console
     - *“Better… Stronger… Faster” —Oscar Goldman*
     - *"There is nothing we won't try…" —Laverne and Shirley*
     - *"Nothin' can stand in our way…" —Olivia Newton-John*
-    - *"Fightin' the system like a true modern day Robin Hood" —Waylon Jennings*
+    - *"Fightin' the system like a true modern-day Robin Hood" —Waylon Jennings*
 
 |
 
@@ -98,8 +98,8 @@ Above, ``fx.end`` is a convenient object to note---\
 it ends all styles and fore/background colors at once,
 where as ``fg.default`` or ``bg.default`` for example,
 resets only the fore or background to its default color.
-To avoid that responsibility,
-and automate higher specificity (in what styles are deactivated),
+To avoid that responsibility
+(while increasing specificity in what styles are deactivated),
 one may also use the call-form instead,
 where
 `it's automatic <https://youtu.be/y5ybok6ZGXk>`_:

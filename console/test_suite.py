@@ -487,6 +487,11 @@ if True:  # fold
         text = 'Hang \x1b[34;4;5mLoose\x1b[0m, Hawaii'
         assert utils.len_stripped(text) == 18
 
+    def test_set_cwd():
+        utils._CHOSEN_PALETTE = ALL_PALETTES  # force, need a better way
+        result = utils.notify_cwd('/foo/bar/baz')
+        assert result == '\x1b]7;file%3A///foo/bar/baz\x1b\\'
+
     # set_title - read title doesn't work to verify
     def test_set_title():
         text = 'foo'
@@ -737,7 +742,7 @@ if True:  # fold
 if True:  # fold
     from console.progress import ProgressBar#, HiDefProgressBar
 
-    #~ def test_progress_ascii():
+    #~ def test_progress_ascii():  # broken, fix
 
         #~ pb = ProgressBar(clear_left=False, theme='basic', width=36)
         #~ assert str(pb(-7))  == '<------------------------------] ERR'

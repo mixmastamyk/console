@@ -85,6 +85,13 @@ Vaguely analogous to today's virtual terminals,
 as a Yugo might compare to a classic BMW.
 But now, it's supercharged with VT power.
 
+But, don't bother with it, it's kind of a waste of time.
+Why?
+Now that `Windows Terminal <https://en.wikipedia.org/wiki/Windows_Terminal>`
+exists, I'd recommend that instead.
+Even though not currently complete,
+it is much better than "a souped up Yugo."
+
 So, now all the top/extant platforms support ANSI escape sequences.
 Again!
 What's old is new again.
@@ -122,6 +129,7 @@ beyond curses and termios
 Those are low-level interfaces however,
 focused on "full screen" terminal apps and tty control respectively,
 while continuing to abstract hardware that now only exists in museums.
+
 The ANSI standard may have won,
 but styling a text snippet here and there or setting a title without a bunch
 of ugly C-style function calls was thought too…
@@ -130,9 +138,33 @@ trivial perhaps.
 .. rubric:: Terminfo?
 
 Besides the difficulty factor mentioned,
-this classic answer to this problem also suffers in that it historically
-doesn't support "true" color (24 bit) palettes,
-and is not included by default on Windows.
+this classic answer to this problem also suffers in that it is:
+
+- Not installed on Windows
+
+- Not up to date on older OS variants
+
+- Not up to date with capability support, i.e. lags the real world:
+
+    - "True color," lagged for almost a decade (though now has some support)
+
+    - Extended xterm capabilities not fully supported
+
+    - Many terminals claim xterm support but aren't completely compatible
+
+    - Tons of obsolete capabilities are supported, crowding the docs
+
+    - New or experimental capabilities not supported, eg:
+
+        - Bracketed paste
+        - Clipboard
+        - Curly/colored underlines
+        - Hyper-links
+
+Turns out that terminfo is a big pain in the butt and not even a full solution
+for all the trouble.
+I've thought about implementing some support,
+but it's more of a curiosity at this point.
 
 
 Meanwhile, over at the Cheeseshop…
