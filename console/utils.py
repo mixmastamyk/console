@@ -320,8 +320,8 @@ def set_title(title, mode=0):
         from .windows import set_title
         return set_title(title)
     else:
+        text = f'{OSC}{_title_mode_map.get(mode, mode)};{title}{BEL}' # ST?
         if _CHOSEN_PALETTE:
-            text = f'{OSC}{_title_mode_map.get(mode, mode)};{title}{BEL}' # ST?
             _write(text)
         return text
 
