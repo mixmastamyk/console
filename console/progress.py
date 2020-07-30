@@ -25,8 +25,6 @@ from .detection import (detect_unicode_support, get_available_palettes,
 
 TIMEDELTAS = (60, 300)  # accuracy thresholds, in seconds, one and five minutes
 MIN_WIDTH = 12
-#~ _END = str(fx.end) if is_fbterm else ''  # TODO: simplify this
-_END = str(fx.end)
 term_width = _term_width_orig = get_size()[0]
 
 # Theme-ing info:
@@ -379,12 +377,7 @@ class ProgressBar:
             raise TypeError('type %s not valid.' % type(value))
 
     def _update_status(self, ratio):
-        ''' Check bounds for errors and update label accordingly.
-
-            fbterm support: can't use call() if combined with other styles
-                            since they get rendered as strings due to differing
-                            escape sequences.  See _END for locations.
-        '''
+        ''' Check bounds for errors and update label accordingly. '''
         # figure label
         label = label_unstyled = ''
         label_mode = self.label_mode
@@ -415,24 +408,23 @@ class ProgressBar:
                 if label_mode:
                     label = label_unstyled = self.label_fmt_str % self.icons[_id]
                 if self.oob_error:  # now fixed, reset
-                    self._first = self.styles[_if] + self.icons[_if] + _END
+                    self._first = self.styles[_if](self.icons[_if])
                     self.oob_error = False
 
             # error - out of bounds :-/
             elif ratio > 1:
                 self.done = True
                 self.oob_error = True
-                # fbterm - can't use call() if combined:
-                self._last = self._err_style + self.icons[_ieh] + _END
+                self._last = self._err_style(self.icons[_ieh])
                 if label_mode and not label_mode == 'internal':
                     label_unstyled = self.label_fmt_str % self.icons[_ieb]
-                    label = self._err_style + label_unstyled + _END
+                    label = self._err_style(label_unstyled)
             else:  # < 0
                 self.oob_error = True
                 self._first = self._err_style(self.icons[_iel])
                 if label_mode and not label_mode == 'internal':
                     label_unstyled = self.label_fmt_str % self.icons[_ieb]
-                    label = self._err_style + label_unstyled + _END
+                    label = self._err_style(label_unstyled)
 
         self._lbl = label
         # dynamic resizing of the bar, depending on label length:
@@ -444,10 +436,10 @@ class ProgressBar:
     def _render(self):
         ''' Standard rendering of bar graph. '''
         cm_chars = (
-            self._comp_style + (self.icons[_ic] * self._num_complete_chars) + _END
+            self._comp_style(self.icons[_ic] * self._num_complete_chars)
         )
         em_chars = (
-            self._empt_style + (self.icons[_ie] * self._num_empty_chars) + _END
+            self._empt_style(self.icons[_ie] * self._num_empty_chars)
         )
         return f'{self._first}{cm_chars}{em_chars}{self._last}{self._lbl}'
 
@@ -455,8 +447,8 @@ class ProgressBar:
         ''' Render with a label inside the bar graph. '''
         ncc = self._num_complete_chars
         bar = self._lbl.center(self._bwidth)
-        cm_chars = self._comp_style + bar[:ncc] + _END
-        em_chars = self._empt_style + bar[ncc:] + _END
+        cm_chars = self._comp_style(bar[:ncc])
+        em_chars = self._empt_style(bar[ncc:])
         return f'{self._first}{cm_chars}{em_chars}{self._last}'
 
 

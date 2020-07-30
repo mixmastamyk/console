@@ -740,11 +740,11 @@ if True:  # fold
 if True:  # fold
     from console.progress import ProgressBar#, HiDefProgressBar
 
-    #~ def test_progress_ascii():  # broken, fix
+    def test_progress_ascii():
 
-        #~ pb = ProgressBar(clear_left=False, theme='basic', width=36)
-        #~ assert str(pb(-7))  == '<------------------------------] ERR'
-        #~ assert str(pb(0))   == '[------------------------------]  0%'
-        #~ assert str(pb(55))  == '[################--------------] 55%'
-        #~ assert str(pb(100)) == '[##############################]   +'
-        #~ assert str(pb(103)) == '[##############################> ERR'
+        pb = ProgressBar(clear_left=False, theme='basic', width=36)
+        assert str(pb(-7))  == '<-----------------------------] ERR'
+        assert str(pb(0))   == '[-----------------------------]  0%'
+        assert str(pb(55))  == '[################-------------] 55%'
+        assert str(pb(100)) == '[#############################]   +'
+        assert str(pb(103)) == '[#############################> ERR'
