@@ -180,11 +180,11 @@ def detect_palette_support(basic_palette=None):
         name = 'basic'
 
     # upgrades
-    if ('256color' in TERM) or is_fbterm:
+    if TERM.endswith('-256color') or is_fbterm:
         name = 'extended'
 
     # https://bugzilla.redhat.com/show_bug.cgi?id=1173688 - obsolete?
-    if env.COLORTERM in ('truecolor', '24bit') or TERM == 'xterm-direct':
+    if env.COLORTERM in ('truecolor', '24bit') or TERM.endswith('-direct'):
         name = 'truecolor'
 
     # find the platform-dependent 16-color basic palette
