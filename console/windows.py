@@ -161,6 +161,7 @@ def detect_palette_support(basic_palette=None):
     log.debug(
         f'Term support: {name!r} (nt, TERM={env.TERM}, '
         f'COLORTERM={env.COLORTERM or ""}, ANSICON={env.ANSICON}, '
+        f'colorama={colorama_init}, '
         f'webcolors={bool(webcolors)}, basic_palette={pal_name})'
     )
     return (name, basic_palette)
