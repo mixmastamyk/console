@@ -128,7 +128,7 @@ def detect_palette_support(basic_palette=None):
                 name:       None or str: 'basic', 'extended', 'truecolor'
                 palette:    len 16 tuple of colors (len 3 tuple)
     '''
-    name = webcolors = None
+    colorama_init = name = webcolors = None
     TERM = env.TERM or ''  # shortcut
     pal_name = 'Unknown'
 
