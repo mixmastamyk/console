@@ -16,7 +16,7 @@ import sys, os
 from time import sleep
 from urllib.parse import quote
 
-from .constants import BEL, OSC, ST
+from .constants import OSC, ST
 from .screen import sc
 from .detection import is_a_tty, os_name, _read_clipboard
 from .meta import defaults
@@ -320,7 +320,7 @@ def set_title(title, mode=0):
         from .windows import set_title
         return set_title(title)
     else:
-        text = f'{OSC}{_title_mode_map.get(mode, mode)};{title}{BEL}' # ST?
+        text = f'{OSC}{_title_mode_map.get(mode, mode)};{title}{ST}'
         if _CHOSEN_PALETTE:
             _write(text)
         return text
