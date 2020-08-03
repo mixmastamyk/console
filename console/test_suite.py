@@ -27,7 +27,7 @@ ul = style.UnderlinePalette(palettes=ALL_PALETTES)
 defx = style.EffectsTerminator(palettes=ALL_PALETTES)
 sc = screen.Screen(force=True)
 
-fg, bg, fx, pytest  # pyflakes
+fg, bg, fx, defx, ul, pytest  # pyflakes
 
 # beginning of tests
 set_debug_mode(True)
@@ -495,7 +495,9 @@ if True:  # fold
     # set_title - read title doesn't work to verify
     def test_set_title():
         text = 'foo'
-        utils.set_title(text)
+        result = utils.set_title(text)
+        assert result == '\x1b]0;foo\x1b\\'
+
         # xterm, make, mate term, iterm2
         possible_results = (text, None, 'Terminal', '',
             # iterm2, sigh:
@@ -740,6 +742,11 @@ if True:  # fold
 # Progress
 # ----------------------------------------------------------------------------
 if True:  # fold
+    import console  # need these to force progress bar output
+    console.fg = fg
+    console.fx = fx
+    console.bg = bg
+    console.sc = sc
     from console.progress import ProgressBar#, HiDefProgressBar
 
     def test_progress_ascii():
@@ -750,3 +757,13 @@ if True:  # fold
         assert str(pb(55))  == '[################-------------] 55%'
         assert str(pb(100)) == '[#############################]   +'
         assert str(pb(103)) == '[#############################> ERR'
+
+    def test_progress_solid():
+
+        pb = ProgressBar(theme='solid')
+        assert str(pb(-2)) == '\r\x1b[0G\x1b[91m⏴\x1b[39m\x1b[2;48;5;236m                             \x1b[0m\x1b[2;38;5;236m▏\x1b[0m'
+        assert str(pb(0)) == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[2;48;5;236m               0%            \x1b[0m\x1b[2;38;5;236m▏\x1b[0m'
+        assert str(pb(16))  == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[1;48;5;70m     \x1b[0m\x1b[2;48;5;236m         16%            \x1b[0m\x1b[2;38;5;236m▏\x1b[0m'
+        assert str(pb(100)) == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48;5;22m                ✓            \x1b[49m\x1b[2;38;5;70m▏\x1b[0m'
+        assert str(pb(112)) == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48;5;22m                             \x1b[49m\x1b[91m⏵\x1b[39m'
+

@@ -16,9 +16,8 @@
 '''
 import time
 
-from . import fg, bg, fx, _CHOSEN_PALETTE
+from . import fg, bg, fx, sc, _CHOSEN_PALETTE
 from .disabled import empty as _empty
-from .screen import sc
 from .utils import len_stripped
 from .detection import (detect_unicode_support, get_available_palettes,
                         get_size, os_name)
@@ -265,8 +264,7 @@ class ProgressBar:
         self._first = _styles[_if](_icons[_if])
         self._last = _styles[_il](_icons[_il])
 
-        # dynamic label fmt, set to None to disable
-        self._start = time.time()
+        self.reset()  # start time
 
         # tqdm-style iterable interface
         if iterable and not self.total:
@@ -375,6 +373,11 @@ class ProgressBar:
             self._clear_left = value
         else:
             raise TypeError('type %s not valid.' % type(value))
+
+    def reset(self):
+        ''' Reset the bar, start time only for now. '''
+        # dynamic label fmt, set to None to disable
+        self._start = time.time()
 
     def _update_status(self, ratio):
         ''' Check bounds for errors and update label accordingly. '''

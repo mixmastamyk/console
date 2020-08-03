@@ -5,6 +5,8 @@
 
     This module contains cross-platform utility and convenience functions for
     use under ANSI-compatible terminals.
+    It is focused on Operating System Command (OSC) functionality and includes
+    a few screen-based convenience functions.
 
     See also:
 
