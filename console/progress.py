@@ -19,8 +19,7 @@ import time
 from . import fg, bg, fx, sc, _CHOSEN_PALETTE
 from .disabled import empty as _empty
 from .utils import len_stripped
-from .detection import (detect_unicode_support, get_available_palettes,
-                        get_size, os_name)
+from .detection import detect_unicode_support, get_size, os_name
 
 TIMEDELTAS = (60, 300)  # accuracy thresholds, in seconds, one and five minutes
 MIN_WIDTH = 12
@@ -111,9 +110,17 @@ styles = dict(
                     _err_color,         # error
                   ),
     greyen_bg   = (
+                    _dim_green,         # first
+                    bg.lightgreen,      # complete
+                    bg.lightblack,      # empty
+                    fg.lightblack,      # last
+                    bg.green,           # done
+                    _err_color,         # error
+                  ),
+    greyen_bg8   = (
                     fx.dim + fg.i70,    # first
                     fx.bold + bg.i70,   # complete
-                    fx.dim + bg.i236,   # empty
+                    bg.i236,            # empty
                     fx.dim + fg.i236,   # last
                     bg.i22,             # done
                     _err_color,         # error
@@ -126,14 +133,6 @@ unicode_support = detect_unicode_support()
 if unicode_support:
     icons['default']  = icons['blocks']
 
-_pals = get_available_palettes(_CHOSEN_PALETTE)
-if _pals and 'extended' in _pals:
-    styles['default'] = styles['ocean8']
-elif _pals:
-    styles['default'] = styles['ocean']
-else:
-    styles['default'] = styles['dumb']
-
 themes = dict(
     basic_color = dict(icons='ascii', styles='default'),
     basic = dict(icons='ascii', styles='dumb'),
@@ -143,6 +142,19 @@ themes = dict(
     solid = dict(icons='spaces', styles='greyen_bg'),
     warm_shaded = dict(icons='shaded', styles='amber'),
 )
+
+_pals = _CHOSEN_PALETTE
+if _CHOSEN_PALETTE in ('extended', 'truecolor'):
+    styles['default'] = styles['ocean8']
+    themes['basic_color']['styles'] = 'ocean8'  # update with hi color
+    themes['solid']['styles'] = 'greyen_bg8'   # update with hi color
+elif _pals:
+    styles['default'] = styles['ocean']
+    themes['basic_color']['styles'] = 'ocean'
+    themes['solid']['styles'] = 'greyen_bg'
+else:
+    styles['default'] = styles['dumb']
+
 themes['default'] = themes['basic_color']
 
 
