@@ -111,7 +111,7 @@ styles = dict(
                   ),
     greyen_bg   = (
                     _dim_green,         # first
-                    bg.lightgreen,      # complete
+                    bg.lightgreen + fg.black,  # complete
                     bg.lightblack,      # empty
                     fg.lightblack,      # last
                     bg.green,           # done
@@ -119,7 +119,7 @@ styles = dict(
                   ),
     greyen_bg8   = (
                     fx.dim + fg.i70,    # first
-                    fx.bold + bg.i70,   # complete
+                    bg.i70 + fg.black,   # complete
                     bg.i236,            # empty
                     fx.dim + fg.i236,   # last
                     bg.i22,             # done

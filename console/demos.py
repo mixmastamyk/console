@@ -148,7 +148,7 @@ def run():
 
     pb = ProgressBar(clear_left=False, theme='solid', width=32)
     print('    ', pb(0), end='')
-    print('      ', pb(50), end='')
+    print('      ', pb(55), end='')
     print('      ', pb(100))
     print()
 
