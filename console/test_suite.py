@@ -764,7 +764,7 @@ if True:  # fold
         pb = ProgressBar(theme='solid')
         assert str(pb(-2))  == '\r\x1b[0G\x1b[91m⏴\x1b[39m\x1b[48;5;236m                             \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
         assert str(pb(0))   == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48;5;236m               0%            \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
-        assert str(pb(16))  == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[1;48;5;70m     \x1b[0m\x1b[48;5;236m         16%            \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
+        assert str(pb(16))  == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48;5;70;30m     \x1b[0m\x1b[48;5;236m         16%            \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
         assert str(pb(100)) == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48;5;22m                ✓            \x1b[49m\x1b[2;38;5;70m▏\x1b[0m'
         assert str(pb(112)) == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48;5;22m                             \x1b[49m\x1b[91m⏵\x1b[39m'
 
