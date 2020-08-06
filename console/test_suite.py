@@ -747,7 +747,7 @@ if True:  # fold
     console.fx = fx
     console.bg = bg
     console.sc = sc
-    from console.progress import ProgressBar#, HiDefProgressBar
+    from console.progress import ProgressBar, HiDefProgressBar
 
     def test_progress_ascii():
 
@@ -761,9 +761,17 @@ if True:  # fold
     def test_progress_solid():
 
         pb = ProgressBar(theme='solid')
-        assert str(pb(-2)) == '\r\x1b[0G\x1b[91m⏴\x1b[39m\x1b[2;48;5;236m                             \x1b[0m\x1b[2;38;5;236m▏\x1b[0m'
-        assert str(pb(0)) == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[2;48;5;236m               0%            \x1b[0m\x1b[2;38;5;236m▏\x1b[0m'
+        assert str(pb(-2))  == '\r\x1b[0G\x1b[91m⏴\x1b[39m\x1b[2;48;5;236m                             \x1b[0m\x1b[2;38;5;236m▏\x1b[0m'
+        assert str(pb(0))   == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[2;48;5;236m               0%            \x1b[0m\x1b[2;38;5;236m▏\x1b[0m'
         assert str(pb(16))  == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[1;48;5;70m     \x1b[0m\x1b[2;48;5;236m         16%            \x1b[0m\x1b[2;38;5;236m▏\x1b[0m'
         assert str(pb(100)) == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48;5;22m                ✓            \x1b[49m\x1b[2;38;5;70m▏\x1b[0m'
         assert str(pb(112)) == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48;5;22m                             \x1b[49m\x1b[91m⏵\x1b[39m'
 
+    def test_progress_hidef1():
+
+        pb = HiDefProgressBar(clear_left=False, styles='greyen')
+        assert str(pb(-2))  == '\x1b[91m⏴\x1b[39m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m\x1b[91m  ✗ \x1b[39m'
+        assert str(pb(0))   == '\x1b[2;32m▕\x1b[0m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m  0%'
+        assert str(pb(18.1))  == '\x1b[2;32m▕\x1b[0m\x1b[32m▉▉▉▉\x1b[39m\x1b[32;48;5;236m▌\x1b[0m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m 18%'
+        assert str(pb(100)) == '\x1b[2;32m▕\x1b[0m\x1b[2;32m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[0m\x1b[2;32m▏\x1b[0m   ✓'
+        assert str(pb(111.9)) == '\x1b[2;32m▕\x1b[0m\x1b[2;32m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[0m\x1b[91m⏵\x1b[39m\x1b[91m  ✗ \x1b[39m'

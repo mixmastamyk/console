@@ -11,7 +11,7 @@ from time import localtime as _localtime
 
 
 pkgname         = 'console'
-__version__     = version = '0.9902'
+__version__     = version = '0.9903a0'
 __author__      = authors = ', '.join([
                                 'Mike Miller',
                                 #~ 'and contributors',
@@ -45,6 +45,7 @@ trove_classifiers = [
     'Programming Language :: Python :: 3.5',
     'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
     'Topic :: Software Development :: Libraries',
     'Topic :: Terminals',
 ]
