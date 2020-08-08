@@ -193,11 +193,11 @@ class ProgressBar:
 
         Arguments:
             clear_left: True        True to clear and mv to 0, or int offset
-            debug: None             Turn on debug output
+            debug: None             Enable debug output
             done: False             True on completion, moderates style
             expand: False           Set width to full terminal width
             iterable: object        An object to iterate on.
-            label_mode:  True       Turn on progress status label
+            label_mode:  True       Enable progress percentage label
             oob_error:  False       Out of bounds error occurred
             total:  100             Set the total number of items
             unicode_support: bool   Detection result, determines default icons
