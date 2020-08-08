@@ -161,8 +161,9 @@ themes['default'] = themes['basic_color']
 class ProgressBar:
     ''' A stylable bar graph for displaying the current progress of task
         completion.
+        ProgressBar is 0-based, i.e. think 0-99 rather than 1-100
 
-        The exection flow goes like this:
+        The execution flow goes like this:
 
             - init()
             - called() by code to set parameters
@@ -173,7 +174,7 @@ class ProgressBar:
 
         Example::
 
-            import time  # demo purposes only
+            from time import sleep  # demo purposes only
             from console.screen import sc
             from console.progress import ProgressBar
 
@@ -182,12 +183,20 @@ class ProgressBar:
                 items = range(256)      # example tasks
                 bar = ProgressBar(total=len(items))  # set total
 
+                # simple loop
                 for i in items:
-                    print('Caption:', bar(i), end='', flush=True)
-                    time.sleep(.1)
+                    print(bar(i), end='', flush=True)
+                    sleep(.02)
                 print()
 
-                # or use as a tqdm-style iterable wrapper:
+                # with caption
+                for i in items:
+                    print(bar(i), f' copying: /path/to/img_{i:>04}.jpg',
+                          end='', flush=True)
+                    sleep(.1)
+                print()
+
+                # or use as a simple tqdm-style iterable wrapper:
                 for i in ProgressBar(range(100)):
                     sleep(.1)
 
@@ -286,8 +295,10 @@ class ProgressBar:
                 self.total = None
             self.iterable = iterable
             self(self._iter_n)  # call() set initial
-        else:
-            self.total = 100
+        elif self.total:
+            self.total = self.total - 1
+        elif self.total is None:
+            self.total = 99
 
     def _set_bar_width(self, width=None):
         ''' Determine the width of the bar only, without labels. '''
@@ -344,6 +355,7 @@ class ProgressBar:
     def __call__(self, complete):
         ''' Sets the value of the bar graph. '''
         # convert ints to float from 0…1 per-one-tage
+        #~ complete = complete + 1  # zero-based
         self.ratio = ratio = complete / self.total
         if self.expand:
             if term_width != _term_width_orig:  # unix change
@@ -436,6 +448,7 @@ class ProgressBar:
                     label = self._err_style(label_unstyled)
             else:  # < 0
                 self.oob_error = True
+                self.done = False
                 self._first = self._err_style(self.icons[_iel])
                 if label_mode and not label_mode == 'internal':
                     label_unstyled = self.label_fmt_str % self.icons[_ieb]
@@ -450,10 +463,10 @@ class ProgressBar:
 
     def _render(self):
         ''' Standard rendering of bar graph. '''
-        cm_chars = (
+        cm_chars = (    # completed
             self._comp_style(self.icons[_ic] * self._num_complete_chars)
         )
-        em_chars = (
+        em_chars = (    # empty
             self._empt_style(self.icons[_ie] * self._num_empty_chars)
         )
         return f'{self._first}{cm_chars}{em_chars}{self._last}{self._lbl}'
@@ -573,13 +586,13 @@ if __name__ == '__main__':
 
     with sc.hidden_cursor():
         try:
-            for i in range(0, 101):
+            for i in range(100):
                 print()
                 for label, bar in bars:
                     print(f' {label:12}', bar(i), sep='')  #, end='', flush=True)
 
                 sleep(.1)
-                if i != 100:
+                if i < 99:
                     cls()
             sleep(2)
         except KeyboardInterrupt:
@@ -596,7 +609,7 @@ if __name__ == '__main__':
             bar._last = bar.styles[_il](bar.icons[_il])
 
         print(label)
-        for complete in (-2, 0, 51, 100, 123):
+        for complete in (-2, 0, 51, 99, 123):
             if bar.expand:
                 print(bar(complete))
             else:

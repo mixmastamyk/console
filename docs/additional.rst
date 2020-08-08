@@ -301,7 +301,7 @@ Hello world looks like this:
 or combined into a full theme.
 There is also a ``HiDefProgressBar`` class that can render itself with sub-cell
 Unicode block characters for "more resolution" in environments with constrained
-space.
+width.
 Some examples:
 
 .. code-block:: python
@@ -328,22 +328,29 @@ ProgressBar defaults to an ASCII representation in that environment.)
 
 A more robust use of the module is illustrated below::
 
-    from time import sleep
+    from time import sleep  # demo purposes only
     from console.screen import sc
     from console.progress import ProgressBar
 
     with sc.hidden_cursor():  # "Ooooohh, I'm tellin' Mama!"
 
-        # conventional usage:
-        items = range(256)    # example tasks
-        bar = ProgressBar(total=len(items))
+        items = range(256)      # example tasks
+        bar = ProgressBar(total=len(items))  # set total
 
+        # simple loop
         for i in items:
-            print('Caption:', bar(i), end='', flush=True)
-            sleep(.1)         # "Uh-Uhn"
+            print(bar(i), end='', flush=True)
+            sleep(.02)         # "Uh-Uhn"
         print()
 
-        # or use as a tqdm-style iterable wrapper:
+        # how to use with a trailing caption:
+        for i in items:
+            print(bar(i), f' copying: /path/to/img_{i:>04}.jpg',
+                  end='', flush=True)
+            sleep(.1)
+        print()
+
+        # or use as a simple tqdm-style iterable wrapper, sans print
         for i in ProgressBar(range(100)):
             sleep(.1)
 
