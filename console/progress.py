@@ -162,11 +162,11 @@ class ProgressBar:
     ''' A stylable bar graph for displaying the current progress of task
         completion.
 
-        The call flow goes like this:
+        The exection flow goes like this:
 
             - init()
             - called() by code to set parameters
-                - _update_status()  # check errors and set label
+                - _update_status()  # check errors and set progress label
 
             - str() when printed
                 - render()
@@ -197,7 +197,7 @@ class ProgressBar:
             done: False             True on completion, moderates style
             expand: False           Set width to full terminal width
             iterable: object        An object to iterate on.
-            label_mode:  True       Turn on label
+            label_mode:  True       Turn on progress status label
             oob_error:  False       Out of bounds error occurred
             total:  100             Set the total number of items
             unicode_support: bool   Detection result, determines default icons
