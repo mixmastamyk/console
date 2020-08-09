@@ -153,31 +153,26 @@ class Screen:
         self._stream.write(str(self.restore_title(0)))  # 0 = both icon, title
         self._stream.flush()
 
+
     @contextmanager
-    def location(self, x=None, y=None):
-        ''' Temporarily move the cursor, perform work, and return to the
-            previous location.
+    def bracketed_paste(self):
+        ''' Context Manager that brackets-the-paste:
 
-            ::
+            - https://cirw.in/blog/bracketed-paste
+            - https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Bracketed-Paste-Mode
 
-                with screen.location(40, 20):
-                    print('Hello, world!')
+            .. code-block:: python
+
+                with screen.bracketed_paste():
+                    print('Hit me with your best shot…')
         '''
         stream = self._stream
-        stream.write(self.save_pos)  # cursor position
-
-        if x is not None and y is not None:
-            stream.write(self.mv(y, x))
-        elif x is not None:
-            stream.write(self.mv_x(x))
-        elif y is not None:
-            stream.write(self.mv_y(y))
-
+        stream.write(self.bracketedpaste_enable)
         stream.flush()
         try:
             yield self
         finally:
-            stream.write(self.rest_pos)
+            stream.write(self.bracketedpaste_disable)
             stream.flush()
 
     @contextmanager
@@ -220,25 +215,32 @@ class Screen:
             stream.flush()
 
     @contextmanager
-    def bracketed_paste(self):
-        ''' Context Manager that brackets-the-paste:
+    def location(self, x=None, y=None):
+        ''' Temporarily move the cursor, perform work, and return to the
+            previous location.
 
-            - https://cirw.in/blog/bracketed-paste
-            - https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Bracketed-Paste-Mode
+            ::
 
-            .. code-block:: python
-
-                with screen.bracketed_paste():
-                    print('Hit me with your best shot…')
+                with screen.location(40, 20):
+                    print('Hello, world!')
         '''
         stream = self._stream
-        stream.write(self.bracketedpaste_enable)
+        stream.write(self.save_pos)  # cursor position
+
+        if x is not None and y is not None:
+            stream.write(self.mv(y, x))
+        elif x is not None:
+            stream.write(self.mv_x(x))
+        elif y is not None:
+            stream.write(self.mv_y(y))
+
         stream.flush()
         try:
             yield self
         finally:
-            stream.write(self.bracketedpaste_disable)
+            stream.write(self.rest_pos)
             stream.flush()
+
 
 # It's Automatic:  https://youtu.be/y5ybok6ZGXk
 sc = Screen()

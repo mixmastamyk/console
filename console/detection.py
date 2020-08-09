@@ -6,9 +6,6 @@
     This module contains capability detection routines for use under ANSI
     compatible terminals.  Most functions return None when not able to detect
     requested information.
-
-    TODO: not entirely sure what to do over ssh, currently downgrades
-          capabilities somewhat.
 '''
 import sys, os
 import logging
