@@ -176,6 +176,30 @@ class Screen:
             stream.flush()
 
     @contextmanager
+    def echo_off(self):
+        ''' Context Manager that temporarily turns off print echo
+            functionality, aka cbreak.
+
+            .. code-block:: python
+
+                with screen.echo_off():
+                    read_password()
+        '''
+        import termios, tty  # defer
+
+        stream = self._stream
+        fd = stream.fileno()
+        orig_attrs = termios.tcgetattr(fd)      # save
+
+        termios.tcflush(fd, termios.TCIFLUSH)   # clear input
+        tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
+        try:
+            yield self                          # wait
+
+        finally: # restore
+            termios.tcsetattr(fd, termios.TCSADRAIN, orig_attrs)
+
+    @contextmanager
     def fullscreen(self):
         ''' Context Manager that enters full-screen mode and restores normal
             mode on exit.
