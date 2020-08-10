@@ -26,7 +26,7 @@
     Note: these could probably be loaded from curses/terminfo,
           but haven't yet found a need.
 
-    TODO:  These objects don't compose as well as the core objects.
+    TODO:  These objects don't compose like the core objects.
 '''
 import sys
 from contextlib import contextmanager
@@ -142,13 +142,14 @@ class Screen:
                     setattr(self, name, attr)
 
     def __enter__(self):
-        ''' Go full-screen. '''
+        ''' Go full-screen and save title. '''
         self._stream.write(self.alt_screen_enable)
         self._stream.write(str(self.save_title(0)))     # 0 = both icon, title
         self._stream.flush()
         return self
 
     def __exit__(self, type_, value, traceback):
+        ''' Return to normal screen, restore title. '''
         self._stream.write(self.alt_screen_disable)
         self._stream.write(str(self.restore_title(0)))  # 0 = both icon, title
         self._stream.flush()
@@ -174,30 +175,6 @@ class Screen:
         finally:
             stream.write(self.bracketedpaste_disable)
             stream.flush()
-
-    @contextmanager
-    def echo_off(self):
-        ''' Context Manager that temporarily turns off print echo
-            functionality, aka cbreak.
-
-            .. code-block:: python
-
-                with screen.echo_off():
-                    read_password()
-        '''
-        import termios, tty  # defer
-
-        stream = self._stream
-        fd = stream.fileno()
-        orig_attrs = termios.tcgetattr(fd)      # save
-
-        termios.tcflush(fd, termios.TCIFLUSH)   # clear input
-        tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
-        try:
-            yield self                          # wait
-
-        finally: # restore
-            termios.tcsetattr(fd, termios.TCSADRAIN, orig_attrs)
 
     @contextmanager
     def fullscreen(self):
@@ -264,6 +241,55 @@ class Screen:
         finally:
             stream.write(self.rest_pos)
             stream.flush()
+
+    @contextmanager
+    def rare_mode(self):
+        ''' Context Manager that temporarily turns off echo and line-editing
+            functionality; still recognizes Ctrl-C break, Ctrl-Z suspend, etc.
+            Also known as "cbreak" mode.
+
+            POSIX only. See getpass for a simple function.
+
+            .. code-block:: python
+
+                with screen.rare_mode():
+                    read_keys()
+        '''
+        import termios, tty  # defer
+
+        fd = self._stream.fileno()
+        orig_attrs = termios.tcgetattr(fd)      # save
+        termios.tcflush(fd, termios.TCIFLUSH)   # clear input
+        tty.setcbreak(fd, termios.TCSANOW)      # aka rare mode
+        try:
+            yield self                          # wait
+
+        finally:  # restore
+            termios.tcsetattr(fd, termios.TCSADRAIN, orig_attrs)
+
+    @contextmanager
+    def raw_mode(self):
+        ''' Context Manager that temporarily that temporarily sets terminal
+            to raw mode.
+
+            POSIX only.
+            See utils.wait_key() if looking for a simple read-key function.
+
+            .. code-block:: python
+
+                with screen.raw_mode():
+                    read_raw_keypresses()
+        '''
+        import termios, tty  # defer
+
+        fd = self._stream.fileno()
+        orig_attrs = termios.tcgetattr(fd)      # save
+        termios.tcflush(fd, termios.TCIFLUSH)   # clear input
+        tty.setraw(fd, termios.TCSANOW)
+        try:
+            yield self                          # wait
+        finally:  # restore
+            termios.tcsetattr(fd, termios.TCSADRAIN, orig_attrs)
 
 
 # It's Automatic:  https://youtu.be/y5ybok6ZGXk

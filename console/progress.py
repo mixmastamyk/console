@@ -161,8 +161,8 @@ themes['default'] = themes['basic_color']
 class ProgressBar:
     ''' A stylable bar graph for displaying the current progress of task
         completion.
-        ProgressBar is 0-based, i.e. think 0-99 rather than 1-100
 
+        ProgressBar is 0-based, i.e. think 0-99 rather than 1-100
         The execution flow goes like this:
 
             - init()
