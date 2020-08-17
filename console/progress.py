@@ -16,10 +16,11 @@
 '''
 import time
 
-from . import fg, bg, fx, sc, TermLevel, _TERM_LEVEL
+from . import fg, bg, fx, sc, _TERM_LEVEL
+from .constants import TermLevel
+from .detection import detect_unicode_support, get_size, os_name
 from .disabled import empty as _empty
 from .utils import len_stripped
-from .detection import detect_unicode_support, get_size, os_name
 
 TIMEDELTAS = (60, 300)  # accuracy thresholds, in seconds, one and five minutes
 MIN_WIDTH = 12

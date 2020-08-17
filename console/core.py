@@ -11,9 +11,9 @@ import sys
 import logging
 import re
 
-from . import TermLevel, _TERM_LEVEL
+from . import _TERM_LEVEL
 from .constants import (CSI, ANSI_BG_LO_BASE, ANSI_BG_HI_BASE, ANSI_FG_LO_BASE,
-                        ANSI_FG_HI_BASE, ANSI_RESET)
+                        ANSI_FG_HI_BASE, ANSI_RESET, TermLevel)
 from .disabled import empty_bin, empty
 from .detection import is_fbterm
 from .meta import defaults

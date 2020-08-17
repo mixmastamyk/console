@@ -12,8 +12,9 @@ import logging
 
 import env
 
-from . import TermLevel, color_tables, proximity
-from .constants import BS, BEL, CSI, ESC, ENQ, OSC, RS, ST, _color_code_map
+from . import color_tables, proximity
+from .constants import (BS, BEL, CSI, ESC, ENQ, OSC, RS, ST, TermLevel,
+                        _color_code_map)
 from .meta import __version__, defaults
 
 

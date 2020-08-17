@@ -26,9 +26,9 @@ except (ValueError, NameError, ImportError):
 
 import env
 
-from . import TermLevel, color_tables
+from . import color_tables
 from .meta import defaults
-from .constants import _color_code_map
+from .constants import TermLevel, _color_code_map
 
 
 # winbase.h constants

@@ -280,8 +280,8 @@ if __name__ == '__main__':
     fx = style.EffectsPalette()
     defx = style.EffectsTerminator()
 
-    from . import TermLevel, _TERM_LEVEL
-    from .constants import BEL
+    from . import _TERM_LEVEL
+    from .constants import BEL, TermLevel
     from .detection import is_a_tty, get_color, get_theme
     from .screen import sc
     from .utils import set_title, strip_ansi, cls, make_hyperlink

@@ -4,6 +4,8 @@
 
     Constants needed cross-package.
 '''
+from enum import IntEnum as _IntEnum
+
                     #  DEC   OCT    HEX   CTL     DESC
 ENQ = '\x05'        #:   5   005           ^E     Enquiry
 BEL = '\a'          #:   7   007   0x07    ^G     Terminal bell - Ding!
@@ -43,6 +45,16 @@ ANSI_RESET = CSI + '0m'
 _color_code_map = dict(foreground='10', fg='10', background='11', bg='11')
 
 
+# Level of functionality provided by the terminal
+class TermLevel(_IntEnum):
+    DUMB            = 0     # Stream/not a tty, disabled, or ASCII teleprinter
+    ANSI_MONOCHROME = 1     # Text effects but no color, e.g. vt220
+    ANSI_BASIC      = 2     # + 3,4 Bit, 8/16 indexed colors
+    ANSI_EXTENDED   = 3     # + 8 bit, 256 indexed colors
+    ANSI_DIRECT     = 4     # + 24 bit, 16m direct colors, aka "true"
+    FULL_MONTY      = 9     # + Bleeding edge
+
+
 if __name__ == '__main__':
 
     # print constants for convenience
@@ -50,4 +62,8 @@ if __name__ == '__main__':
     _locals = locals()      # avoids issues
     for key in dir():
         if not key.startswith('_'):
-            print('%16s = %r' % (key, _locals[key]))
+            if key == 'TermLevel':
+                print('%16s = %r %r' % (key, _locals[key],
+                    tuple(m.name for m in TermLevel)))
+            else:
+                print('%16s = %r' % (key, _locals[key]))

@@ -13,10 +13,10 @@ try:
 except Exception:
     webcolors = None
 
-from . import TermLevel
 from . import detection, screen, style, utils, set_debug_mode
 
 from . import proximity, color_tables
+from .constants import TermLevel
 proximity.build_color_tables(base=color_tables.xterm_palette4)
 
 # configure our own - force all palettes on
