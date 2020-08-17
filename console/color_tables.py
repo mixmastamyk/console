@@ -55,7 +55,7 @@ cmd1709_palette4 = (
     (242, 242, 242),    # 15    bright white
 )
 
-linuxcon_palette4 = (   # ubuntu config from: /etc/vtrgb
+linuxcon_palette4 = (   # config from: /etc/vtrgb
     (1, 1, 1),          # 0     black
     (222, 56, 43),      # 1     red
     (57, 181, 74),      # 2     green
@@ -218,6 +218,17 @@ xterm_palette4 = (
     #~ (),   # 14    bright cyan
     #~ (),   # 15    bright white
 #~ )
+
+
+# Mapping from (TERM, TERM_PROGRAM) environment variables to basic palettes,
+# for use over SSH.  Windows doesn't use these.
+term_palette_map = {
+    ('xterm', None):                xterm_palette4,
+    ('xterm-256color', None):       xterm_palette4,
+    ('linux', None):                linuxcon_palette4,
+    ('xterm', 'Apple_Terminal'):    termapp_palette4,
+    ('xterm', 'iTerm.app'):         iterm_palette4,
+}
 
 
 # Extended/256 color table for finding rgb values for indexes,

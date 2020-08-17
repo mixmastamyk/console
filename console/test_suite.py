@@ -13,18 +13,18 @@ try:
 except Exception:
     webcolors = None
 
+from . import TermLevel
 from . import detection, screen, style, utils, set_debug_mode
-from .constants import ALL_PALETTES
 
 from . import proximity, color_tables
 proximity.build_color_tables(base=color_tables.xterm_palette4)
 
 # configure our own - force all palettes on
-fg = style.ForegroundPalette(palettes=ALL_PALETTES)
-bg = style.BackgroundPalette(palettes=ALL_PALETTES)
-fx = style.EffectsPalette(palettes=ALL_PALETTES)
-ul = style.UnderlinePalette(palettes=ALL_PALETTES)
-defx = style.EffectsTerminator(palettes=ALL_PALETTES)
+fg = style.ForegroundPalette(level=TermLevel.FULL_MONTY)
+bg = style.BackgroundPalette(level=TermLevel.FULL_MONTY)
+fx = style.EffectsPalette(level=TermLevel.FULL_MONTY)
+ul = style.UnderlinePalette(level=TermLevel.FULL_MONTY)
+defx = style.EffectsTerminator(level=TermLevel.FULL_MONTY)
 sc = screen.Screen(force=True)
 
 fg, bg, fx, defx, ul, pytest  # pyflakes
@@ -416,7 +416,7 @@ if True:  # fold
            '\x1b]L-OSC-C0-\x1b\\ | \x1b]L-OSC-C0-7-\a | \x9bL-OSC-C1-\x9d END')
 
     def test_utils_mk_hyperlink():
-        utils._CHOSEN_PALETTE = ALL_PALETTES  # force for make
+        utils._TERM_LEVEL = TermLevel.FULL_MONTY  # force for make
         result = utils.make_hyperlink('ftp://netscape.com/…/navigator.tar.gz',
                                       'Blast from the past!', icon='')
         assert result == (
@@ -488,7 +488,7 @@ if True:  # fold
         assert utils.len_stripped(text) == 18
 
     def test_set_cwd():
-        utils._CHOSEN_PALETTE = ALL_PALETTES  # force for make
+        utils._TERM_LEVEL = TermLevel.FULL_MONTY  # force for make
         result = utils.notify_cwd('/foo/bar/baz')
         assert result == '\x1b]7;file%3A///foo/bar/baz\x1b\\'
 
@@ -562,33 +562,32 @@ if True:  # fold
         assert detection.color_is_forced() is True
 
     def test_palette_support():
-        pal = (1,)  # dummy palette, tests true
         terms = (
-            ('dumb', None),
-            ('linux', 'basic'),
-            ('xterm-color', 'basic'),
-            ('xterm-256color', 'extended'),
+            ('dumb', TermLevel.DUMB),
+            ('linux', TermLevel.ANSI_BASIC),
+            ('xterm-color', TermLevel.ANSI_BASIC),
+            ('xterm-256color', TermLevel.ANSI_EXTENDED),
         )
         for name, result in terms:
             detection.env = Environment(environ=dict(TERM=name))
-            assert detection.detect_palette_support(basic_palette=pal) == (result, pal)
+            assert detection.detect_terminal_level() == result
 
         detection.env = Environment(environ=dict(COLORTERM='24bit'))
-        assert detection.detect_palette_support(basic_palette=pal) == ('truecolor', pal)
+        assert detection.detect_terminal_level() == TermLevel.ANSI_DIRECT
 
         from . import windows  # try win implementation
         terms = (
-            ('dumb', None),
-            ('xterm-color', 'basic'),
-            ('xterm-256color', 'extended'),
-            ('cygwin', 'truecolor'),  # ?
+            ('dumb', TermLevel.DUMB),
+            ('xterm-color', TermLevel.ANSI_BASIC),
+            ('xterm-256color', TermLevel.ANSI_EXTENDED),
+            ('cygwin', TermLevel.ANSI_DIRECT),  # ?
         )
         for name, result in terms:
             windows.env = Environment(environ=dict(TERM=name))
-            assert windows.detect_palette_support(basic_palette=pal) == (result, pal)
+            assert windows.detect_terminal_level() == result
 
         windows.env = Environment(environ=dict(ANSICON='1'))
-        assert windows.detect_palette_support(basic_palette=pal) == ('extended', pal)
+        assert windows.detect_terminal_level() == TermLevel.ANSI_EXTENDED
 
     def test_is_a_tty():
         f = StringIO()
@@ -612,9 +611,9 @@ if True:  # fold
 # downgrade support:
 
     def test_downgrade():
-        bgall = style.BackgroundPalette(palettes=ALL_PALETTES)
-        bge = style.BackgroundPalette(palettes=('basic', 'extended'))
-        bgb = style.BackgroundPalette(palettes='basic')
+        bgall = style.BackgroundPalette(level=TermLevel.FULL_MONTY)
+        bge = style.BackgroundPalette(level=TermLevel.ANSI_EXTENDED)
+        bgb = style.BackgroundPalette(level=TermLevel.ANSI_BASIC)
         E = CSI
 
         results = (
@@ -747,7 +746,7 @@ if True:  # fold
     console.fx = fx
     console.bg = bg
     console.sc = sc
-    console._CHOSEN_PALETTE = 'extended'  # patch for hicolor theme
+    console._TERM_LEVEL = TermLevel.ANSI_EXTENDED  # patch for hicolor theme
     from console.progress import ProgressBar, HiDefProgressBar
 
     def test_progress_ascii():
@@ -755,8 +754,8 @@ if True:  # fold
         pb = ProgressBar(clear_left=False, theme='basic', width=36)
         assert str(pb(-7))  == '<-----------------------------] ERR'
         assert str(pb(0))   == '[-----------------------------]  0%'
-        assert str(pb(55))  == '[################-------------] 55%'
-        assert str(pb(100)) == '[#############################]   +'
+        assert str(pb(55))  == '[################-------------] 56%'
+        assert str(pb(99))  == '[#############################]   +'
         assert str(pb(103)) == '[#############################> ERR'
 
     def test_progress_solid():
@@ -765,14 +764,15 @@ if True:  # fold
         assert str(pb(-2))  == '\r\x1b[0G\x1b[91m⏴\x1b[39m\x1b[48;5;236m                             \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
         assert str(pb(0))   == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48;5;236m               0%            \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
         assert str(pb(16))  == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48;5;70;30m     \x1b[0m\x1b[48;5;236m         16%            \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
-        assert str(pb(100)) == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48;5;22m                ✓            \x1b[49m\x1b[2;38;5;70m▏\x1b[0m'
+        assert str(pb(99))  == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48;5;22m                ✓            \x1b[49m\x1b[2;38;5;70m▏\x1b[0m'
         assert str(pb(112)) == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48;5;22m                             \x1b[49m\x1b[91m⏵\x1b[39m'
 
     def test_progress_hidef1():
 
         pb = HiDefProgressBar(clear_left=False, styles='greyen')
+
         assert str(pb(-2))  == '\x1b[91m⏴\x1b[39m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m\x1b[91m  ✗ \x1b[39m'
         assert str(pb(0))   == '\x1b[2;32m▕\x1b[0m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m  0%'
-        assert str(pb(18.1))  == '\x1b[2;32m▕\x1b[0m\x1b[32m▉▉▉▉\x1b[39m\x1b[32;48;5;236m▌\x1b[0m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m 18%'
-        assert str(pb(100)) == '\x1b[2;32m▕\x1b[0m\x1b[2;32m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[0m\x1b[2;32m▏\x1b[0m   ✓'
+        assert str(pb(18.1))  == '\x1b[2;32m▕\x1b[0m\x1b[32m▉▉▉▉\x1b[39m\x1b[32;48;5;236m▋\x1b[0m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m 18%'
+        assert str(pb(99))  == '\x1b[2;32m▕\x1b[0m\x1b[2;32m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[0m\x1b[2;32m▏\x1b[0m   ✓'
         assert str(pb(111.9)) == '\x1b[2;32m▕\x1b[0m\x1b[2;32m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[0m\x1b[91m⏵\x1b[39m\x1b[91m  ✗ \x1b[39m'

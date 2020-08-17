@@ -143,19 +143,19 @@ def run():
     pb = ProgressBar(clear_left=False, label=True, width=36)
     print('    ', pb(0), end='')
     print('  ', pb(45), end='')
-    print('  ', pb(100))
+    print('  ', pb(99))
     print()
 
     pb = ProgressBar(clear_left=False, theme='solid', width=32)
     print('    ', pb(0), end='')
     print('      ', pb(55), end='')
-    print('      ', pb(100))
+    print('      ', pb(99))
     print()
 
     pb = HiDefProgressBar(clear_left=False, styles='greyen', width=36)
     print('    ', pb(0), end='')
     print('  ', pb(55), end='')
-    print('  ', pb(100))
+    print('  ', pb(99))
     print()
 
     print(make_header(i+5), 'Test color downgrade support '
@@ -166,10 +166,10 @@ def run():
         print('      Test not available without webcolors installed.')
         sys.exit()
 
-    if 'pal' in globals() and pal:
-        bgall = style.BackgroundPalette(palettes=ALL_PALETTES);
-        bge =   style.BackgroundPalette(palettes=('basic', 'extended'))
-        bgb =   style.BackgroundPalette(palettes='basic')
+    if _TERM_LEVEL:
+        bgall = style.BackgroundPalette(level=TermLevel.FULL_MONTY);
+        bge =   style.BackgroundPalette(level=TermLevel.ANSI_EXTENDED)
+        bgb =   style.BackgroundPalette(level=TermLevel.ANSI_BASIC)
         print()
 
         colors = (
@@ -206,9 +206,9 @@ def run():
             if i % 2 == 1:
                 print()
 
-        fgall = style.ForegroundPalette(palettes=ALL_PALETTES)
-        fge =   style.ForegroundPalette(palettes=('basic', 'extended'))
-        fgb =   style.ForegroundPalette(palettes='basic')
+        fgall = style.ForegroundPalette(level=TermLevel.FULL_MONTY);
+        fge =   style.ForegroundPalette(level=TermLevel.ANSI_EXTENDED)
+        fgb =   style.ForegroundPalette(level=TermLevel.ANSI_BASIC)
         print('      FG t_deadbf:      ',
             fgall.t_deadbf('▉▉▉▉▉'),
             fge.t_deadbf('▉▉▉▉▉'),
@@ -271,16 +271,17 @@ if __name__ == '__main__':
         logging.basicConfig(level=logging.DEBUG, format=fmt)
 
     # detection already happened - need to run this again to log it. :-/
-    from .detection import choose_palette, get_available_palettes
+    from .detection import init
     from . import style
 
-    pal = get_available_palettes(choose_palette())
-    fg = style.ForegroundPalette(palettes=pal)
-    bg = style.BackgroundPalette(palettes=pal)
-    fx = style.EffectsPalette(palettes=pal)
-    defx = style.EffectsTerminator(palettes=pal)
+    init()
+    fg = style.ForegroundPalette()
+    bg = style.BackgroundPalette()
+    fx = style.EffectsPalette()
+    defx = style.EffectsTerminator()
 
-    from .constants import BEL, ALL_PALETTES
+    from . import TermLevel, _TERM_LEVEL
+    from .constants import BEL
     from .detection import is_a_tty, get_color, get_theme
     from .screen import sc
     from .utils import set_title, strip_ansi, cls, make_hyperlink

@@ -16,7 +16,7 @@
 '''
 import time
 
-from . import fg, bg, fx, sc, _CHOSEN_PALETTE
+from . import fg, bg, fx, sc, TermLevel, _TERM_LEVEL
 from .disabled import empty as _empty
 from .utils import len_stripped
 from .detection import detect_unicode_support, get_size, os_name
@@ -143,8 +143,8 @@ themes = dict(
     warm_shaded = dict(icons='shaded', styles='amber'),
 )
 
-_pals = _CHOSEN_PALETTE
-if _CHOSEN_PALETTE in ('extended', 'truecolor'):
+_pals = _TERM_LEVEL
+if _TERM_LEVEL >= TermLevel.ANSI_EXTENDED:
     styles['default'] = styles['ocean8']
     themes['basic_color']['styles'] = 'ocean8'  # update with hi color
     themes['solid']['styles'] = 'greyen_bg8'   # update with hi color
@@ -163,13 +163,13 @@ class ProgressBar:
         completion.
 
         ProgressBar is 0-based, i.e. think 0-99 rather than 1-100
-        The execution flow goes like this:
+        The execution flows like this:
 
-            - init()
-            - called() by code to set parameters
+            - __init__()
+            - bar() # __call__() by code to set parameters
                 - _update_status()  # check errors and set progress label
 
-            - str() when printed
+            - __str__() # and when printed
                 - render()
 
         Example::

@@ -261,12 +261,12 @@ package as well:
 
 There are several blessings-inspired context managers as well:
 
-- sc.bracketed_paste()
-- sc.fullscreen()
-- sc.hidden_cursor()
-- sc.location(x, y)
-- sc.rare_mode()
-- sc.raw_mode()
+- ``sc.bracketed_paste()``
+- ``sc.fullscreen()``
+- ``sc.hidden_cursor()``
+- ``sc.location(x, y)``
+- ``sc.rare_mode()  # aka "cbreak mode"``
+- ``sc.raw_mode()``
 
 
 Progress Bars

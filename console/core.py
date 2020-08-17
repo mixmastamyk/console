@@ -11,11 +11,11 @@ import sys
 import logging
 import re
 
-from . import _CHOSEN_PALETTE
+from . import TermLevel, _TERM_LEVEL
 from .constants import (CSI, ANSI_BG_LO_BASE, ANSI_BG_HI_BASE, ANSI_FG_LO_BASE,
                         ANSI_FG_HI_BASE, ANSI_RESET)
 from .disabled import empty_bin, empty
-from .detection import get_available_palettes, is_fbterm
+from .detection import is_fbterm
 from .meta import defaults
 from .proximity import (color_table4, find_nearest_color_hexstr,
                         find_nearest_color_index)
@@ -42,7 +42,7 @@ _string_plus_call_warning_template = '''
 '''
 
 # Palette attribute name finders.  Now we've got two problems.
-# Not a huge fan of regex but here they nicely enforce the naming rules:
+# Not a huge fan of regex but they nicely enforce the naming rules here:
 _hd = r'[0-9A-Fa-f]'  # hex digits
 _index_finder = re.compile(r'^i_?\d{1,3}$', re.A)                   # i_DDD
 _nearest_finder = re.compile(f'^n_?{_hd}{{3}}$', re.A)              # n_HHH
@@ -60,35 +60,29 @@ class _BasicPaletteBuilder:
 
         Basic is useful for the basic 8/16 color and fx palettes.
     '''
-    def __new__(cls, palettes=Ellipsis):
+    def __new__(cls, level=Ellipsis):
         ''' Override new() to replace the class entirely on deactivation.
 
             Arguments:
-                palettes    - The palette(s) to support, e.g. from:
-                              ('basic', 'extended', 'truecolor').
-
-                              - Set explicitly with: str or sequence,
-                              - Disable with: None
-                              - Ellipsis - Autodetect environment.
+                level       - Term level to support.
+                              - Ellipsis - Detect from environment.
         '''
         self = super().__new__(cls)
-        if palettes is Ellipsis:                # autodetecten-Sie
-            if _CHOSEN_PALETTE:  # enable "up to" the chosen palette level:
-                palettes = get_available_palettes(_CHOSEN_PALETTE)
-            else:
-                self = empty_bin                # None, deactivate
-                palettes = ()                   # skipen-Sie bitte
-        elif type(palettes) in (list, tuple):   # carry on fine sir
-            pass
-        elif type(palettes) is str:             # make iterable
-            palettes = (palettes,)
-        elif palettes is None:                  # Ah, Shaddap-a ya face
+        if level is Ellipsis:                   # autodetecten-Sie
+            if _TERM_LEVEL:  # enable "up to" the chosen support level:
+                level = _TERM_LEVEL
+            else:  # None
+                self = empty_bin                # deactivate self
+                level = TermLevel.DUMB      # skipen-Sie bitte
+            self._level = level
+        elif isinstance(level, TermLevel):  # continue on fine sir
+            self._level = level
+        elif level is None:                     # Ah, Shaddap-a ya face
             self = empty_bin
-            palettes = ()                       # skipen-Sie
+            level = TermLevel.DUMB
         else:
-            raise TypeError(f'{palettes!r} was unrecognized.')
+            raise TypeError(f'level: {level!r} was unrecognized.')
 
-        self._palette_support = palettes
         return self
 
     def __init__(self, **kwargs):
@@ -98,7 +92,7 @@ class _BasicPaletteBuilder:
             if not name.startswith('_'):
                 value = getattr(self, name, None)  # fx man not have default
                 if type(value) in (int, str, tuple):  # skip methods, default²
-                    if 'basic' in self._palette_support:
+                    if self._level >= TermLevel.ANSI_BASIC:
                         display_name = name.upper()
                         attr = _PaletteEntry(self, display_name, value)
                     else:
@@ -106,7 +100,7 @@ class _BasicPaletteBuilder:
                     setattr(self, name, attr)
 
     def __repr__(self):
-        return f'{self.__class__.__name__}(palettes={self._palette_support})'
+        return f'{self.__class__.__name__}(level={self._level})'
 
 
 class _HighColorPaletteBuilder(_BasicPaletteBuilder):
@@ -166,8 +160,8 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         elif _nearest_finder.match(name):   # Nearest
             result = self._get_extended_palette_entry(name, key, is_hex=True)
 
-        elif _true_finder.match(name):      # Truecolor
-            result = self._get_true_palette_entry(name, key)
+        elif _true_finder.match(name):      # Direct color
+            result = self._get_direct_palette_entry(name, key)
 
         elif _x11_finder.match(name):       # X11, forced via prefix
             result = self._get_X11_palette_entry(key)
@@ -200,7 +194,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         ''' Compute extended entry, once on the fly. '''
         values = None
 
-        if 'extended' in self._palette_support:  # build entry
+        if self._level >= TermLevel.ANSI_EXTENDED:  # build entry
             if is_hex:
                 index = str(find_nearest_color_hexstr(index,
                                                       method=self._dg_method))
@@ -210,7 +204,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             values = [start_codes, index]
 
         # downgrade section
-        elif 'basic' in self._palette_support:
+        elif self._level is TermLevel.ANSI_BASIC:
             if is_hex:
                 nearest_idx = find_nearest_color_hexstr(index, color_table4,
                                                         method=self._dg_method)
@@ -223,7 +217,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
 
         return (self._create_entry(name, values) if values else empty)
 
-    def _get_true_palette_entry(self, name, digits):
+    def _get_direct_palette_entry(self, name, digits):
         ''' Compute truecolor entry, once on the fly.
 
             values become sequence of decimal int strings: ('1', '2', '3')
@@ -231,7 +225,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         values = None
         digits_type = type(digits)
 
-        if 'truecolor' in self._palette_support:  # build entry
+        if self._level >= TermLevel.ANSI_DIRECT:  # build entry
             values = [self._start_codes_true]
             if digits_type is str:  # convert from hex string
                 if len(digits) == 3:
@@ -242,7 +236,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                 values.extend(str(digit) for digit in digits)
 
         # downgrade section
-        elif 'extended' in self._palette_support:
+        elif self._level is TermLevel.ANSI_EXTENDED:  # build entry
             start_codes = self._start_codes_extended
             if is_fbterm:
                 start_codes = self._start_codes_extended_fbterm
@@ -257,7 +251,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                                                        method=self._dg_method)
             values = [start_codes, str(nearest_idx)]
 
-        elif 'basic' in self._palette_support:
+        elif self._level is TermLevel.ANSI_BASIC:
             if digits_type is str:
                 nearest_idx = find_nearest_color_hexstr(digits, color_table4,
                                                        method=self._dg_method)
@@ -272,21 +266,23 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         return (self._create_entry(name, values) if values else empty)
 
     def _get_X11_palette_entry(self, name):
+        ''' Look up colors from bundled X11 palette. '''
         from .color_tables_x11 import x11_color_map
         result = empty
         try:            # to decimal int strings, e.g.: ('1', '2', '3')
             color = x11_color_map[name.lower()]
         except KeyError:  # convert to AttributeError
             raise AttributeError(f'{name.lower()!r} not found in X11 palette.')
-        result = self._get_true_palette_entry(name, color)
+        result = self._get_direct_palette_entry(name, color)
         return result
 
     def _get_web_palette_entry(self, name):
+        ''' Look up colors from webcolors module. '''
         result = empty
         if webcolors:
             try:  # wc: returns tuple of "decimal" int: (1, 2, 3)
                 color = webcolors.name_to_rgb(name)
-                result = self._get_true_palette_entry(name, color)
+                result = self._get_direct_palette_entry(name, color)
             except ValueError:  # convert to AttributeError
                 raise AttributeError(
                     f'{name!r} not found in webcolors palette.')

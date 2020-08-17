@@ -39,7 +39,6 @@ ANSI_BG_LO_BASE = 40
 ANSI_BG_HI_BASE = 100
 
 ANSI_RESET = CSI + '0m'
-ALL_PALETTES = ('basic', 'extended', 'truecolor')  # variants 'x11', 'web'
 
 _color_code_map = dict(foreground='10', fg='10', background='11', bg='11')
 

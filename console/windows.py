@@ -20,12 +20,13 @@ try:
     # https://stackoverflow.com/a/17998333/450917
     kernel32.GetStdHandle.restype = HANDLE
 
-except (ValueError, NameError, ImportError):  # handle Sphinx import on Linux
+except (ValueError, NameError, ImportError):
+    # handle Sphinx import under Linux errors
     c_short = c_ushort = c_long = Structure = kernel32 = DWORD = windll = object
 
 import env
 
-from . import color_tables
+from . import TermLevel, color_tables
 from .meta import defaults
 from .constants import _color_code_map
 
@@ -107,6 +108,41 @@ def cls():
     call('cls', shell=True)
 
 
+def detect_terminal_level(basic_palette=None):
+    ''' Returns whether we think the terminal supports basic, extended, or
+        direct color; None if not able to tell.  Windows variant.
+
+        Returns:
+            level:       None or TermLevel member
+    '''
+    ansicon = is_colorama = None
+    level = TermLevel.DUMB
+    TERM = env.TERM or ''  # shortcut
+
+    if is_ansi_capable() and all(enable_vt_processing()):  # newfangled
+        level = TermLevel.ANSI_DIRECT
+    else:
+        is_colorama = is_colorama_installed()
+        ansicon = env.ANSICON
+
+        if is_colorama or TERM.startswith('xterm'):
+            level = TermLevel.ANSI_BASIC
+
+        # upgrades
+        if ansicon or TERM.endswith('-256color'):
+            level = TermLevel.ANSI_EXTENDED
+
+        if env.COLORTERM in ('truecolor', '24bit') or TERM == 'cygwin':
+            level = TermLevel.ANSI_DIRECT
+
+    log.debug(
+        f'Term support: {level!r} (nt, TERM={TERM}, '
+        f'COLORTERM={env.COLORTERM or ""}, ANSICON={ansicon}, '
+        f'colorama={is_colorama}, '
+    )
+    return level
+
+
 def detect_unicode_support(codepage='cp65001'):  # aka utf8
     ''' Return whether unicode/utf8 is supported by the console/terminal. '''
     result = None
@@ -115,81 +151,23 @@ def detect_unicode_support(codepage='cp65001'):  # aka utf8
     return result
 
 
-def detect_palette_support(basic_palette=None):
-    ''' Returns whether we think the terminal supports basic, extended, or
-        truecolor; None if not able to tell.
-
-        Arguments:
-            basic_palette   A custom 16 color palette.
-                            If not given, an an attempt to detect the platform
-                            standard is made.
-        Returns:
-            Tuple of:
-                name:       None or str: 'basic', 'extended', 'truecolor'
-                palette:    len 16 tuple of colors (len 3 tuple)
-    '''
-    colorama_init = name = webcolors = None
-    TERM = env.TERM or ''  # shortcut
-    pal_name = 'Unknown'
-
-    if is_ansi_capable() and all(enable_vt_processing()):
-        name = 'truecolor'
-    else:
-        colorama_init = is_colorama_initialized()
-        ansicon = env.ANSICON
-
-        if colorama_init or TERM.startswith('xterm'):
-            name = 'basic'
-
-        # upgrades
-        if ansicon or ('256color' in TERM):
-            name = 'extended'
-
-        if env.COLORTERM in ('truecolor', '24bit') or TERM == 'cygwin':
-            name = 'truecolor'
-
-    # find the platform-dependent 16-color basic palette
-    if name and not basic_palette:
-        name, pal_name, basic_palette = _find_basic_palette(name)
-
-    if name == 'truecolor':
-        try:
-            import webcolors
-        except ImportError:
-            pass
-
-    log.debug(
-        f'Term support: {name!r} (nt, TERM={env.TERM}, '
-        f'COLORTERM={env.COLORTERM or ""}, ANSICON={env.ANSICON}, '
-        f'colorama={colorama_init}, '
-        f'webcolors={bool(webcolors)}, basic_palette={pal_name})'
-    )
-    return (name, basic_palette)
-
-
-def _find_basic_palette(name):
+def _find_basic_palette(level):
     ''' Find the platform-dependent 16-color basic palette—Windows version.
 
         This is used for "downgrading to the nearest color" support.
 
         Arguments:
-            name        This is passed on the possibility it may need to be
-                        overridden, due to WSL oddities.
+            level       This is passed through on the possibility it may need
+                        to be overridden, due to WSL oddities. (Compat. only)
     '''
-    pal_name = 'default (xterm)'
-    basic_palette = color_tables.xterm_palette4
-
-    if env.SSH_CLIENT:  # fall back to xterm over ssh, info often wrong
-        pal_name = 'ssh (xterm)'
+    if sys.getwindowsversion()[2] >= 16299: # new palette after Win10 1709 FCU
+        pal_name = 'cmd_1709'
+        basic_palette = color_tables.cmd1709_palette4
     else:
-        if sys.getwindowsversion()[2] > 16299: # Win10 FCU, new palette
-            pal_name = 'cmd_1709'
-            basic_palette = color_tables.cmd1709_palette4
-        else:
-            pal_name = 'cmd_legacy'
-            basic_palette = color_tables.cmd_palette4
+        pal_name = 'cmd_legacy'
+        basic_palette = color_tables.cmd_palette4
 
-    return name, pal_name, basic_palette
+    return level, pal_name, basic_palette
 
 
 def enable_vt_processing():
@@ -229,7 +207,7 @@ def is_ansi_capable():
         support "ANSI VT"" processing.
     '''
     try:
-        CURRENT_VERS = sys.getwindowsversion()[:3]  # not avail off windows
+        CURRENT_VERS = sys.getwindowsversion()[:3]
 
         if CURRENT_VERS[2] > BUILD_ANSI_AVAIL:
             result = True
@@ -241,8 +219,8 @@ def is_ansi_capable():
         pass
 
 
-def is_colorama_initialized(stream=sys.stdout):
-    '''  Detect if the colorama stream wrapper has been installed. '''
+def is_colorama_installed(stream=sys.stdout):
+    '''  Detect if the colorama stream wrapper has been initialized. '''
     result = None
     try:
         import colorama
