@@ -40,7 +40,7 @@ class _TemplateString(str):  # Callable[[str], str]
     ''' A template string that renders itself with default arguments when
         created, and may also be called with other arguments.
     '''
-    def __new__(cls, endcode, arg='%d'):
+    def __new__(cls, endcode, arg='%s'):
         self = str.__new__(cls, CSI + arg + endcode)
         self.endcode = endcode
         return self
@@ -70,8 +70,8 @@ class Screen:
 
     mv_x        = cha = hpa = 'G'
     mv_y        = cva = vpa = 'd'
-    mv          = cup = ('H', '%d;%d')      # double trouble - move to pos
-    mv2         = hvp = ('f', '%d;%d')      # ""
+    mv          = cup = ('H', '%s;%s')      # double trouble - move to pos
+    mv2         = hvp = ('f', '%s;%s')      # ""
 
     erase       = ed = 'J'
     erase_line  = el = 'K'
@@ -79,8 +79,8 @@ class Screen:
     scroll_up   = su = 'S'
     scroll_down = sd = 'T'
 
-    save_title  = ('t', '22;%d')
-    restore_title = ('t', '23;%d')
+    save_title  = ('t', '22;%s')
+    restore_title = ('t', '23;%s')
 
     # The following don't need parameter wrapping.  All start with ESC
     auxoff      = CSI + '4i'

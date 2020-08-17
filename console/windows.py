@@ -28,7 +28,7 @@ import env
 
 from . import color_tables
 from .meta import defaults
-from .constants import TermLevel, _color_code_map
+from .constants import TermLevel, _COLOR_CODE_MAP
 
 
 # winbase.h constants
@@ -290,8 +290,8 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
             see ``windows.get_color``.
     '''
     colors = ()
-    if not 'index' in _color_code_map:  # ?
-        _color_code_map['index'] = '4;' + str(number or '')
+    if not 'index' in _COLOR_CODE_MAP:  # ?
+        _COLOR_CODE_MAP['index'] = '4;' + str(number or '')
 
     # also applies to Windows Terminal
     color_id = get_color_id(name)

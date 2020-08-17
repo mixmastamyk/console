@@ -14,7 +14,7 @@ import env
 
 from . import color_tables, proximity
 from .constants import (BS, BEL, CSI, ESC, ENQ, OSC, RS, ST, TermLevel,
-                        _color_code_map)
+                        _COLOR_CODE_MAP)
 from .meta import __version__, defaults
 
 
@@ -418,7 +418,7 @@ def _get_color_xterm(name, number=None, timeout=None):
         Warning: likely to block on incompatible terminals, use timeout.
     '''
     colors = ()
-    color_code = _color_code_map.get(name)
+    color_code = _COLOR_CODE_MAP.get(name)
     if color_code:
         query_sequence = f'{OSC}{color_code};?{BEL}'
         try:
@@ -552,8 +552,8 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
             see ``windows.get_color``.
     '''
     colors = ()
-    if not 'index' in _color_code_map:
-        _color_code_map['index'] = '4;' + str(number or '')
+    if not 'index' in _COLOR_CODE_MAP:
+        _COLOR_CODE_MAP['index'] = '4;' + str(number or '')
 
     if sys.platform == 'darwin':
         if env.TERM_PROGRAM == 'iTerm.app':

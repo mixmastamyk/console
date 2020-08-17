@@ -18,7 +18,7 @@ import sys, os
 from time import sleep
 from urllib.parse import quote
 
-from .constants import OSC, ST
+from .constants import OSC, ST, _MODE_MAP, _TITLE_MODE_MAP
 from .screen import sc
 from .detection import is_a_tty, os_name, _read_clipboard
 from .meta import defaults
@@ -34,19 +34,6 @@ ansi_csi1_finder = re.compile(r'\x9b[0-?]*[ -/]*[@-~]')
 ansi_osc0_finder = re.compile(r'\x1b\].*?(\a|\x1b\\)')
 ansi_osc1_finder = re.compile(r'\x9b.*?(\a|\x9d)')
 
-_mode_map = dict(
-    forward=0,
-    backward=1,
-    right=0,
-    left=1,
-    full=2,
-    history=3,
-)
-_title_mode_map = dict(
-    both=0,
-    icon=1,
-    title=2,
-)
 
 if _DEBUG:
     def _write(message):
@@ -71,7 +58,7 @@ def clear_line(mode=2):
         Note:
             Cursor position does not change.
     '''
-    text = sc.erase_line(_mode_map.get(mode, mode))
+    text = sc.erase_line(_MODE_MAP.get(mode, mode))
     if _TERM_LEVEL:
         _write(text)
     return text
@@ -88,7 +75,7 @@ def clear_lines(lines, mode=2):
 
         Returns: text sequence to be written, for testing.
     '''
-    mode = _mode_map.get(mode, mode)
+    mode = _MODE_MAP.get(mode, mode)
     erase_cmd = sc.erase_line(mode)
     up_cmd = sc.up(1)
     commands = []
@@ -116,7 +103,7 @@ def clear_screen(mode=2):
 
         Returns: text sequence to be written, for testing.
     '''
-    text = sc.erase(_mode_map.get(mode, mode))
+    text = sc.erase(_MODE_MAP.get(mode, mode))
     if _TERM_LEVEL:
         _write(text)
     return text
@@ -322,7 +309,7 @@ def set_title(title, mode=0):
         from .windows import set_title
         return set_title(title)
     else:
-        text = f'{OSC}{_title_mode_map.get(mode, mode)};{title}{ST}'
+        text = f'{OSC}{_TITLE_MODE_MAP.get(mode, mode)};{title}{ST}'
         if _TERM_LEVEL:
             _write(text)
         return text

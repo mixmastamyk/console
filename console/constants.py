@@ -42,7 +42,11 @@ ANSI_BG_HI_BASE = 100
 
 ANSI_RESET = CSI + '0m'
 
-_color_code_map = dict(foreground='10', fg='10', background='11', bg='11')
+# Various maps for xterm utils.  Supports integers, str a bit faster
+_COLOR_CODE_MAP = dict(foreground='10', fg='10', background='11', bg='11')
+_MODE_MAP = dict(forward='0', backward='1', right='0', left='1', full='2',
+                 history='3')
+_TITLE_MODE_MAP = dict(both='0', icon='1', title='2')
 
 
 # Level of functionality provided by the terminal
