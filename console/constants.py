@@ -71,7 +71,7 @@ if __name__ == '__main__':
         if not key.startswith('_'):
             obj = _locals[key]
             if isinstance(obj, type) and issubclass(obj, _IntEnum):
-                print('%16s = %r %r' % (key, obj,
-                    tuple(m.name for m in TermLevel)))
+                print('%16s = %r%r' % (key, obj,
+                    tuple((m.value, m.name) for m in TermLevel)))
             else:
                 print('%16s = %r' % (key, obj))
