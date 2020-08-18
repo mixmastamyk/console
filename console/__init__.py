@@ -2,9 +2,9 @@
     | console - Comprehensive utility library for ANSI terminals.
     | © 2018, Mike Miller - Released under the LGPL, version 3+.
 '''
-import sys
+import sys as _sys
 
-import env
+import env as _env
 
 from .constants import TermLevel as _TermLevel
 from .disabled import empty_bin as _empty_bin
@@ -26,7 +26,7 @@ def set_debug_mode(value):
 
 
 # Py3.6+ - set up a dummy future-fstrings encoding that is really utf8
-if sys.version_info >= (3, 6):
+if _sys.version_info >= (3, 6):
     import codecs as _codecs
     import encodings as _encodings
 
@@ -38,7 +38,7 @@ if sys.version_info >= (3, 6):
 # defer imports for proper ordering
 from .detection import TermStack
 
-if env.PY_CONSOLE_AUTODETECT != '0':
+if _env.PY_CONSOLE_AUTODETECT != '0':
 
     # detect palette, other modules are dependent
     from .detection import init as _init  # noqa
@@ -54,3 +54,9 @@ if env.PY_CONSOLE_AUTODETECT != '0':
             from .style import fg, bg, ul  # Yo Iz, let's do this…
 
     fg, bg, ul, fx, defx, sc, TermStack  # quiet pyflakes
+
+
+# Experimental terminfo support, under construction
+if _env.PY_CONSOLE_USE_TERMINFO.truthy:
+
+    from . import terminfo

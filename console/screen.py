@@ -154,7 +154,6 @@ class Screen:
         self._stream.write(str(self.restore_title(0)))  # 0 = both icon, title
         self._stream.flush()
 
-
     @contextmanager
     def bracketed_paste(self):
         ''' Context Manager that brackets-the-paste:

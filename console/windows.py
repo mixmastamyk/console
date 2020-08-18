@@ -290,7 +290,7 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
             see ``windows.get_color``.
     '''
     colors = ()
-    if not 'index' in _COLOR_CODE_MAP:  # TODO: untangle this constant violation
+    if not 'index' in _COLOR_CODE_MAP:  # TODO: untangle constant violation
         _COLOR_CODE_MAP['index'] = '4;' + str(number or '')
 
     # also applies to Windows Terminal

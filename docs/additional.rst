@@ -234,7 +234,9 @@ MacOS:
 
 Console itself:
 
-    - PY_CONSOLE_AUTODETECT, Enable or disable the detection routines
+    - ``PY_CONSOLE_AUTODETECT``, Disables detection routines.
+    - ``PY_CONSOLE_USE_TERMINFO``, Enables terminfo lookup for many
+      capabilities.
 
 
 Screen Stuff

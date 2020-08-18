@@ -103,7 +103,7 @@ def init(stream=sys.stdout, basic_palette=None):
     # find terminal capability level - given preferences and environment
     if color_is_forced() or (not color_is_disabled() and is_a_tty(stream=stream)):
         # detecten Sie, bitte
-        if env.PY_CONSOLE_USE_TERMINFO or env.SSH_CLIENT:
+        if env.PY_CONSOLE_USE_TERMINFO.truthy or env.SSH_CLIENT:
             level = detect_terminal_level_terminfo()
 
         if not level:  # didn't occur or fall back if above failed
@@ -552,7 +552,7 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
             see ``windows.get_color``.
     '''
     colors = ()
-    if not 'index' in _COLOR_CODE_MAP:  # TODO: untangle this constant violation
+    if not 'index' in _COLOR_CODE_MAP:  # TODO: untangle constant violation
         _COLOR_CODE_MAP['index'] = '4;' + str(number or '')
 
     if sys.platform == 'darwin':

@@ -163,8 +163,10 @@ this classic answer to this problem also suffers in that it is:
 
 Turns out that terminfo is a big pain in the butt and not even a full solution
 for all the trouble.
-I've thought about implementing some support,
-but it's more of a curiosity at this point.
+The console package has implemented some support,
+but it's a bit of a curiosity at this point.
+Use ``import console.terminfo`` first thing or
+set ``PY_CONSOLE_USE_TERMINFO=1`` to try it out.
 
 
 Meanwhile, over at the Cheeseshop…

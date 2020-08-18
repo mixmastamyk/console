@@ -6,7 +6,9 @@
 '''
 from enum import IntEnum as _IntEnum
 
-                    #  DEC   OCT    HEX   CTL     DESC
+import env as _env
+
+# ASCII Constants      DEC   OCT    HEX   CTL     DESC
 ENQ = '\x05'        #:   5   005           ^E     Enquiry
 BEL = '\a'          #:   7   007   0x07    ^G     Terminal bell - Ding!
 BS  = '\b'          #:   8   010   0x08    ^H     Backspace
@@ -23,6 +25,7 @@ RS  = '\x1e'        #:  30   036                  Record Separator
 
 DEL = '\177'        #: 127   177   0x7F           Delete character
 
+# ANSI Constants
 CSI = ESC + '['     #: Control Sequence Introducer
 OSC = ESC + ']'     #: Operating System Command
 RIS = ESC + 'c'     #: Reset to Initial State, aka clear screen (see utils)
@@ -42,7 +45,7 @@ ANSI_BG_HI_BASE = 100
 
 ANSI_RESET = CSI + '0m'
 
-# Various maps for xterm utils.  Supports integers, str a bit faster
+# Various maps for xterm utils.  Supports integers, though str a bit faster
 _COLOR_CODE_MAP = dict(foreground='10', fg='10', background='11', bg='11')
 _MODE_MAP = dict(forward='0', backward='1', right='0', left='1', full='2',
                  history='3')
@@ -66,8 +69,9 @@ if __name__ == '__main__':
     _locals = locals()      # avoids issues
     for key in dir():
         if not key.startswith('_'):
-            if key == 'TermLevel':
-                print('%16s = %r %r' % (key, _locals[key],
+            obj = _locals[key]
+            if isinstance(obj, type) and issubclass(obj, _IntEnum):
+                print('%16s = %r %r' % (key, obj,
                     tuple(m.name for m in TermLevel)))
             else:
-                print('%16s = %r' % (key, _locals[key]))
+                print('%16s = %r' % (key, obj))
