@@ -144,12 +144,11 @@ themes = dict(
     warm_shaded = dict(icons='shaded', styles='amber'),
 )
 
-_pals = _term_level
-if _term_level >= TermLevel.ANSI_EXTENDED:
+if _term_level and _term_level >= TermLevel.ANSI_EXTENDED:
     styles['default'] = styles['ocean8']
     themes['basic_color']['styles'] = 'ocean8'  # update with hi color
     themes['solid']['styles'] = 'greyen_bg8'   # update with hi color
-elif _pals:
+elif _term_level:
     styles['default'] = styles['ocean']
     themes['basic_color']['styles'] = 'ocean'
     themes['solid']['styles'] = 'greyen_bg'
