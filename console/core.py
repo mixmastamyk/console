@@ -11,7 +11,7 @@ import sys
 import logging
 import re
 
-from . import _TERM_LEVEL
+from . import _term_level
 from .constants import (CSI, ANSI_BG_LO_BASE, ANSI_BG_HI_BASE, ANSI_FG_LO_BASE,
                         ANSI_FG_HI_BASE, ANSI_RESET, TermLevel)
 from .disabled import empty_bin, empty
@@ -69,8 +69,8 @@ class _BasicPaletteBuilder:
         '''
         self = super().__new__(cls)
         if level is Ellipsis:                   # autodetecten-Sie
-            if _TERM_LEVEL:  # enable "up to" the chosen support level:
-                level = _TERM_LEVEL
+            if _term_level:  # enable "up to" the chosen support level:
+                level = _term_level
             else:  # None
                 self = empty_bin                # deactivate self
                 level = TermLevel.DUMB      # skipen-Sie bitte

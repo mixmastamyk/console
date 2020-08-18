@@ -166,7 +166,7 @@ def run():
         print('      Test not available without webcolors installed.')
         sys.exit()
 
-    if _TERM_LEVEL:
+    if _term_level:
         bgall = style.BackgroundPalette(level=TermLevel.FULL_MONTY);
         bge =   style.BackgroundPalette(level=TermLevel.ANSI_EXTENDED)
         bgb =   style.BackgroundPalette(level=TermLevel.ANSI_BASIC)
@@ -280,7 +280,7 @@ if __name__ == '__main__':
     fx = style.EffectsPalette()
     defx = style.EffectsTerminator()
 
-    from . import _TERM_LEVEL
+    from . import _term_level
     from .constants import BEL, TermLevel
     from .detection import is_a_tty, get_color, get_theme
     from .screen import sc

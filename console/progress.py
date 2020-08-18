@@ -16,7 +16,7 @@
 '''
 import time
 
-from . import fg, bg, fx, sc, _TERM_LEVEL
+from . import fg, bg, fx, sc, _term_level
 from .constants import TermLevel
 from .detection import detect_unicode_support, get_size, os_name
 from .disabled import empty as _empty
@@ -144,8 +144,8 @@ themes = dict(
     warm_shaded = dict(icons='shaded', styles='amber'),
 )
 
-_pals = _TERM_LEVEL
-if _TERM_LEVEL >= TermLevel.ANSI_EXTENDED:
+_pals = _term_level
+if _term_level >= TermLevel.ANSI_EXTENDED:
     styles['default'] = styles['ocean8']
     themes['basic_color']['styles'] = 'ocean8'  # update with hi color
     themes['solid']['styles'] = 'greyen_bg8'   # update with hi color

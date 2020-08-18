@@ -11,7 +11,7 @@ from .disabled import empty_bin as _empty_bin
 
 
 _DEBUG = []  # mutable reference
-_TERM_LEVEL = None
+_term_level = None
 # Define pass-thru objects for streams/dumb terminals:
 fg = bg = ul = fx = defx = sc = _empty_bin
 
@@ -43,14 +43,14 @@ if _env.PY_CONSOLE_AUTODETECT != '0':
     # detect palette, other modules are dependent
     from .detection import init as _init  # noqa
 
-    _TERM_LEVEL = _init()
+    _term_level = _init()
 
-    if _TERM_LEVEL:  # may now import other modules
+    if _term_level:  # may now import other modules
         # monochrome stuff first
         from .style import fx, defx
         from .screen import sc
 
-        if _TERM_LEVEL > _TermLevel.ANSI_MONOCHROME:
+        if _term_level > _TermLevel.ANSI_MONOCHROME:
             from .style import fg, bg, ul  # Yo Iz, let's do this…
 
     fg, bg, ul, fx, defx, sc, TermStack  # quiet pyflakes

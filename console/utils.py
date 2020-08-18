@@ -22,7 +22,7 @@ from .constants import OSC, ST, _MODE_MAP, _TITLE_MODE_MAP
 from .screen import sc
 from .detection import is_a_tty, os_name, _read_clipboard
 from .meta import defaults
-from . import _DEBUG, _TERM_LEVEL
+from . import _DEBUG, _term_level
 
 
 log = logging.getLogger(__name__)
@@ -59,7 +59,7 @@ def clear_line(mode=2):
             Cursor position does not change.
     '''
     text = sc.erase_line(_MODE_MAP.get(mode, mode))
-    if _TERM_LEVEL:
+    if _term_level:
         _write(text)
     return text
 
@@ -85,7 +85,7 @@ def clear_lines(lines, mode=2):
         commands.append(up_cmd)
 
     text = ''.join(commands)
-    if _TERM_LEVEL:
+    if _term_level:
         _write(text)
     return text
 
@@ -104,7 +104,7 @@ def clear_screen(mode=2):
         Returns: text sequence to be written, for testing.
     '''
     text = sc.erase(_MODE_MAP.get(mode, mode))
-    if _TERM_LEVEL:
+    if _term_level:
         _write(text)
     return text
 
@@ -120,7 +120,7 @@ def flash(seconds=.1):
 
         Returns: text sequence to be written, for testing.
     '''
-    if _TERM_LEVEL:
+    if _term_level:
         _write(sc.reverse_video)
         sleep(seconds)
         _write(sc.normal_video)
@@ -145,7 +145,7 @@ def get_clipboard(source='c', encoding='utf8',
             #h3-Operating-System-Commands
             Works on xterm, hterm.
     '''  # functionality in detection module:
-    if _TERM_LEVEL:
+    if _term_level:
         return _read_clipboard(source=source, encoding=encoding,
                                max_bytes=max_bytes, timeout=timeout)
 
@@ -178,7 +178,7 @@ def make_hyperlink(target, caption=None, icon='', **params):
         Note: experimental, see below for details:
             https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
     '''
-    if _TERM_LEVEL:
+    if _term_level:
         MAX_URL = 2083  # spec recommendations
         MAX_VAL = 250
         SAFE_CHARS = (  # ''.join([ chr(n) for n in range(32, 126) ])
@@ -231,7 +231,7 @@ def notify_cwd(path=None):
         path = scheme + path
     path = quote(path)
     text = f'{OSC}7;{path}{ST}'
-    if _TERM_LEVEL:
+    if _term_level:
         _write(text)
     return text
 
@@ -247,7 +247,7 @@ def reset_terminal():
         cls()
     else:
         text = sc.reset
-        if _TERM_LEVEL:
+        if _term_level:
             _write(text)
         return text  # for testing
 
@@ -269,7 +269,7 @@ def set_clipboard(data, destination='c', encoding='utf8',
             https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
             #h3-Operating-System-Commands
     '''
-    if _TERM_LEVEL:
+    if _term_level:
         if len(data) > max_bytes:
             raise RuntimeError(f'clipboard data too large! ({len(data)} bytes)')
 
@@ -310,7 +310,7 @@ def set_title(title, mode=0):
         return set_title(title)
     else:
         text = f'{OSC}{_TITLE_MODE_MAP.get(mode, mode)};{title}{ST}'
-        if _TERM_LEVEL:
+        if _term_level:
             _write(text)
         return text
 

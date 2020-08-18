@@ -31,7 +31,7 @@
 import sys
 from contextlib import contextmanager
 
-from . import _TERM_LEVEL
+from . import _term_level
 from .constants import CSI, ESC, RIS
 from .disabled import empty_bin
 
@@ -121,7 +121,7 @@ class Screen:
         self = super().__new__(cls)
 
         if not force:
-            if not _TERM_LEVEL:
+            if not _term_level:
                 self = empty_bin    # None, deactivate completely
         # else: continue on unabated
         return self
