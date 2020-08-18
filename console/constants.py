@@ -6,7 +6,6 @@
 '''
 from enum import IntEnum as _IntEnum
 
-import env as _env
 
 # ASCII Constants      DEC   OCT    HEX   CTL     DESC
 ENQ = '\x05'        #:   5   005           ^E     Enquiry
@@ -59,7 +58,7 @@ class TermLevel(_IntEnum):
     ANSI_BASIC      = 2     # + 3,4 Bit, 8/16 indexed colors
     ANSI_EXTENDED   = 3     # + 8 bit, 256 indexed colors
     ANSI_DIRECT     = 4     # + 24 bit, 16m direct colors, aka "true"
-    FULL_MONTY      = 9     # + Bleeding edge
+    THE_FULL_MONTY  = 9     # + Bleeding edge (not yet a determining factor)
 
 
 if __name__ == '__main__':

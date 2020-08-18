@@ -167,7 +167,7 @@ def run():
         sys.exit()
 
     if _term_level:
-        bgall = style.BackgroundPalette(level=TermLevel.FULL_MONTY);
+        bgall = style.BackgroundPalette(level=TermLevel.THE_FULL_MONTY);
         bge =   style.BackgroundPalette(level=TermLevel.ANSI_EXTENDED)
         bgb =   style.BackgroundPalette(level=TermLevel.ANSI_BASIC)
         print()
@@ -206,7 +206,7 @@ def run():
             if i % 2 == 1:
                 print()
 
-        fgall = style.ForegroundPalette(level=TermLevel.FULL_MONTY);
+        fgall = style.ForegroundPalette(level=TermLevel.THE_FULL_MONTY);
         fge =   style.ForegroundPalette(level=TermLevel.ANSI_EXTENDED)
         fgb =   style.ForegroundPalette(level=TermLevel.ANSI_BASIC)
         print('      FG t_deadbf:      ',

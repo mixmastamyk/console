@@ -20,11 +20,11 @@ from .constants import TermLevel
 proximity.build_color_tables(base=color_tables.xterm_palette4)
 
 # configure our own - force all palettes on
-fg = style.ForegroundPalette(level=TermLevel.FULL_MONTY)
-bg = style.BackgroundPalette(level=TermLevel.FULL_MONTY)
-fx = style.EffectsPalette(level=TermLevel.FULL_MONTY)
-ul = style.UnderlinePalette(level=TermLevel.FULL_MONTY)
-defx = style.EffectsTerminator(level=TermLevel.FULL_MONTY)
+fg = style.ForegroundPalette(level=TermLevel.THE_FULL_MONTY)
+bg = style.BackgroundPalette(level=TermLevel.THE_FULL_MONTY)
+fx = style.EffectsPalette(level=TermLevel.THE_FULL_MONTY)
+ul = style.UnderlinePalette(level=TermLevel.THE_FULL_MONTY)
+defx = style.EffectsTerminator(level=TermLevel.THE_FULL_MONTY)
 sc = screen.Screen(force=True)
 
 fg, bg, fx, defx, ul, pytest  # pyflakes
@@ -416,7 +416,7 @@ if True:  # fold
            '\x1b]L-OSC-C0-\x1b\\ | \x1b]L-OSC-C0-7-\a | \x9bL-OSC-C1-\x9d END')
 
     def test_utils_mk_hyperlink():
-        utils._term_level = TermLevel.FULL_MONTY  # force for make
+        utils._term_level = TermLevel.THE_FULL_MONTY  # force for make
         result = utils.make_hyperlink('ftp://netscape.com/…/navigator.tar.gz',
                                       'Blast from the past!', icon='')
         assert result == (
@@ -476,7 +476,8 @@ if True:  # fold
         assert ", C'est chic." == utils.strip_ansi(text, osc=True)
 
     def test_strip_ansi_c1():
-        assert ('-C0-TEXT- | -C1-Text- | \x1b]L-OSC-C0-\x1b\\ | \x1b]L-OSC-C0-7-\x07 | -OSC-C1-\x9d END'
+        assert ('-C0-TEXT- | -C1-Text- | \x1b]L-OSC-C0-\x1b\\ | '
+                '\x1b]L-OSC-C0-7-\x07 | -OSC-C1-\x9d END'
                 == utils.strip_ansi(txt, c1=True))
 
     def test_strip_ansi_c1_osc():
@@ -488,7 +489,7 @@ if True:  # fold
         assert utils.len_stripped(text) == 18
 
     def test_set_cwd():
-        utils._term_level = TermLevel.FULL_MONTY  # force for make
+        utils._term_level = TermLevel.THE_FULL_MONTY  # force for make
         result = utils.notify_cwd('/foo/bar/baz')
         assert result == '\x1b]7;file%3A///foo/bar/baz\x1b\\'
 
@@ -611,7 +612,7 @@ if True:  # fold
 # downgrade support:
 
     def test_downgrade():
-        bgall = style.BackgroundPalette(level=TermLevel.FULL_MONTY)
+        bgall = style.BackgroundPalette(level=TermLevel.THE_FULL_MONTY)
         bge = style.BackgroundPalette(level=TermLevel.ANSI_EXTENDED)
         bgb = style.BackgroundPalette(level=TermLevel.ANSI_BASIC)
         E = CSI
