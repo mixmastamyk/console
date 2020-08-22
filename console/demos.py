@@ -34,6 +34,9 @@ def run():
     print('\nConsole - ANSI lib demos, here we go:\n')
     hello_world = f'''Greetings: {fx.bold + fg.blue}Hello {fx.reverse +
                     fg.yellow}World{fg.default + defx.reverse}!{fx.end}'''
+    # styles
+    bad_grammar = fx.curly_underline + ul.i2
+    bad_spelling = fx.curly_underline + ul.i1
 
     demos = [
         hello_world,
@@ -48,6 +51,7 @@ def run():
 
         'hyper-link: ' + make_hyperlink('http://www.coolsiteoftheday.com/',
                                         'Cool Site of the Day!'),
+        'underline-hijinks: I %s %s' % (bad_grammar('not'), bad_spelling('mizpelled.')),
     ]
 
     if not _SHORT:
@@ -275,6 +279,7 @@ if __name__ == '__main__':
     fg = style.ForegroundPalette()
     bg = style.BackgroundPalette()
     fx = style.EffectsPalette()
+    ul = style.UnderlinePalette()
     defx = style.EffectsTerminator()
 
     from . import _term_level
