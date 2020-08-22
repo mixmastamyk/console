@@ -97,7 +97,7 @@ def init(stream=sys.stdout, basic_palette=None):
     '''
     level = None
     webcolors = None
-    log.debug('console version: %s', __version__)
+    log.debug('console package, version: %s', __version__)
     log.debug('os.name/sys.platform: %s/%s', os_name, sys.platform)
 
     # find terminal capability level - given preferences and environment

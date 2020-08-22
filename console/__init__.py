@@ -10,19 +10,9 @@ from .constants import TermLevel as _TermLevel
 from .disabled import empty_bin as _empty_bin
 
 
-_DEBUG = []  # mutable reference
 _term_level = None
 # Define pass-thru objects for streams/dumb terminals:
 fg = bg = ul = fx = defx = sc = _empty_bin
-
-
-def set_debug_mode(value):
-    ''' Provides for more detailed output via logging functionality.
-        Currently only used in the utils module.
-    '''
-    _DEBUG.clear()
-    if value:
-        _DEBUG.append(1)
 
 
 # Py3.6+ - set up a dummy future-fstrings encoding that is really utf8

@@ -22,7 +22,7 @@ from .constants import OSC, ST, _MODE_MAP, _TITLE_MODE_MAP
 from .screen import sc
 from .detection import is_a_tty, os_name, _read_clipboard
 from .meta import defaults
-from . import _DEBUG, _term_level
+from . import _term_level
 
 
 log = logging.getLogger(__name__)
@@ -33,15 +33,6 @@ ansi_csi1_finder = re.compile(r'\x9b[0-?]*[ -/]*[@-~]')
 # ansi_osc0_finder = re.compile(r'(\x1b\][0-?]*\a?|\a)')  # TODO: leave title
 ansi_osc0_finder = re.compile(r'\x1b\].*?(\a|\x1b\\)')
 ansi_osc1_finder = re.compile(r'\x9b.*?(\a|\x9d)')
-
-
-if _DEBUG:
-    def _write(message):
-        log.debug('%r', message)
-        print(message, end='', flush=True)
-else:
-    def _write(message):
-        print(message, end='', flush=True)
 
 
 def clear_line(mode=2):
@@ -60,7 +51,7 @@ def clear_line(mode=2):
     '''
     text = sc.erase_line(_MODE_MAP.get(mode, mode))
     if _term_level:
-        _write(text)
+        print(text, end='', flush=True)
     return text
 
 
@@ -86,7 +77,7 @@ def clear_lines(lines, mode=2):
 
     text = ''.join(commands)
     if _term_level:
-        _write(text)
+        print(text, end='', flush=True)
     return text
 
 
@@ -105,7 +96,7 @@ def clear_screen(mode=2):
     '''
     text = sc.erase(_MODE_MAP.get(mode, mode))
     if _term_level:
-        _write(text)
+        print(text, end='', flush=True)
     return text
 
 
@@ -121,9 +112,9 @@ def flash(seconds=.1):
         Returns: text sequence to be written, for testing.
     '''
     if _term_level:
-        _write(sc.reverse_video)
+        print(sc.reverse_video, end='', flush=True)
         sleep(seconds)
-        _write(sc.normal_video)
+        print(sc.normal_video, end='', flush=True)
         return sc.reverse_video + sc.normal_video  # for testing
 
 
@@ -175,8 +166,11 @@ def make_hyperlink(target, caption=None, icon='', **params):
             link_style = fg.blue + fx.underline
             print(link_style(link))  # in full effect
 
-        Note: experimental, see below for details:
-            https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
+        Note:
+            This function doesn't print the escape sequence so it may be styled
+            more easily.
+            Experimental, see below for details:
+             https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
     '''
     if _term_level:
         MAX_URL = 2083  # spec recommendations
@@ -232,7 +226,7 @@ def notify_cwd(path=None):
     path = quote(path)
     text = f'{OSC}7;{path}{ST}'
     if _term_level:
-        _write(text)
+        print(text, end='', flush=True)
     return text
 
 
@@ -248,7 +242,7 @@ def reset_terminal():
     else:
         text = sc.reset
         if _term_level:
-            _write(text)
+            print(text, end='', flush=True)
         return text  # for testing
 
 
@@ -290,7 +284,8 @@ def set_clipboard(data, destination='c', encoding='utf8',
             sys.stdout.buffer.write(text)
             sys.stdout.flush()
         else:
-            _write(text.decode('ascii'))  # bytes --> unicode --> bytes
+            # bytes --> unicode --> bytes :-/
+            print(text.decode('ascii'), end='', flush=True)
         return text
 
 
@@ -311,7 +306,7 @@ def set_title(title, mode=0):
     else:
         text = f'{OSC}{_TITLE_MODE_MAP.get(mode, mode)};{title}{ST}'
         if _term_level:
-            _write(text)
+            print(text, end='', flush=True)
         return text
 
 

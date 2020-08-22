@@ -263,10 +263,7 @@ if __name__ == '__main__':
     # What needs to be done to get demos to run:
     _DEBUG = '-d' in sys.argv
     _SHORT = '-s' in sys.argv
-    if _DEBUG:
-        from . import set_debug_mode
-        set_debug_mode(_DEBUG)
-
+    if _DEBUG:  # set up debug logging
         fmt = '  %(levelname)-7.7s %(module)s/%(funcName)s:%(lineno)s %(message)s'
         logging.basicConfig(level=logging.DEBUG, format=fmt)
 

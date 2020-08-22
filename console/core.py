@@ -42,7 +42,7 @@ _string_plus_call_warning_template = '''
 '''
 
 # Palette attribute name finders.  Now we've got two problems.
-# Not a huge fan of regex but they nicely enforce the naming rules here:
+# Not a huge fan of regex but they nicely enforce the attribute naming rules:
 _hd = r'[0-9A-Fa-f]'  # hex digits
 _index_finder = re.compile(r'^i_?\d{1,3}$', re.A)                   # i_DDD
 _nearest_finder = re.compile(f'^n_?{_hd}{{3}}$', re.A)              # n_HHH

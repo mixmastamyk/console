@@ -13,7 +13,7 @@ try:
 except Exception:
     webcolors = None
 
-from . import detection, screen, style, utils, set_debug_mode
+from . import detection, screen, style, utils
 
 from . import proximity, color_tables
 from .constants import TermLevel
@@ -30,7 +30,6 @@ sc = screen.Screen(force=True)
 fg, bg, fx, defx, ul, pytest  # pyflakes
 
 # beginning of tests
-set_debug_mode(True)
 CSI = '\x1b['           # sanity check
 
 
