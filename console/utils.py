@@ -41,7 +41,9 @@ def clear_line(mode=2):
 
         Arguments:
 
-            mode:  | 0 | 'forward'  | 'right' - Clear cursor to end of line.
+            mode: int | str
+
+                   | 0 | 'forward'  | 'right' - Clear cursor to end of line.
                    | 1 | 'backward' | 'left'  - Clear cursor to beginning of line.
                    | 2 | 'full'               - Clear entire line.
 
@@ -60,8 +62,10 @@ def clear_lines(lines, mode=2):
     ''' Clear the given number of lines above.
 
         Arguments:
-            lines: number of lines above to clear.
-            mode:  | 0 | 'forward'  | 'right' - Clear cursor to end of line.
+            lines: int - number of lines above to clear.
+            mode: int | str
+
+                   | 0 | 'forward'  | 'right' - Clear cursor to end of line.
                    | 1 | 'backward' | 'left'  - Clear cursor to beginning of line.
                    | 2 | 'full'               - Clear entire line.
 
@@ -87,7 +91,9 @@ def clear_screen(mode=2):
 
         Arguments:
 
-            mode:  | 0 | 'forward'   - Clear cursor to end of screen, cursor stays.
+            mode: int | str
+
+                   | 0 | 'forward'   - Clear cursor to end of screen, cursor stays.
                    | 1 | 'backward'  - Clear cursor to beginning of screen, ""
                    | 2 | 'full'      - Clear entire visible screen, cursor to 1,1.
                    | 3 | 'history'   - Clear entire visible screen and scrollback
@@ -108,7 +114,7 @@ def flash(seconds=.1):
         This can be useful as a visible bell.
 
         Arguments:
-            float seconds:  how long to wait in reverse video
+            seconds:  float - how long to wait in reverse video
 
         Returns: text sequence to be written, for testing.
     '''
@@ -125,10 +131,11 @@ def get_clipboard(source='c', encoding='utf8',
 
         Arguments:
             data:  str
-            source:  {c, p, q, s, 0-7}
+            source:  (int | str) of {c, p, q, s, 0-7}
                 (clipboard, primary, secondary, selection, buffers 0-7)
-            encoding: decode to unicode or pass None for bytes.
-            max_bytes: minor impediment to sending too much text.
+            encoding: str - decode to unicode or pass None for bytes.
+            max_bytes: int - minor impediment to sending too much text.
+            timeout: float - seconds give up if answer not received in time.
 
         Returns: data found
 
@@ -147,11 +154,13 @@ def make_hyperlink(target, caption=None, icon='', **params):
 
         Arguments:
 
-            target:     Link to the destination, 'http://foo.bar/baz'
-            caption:    Optional descriptive text, defaults to target, e.g.
-                        'Click-en Sie hier!'
-            icon:       Add link icon to end of text, e.g. icon='🔗'
-            params:     Optional key word args, to be formatted as:
+            target:     str. Link to the destination, 'http://foo.bar/baz'
+            caption:    str | None
+                        Optional descriptive text, defaults to target, e.g.
+                        'Clicken Sie hier!'
+            icon:       str Add link icon to end of text, e.g. icon='🔗'
+            params:     str: str
+                        Optional key word args, to be formatted as:
                         'id=xyz123:foo=bar:baz=quux'
                         (See note below.)
 
@@ -252,11 +261,11 @@ def set_clipboard(data, destination='c', encoding='utf8',
     ''' Write string or byte data to the clipboard.
 
         Arguments:
-            data: str or bytes
-            destination:  {c, p, q, s, 0-7}
+            data: str | bytes
+            destination:  (int | str) of {c, p, q, s, 0-7}
                 (clipboard, primary, secondary, selection, buffers 0-7)
-            encoding: if string is passed, encode to bytes
-            max_bytes: minor impediment to sending too much text.
+            encoding: str - if string is passed, encode to bytes
+            max_bytes: int minor impediment to sending too much text.
 
         Returns: text sequence to be written or None, for testing.
 
@@ -317,8 +326,8 @@ def strip_ansi(text, c1=False, osc=False):
 
         Arguments:
             line: str
-            osc: bool  - include OSC commands in the strippage.
             c1:  bool  - include C1 based commands in the strippage.
+            osc: bool  - include OSC commands in the strippage.
 
         Returns: stripped text
 
@@ -348,7 +357,7 @@ def len_stripped(text):
 
 # shortcuts for convenience, compatibility:
 clear = clear_screen
-cls = reset_terminal
+cls = reset_terminal  # like DOS
 
 
 # -- wait key implementations ------------------------------------------------
