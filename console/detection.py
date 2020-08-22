@@ -418,9 +418,14 @@ def _get_color_xterm(name, number=None, timeout=None):
         Warning: likely to block on incompatible terminals, use timeout.
     '''
     colors = ()
-    color_code = _COLOR_CODE_MAP.get(name)
+    if name == 'index' and isinstance(number, int):
+        color_code = '4;' + str(number)
+    else:
+        color_code = _COLOR_CODE_MAP.get(name)
+
     if color_code:
         query_sequence = f'{OSC}{color_code};?{BEL}'
+        log.debug('query_sequence: %r' % query_sequence)
         try:
             with TermStack() as fd:
                 termios.tcflush(fd, termios.TCIFLUSH)   # clear input
@@ -509,10 +514,10 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
         Direct queries supported on xterm, iTerm, perhaps others.
 
         Arguments:
-            str:  name, one of ('foreground', 'fg', 'background', 'bg',
+            name: str, one of ('foreground', 'fg', 'background', 'bg',
                                 or 'index')  # index grabs a palette index
-            int:  or a "dynamic color number of (4, 10-19)," see links below.
-            str:  number - if name is index, number should be an int from 0…255
+            number: int, if name is index, should be an ANSI color index from
+                         0…255," see links below.
 
         Queries terminal using ``OSC # ? BEL`` sequence,
         call responds with a color in this X Window format syntax:
@@ -524,7 +529,7 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
               <https://www.x.org/releases/X11R7.7/doc/libX11/libX11/libX11.html#RGB_Device_String_Specification>`_
 
         Returns:
-            tuple[int]: 
+            tuple[str]: 
                 A tuple of four-digit hex strings after parsing,
                 the last two digits are the least significant and can be
                 chopped when needed:
@@ -548,13 +553,8 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
 
             On Windows, only able to find palette defaults,
             which may be different if they were customized.
-            To find the palette index instead,
-            see ``windows.get_color``.
     '''
     colors = ()
-    if not 'index' in _COLOR_CODE_MAP:  # TODO: untangle constant violation
-        _COLOR_CODE_MAP['index'] = '4;' + str(number or '')
-
     if sys.platform == 'darwin':
         if env.TERM_PROGRAM == 'iTerm.app':
             # supports, though returns only two chars per
@@ -563,8 +563,7 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
     elif os_name == 'posix':
         if sys.platform.startswith('freebsd'):  # TODO, may not be console
             pass
-        elif env.TERM:
-            if env.TERM.startswith('xterm'):
+        elif env.TERM.startswith('xterm'):
                 if env.TERM_PROGRAM == 'vscode':  # vscode on Linux hangs
                     pass
                 else:

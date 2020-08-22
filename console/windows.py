@@ -28,7 +28,7 @@ import env
 
 from . import color_tables
 from .meta import defaults
-from .constants import TermLevel, _COLOR_CODE_MAP
+from .constants import TermLevel
 
 
 # winbase.h constants
@@ -240,26 +240,17 @@ def get_code_page():
     return getpreferredencoding()
 
 
-def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
+def get_color(name, number=None, timeout=None):
     ''' Query the default terminal for colors, etc.
 
         Arguments:
-            str:  name, one of ('foreground', 'fg', 'background', 'bg',
-                                or 'index')  # index grabs a palette index
-            int:  or a "dynamic color number of (4, 10-19)," see links below.
-            str:  number - if name is index, number should be an int from 0…255
+            name: str - one of ('foreground', 'fg', 'background', 'bg')
 
-        Queries terminal using ``OSC # ? BEL`` sequence,
-        call responds with a color in this X Window format syntax:
-
-            - ``rgb:DEAD/BEEF/CAFE``
-            - `Control sequences
-              <http://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Operating-System-Commands>`_
-            - `X11 colors
-              <https://www.x.org/releases/X11R7.7/doc/libX11/libX11/libX11.html#RGB_Device_String_Specification>`_
+            number: compatibility only
+            timeout: compatibility only
 
         Returns:
-            tuple[int]: 
+            tuple[str]: 
                 A tuple of four-digit hex strings after parsing,
                 the last two digits are the least significant and can be
                 chopped when needed:
@@ -277,35 +268,24 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
             ... ('4e4d', '9a9a', '0605')    # palette, 2 aka 32 in basic
 
         Notes:
-            Checks is_a_tty() first, since function would also block if i/o
-            were redirected through a pipe.
-
-            Query blocks until timeout if terminal does not support the function.
-            Many don't.  Timeout can be disabled with None or set to a higher
-            number for a slow terminal.
-
             On Windows, only able to find palette defaults,
             which may be different if they were customized.
-            To find the palette index instead,
-            see ``windows.get_color``.
     '''
     colors = ()
-    if not 'index' in _COLOR_CODE_MAP:  # TODO: untangle constant violation
-        _COLOR_CODE_MAP['index'] = '4;' + str(number or '')
-
-    # also applies to Windows Terminal
-    color_id = get_color_id(name)
-    if sys.getwindowsversion()[2] > 16299:  # Win10 FCU, new palette
-        basic_palette = color_tables.cmd1709_palette4
-    else:
-        basic_palette = color_tables.cmd_palette4
-    colors = (f'{i:02x}' for i in basic_palette[color_id]) # compat
+    if name != 'index':
+        # also applies to Windows Terminal
+        color_id = get_color_id(name)
+        if sys.getwindowsversion()[2] > 16299:  # Win10 FCU, new palette
+            basic_palette = color_tables.cmd1709_palette4
+        else:
+            basic_palette = color_tables.cmd_palette4
+        colors = (f'{i:02x}' for i in basic_palette[color_id]) # compat
 
     return tuple(colors)
 
 
 def get_color_id(name, stream=STD_OUTPUT_HANDLE):
-    ''' Returns current colors of console.
+    ''' Returns current color ids of console.
 
         https://docs.microsoft.com/en-us/windows/console/getconsolescreenbufferinfo
 
@@ -314,8 +294,9 @@ def get_color_id(name, stream=STD_OUTPUT_HANDLE):
             stream: Handle to stdout, stderr, etc.
 
         Returns:
-            int:  a color id from the conhost palette.
-                  Ids under 0x8 (8) are dark colors, above light.
+            int:  a color id offset from the conhost palette.
+                  Ids 8 and under are dark colors, above light.
+                  Id numbers are converted to ANSI order.
     '''
     stream = kernel32.GetStdHandle(stream)
     csbi = CONSOLE_SCREEN_BUFFER_INFO()
