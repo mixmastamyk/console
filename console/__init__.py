@@ -28,7 +28,10 @@ if _sys.version_info >= (3, 6):
 # defer imports for proper ordering
 from .detection import TermStack
 
-if _env.PY_CONSOLE_AUTODETECT != '0':
+
+# detection defaults to True if not explicitly disabled
+if (_env.PY_CONSOLE_AUTODETECT.value is None or
+    _env.PY_CONSOLE_AUTODETECT.truthy):
 
     # detect palette, other modules are dependent
     from .detection import init as _init  # noqa
@@ -50,3 +53,4 @@ if _env.PY_CONSOLE_AUTODETECT != '0':
 if _env.PY_CONSOLE_USE_TERMINFO.truthy:
 
     from . import terminfo
+    terminfo  # quiet pyflakes
