@@ -386,22 +386,30 @@ def _get_char():
 def _read_until_select(infile=sys.stdin, max_bytes=20, end=RS, timeout=None):
     ''' Read a terminal response of up to a given max characters from stdin,
         with timeout.  POSIX only, files not compat with select on Windows.
+
+        Arguments:
+            infile: file, stdin
+            max_bytes: int, read no longer than this.
+            end: str, end of data marker, one or two chars.
+            timeout: float secs, how long to wait until giving up.
     '''
     from select import select
     chars = []
     read = infile.read  # shortcut
+    double_char_end = False
     last_char = ''
-    if not isinstance(end, tuple):
-        end = tuple(end)
-    log.debug('max_bytes=%s, end=%r, timeout %s …', max_bytes, end, timeout)
+    if len(end) > 1:
+        double_char_end = True
+    #~ log.debug('read: max_bytes=%s, end=%r, timeout %s …', max_bytes, end, timeout)
 
     if select((infile,), (), (), timeout)[0]:  # wait until response or timeout
-        log.debug('select start reading:')
+        log.debug('select output, start reading:')
         while max_bytes:  # response: count down chars, stopping at 0
-            char = read(1)  # TODO: this could probably be better than 1 char
-            if char in end:  # simple comparison
+            char = read(1)
+            if double_char_end and (last_char + char) == end:
+                del chars[-1]  # rm end[0]
                 break
-            elif (last_char + char) in end:  # consider two char sequence
+            elif char == end:  # simple comparison
                 break
             chars.append(char)
             last_char = char
@@ -424,18 +432,17 @@ def _get_color_xterm(name, number=None, timeout=None):
         color_code = _COLOR_CODE_MAP.get(name)
 
     if color_code:
-        query_sequence = f'{OSC}{color_code};?{BEL}'
-        log.debug('query_sequence: %r' % query_sequence)
+        query_sequence = f'{OSC}{color_code};?{ST}'
         try:
             with TermStack() as fd:
-                termios.tcflush(fd, termios.TCIFLUSH)   # clear input
+                termios.tcflush(fd, termios.TCIOFLUSH)  # clear input & output
                 tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
                 sys.stdout.write(query_sequence)
                 sys.stdout.flush()
-                log.debug('about to read get_color_xterm response…')
-                resp = _read_until_select(
-                            max_bytes=26, end=(BEL, ST), timeout=timeout
-                        ).rstrip(ESC)
+                resp = _read_until_select(  # max bytes 26 + 2 for 256 digits
+                            max_bytes=28, end=ST, timeout=timeout
+                        )
+                log.debug('response: %r', resp)
         except AttributeError:
             log.debug('warning - no .fileno() attribute was found on the stream.')
         except EnvironmentError:  # Winders
