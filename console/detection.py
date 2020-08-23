@@ -220,7 +220,7 @@ def detect_terminal_level():
 
     log.debug(
         f'Term support level: {level.name!r} ({os_name}, TERM={TERM}, '
-        f'COLORTERM={env.COLORTERM or ""})'
+        f'COLORTERM={env.COLORTERM or ""}, TERM_PROGRAM={env.TERM_PROGRAM})'
     )
     return level
 
@@ -396,20 +396,20 @@ def _read_until_select(infile=sys.stdin, max_bytes=20, end=RS, timeout=None):
     from select import select
     chars = []
     read = infile.read  # shortcut
-    double_char_end = False
     last_char = ''
-    if len(end) > 1:
-        double_char_end = True
-    #~ log.debug('read: max_bytes=%s, end=%r, timeout %s …', max_bytes, end, timeout)
+    if not isinstance(end, tuple):
+        end = (end,)
+    log.debug('read: max_bytes=%s, end=%r, timeout %s …', max_bytes, end, timeout)
 
     if select((infile,), (), (), timeout)[0]:  # wait until response or timeout
         log.debug('select output, start reading:')
         while max_bytes:  # response: count down chars, stopping at 0
             char = read(1)
-            if double_char_end and (last_char + char) == end:
-                del chars[-1]  # rm end[0]
+            # print(max_bytes, repr(char))
+            if char in end:  # single
                 break
-            elif char == end:  # simple comparison
+            if (last_char + char) in end:  # double char, i.e. ST
+                del chars[-1]  # rm end[0]
                 break
             chars.append(char)
             last_char = char
@@ -433,6 +433,7 @@ def _get_color_xterm(name, number=None, timeout=None):
 
     if color_code:
         query_sequence = f'{OSC}{color_code};?{ST}'
+        log.debug('query seq: %r', query_sequence)
         try:
             with TermStack() as fd:
                 termios.tcflush(fd, termios.TCIFLUSH)   # clear input
@@ -440,7 +441,7 @@ def _get_color_xterm(name, number=None, timeout=None):
                 sys.stdout.write(query_sequence)
                 sys.stdout.flush()
                 resp = _read_until_select(  # max bytes 26 + 2 for 256 digits
-                            max_bytes=28, end=ST, timeout=timeout
+                            max_bytes=28, end=(BEL, ST), timeout=timeout
                         )
                 log.debug('response: %r', resp)
         except AttributeError:
@@ -471,9 +472,9 @@ def _read_clipboard(
             sys.stdout.write(query_sequence)
             sys.stdout.flush()
             log.debug('about to read get_color_xterm response…')
-            resp = _read_until_select(
+            resp = _read_until_select(  # not working on iterm, check for BEL
                         max_bytes=max_bytes, end=ST, timeout=timeout
-                    ).rstrip(BEL + ST)
+                    )
     except AttributeError:
         log.debug('warning - no .fileno() attribute was found on the stream.')
     except EnvironmentError:  # Winders
@@ -490,7 +491,7 @@ def _read_clipboard(
     return resp
 
 
-def get_answerback(max_bytes=32, end=ST, timeout=defaults.READ_TIMEOUT):
+def get_answerback(max_bytes=32, end=(BEL, ST, '\n'), timeout=defaults.READ_TIMEOUT):
     ''' Returns the "answerback" string which is often empty,
         None if not available.
 
