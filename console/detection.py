@@ -132,7 +132,7 @@ def init(stream=sys.stdout, basic_palette=None):
 
         proximity.build_color_tables(basic_palette)  # for color downgrade
 
-    log.debug('%s is available', level and level.name)
+    log.debug('%s is available', (level or 'DUMB') and level.name)
     return level
 
 
