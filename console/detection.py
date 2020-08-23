@@ -435,7 +435,7 @@ def _get_color_xterm(name, number=None, timeout=None):
         query_sequence = f'{OSC}{color_code};?{ST}'
         try:
             with TermStack() as fd:
-                termios.tcflush(fd, termios.TCIOFLUSH)  # clear input & output
+                termios.tcflush(fd, termios.TCIFLUSH)   # clear input
                 tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
                 sys.stdout.write(query_sequence)
                 sys.stdout.flush()
@@ -472,7 +472,7 @@ def _read_clipboard(
             sys.stdout.flush()
             log.debug('about to read get_color_xterm response…')
             resp = _read_until_select(
-                        max_bytes=max_bytes, end=(BEL, ST), timeout=timeout
+                        max_bytes=max_bytes, end=ST, timeout=timeout
                     ).rstrip(BEL + ST)
     except AttributeError:
         log.debug('warning - no .fileno() attribute was found on the stream.')
@@ -490,8 +490,7 @@ def _read_clipboard(
     return resp
 
 
-
-def get_answerback(max_bytes=32, end=(), timeout=defaults.READ_TIMEOUT):
+def get_answerback(max_bytes=32, end=ST, timeout=defaults.READ_TIMEOUT):
     ''' Returns the "answerback" string which is often empty,
         None if not available.
 
@@ -584,11 +583,12 @@ def get_position(fallback=defaults.CURSOR_POS_FALLBACK):
         Used to figure out if we need to print an extra newline.
 
         Returns:
-            tuple(int): (x, y), (,)  - empty, if an error occurred.
+            tuple(int): (x, y) | (,)  - empty, if an error occurred.
     '''
     values = fallback
     try:
         with TermStack() as fd:
+            termios.tcflush(fd, termios.TCIFLUSH)   # clear input
             tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
             sys.stdout.write(CSI + '6n')            # screen.dsr, avoid import
             sys.stdout.flush()
@@ -652,7 +652,6 @@ def get_title(mode='title'):
         with TermStack() as fd:
             termios.tcflush(fd, termios.TCIFLUSH)   # clear input
             tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
-
             sys.stdout.write(query_sequence)
             sys.stdout.flush()
             log.debug('about to read get_title response…')
