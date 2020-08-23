@@ -138,7 +138,7 @@ def detect_terminal_level(basic_palette=None):
     log.debug(
         f'Term support: {level.name!r} (nt, TERM={TERM}, '
         f'COLORTERM={env.COLORTERM or ""}, ANSICON={ansicon}, '
-        f'colorama={is_colorama}, '
+        f'colorama={is_colorama}) '
     )
     return level
 
