@@ -95,7 +95,7 @@ def init(stream=sys.stdout, basic_palette=None):
             This is the main function of the module—\
             meant to be used unless requirements are more specific.
     '''
-    level = None
+    level = TermLevel.DUMB
     webcolors = None
     log.debug('console package, version: %s', __version__)
     log.debug('os.name/sys.platform: %s/%s', os_name, sys.platform)
@@ -132,7 +132,7 @@ def init(stream=sys.stdout, basic_palette=None):
 
         proximity.build_color_tables(basic_palette)  # for color downgrade
 
-    log.debug('%s is available', (level or 'DUMB') and level.name)
+    log.debug('%s is available', level.name)
     return level
 
 
