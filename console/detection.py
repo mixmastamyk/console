@@ -196,7 +196,7 @@ def detect_terminal_level():
             level:       None or TermLevel member
     '''
     level = TermLevel.DUMB
-    TERM = env.TERM or ''  # shortcut
+    TERM = env.TERM.value or ''  # shortcut
 
     if TERM.startswith(('xterm', 'linux')):
         level = TermLevel.ANSI_BASIC
@@ -210,8 +210,9 @@ def detect_terminal_level():
         level = TermLevel.ANSI_DIRECT
 
     log.debug(
-        f'Terminal level: {level.name!r} ({os_name}, TERM={TERM}, '
-        f'COLORTERM={env.COLORTERM or ""}, TERM_PROGRAM={env.TERM_PROGRAM})'
+        f'Terminal level: {level.name!r} ({os_name}, TERM={TERM!r}, '
+        f'COLORTERM={env.COLORTERM.value!r}, '
+        f'TERM_PROGRAM={env.TERM_PROGRAM.value!r})'
     )
     return level
 
@@ -245,7 +246,9 @@ def detect_terminal_level_terminfo():
             elif 16777216 <= num_colors:
                 level = TermLevel.ANSI_DIRECT
 
-        log.debug(f'Terminal level: {level.name!r} ({os_name}, TERM={env.TERM})')
+        log.debug(
+          f'Terminal level: {level.name!r} ({os_name}, TERM={env.TERM.value!r})'
+        )
         return level
     except ImportError:
         log.error('''Curses/terminfo not installed, see:

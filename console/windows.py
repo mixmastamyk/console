@@ -117,13 +117,13 @@ def detect_terminal_level(basic_palette=None):
     '''
     ansicon = is_colorama = None
     level = TermLevel.DUMB
-    TERM = env.TERM or ''  # shortcut
+    TERM = env.TERM.value or ''  # shortcut
 
     if is_ansi_capable() and all(enable_vt_processing()):  # newfangled
         level = TermLevel.ANSI_DIRECT
     else:
         is_colorama = is_colorama_installed()
-        ansicon = env.ANSICON
+        ansicon = env.ANSICON.value
 
         if is_colorama or TERM.startswith('xterm'):
             level = TermLevel.ANSI_BASIC
@@ -136,8 +136,8 @@ def detect_terminal_level(basic_palette=None):
             level = TermLevel.ANSI_DIRECT
 
     log.debug(
-        f'Term support: {level.name!r} (nt, TERM={TERM}, '
-        f'COLORTERM={env.COLORTERM or ""}, ANSICON={ansicon}, '
+        f'Term support: {level.name!r} (nt, TERM={TERM!r}, '
+        f'COLORTERM={env.COLORTERM.value!r}, ANSICON={ansicon!r}, '
         f'colorama={is_colorama}) '
     )
     return level
