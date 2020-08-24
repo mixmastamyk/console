@@ -245,6 +245,7 @@ def detect_terminal_level_terminfo():
             elif 16777216 <= num_colors:
                 level = TermLevel.ANSI_DIRECT
 
+        log.debug(f'Terminal level: {level.name!r} ({os_name}, TERM={env.TERM})')
         return level
     except ImportError:
         log.error('''Curses/terminfo not installed, see:
