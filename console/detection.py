@@ -122,7 +122,7 @@ def init(stream=sys.stdout, basic_palette=None):
             basic_palette = color_tables.xterm_palette4
 
             if env.SSH_CLIENT:  # fall back to xterm over ssh, info often wrong
-                pal_name = 'ssh'  # TODO: needs descriptive name
+                pal_name = 'ssh'
                 basic_palette = color_tables.term_palette_map.get(
                     (env.TERM, env.TERM_PROGRAM), basic_palette
                 )
@@ -240,10 +240,11 @@ def detect_terminal_level_terminfo():
         has_underline = tigetstr('smul')
         if has_underline:   # This first test could be more granular,
                             # but it is so rare today we won't bother:
-            if has_underline.startswith(bytes(CSI)):
+            if has_underline.startswith(bytes(CSI, 'ascii')):
                 level = TermLevel.ANSI_MONOCHROME
 
             num_colors = tigetnum('colors')
+            # -1 means not set, leaving level unchanged from above.
             if -1 < num_colors < 50:
                 level = TermLevel.ANSI_BASIC
 
