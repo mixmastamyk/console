@@ -279,9 +279,9 @@ def get_color(name, number=None, timeout=None):
             basic_palette = color_tables.cmd1709_palette4
         else:
             basic_palette = color_tables.cmd_palette4
-        colors = (f'{i:02x}' for i in basic_palette[color_id]) # compat
+        colors = tuple(f'{i:02x}' for i in basic_palette[color_id]) # compat
 
-    return tuple(colors)
+    return colors
 
 
 def get_color_id(name, stream=STD_OUTPUT_HANDLE):

@@ -410,10 +410,10 @@ def _read_until_select(infile=sys.stdin, max_bytes=20, end=RS, timeout=None):
     last_char = ''
     if not isinstance(end, tuple):
         end = (end,)
-    log.debug('read: max_bytes=%s, end=%r, timeout %s …', max_bytes, end, timeout)
+    #~ log.debug('read: max_bytes=%s, end=%r, timeout %s …', max_bytes, end, timeout)
 
     if select((infile,), (), (), timeout)[0]:  # wait until response or timeout
-        log.debug('select output, start reading:')
+        #~ log.debug('select output, start reading:')
         while max_bytes:  # response: count down chars, stopping at 0
             char = read(1)
             # print(max_bytes, repr(char))
@@ -444,7 +444,7 @@ def _get_color_xterm(name, number=None, timeout=None):
 
     if color_code:
         query_sequence = f'{OSC}{color_code};?{ST}'
-        log.debug('query seq: %r', query_sequence)
+        #~ log.debug('query seq: %r', query_sequence)
         try:
             with TermStack() as fd:
                 termios.tcflush(fd, termios.TCIFLUSH)   # clear input
@@ -454,7 +454,7 @@ def _get_color_xterm(name, number=None, timeout=None):
                 resp = _read_until_select(  # max bytes 26 + 2 for 256 digits
                             max_bytes=28, end=(BEL, ST), timeout=timeout
                         )
-                log.debug('response: %r', resp)
+                #~ log.debug('response: %r', resp)
         except AttributeError:
             log.debug('warning - no .fileno() attribute was found on the stream.')
         except EnvironmentError:  # Winders
@@ -463,6 +463,7 @@ def _get_color_xterm(name, number=None, timeout=None):
             colors = resp.partition(':')[2].split('/')
             if colors == ['']:  # nuttin
                 colors = []  # empty on failure
+            colors = tuple(colors)
 
     return colors
 
@@ -572,11 +573,11 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
             On Windows, only able to find palette defaults,
             which may be different if they were customized.
     '''
-    colors = ()
+    color = ()
     if sys.platform == 'darwin':
         if env.TERM_PROGRAM == 'iTerm.app':
             # supports, though returns only two chars per
-            colors = _get_color_xterm(name, number, timeout=timeout)
+            color = _get_color_xterm(name, number, timeout=timeout)
 
     elif os_name == 'posix':
         if sys.platform.startswith('freebsd'):  # TODO, may not be console
@@ -585,9 +586,10 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
                 if env.TERM_PROGRAM == 'vscode':  # vscode on Linux hangs
                     pass
                 else:
-                    colors = _get_color_xterm(name, number, timeout=timeout)
+                    color = _get_color_xterm(name, number, timeout=timeout)
 
-    return tuple(colors)
+    log.debug('%s %s color: %r', name, number, color)
+    return color
 
 
 def get_position(fallback=defaults.CURSOR_POS_FALLBACK):
