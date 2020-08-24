@@ -151,7 +151,7 @@ def detect_unicode_support(codepage='cp65001'):  # aka utf8
     return result
 
 
-def _find_basic_palette(level):
+def _find_basic_palette_from_os(level):
     ''' Find the platform-dependent 16-color basic palette—Windows version.
 
         This is used for "downgrading to the nearest color" support.

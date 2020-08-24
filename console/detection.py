@@ -13,6 +13,7 @@ import logging
 import env
 
 from . import color_tables, proximity
+from console.color_tables import DEFAULT_BASIC_PALETTE, term_palette_map
 from .constants import (BS, BEL, CSI, ESC, ENQ, OSC, RS, ST, TermLevel,
                         _COLOR_CODE_MAP)
 from .meta import __version__, defaults
@@ -103,7 +104,7 @@ def init(stream=sys.stdout, basic_palette=None):
     # find terminal capability level - given preferences and environment
     if color_is_forced() or (not color_is_disabled() and is_a_tty(stream=stream)):
         # detecten Sie, bitte
-        if env.PY_CONSOLE_USE_TERMINFO.truthy or env.SSH_CLIENT:
+        if env.PY_CONSOLE_USE_TERMINFO.truthy or env.SSH_CLIENT:  # TODO: break out
             level = detect_terminal_level_terminfo()
 
         if not level:  # didn't occur or fall back if above failed
@@ -119,15 +120,12 @@ def init(stream=sys.stdout, basic_palette=None):
         # find the platform-dependent 16-color basic palette
         if level and not basic_palette:
             pal_name = 'default (xterm)'
-            basic_palette = color_tables.xterm_palette4
+            basic_palette = DEFAULT_BASIC_PALETTE
 
             if env.SSH_CLIENT:  # fall back to xterm over ssh, info often wrong
-                pal_name = 'ssh'
-                basic_palette = color_tables.term_palette_map.get(
-                    (env.TERM, env.TERM_PROGRAM), basic_palette
-                )
+                pal_name, basic_palette = _find_basic_palette_from_term(env.TERM)
             else:
-                level, pal_name, basic_palette = _find_basic_palette(level)
+                level, pal_name, basic_palette = _find_basic_palette_from_os(level)
             log.debug('Basic palette: %r %r', pal_name, basic_palette)
 
         proximity.build_color_tables(basic_palette)  # for color downgrade
@@ -219,7 +217,7 @@ def detect_terminal_level():
         level = TermLevel.ANSI_DIRECT
 
     log.debug(
-        f'Term support level: {level.name!r} ({os_name}, TERM={TERM}, '
+        f'Terminal level: {level.name!r} ({os_name}, TERM={TERM}, '
         f'COLORTERM={env.COLORTERM or ""}, TERM_PROGRAM={env.TERM_PROGRAM})'
     )
     return level
@@ -300,7 +298,7 @@ def detect_unicode_support():
     return result
 
 
-def _find_basic_palette(level):
+def _find_basic_palette_from_os(level):
     ''' Find the platform-dependent 16-color basic palette—posix version.
 
         This is used for "downgrading to the nearest color" support.
@@ -310,7 +308,7 @@ def _find_basic_palette(level):
                         be overridden, due to WSL oddities.
     '''
     pal_name = 'default (xterm)'
-    basic_palette = color_tables.xterm_palette4
+    basic_palette = DEFAULT_BASIC_PALETTE
 
     if env.TERM.startswith(('linux', 'fbterm')):
         pal_name = 'vtrgb'
@@ -342,6 +340,25 @@ def _find_basic_palette(level):
                 log.debug('get_color return value failed: %s', err)
 
     return level, pal_name, basic_palette
+
+
+def _find_basic_palette_from_term(term):
+    ''' Find the platform-dependent 16-color basic palette—\
+        remotely via TERM variable.
+
+        This is used for "downgrading to the nearest color" support.
+    '''
+    from fnmatch import fnmatchcase  # defer, rarely needed
+
+    pal_name = 'xterm'
+    basic_palette = DEFAULT_BASIC_PALETTE
+    for term_spec in term_palette_map:
+        if fnmatchcase(term, term_spec):  # matches
+            basic_palette = term_palette_map[term_spec]
+            pal_name = term_spec.rstrip('*')
+            break
+
+    return pal_name, basic_palette
 
 
 def is_a_tty(stream=sys.stdout):
@@ -714,7 +731,7 @@ if os_name == 'nt':  # I'm a PC
     from .windows import (
         detect_unicode_support,
         detect_terminal_level,
-        _find_basic_palette,
+        _find_basic_palette_from_os,
         get_color,
         get_position,
         get_title,
@@ -723,7 +740,7 @@ if os_name == 'nt':  # I'm a PC
 
 elif sys.platform == 'darwin':  # Think different
 
-    def _find_basic_palette(name):
+    def _find_basic_palette_from_os(name):
         ''' Find the platform-dependent 16-color basic palette—macOS version.
 
             This is used for "downgrading to the nearest color" support.
@@ -733,17 +750,14 @@ elif sys.platform == 'darwin':  # Think different
                             overridden, due to WSL oddities.
         '''
         pal_name = 'default (xterm)'
-        basic_palette = color_tables.xterm_palette4
+        basic_palette = DEFAULT_BASIC_PALETTE
 
-        if env.SSH_CLIENT:  # fall back to xterm over ssh, info often wrong
-            pal_name = 'ssh (xterm)'
-        else:
-            if env.TERM_PROGRAM == 'Apple_Terminal':
-                pal_name = 'termapp'
-                basic_palette = color_tables.termapp_palette4
-            elif env.TERM_PROGRAM == 'iTerm.app':
-                pal_name = 'iterm'
-                basic_palette = color_tables.iterm_palette4
+        if env.TERM_PROGRAM == 'Apple_Terminal':
+            pal_name = 'termapp'
+            basic_palette = color_tables.termapp_palette4
+        elif env.TERM_PROGRAM == 'iTerm.app':
+            pal_name = 'iterm'
+            basic_palette = color_tables.iterm_palette4
 
         return name, pal_name, basic_palette
 

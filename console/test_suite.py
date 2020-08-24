@@ -589,6 +589,26 @@ if True:  # fold
         windows.env = Environment(environ=dict(ANSICON='1'))
         assert windows.detect_terminal_level() == TermLevel.ANSI_EXTENDED
 
+    def test_find_basic_palette_by_term():
+        ct = color_tables
+        test_map = {  # TERM: expected name/palette
+            'xterm':           ('xterm',  ct.xterm_palette4),
+            'xterm-256color':  ('xterm',  ct.xterm_palette4),
+            'xterm-direct':    ('xterm',  ct.xterm_palette4),
+            'linux':           ('linux',  ct.linuxcon_palette4),
+            'fbterm':          ('fbterm', ct.linuxcon_palette4),
+            'iterm2':          ('iterm',  ct.iterm_palette4),
+            'nsterm':          ('nsterm', ct.termapp_palette4),
+            'kitty':           ('xterm',  ct.xterm_palette4),  # try less common
+        }
+        for TERM in test_map:
+            pal_name, palette = detection._find_basic_palette_from_term(TERM)
+            expected_name, expected_palette = test_map.get(
+                TERM, ct.DEFAULT_BASIC_PALETTE
+            )
+            assert pal_name == expected_name
+            assert palette is expected_palette
+
     def test_is_a_tty():
         f = StringIO()
         class YesMan:

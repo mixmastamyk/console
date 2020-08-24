@@ -220,19 +220,20 @@ xterm_palette4 = (
 #~ )
 
 
-# Mapping from (TERM, TERM_PROGRAM) environment variables to basic palettes,
-# for use over SSH.  Windows doesn't use these.
+# Mapping from TERM environment variable specs to basic palettes,
+# for use over SSH.  Windows generally doesn't use these.
 term_palette_map = {
-    ('xterm', None):                xterm_palette4,
-    ('xterm-256color', None):       xterm_palette4,
-    ('linux', None):                linuxcon_palette4,
-    ('xterm', 'Apple_Terminal'):    termapp_palette4,
-    ('xterm', 'iTerm.app'):         iterm_palette4,
+    'xterm*':   xterm_palette4,
+    'linux*':   linuxcon_palette4,
+    'fbterm':   linuxcon_palette4,
+    'iterm*':   iterm_palette4,
+    'nsterm*':  termapp_palette4,
 }
+DEFAULT_BASIC_PALETTE = xterm_palette4
 
 
 # Extended/256 color table for finding rgb values for indexes,
-# useful for color downgrading:
+# useful for color downgrade:
 index_to_rgb8 = {
       '0': (0, 0, 0),
       '1': (128, 0, 0),
