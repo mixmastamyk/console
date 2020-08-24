@@ -458,7 +458,7 @@ def _get_color_xterm(name, number=None, timeout=None):
         except AttributeError:
             log.debug('warning - no .fileno() attribute was found on the stream.')
         except EnvironmentError:  # Winders
-            log.debug('get_color not yet implemented by Windows.')
+            log.debug('see console.windows.get_color()')
         else:  # parse response
             colors = resp.partition(':')[2].split('/')
             if colors == ['']:  # nuttin

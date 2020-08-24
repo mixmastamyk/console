@@ -271,7 +271,7 @@ def get_color(name, number=None, timeout=None):
             On Windows, only able to find palette defaults,
             which may be different if they were customized.
     '''
-    colors = ()
+    color = ()
     if name != 'index':
         # also applies to Windows Terminal
         color_id = get_color_id(name)
@@ -279,9 +279,10 @@ def get_color(name, number=None, timeout=None):
             basic_palette = color_tables.cmd1709_palette4
         else:
             basic_palette = color_tables.cmd_palette4
-        colors = tuple(f'{i:02x}' for i in basic_palette[color_id]) # compat
+        color = tuple(f'{i:02x}' for i in basic_palette[color_id]) # compat
 
-    return colors
+    log.debug('%s %s color: %r', name, number, color)
+    return color
 
 
 def get_color_id(name, stream=STD_OUTPUT_HANDLE):
