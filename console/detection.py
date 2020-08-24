@@ -97,37 +97,30 @@ def init(stream=sys.stdout, basic_palette=None):
             meant to be used unless requirements are more specific.
     '''
     level = TermLevel.DUMB
-    webcolors = None
+    basic_palette = pal_name = webcolors = None
     log.debug('console package, version: %s', __version__)
     log.debug('os.name/sys.platform: %s/%s', os_name, sys.platform)
 
     # find terminal capability level - given preferences and environment
     if color_is_forced() or (not color_is_disabled() and is_a_tty(stream=stream)):
-        # detecten Sie, bitte
-        if env.PY_CONSOLE_USE_TERMINFO.truthy or env.SSH_CLIENT:  # TODO: break out
+        # detecten Sie, bitte - forced terminfo or remote
+        if env.PY_CONSOLE_USE_TERMINFO.truthy or env.SSH_CLIENT:
             level = detect_terminal_level_terminfo()
+            pal_name, basic_palette = _find_basic_palette_from_term(env.TERM)
 
-        if not level:  # didn't occur or fall back if above failed
+        if not level:  # didn't occur or fall back to OS inspection
             level = detect_terminal_level()
 
-        if level is TermLevel.ANSI_DIRECT:
-            try:
-                import webcolors
-            except ImportError:
-                pass
+        if level is TermLevel.ANSI_DIRECT:  # webcolors?
+            try: import webcolors
+            except ImportError: pass
         log.debug(f'webcolors={bool(webcolors)}')
 
         # find the platform-dependent 16-color basic palette
         if level and not basic_palette:
-            pal_name = 'default (xterm)'
-            basic_palette = DEFAULT_BASIC_PALETTE
+            level, pal_name, basic_palette = _find_basic_palette_from_os(level)
 
-            if env.SSH_CLIENT:  # fall back to xterm over ssh, info often wrong
-                pal_name, basic_palette = _find_basic_palette_from_term(env.TERM)
-            else:
-                level, pal_name, basic_palette = _find_basic_palette_from_os(level)
-            log.debug('Basic palette: %r %r', pal_name, basic_palette)
-
+        log.debug('Basic palette: %r %r', pal_name, basic_palette)
         proximity.build_color_tables(basic_palette)  # for color downgrade
 
     log.debug('%s is available', level.name)
