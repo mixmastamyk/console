@@ -21,7 +21,7 @@ from .meta import __version__, defaults
 
 log = logging.getLogger(__name__)
 os_name = os.name  # frequent use
-is_fbterm = termios = tty = None
+is_fbterm = termios = tty = _warned_about_curses = None
 
 
 if os_name == 'posix':  # Tron leotards
@@ -185,7 +185,7 @@ def color_is_forced(**envars):
     return result
 
 
-def detect_terminal_level():
+def detect_terminal_level_posix():
     ''' Returns whether we think the terminal is dumb or supports basic,
         extended, or direct color sequences.  Posix version.
 
@@ -216,6 +216,9 @@ def detect_terminal_level():
     )
     return level
 
+# alias to main function, shadowed on Windows
+detect_terminal_level = detect_terminal_level_posix
+
 
 def detect_terminal_level_terminfo():
     ''' Use curses to query the terminfo database for the terminal support
@@ -226,6 +229,7 @@ def detect_terminal_level_terminfo():
     '''
     level = TermLevel.DUMB
     try:
+        #~ raise ImportError('missing curses')  # ****************
         from curses import setupterm, tigetnum, tigetstr
 
         setupterm()
@@ -251,10 +255,16 @@ def detect_terminal_level_terminfo():
         )
         return level
     except ImportError:
-        log.error('''Curses/terminfo not installed, see:
+        global _warned_about_curses  # warn only once please
+        if not _warned_about_curses:
+            log.warning('''Warning: Curses/terminfo not installed on Windows see:
             - https://pypi.org/project/windows-curses/
             - https://www.lfd.uci.edu/~gohlke/pythonlibs/#curses
-        ''')
+            ''')
+            _warned_about_curses = True
+        # Fall back early when remoting to Windows w/o curses
+        # TERM variable only clue:
+        return detect_terminal_level_posix()
 
 
 def detect_unicode_support():
@@ -773,6 +783,7 @@ if __name__ == '__main__':
     # logs the detection information sequence
     print()  # space from warnings  :-/
 
+    print('about to import out')
     try:
         import out
         out.configure(level='debug')
@@ -780,4 +791,5 @@ if __name__ == '__main__':
         fmt = '  %(levelname)-7.7s %(module)s/%(funcName)s:%(lineno)s %(message)s'
         logging.basicConfig(level=logging.DEBUG, format=fmt)
 
-    init()
+    #~ _warned_about_curses = True  # not needed?
+    init()  # run again so detection gets logged
