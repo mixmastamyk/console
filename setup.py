@@ -23,6 +23,7 @@ install_requires = (
 tests_require = ('pyflakes', 'pytest', 'readme_renderer'),
 extras_require = dict(
     webcolors=('webcolors',),
+    win_terminfo=('jinxed',),  # for ssh into windows
 )
 
 

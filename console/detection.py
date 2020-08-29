@@ -21,7 +21,7 @@ from .meta import __version__, defaults
 
 log = logging.getLogger(__name__)
 os_name = os.name  # frequent use
-is_fbterm = termios = tty = _warned_about_curses = None
+is_fbterm = termios = tty = None
 
 
 if os_name == 'posix':  # Tron leotards
@@ -229,7 +229,10 @@ def detect_terminal_level_terminfo():
     '''
     level = TermLevel.DUMB
     try:
-        #~ raise ImportError('missing curses')  # ****************
+        # Even if curses is installed on Windows,
+        # it (pdcurses) doesn't currently support terminfo
+        if os_name == 'nt':
+            raise ModuleNotFoundError()
         from curses import setupterm, tigetnum, tigetstr
 
         setupterm()
@@ -254,14 +257,7 @@ def detect_terminal_level_terminfo():
           f'Terminal level: {level.name!r} ({os_name}, TERM={env.TERM.value!r})'
         )
         return level
-    except ImportError:
-        global _warned_about_curses  # warn only once please
-        if not _warned_about_curses:
-            log.warning('''Warning: Curses/terminfo not installed on Windows see:
-            - https://pypi.org/project/windows-curses/
-            - https://www.lfd.uci.edu/~gohlke/pythonlibs/#curses
-            ''')
-            _warned_about_curses = True
+    except ModuleNotFoundError:
         # Fall back early when remoting to Windows w/o curses
         # TERM variable only clue:
         return detect_terminal_level_posix()
