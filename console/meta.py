@@ -6,6 +6,7 @@
     This module *should not* import anything from the project or third-party
     modules, to avoid dependencies in setup.py or circular import issues.
 '''
+from os import environ as _environ
 from os.path import join as _join
 from time import localtime as _localtime
 
@@ -51,8 +52,9 @@ trove_classifiers = [
 ]
 
 class defaults:
+    COLOR_SEP = _environ.get('PY_CONSOLE_COLOR_SEP', ':')
     CURSOR_POS_FALLBACK = (0, 0)
+    MAX_CLIPBOARD_SIZE = 65536  # 64k by default
     MAX_NL_SEARCH = 4096
     READ_TIMEOUT = .200  # select read timeout in float seconds
     TERM_SIZE_FALLBACK = (80, 24)
-    MAX_CLIPBOARD_SIZE = 65536  # 64k by default

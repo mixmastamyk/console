@@ -203,7 +203,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
 
     def _get_extended_palette_entry(self, name, index, is_hex=False):
         ''' Compute extended entry, once on the fly. '''
-        values = None
+        values = []
 
         if self._level >= TermLevel.ANSI_EXTENDED:  # build entry
             if is_hex:
@@ -212,7 +212,8 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             start_codes = self._start_codes_extended
             if is_fbterm:
                 start_codes = self._start_codes_extended_fbterm
-            values = [start_codes, index]
+            values.extend(start_codes)
+            values.append(index)
 
         # downgrade section
         elif self._level is TermLevel.ANSI_BASIC:
@@ -224,7 +225,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                 nearest_idx = find_nearest_color_index(*index_to_rgb8[index],
                                                        color_table=color_table4,
                                                        method=self._dg_method)
-            values = self._index_to_ansi_values(nearest_idx)
+            values.extend(self._index_to_ansi_values(nearest_idx))
 
         return (self._create_entry(name, values) if values else empty)
 
@@ -233,11 +234,11 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
 
             values become sequence of decimal int strings: ('1', '2', '3')
         '''
-        values = None
+        values = []
         digits_type = type(digits)
 
         if self._level >= TermLevel.ANSI_DIRECT:  # build entry
-            values = [self._start_codes_true]
+            values.extend(self._start_codes_direct)
             if digits_type is str:  # convert from hex string
                 if len(digits) == 3:
                     values.extend(str(int(ch + ch, 16)) for ch in digits)
@@ -260,7 +261,8 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                     digits = tuple(int(digit) for digit in digits)
                 nearest_idx = find_nearest_color_index(*digits,
                                                        method=self._dg_method)
-            values = [start_codes, str(nearest_idx)]
+            values.extend(start_codes)
+            values.append(str(nearest_idx))
 
         elif self._level is TermLevel.ANSI_BASIC:
             if digits_type is str:
@@ -272,7 +274,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                 nearest_idx = find_nearest_color_index(*digits,
                                                        color_table=color_table4,
                                                        method=self._dg_method)
-            values = self._index_to_ansi_values(nearest_idx)
+            values.extend(self._index_to_ansi_values(nearest_idx))
 
         return (self._create_entry(name, values) if values else empty)
 
@@ -303,7 +305,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         ''' Render first values as string and place as first code,
             save, and return attr.
         '''
-        str_values = ';'.join(values)
+        str_values = defaults.COLOR_SEP.join(values)
         if is_fbterm:
             attr = _PaletteEntryFBTerm(self, name.upper(), str_values)
         else:

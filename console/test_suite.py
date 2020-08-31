@@ -127,10 +127,10 @@ if True:  # fold
         assert str(dx.overline)     ==  CSI + '55m'
 
     def test_ulbasic():
-        assert str(ul.red)          ==  CSI + '58;2;255;0;0m'
-        assert str(ul.i3)           ==  CSI + '58;5;3m'
-        assert str(ul.t_123)        ==  CSI + '58;2;17;34;51m'
-        assert str(ul.bisque)       ==  CSI + '58;2;255;228;196m'
+        assert str(ul.red)          ==  CSI + '58:2:255:0:0m'
+        assert str(ul.i3)           ==  CSI + '58:5:3m'
+        assert str(ul.t_123)        ==  CSI + '58:2:17:34:51m'
+        assert str(ul.bisque)       ==  CSI + '58:2:255:228:196m'
 
     def test_basic_wrong_name():
         with pytest.raises(AttributeError):
@@ -148,15 +148,15 @@ if True:  # fold
 
     def test_fgext_one_digit():
 
-        assert str(fg.i1) ==  CSI + '38;5;1m'
+        assert str(fg.i1) ==  CSI + '38:5:1m'
 
     def test_fgext_two_digit():
 
-        assert str(fg.i11) == CSI + '38;5;11m'
+        assert str(fg.i11) == CSI + '38:5:11m'
 
     def test_fgext_three_digits():
 
-        assert str(fg.i_111) == CSI + '38;5;111m'
+        assert str(fg.i_111) == CSI + '38:5:111m'
 
     def test_fgext_four_digits():
         with pytest.raises(AttributeError) as err:
@@ -171,15 +171,15 @@ if True:  # fold
 
     def test_bgext_one_digit():
 
-        assert str(bg.i1) ==  CSI + '48;5;1m'
+        assert str(bg.i1) ==  CSI + '48:5:1m'
 
     def test_bgext_two_digit():
 
-        assert str(bg.i11) == CSI + '48;5;11m'
+        assert str(bg.i11) == CSI + '48:5:11m'
 
     def test_bgext_three_digits():
 
-        assert str(bg.i111) == CSI + '48;5;111m'
+        assert str(bg.i111) == CSI + '48:5:111m'
 
     def test_bgext_too_long():
         with pytest.raises(AttributeError) as err:
@@ -198,7 +198,7 @@ if True:  # fold
 
     def test_fgextn_three_digits():
 
-        assert str(fg.nf0f) == CSI + '38;5;13m'
+        assert str(fg.nf0f) == CSI + '38:5:13m'
 
     def test_fgextn_four_digits():
         with pytest.raises(AttributeError) as err:
@@ -213,7 +213,7 @@ if True:  # fold
 
     def test_bgextn_three_digits():
 
-        assert str(bg.n080) == CSI + '48;5;28m'
+        assert str(bg.n080) == CSI + '48:5:28m'
 
     def test_bgextn_too_long():
         with pytest.raises(AttributeError) as err:
@@ -232,11 +232,11 @@ if True:  # fold
 
     def test_fgtrue_three_digits():
 
-        assert str(fg.tb0b) ==  CSI + '38;2;187;0;187m'
+        assert str(fg.tb0b) ==  CSI + '38:2:187:0:187m'
 
     def test_fgtrue_six_digits():
 
-        assert str(fg.t_ff00bb) ==  CSI + '38;2;255;0;187m'
+        assert str(fg.t_ff00bb) ==  CSI + '38:2:255:0:187m'
 
     def test_fgtrue_wrong_format():
         with pytest.raises(AttributeError) as err:
@@ -256,11 +256,11 @@ if True:  # fold
 
     def test_bgtrue_three_digits():
 
-        assert str(bg.tb0b) ==  CSI + '48;2;187;0;187m'
+        assert str(bg.tb0b) ==  CSI + '48:2:187:0:187m'
 
     def test_bgtrue_six_digits():
 
-        assert str(bg.tff00bb) ==  CSI + '48;2;255;0;187m'
+        assert str(bg.tff00bb) ==  CSI + '48:2:255:0:187m'
 
     def test_bgtrue_wrong_format():
         with pytest.raises(AttributeError) as err:
@@ -279,8 +279,8 @@ if True:  # fold
 
     def test_webcolors_bisque():
         if webcolors:
-            assert str(fg.bisque) == CSI + '38;2;255;228;196m'
-            assert str(bg.w_bisque) == CSI + '48;2;255;228;196m'
+            assert str(fg.bisque) == CSI + '38:2:255:228:196m'
+            assert str(bg.w_bisque) == CSI + '48:2:255:228:196m'
 
     def test_webcolors_xyzzyx():
         if webcolors:
@@ -637,24 +637,24 @@ if True:  # fold
         E = CSI
 
         results = (
-          ('t_222'           , E+'48;2;34;34;34m'   , E+'48;5;235m', E+'40m'),
-          ('t_808080'        , E+'48;2;128;128;128m', E+'48;5;244m', E+'100m'),
-          ('t_ccc'           , E+'48;2;204;204;204m', E+'48;5;252m', E+'47m'),
-          ('t_ddd'           , E+'48;2;221;221;221m', E+'48;5;253m', E+'47m'),
-          ('t_eee'           , E+'48;2;238;238;238m', E+'48;5;255m', E+'47m'),
-          ('t_e95420'        , E+'48;2;233;84;32m'  , E+'48;5;166m', E+'101m'),
-          ('coral'           , E+'48;2;255;127;80m' , E+'48;5;209m', E+'43m'),
-          ('t_ff00ff'        , E+'48;2;255;0;255m'  , E+'48;5;13m' , E+'105m'),
-          ('t_bb00bb'        , E+'48;2;187;0;187m'  , E+'48;5;127m', E+'45m'),
-          ('x_bisque'        , E+'48;2;255;228;196m', E+'48;5;224m', E+'47m'),
-          ('x_dodgerblue'    , E+'48;2;30;144;255m' , E+'48;5;33m' , E+'104m'),
-          ('w_cornflowerblue', E+'48;2;100;149;237m', E+'48;5;69m' , E+'104m'),
-          ('w_navy'          , E+'48;2;0;0;128m'    , E+'48;5;18m' , E+'44m'),
-          ('w_forestgreen'   , E+'48;2;34;139;34m'  , E+'48;5;28m' , E+'42m'),
-          ('i_28'            , E+'48;5;28m'         , E+'48;5;28m' , E+'42m'),
-          ('i_160'           , E+'48;5;160m'        , E+'48;5;160m', E+'41m'),
-          ('n_a08'           , E+'48;5;126m'        , E+'48;5;126m', E+'45m'),
-          ('n_f0f'           , E+'48;5;13m'         , E+'48;5;13m' , E+'105m'),
+          ('t_222'           , E+'48:2:34:34:34m'   , E+'48:5:235m', E+'40m'),
+          ('t_808080'        , E+'48:2:128:128:128m', E+'48:5:244m', E+'100m'),
+          ('t_ccc'           , E+'48:2:204:204:204m', E+'48:5:252m', E+'47m'),
+          ('t_ddd'           , E+'48:2:221:221:221m', E+'48:5:253m', E+'47m'),
+          ('t_eee'           , E+'48:2:238:238:238m', E+'48:5:255m', E+'47m'),
+          ('t_e95420'        , E+'48:2:233:84:32m'  , E+'48:5:166m', E+'101m'),
+          ('coral'           , E+'48:2:255:127:80m' , E+'48:5:209m', E+'43m'),
+          ('t_ff00ff'        , E+'48:2:255:0:255m'  , E+'48:5:13m' , E+'105m'),
+          ('t_bb00bb'        , E+'48:2:187:0:187m'  , E+'48:5:127m', E+'45m'),
+          ('x_bisque'        , E+'48:2:255:228:196m', E+'48:5:224m', E+'47m'),
+          ('x_dodgerblue'    , E+'48:2:30:144:255m' , E+'48:5:33m' , E+'104m'),
+          ('w_cornflowerblue', E+'48:2:100:149:237m', E+'48:5:69m' , E+'104m'),
+          ('w_navy'          , E+'48:2:0:0:128m'    , E+'48:5:18m' , E+'44m'),
+          ('w_forestgreen'   , E+'48:2:34:139:34m'  , E+'48:5:28m' , E+'42m'),
+          ('i_28'            , E+'48:5:28m'         , E+'48:5:28m' , E+'42m'),
+          ('i_160'           , E+'48:5:160m'        , E+'48:5:160m', E+'41m'),
+          ('n_a08'           , E+'48:5:126m'        , E+'48:5:126m', E+'45m'),
+          ('n_f0f'           , E+'48:5:13m'         , E+'48:5:13m' , E+'105m'),
         )
 
         for result in results:
@@ -781,18 +781,18 @@ if True:  # fold
     def test_progress_solid():
 
         pb = ProgressBar(theme='solid')
-        assert str(pb(-2))  == '\r\x1b[0G\x1b[91m⏴\x1b[39m\x1b[48;5;236m                             \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
-        assert str(pb(0))   == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48;5;236m               0%            \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
-        assert str(pb(16))  == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48;5;70;30m     \x1b[0m\x1b[48;5;236m         16%            \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
-        assert str(pb(99))  == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48;5;22m                ✓            \x1b[49m\x1b[2;38;5;70m▏\x1b[0m'
-        assert str(pb(112)) == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48;5;22m                             \x1b[49m\x1b[91m⏵\x1b[39m'
+        assert str(pb(-2))  == '\r\x1b[0G\x1b[91m⏴\x1b[39m\x1b[48:5:236m                             \x1b[49m\x1b[2;38:5:236m▏\x1b[0m'
+        assert str(pb(0))   == '\r\x1b[0G\x1b[2;38:5:70m▕\x1b[0m\x1b[48:5:236m               0%            \x1b[49m\x1b[2;38:5:236m▏\x1b[0m'
+        assert str(pb(16))  == '\r\x1b[0G\x1b[2;38:5:70m▕\x1b[0m\x1b[48:5:70;30m     \x1b[0m\x1b[48:5:236m         16%            \x1b[49m\x1b[2;38:5:236m▏\x1b[0m'
+        assert str(pb(99))  == '\r\x1b[0G\x1b[2;38:5:70m▕\x1b[0m\x1b[48:5:22m                ✓            \x1b[49m\x1b[2;38:5:70m▏\x1b[0m'
+        assert str(pb(112)) == '\r\x1b[0G\x1b[2;38:5:70m▕\x1b[0m\x1b[48:5:22m                             \x1b[49m\x1b[91m⏵\x1b[39m'
 
     def test_progress_hidef1():
 
         pb = HiDefProgressBar(clear_left=False, styles='greyen')
 
-        assert str(pb(-2))  == '\x1b[91m⏴\x1b[39m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m\x1b[91m  ✗ \x1b[39m'
-        assert str(pb(0))   == '\x1b[2;32m▕\x1b[0m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m  0%'
-        assert str(pb(18.1))  == '\x1b[2;32m▕\x1b[0m\x1b[32m▉▉▉▉\x1b[39m\x1b[32;48;5;236m▋\x1b[0m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m 18%'
+        assert str(pb(-2))  == '\x1b[91m⏴\x1b[39m\x1b[38:5:236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38:5:236m▏\x1b[0m\x1b[91m  ✗ \x1b[39m'
+        assert str(pb(0))   == '\x1b[2;32m▕\x1b[0m\x1b[38:5:236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38:5:236m▏\x1b[0m  0%'
+        assert str(pb(18.1))  == '\x1b[2;32m▕\x1b[0m\x1b[32m▉▉▉▉\x1b[39m\x1b[32;48:5:236m▋\x1b[0m\x1b[38:5:236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38:5:236m▏\x1b[0m 18%'
         assert str(pb(99))  == '\x1b[2;32m▕\x1b[0m\x1b[2;32m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[0m\x1b[2;32m▏\x1b[0m   ✓'
         assert str(pb(111.9)) == '\x1b[2;32m▕\x1b[0m\x1b[2;32m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[0m\x1b[91m⏵\x1b[39m\x1b[91m  ✗ \x1b[39m'
