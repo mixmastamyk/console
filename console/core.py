@@ -87,21 +87,17 @@ class _BasicPaletteBuilder:
     def __init__(self, **kwargs):
         # look for attributes to wrap as a basic palette:
         attributes = ['default'] + dir(self)  # default needs to go first
-        mono_available = (
+        color_available = self._level >= TermLevel.ANSI_BASIC
+        mono_available = color_available or (
             isinstance(self, _MonochromePaletteBuilder) and
             self._level >= TermLevel.ANSI_MONOCHROME
         )
-        color_available = (
-            isinstance(self, _BasicPaletteBuilder) and
-            self._level >= TermLevel.ANSI_BASIC
-        )
-
         for name in attributes:
             if not name.startswith('_'):
                 value = getattr(self, name, None)  # fx has no default
 
                 if type(value) in (int, str, tuple):  # skip methods, default²
-                    if mono_available or color_available:
+                    if color_available or mono_available:
                         attr = _PaletteEntry(self, name.upper(), value)
                     else:
                         attr = empty
@@ -112,6 +108,9 @@ class _BasicPaletteBuilder:
 
 
 class _MonochromePaletteBuilder(_BasicPaletteBuilder):
+    ''' A type of PaletteBuilder that let's us classify and enable effects
+        objects.
+    '''
     pass
 
 

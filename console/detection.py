@@ -96,7 +96,7 @@ def init(stream=sys.stdout, basic_palette=None):
             This is the main function of the module—\
             meant to be used unless requirements are more specific.
     '''
-    level = TermLevel.DUMB
+    level = None
     basic_palette = pal_name = webcolors = None
     log.debug('console package, version: %s', __version__)
     log.debug('os.name/sys.platform: %s/%s', os_name, sys.platform)
@@ -108,7 +108,7 @@ def init(stream=sys.stdout, basic_palette=None):
             level = detect_terminal_level_terminfo()
             pal_name, basic_palette = _find_basic_palette_from_term(env.TERM)
 
-        if not level:  # didn't occur or fall back to OS inspection
+        if level is None:  # didn't occur or fall back to OS inspection
             level = detect_terminal_level()
 
         if level is TermLevel.ANSI_DIRECT:  # webcolors?
@@ -123,6 +123,7 @@ def init(stream=sys.stdout, basic_palette=None):
         log.debug('Basic palette: %r %r', pal_name, basic_palette)
         proximity.build_color_tables(basic_palette)  # for color downgrade
 
+    level = level or TermLevel.DUMB
     log.debug('%s is available', level.name)
     return level
 
