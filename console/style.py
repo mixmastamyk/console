@@ -14,7 +14,8 @@
       <https://en.wikipedia.org/wiki/ANSI_escape_code>`_
       and section 5:
 '''
-from .core import _BasicPaletteBuilder, _HighColorPaletteBuilder
+from .core import (_BasicPaletteBuilder, _MonochromePaletteBuilder,
+                   _HighColorPaletteBuilder)
 from .constants import (ANSI_BG_LO_BASE, ANSI_BG_HI_BASE, ANSI_FG_LO_BASE,
                         ANSI_FG_HI_BASE)
 
@@ -128,7 +129,7 @@ class UnderlinePalette(_HighColorPaletteBuilder):
     _start_codes_true = '58;2'
 
 
-class EffectsTerminator(_BasicPaletteBuilder):
+class EffectsTerminator(_MonochromePaletteBuilder):
     ''' *"I'll be baaahhhck."*
 
         Rarely used codes to turn off *specific* style features, not supported
@@ -172,7 +173,7 @@ class EffectsTerminator(_BasicPaletteBuilder):
     ideogram        = 65
 
 
-class EffectsPalette(_BasicPaletteBuilder):
+class EffectsPalette(_MonochromePaletteBuilder):
     ''' Container for text style codes.
 
         Bold, italic, underline, blink, reverse, strike, fonts, etc.

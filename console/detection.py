@@ -781,6 +781,7 @@ if __name__ == '__main__':
 
     print('about to import out')
     try:
+        raise ImportError('foo')
         import out
         out.configure(level='debug')
     except ImportError:

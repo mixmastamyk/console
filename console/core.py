@@ -43,7 +43,7 @@ _string_plus_call_warning_template = '''
 
 # Palette attribute name finders.  Now we've got two problems.
 # Not a huge fan of regex but they nicely enforce the attribute naming rules:
-_hd = r'[0-9A-Fa-f]'  # hex digits
+_hd = '[0-9A-Fa-f]'  # hex digits
 _index_finder = re.compile(r'^i_?\d{1,3}$', re.A)                   # i_DDD
 _nearest_finder = re.compile(f'^n_?{_hd}{{3}}$', re.A)              # n_HHH
 _true_finder = re.compile(f'^t_?({_hd}{{3}}|{_hd}{{6}})$', re.A)    # t_HHH+
@@ -52,13 +52,13 @@ _web_finder = re.compile(r'^w_\w{4,64}$', re.A)                     # w_NAME
 
 
 class _BasicPaletteBuilder:
-    ''' Code container for ANSI colors, styles, fonts, etc.
+    ''' Code container for ANSI colors and effects.
 
-        A container object base-class that creates child attributes on
-        initialization.  Attributes are ANSI codes as integers wrapped in a
-        manager object to provide additional functionality.
+        A container base-class that creates child attributes on initialization.
+        Attributes are integer ANSI codes that are wrapped in a _PaletteEntry
+        object to provide functionality.
 
-        Basic is useful for the basic 8/16 color and fx palettes.
+        Used for the basic 8/16 color and fx palettes.
     '''
     def __new__(cls, level=Ellipsis):
         ''' Override new() to replace the class entirely on deactivation.
@@ -68,18 +68,17 @@ class _BasicPaletteBuilder:
                               - Ellipsis - Detect from environment.
         '''
         self = super().__new__(cls)
+        self._level = TermLevel.DUMB
+
         if level is Ellipsis:                   # autodetecten-Sie
-            if _term_level:  # enable "up to" the chosen support level:
-                level = _term_level
+            if _term_level:  # TODO: enable "up to" the chosen support level:
+                self._level = _term_level
             else:  # None
                 self = empty_bin                # deactivate self
-                level = TermLevel.DUMB      # skipen-Sie bitte
-            self._level = level
-        elif isinstance(level, TermLevel):  # continue on fine sir
+        elif isinstance(level, TermLevel):      # continue on fine sir…
             self._level = level
         elif level is None:                     # Ah, Shaddap-a ya face
             self = empty_bin
-            level = TermLevel.DUMB
         else:
             raise TypeError(f'level: {level!r} was unrecognized.')
 
@@ -88,19 +87,32 @@ class _BasicPaletteBuilder:
     def __init__(self, **kwargs):
         # look for attributes to wrap as a basic palette:
         attributes = ['default'] + dir(self)  # default needs to go first
+        mono_available = (
+            isinstance(self, _MonochromePaletteBuilder) and
+            self._level >= TermLevel.ANSI_MONOCHROME
+        )
+        color_available = (
+            isinstance(self, _BasicPaletteBuilder) and
+            self._level >= TermLevel.ANSI_BASIC
+        )
+
         for name in attributes:
             if not name.startswith('_'):
-                value = getattr(self, name, None)  # fx man not have default
+                value = getattr(self, name, None)  # fx has no default
+
                 if type(value) in (int, str, tuple):  # skip methods, default²
-                    if self._level >= TermLevel.ANSI_BASIC:
-                        display_name = name.upper()
-                        attr = _PaletteEntry(self, display_name, value)
+                    if mono_available or color_available:
+                        attr = _PaletteEntry(self, name.upper(), value)
                     else:
                         attr = empty
                     setattr(self, name, attr)
 
     def __repr__(self):
-        return f'{self.__class__.__name__}(level={self._level})'
+        return f'{self.__class__.__name__}(level={self._level.name})'
+
+
+class _MonochromePaletteBuilder(_BasicPaletteBuilder):
+    pass
 
 
 class _HighColorPaletteBuilder(_BasicPaletteBuilder):

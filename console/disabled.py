@@ -53,6 +53,8 @@ class _EmptyBin:
     def __exit__(self, *args):
         pass
 
+    def __repr__(self):
+        return f'{self.__class__.__name__}()'
 
 empty = _EmptyAttribute()
 empty_bin = _EmptyBin(empty)
