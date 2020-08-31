@@ -71,7 +71,7 @@ class _BasicPaletteBuilder:
         self._level = TermLevel.DUMB
 
         if level is Ellipsis:                   # autodetecten-Sie
-            if _term_level:  # TODO: enable "up to" the chosen support level:
+            if _term_level:
                 self._level = _term_level
             else:  # None
                 self = empty_bin                # deactivate self
@@ -87,7 +87,7 @@ class _BasicPaletteBuilder:
     def __init__(self, **kwargs):
         # look for attributes to wrap as a basic palette:
         attributes = ['default'] + dir(self)  # default needs to go first
-        color_available = self._level >= TermLevel.ANSI_BASIC
+        color_available = self._level >= TermLevel.ANSI_BASIC  # look again
         mono_available = color_available or (
             isinstance(self, _MonochromePaletteBuilder) and
             self._level >= TermLevel.ANSI_MONOCHROME
