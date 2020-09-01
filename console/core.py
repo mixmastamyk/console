@@ -3,19 +3,20 @@
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
-    Complicated gobbyldegook supporting simple user interfaces located here.
-
-    Classes below not meant to be instantiated by client code.
+    Complicated gobbyldegook supporting simple color/style interface
+    located here.
+    Classes below are not meant to be instantiated by client code;
+    see style.py.
 '''
 import sys
 import logging
 import re
 
 from . import _term_level
-from .constants import (CSI, ANSI_BG_LO_BASE, ANSI_BG_HI_BASE, ANSI_FG_LO_BASE,
-                        ANSI_FG_HI_BASE, ANSI_RESET, TermLevel)
+from .constants import (CSI, ANSI_BG_LO_BASE, ANSI_FG_LO_BASE, ANSI_RESET,
+                        TermLevel)
 from .disabled import empty_bin, empty
-from .detection import is_fbterm
+from .detection import is_fbterm, color_sep
 from .meta import defaults
 from .proximity import (color_table4, find_nearest_color_hexstr,
                         find_nearest_color_index)
@@ -60,7 +61,7 @@ class _BasicPaletteBuilder:
 
         Used for the basic 8/16 color and fx palettes.
     '''
-    def __new__(cls, level=Ellipsis):
+    def __new__(cls, color_sep=None, level=Ellipsis):
         ''' Override new() to replace the class entirely on deactivation.
 
             Arguments:
@@ -84,7 +85,7 @@ class _BasicPaletteBuilder:
 
         return self
 
-    def __init__(self, **kwargs):
+    def __init__(self, color_sep=color_sep, **kwargs):
         # look for attributes to wrap as a basic palette:
         attributes = ['default'] + dir(self)  # default needs to go first
         color_available = self._level >= TermLevel.ANSI_BASIC  # look again
@@ -95,13 +96,14 @@ class _BasicPaletteBuilder:
         for name in attributes:
             if not name.startswith('_'):
                 value = getattr(self, name, None)  # fx has no default
-
                 if type(value) in (int, str, tuple):  # skip methods, default²
                     if color_available or mono_available:
                         attr = _PaletteEntry(self, name.upper(), value)
                     else:
                         attr = empty
                     setattr(self, name, attr)
+
+        self._color_sep = color_sep  # for ease of testing
 
     def __repr__(self):
         return f'{self.__class__.__name__}(level={self._level.name})'
@@ -181,12 +183,11 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             result = self._get_web_palette_entry(key)
 
         else:  # look for bare names (without prefix)
-            try:
-                result = self._get_web_palette_entry(name)
-                if result:
-                    return result
-            except AttributeError:
-                pass  # nope, didn't find…
+            if webcolors:
+                try:
+                    return self._get_web_palette_entry(name)
+                except AttributeError:
+                    pass  # nope, didn't find…
 
             try:  # try X11
                 result = self._get_X11_palette_entry(name)
@@ -202,7 +203,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         return result
 
     def _get_extended_palette_entry(self, name, index, is_hex=False):
-        ''' Compute extended entry, once on the fly. '''
+        ''' Compute extended entry. '''
         values = []
 
         if self._level >= TermLevel.ANSI_EXTENDED:  # build entry
@@ -230,9 +231,9 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         return (self._create_entry(name, values) if values else empty)
 
     def _get_direct_palette_entry(self, name, digits):
-        ''' Compute truecolor entry, once on the fly.
+        ''' Compute direct color entry.
 
-            values become sequence of decimal int strings: ('1', '2', '3')
+            Values become sequence of decimal int strings: ('1', '2', '3')
         '''
         values = []
         digits_type = type(digits)
@@ -291,24 +292,24 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
 
     def _get_web_palette_entry(self, name):
         ''' Look up colors from webcolors module. '''
-        result = empty
-        if webcolors:
-            try:  # wc: returns tuple of "decimal" int: (1, 2, 3)
-                color = webcolors.name_to_rgb(name)
-                result = self._get_direct_palette_entry(name, color)
-            except ValueError:  # convert to AttributeError
-                raise AttributeError(
-                    f'{name!r} not found in webcolors palette.')
+        result = None
+        try:  # wc: returns tuple of "decimal" int: (1, 2, 3)
+            color = webcolors.name_to_rgb(name)
+            result = self._get_direct_palette_entry(name, color)
+        except (ValueError, AttributeError):  # convert to AttributeError
+            raise AttributeError(
+                f'{name!r} not found in webcolors palette.')
         return result
 
     def _create_entry(self, name, values):
         ''' Render first values as string and place as first code,
             save, and return attr.
         '''
-        str_values = defaults.COLOR_SEP.join(values)
         if is_fbterm:
+            str_values = ';'.join(values)  # always semi-colon
             attr = _PaletteEntryFBTerm(self, name.upper(), str_values)
         else:
+            str_values = (self._color_sep or '').join(values)  # if None
             attr = _PaletteEntry(self, name.upper(), str_values)
         setattr(self, name, attr)  # now cached
         return attr
@@ -325,17 +326,17 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             if index < 8:
                 index += ANSI_FG_LO_BASE
             else:
-                index += (ANSI_FG_HI_BASE - 8)  # 82
+                index += 82                     # (ANSI_FG_HI_BASE - 8)
         else:                                   # Background
             if index < 8:
                 index += ANSI_BG_LO_BASE
             else:
-                index += (ANSI_BG_HI_BASE - 8)  # 92
+                index += 92                     # (ANSI_BG_HI_BASE - 8)
         return [str(index)]
 
     def clear(self):
         ''' "Cleanse the palette" to free memory.
-            Useful for truecolor, perhaps.
+            Useful for direct color, perhaps.
         '''
         self.__dict__.clear()
 
@@ -388,7 +389,7 @@ class _PaletteEntry:
     _end_code = 'm'
 
     def __init__(self, parent, name, code, stream=sys.stdout):
-        self.parent = parent
+        self._parent = parent
         self.name = name
         self._stream = stream               # for redirection
 
@@ -420,10 +421,10 @@ class _PaletteEntry:
             # Make a copy, so codes don't pile up after each addition
             # Render initial values once as string and place as first code:
             newcodes = self._codes + other._codes
-            new_entry = _PaletteEntry(self.parent, self.name,
-                                 ';'.join(newcodes))
+            new_entry = _PaletteEntry(self._parent, self.name,
+                                      ';'.join(newcodes)) # _not_ color_sep
 
-            if not self.default == other.default:   # not alike,
+            if not self.default == other.default:   # not in same class,
                 new_entry.default = ANSI_RESET      # switch to full reset
 
             return new_entry
@@ -450,20 +451,20 @@ class _PaletteEntry:
         log.debug(repr(str(self.default)))
         self._stream.write(str(self.default))  # just in case
 
-    def __call__(self, text, *styles, original_length=False):
+    def __call__(self, text, *styles, save_length=False):
         ''' Formats text.  Not appropriate for *huge* input strings.
 
             Arguments:
                 text                Original text.
                 *styles             Add "mix-in" styles, per invocation.
-                original_length     bool - Save original string length for
+                save_length         bool - Save original string length for
                                     later use.
 
             Note:
                 Color sequences are terminated at newlines,
                 so that paging of output works correctly.
         '''
-        if (self.parent.__class__.__name__ == 'EffectsTerminator' or
+        if (self._parent.__class__.__name__ == 'EffectsTerminator' or
             self.name in ('DEFAULT', 'END')):
             raise NotImplementedError("call form undefined for "
                                       "EffectsTerminator or 'default'.")
@@ -485,7 +486,7 @@ class _PaletteEntry:
                 lines[i] = f'{self}{line}{self.default}'  # add styles, see tip
             result = '\n'.join(lines)
 
-        if original_length:
+        if save_length:
             return _LengthyString(len(text), result)
         else:
             return result
@@ -528,7 +529,7 @@ class _PaletteEntry:
                     tokens.append(str(self.default))
                 else:                           # different
                     tokens.append(ANSI_RESET)
-                # put back together:
+                # put humpty (pronounced with an -umpty) back together again:
                 lines[i] = ''.join(tokens)
             result = '\n'.join(lines)
 
@@ -552,7 +553,7 @@ class _PaletteEntry:
         ''' Set's the output file, currently only useful with context-managers.
 
             Note:
-                This function is experimental and may not last.
+                This function is experimental and may not survive.
         '''
         if self._orig_stdout:  # restore Usted
             sys.stdout = self._orig_stdout
@@ -573,7 +574,7 @@ class _PaletteEntryFBTerm(_PaletteEntry):
         else:
             return super().__add__(other)
 
-    def __str__(self):
+    def __str__(self):  # outer sep, not color_sep
         return f'{CSI}{";".join(self._codes)}}}'  # note '}' at end not std 'm'
 
 

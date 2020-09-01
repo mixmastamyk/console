@@ -3,11 +3,11 @@
     .. console - Comprehensive ANSI sequence utility library for terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
-    Testen-Sie, bitte.
+    Testen-Sie, bitte.  Supported under Linux with a libvte terminal.
 '''
 from io import StringIO
-import pytest
 
+import pytest
 try:
     import webcolors
 except Exception:
@@ -561,33 +561,47 @@ if True:  # fold
         detection.env = Environment(environ=dict(CLICOLOR_FORCE='1'))
         assert detection.color_is_forced() is True
 
-    def test_palette_support():
+    def test_color_sep():
+
+        assert str(bg.i_11) == CSI + '48:5:11m'  # sanity check
+        _bg = style.BackgroundPalette(color_sep=';', level=TermLevel.THE_FULL_MONTY)
+        assert str(_bg.i_123) == CSI + '48;5;123m'
+
+        _fg = style.ForegroundPalette(color_sep='_', level=TermLevel.THE_FULL_MONTY)
+        assert str(_fg.bisque) == CSI + '38_2_255_228_196m'
+
+    def test_terminal_level_detection():
         terms = (
-            ('dumb', TermLevel.DUMB),
-            ('linux', TermLevel.ANSI_BASIC),
-            ('xterm-color', TermLevel.ANSI_BASIC),
-            ('xterm-256color', TermLevel.ANSI_EXTENDED),
+            ('dumb', (TermLevel.DUMB, None)),
+            ('linux', (TermLevel.ANSI_BASIC, None)),
+            ('xterm-color', (TermLevel.ANSI_BASIC, None)),
+            ('xterm-256color', (TermLevel.ANSI_EXTENDED, ';')),
+            ('xterm-direct', (TermLevel.ANSI_DIRECT, ':')),
+            ('fbterm', (TermLevel.ANSI_EXTENDED, ';')),
         )
         for name, result in terms:
             detection.env = Environment(environ=dict(TERM=name))
+            if name == 'fbterm':  # :-/
+                detection.is_fbterm = True
             assert detection.detect_terminal_level() == result
 
         detection.env = Environment(environ=dict(COLORTERM='24bit'))
-        assert detection.detect_terminal_level() == TermLevel.ANSI_DIRECT
+        detection.is_fbterm = False  # :-/
+        assert detection.detect_terminal_level() == (TermLevel.ANSI_DIRECT, ':')
 
         from . import windows  # try win implementation
         terms = (
-            ('dumb', TermLevel.DUMB),
-            ('xterm-color', TermLevel.ANSI_BASIC),
-            ('xterm-256color', TermLevel.ANSI_EXTENDED),
-            ('cygwin', TermLevel.ANSI_DIRECT),  # ?
+            ('dumb', (TermLevel.DUMB, ';')),
+            ('xterm-color', (TermLevel.ANSI_BASIC, ';')),
+            ('xterm-256color', (TermLevel.ANSI_EXTENDED, ';')),
+            ('cygwin', (TermLevel.ANSI_DIRECT, ';')),  # ?
         )
         for name, result in terms:
             windows.env = Environment(environ=dict(TERM=name))
             assert windows.detect_terminal_level() == result
 
         windows.env = Environment(environ=dict(ANSICON='1'))
-        assert windows.detect_terminal_level() == TermLevel.ANSI_EXTENDED
+        assert windows.detect_terminal_level() ==( TermLevel.ANSI_EXTENDED, ';')
 
     def test_find_basic_palette_by_term():
         ct = color_tables

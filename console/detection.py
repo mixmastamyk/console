@@ -21,12 +21,11 @@ from .meta import __version__, defaults
 
 log = logging.getLogger(__name__)
 os_name = os.name  # frequent use
-is_fbterm = termios = tty = None
-
+color_sep = termios = tty = None
+is_fbterm = (env.TERM == 'fbterm')
 
 if os_name == 'posix':  # Tron leotards
     import termios, tty
-    is_fbterm = (env.TERM == 'fbterm')
 
 
 class TermStack:
@@ -103,13 +102,15 @@ def init(stream=sys.stdout, basic_palette=None):
 
     # find terminal capability level - given preferences and environment
     if color_is_forced() or (not color_is_disabled() and is_a_tty(stream=stream)):
+        global color_sep
+
         # detecten Sie, bitte - forced terminfo or remote
         if env.PY_CONSOLE_USE_TERMINFO.truthy or env.SSH_CLIENT:
-            level = detect_terminal_level_terminfo()
+            level, color_sep = detect_terminal_level_terminfo()
             pal_name, basic_palette = _find_basic_palette_from_term(env.TERM)
 
         if level is None:  # didn't occur or fall back to OS inspection
-            level = detect_terminal_level()
+            level, color_sep = detect_terminal_level()
 
         if level is TermLevel.ANSI_DIRECT:  # webcolors?
             try: import webcolors
@@ -188,16 +189,19 @@ def color_is_forced(**envars):
 
 def detect_terminal_level_posix():
     ''' Returns whether we think the terminal is dumb or supports basic,
-        extended, or direct color sequences.  Posix version.
+        extended, or direct color sequences.  posix version.
 
         This implementation looks at common environment variables,
         rather than terminfo.
 
         Returns:
-            level:       None or TermLevel member
+            level:      None or TermLevel member
+            color_sep   The extended color sequence separator character,
+                        i.e. ":" or ";".
     '''
     level = TermLevel.DUMB
     TERM = env.TERM.value or ''  # shortcut
+    _color_sep = None
 
     if TERM.startswith(('xterm', 'linux')):
         level = TermLevel.ANSI_BASIC
@@ -205,17 +209,20 @@ def detect_terminal_level_posix():
     # upgrades
     if TERM.endswith('-256color') or is_fbterm:
         level = TermLevel.ANSI_EXTENDED
+        _color_sep = ';'
 
     # https://bugzilla.redhat.com/show_bug.cgi?id=1173688 - obsolete?
     if TERM.endswith('-direct') or env.COLORTERM in ('truecolor', '24bit'):
         level = TermLevel.ANSI_DIRECT
+        _color_sep = ';' if is_fbterm else ':'
 
     log.debug(
         f'Terminal level: {level.name!r} ({os_name}, TERM={TERM!r}, '
         f'COLORTERM={env.COLORTERM.value!r}, '
-        f'TERM_PROGRAM={env.TERM_PROGRAM.value!r})'
+        f'TERM_PROGRAM={env.TERM_PROGRAM.value!r}, '
+        f'color_sep={_color_sep!r}) '
     )
-    return level
+    return level, _color_sep
 
 # alias to main function, shadowed on Windows
 detect_terminal_level = detect_terminal_level_posix
@@ -226,9 +233,12 @@ def detect_terminal_level_terminfo():
         level
 
         Returns:
-            level:       TermLevel member
+            level:      TermLevel member
+            color_sep   The extended color sequence separator character,
+                        i.e. ":" or ";".
     '''
     level = TermLevel.DUMB
+    _color_sep = None
     try:
         # Even if curses is installed on Windows,
         # it (pdcurses) doesn't currently support terminfo
@@ -254,10 +264,21 @@ def detect_terminal_level_terminfo():
             elif 16777216 <= num_colors:
                 level = TermLevel.ANSI_DIRECT
 
+            # finding color_sep is a bit problematic
+            if is_fbterm:
+                _color_sep = ';'
+            elif level >= TermLevel.ANSI_EXTENDED:
+                setaf = (tigetstr('setaf') or b'').decode('ascii')
+                # log.debug('tigetstr setaf: %r', setaf)
+                suffix = setaf.partition('38')[2]
+                if suffix:
+                     _color_sep = suffix[0]  # first char after 38
+
         log.debug(
-          f'Terminal level: {level.name!r} ({os_name}, TERM={env.TERM.value!r})'
+          f'Terminal level: {level.name!r} ({os_name}, '
+          f'TERM={env.TERM.value!r}, color_sep={_color_sep!r})'
         )
-        return level
+        return level, _color_sep
     except ModuleNotFoundError:
         # Fall back early when remoting to Windows w/o curses
         # TERM variable only clue:
@@ -363,6 +384,12 @@ def _find_basic_palette_from_term(term):
             break
 
     return pal_name, basic_palette
+
+
+def get_color_sep():
+
+
+    return env.PY_CONSOLE_COLOR_SEP or (';' if is_fbterm else ':')
 
 
 def is_a_tty(stream=sys.stdout):
@@ -782,12 +809,11 @@ if __name__ == '__main__':
 
     print('about to import out')
     try:
-        raise ImportError('foo')
+        #~ raise ImportError()
         import out
         out.configure(level='debug')
     except ImportError:
         fmt = '  %(levelname)-7.7s %(module)s/%(funcName)s:%(lineno)s %(message)s'
         logging.basicConfig(level=logging.DEBUG, format=fmt)
 
-    #~ _warned_about_curses = True  # not needed?
     init()  # run again so detection gets logged

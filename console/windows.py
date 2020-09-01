@@ -113,9 +113,11 @@ def detect_terminal_level(basic_palette=None):
         direct color; None if not able to tell.  Windows variant.
 
         Returns:
-            level:       None or TermLevel member
+            level:      None or TermLevel member
+            color_sep   The extended color sequence separator character,
+                        i.e. ":" or ";".
     '''
-    ansicon = is_colorama = None
+    ansicon = color_sep = is_colorama = None
     level = TermLevel.DUMB
     TERM = env.TERM.value or ''  # shortcut
 
@@ -135,12 +137,15 @@ def detect_terminal_level(basic_palette=None):
         if env.COLORTERM in ('truecolor', '24bit') or TERM == 'cygwin':
             level = TermLevel.ANSI_DIRECT
 
+    if level >= TermLevel.ANSI_EXTENDED:
+        color_sep = env.PY_CONSOLE_COLOR_SEP or ';'  # supports only ; for now
+
     log.debug(
         f'Term support: {level.name!r} (nt, TERM={TERM!r}, '
         f'COLORTERM={env.COLORTERM.value!r}, ANSICON={ansicon!r}, '
-        f'colorama={is_colorama}) '
+        f'colorama={is_colorama}, color_sep={color_sep}) '
     )
-    return level
+    return level, color_sep
 
 
 def detect_unicode_support(codepage='cp65001'):  # aka utf8

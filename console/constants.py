@@ -51,7 +51,7 @@ _MODE_MAP = dict(forward='0', backward='1', right='0', left='1', full='2',
 _TITLE_MODE_MAP = dict(both='0', icon='1', title='2')
 
 
-# Level of functionality provided by the terminal
+# Level of functionality provided by der terminal
 class TermLevel(_IntEnum):
     DUMB            = 0     # Stream/not a tty, disabled, or ASCII teleprinter
     ANSI_MONOCHROME = 1     # Text effects but no color, e.g. vt220

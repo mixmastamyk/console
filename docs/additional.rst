@@ -234,10 +234,12 @@ MacOS:
 
 Console itself:
 
-    - ``PY_CONSOLE_AUTODETECT``, Disables detection routines.
-    - ``PY_CONSOLE_COLOR_SEP``, inner separator char for extended color
-      sequences.
-      Typically ``:``, but may need to be changed to ``;`` under legacy terms.
+    - ``PY_CONSOLE_AUTODETECT``, Disables automatic detection routines.
+
+    .. ~ - ``PY_CONSOLE_COLOR_SEP``, inner separator char for extended color
+      .. ~ sequences.
+      .. ~ Typically ``:``, but may need to be changed to ``;`` under legacy terms.
+
     - ``PY_CONSOLE_USE_TERMINFO``, Enables terminfo lookup for many
       capabilities.
 
