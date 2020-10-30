@@ -591,8 +591,8 @@ if True:  # fold
 
         from . import windows  # try win implementation
         terms = (
-            ('dumb', (TermLevel.DUMB, ';')),
-            ('xterm-color', (TermLevel.ANSI_BASIC, ';')),
+            ('dumb', (TermLevel.DUMB, None)),
+            ('xterm-color', (TermLevel.ANSI_BASIC, None)),
             ('xterm-256color', (TermLevel.ANSI_EXTENDED, ';')),
             ('cygwin', (TermLevel.ANSI_DIRECT, ';')),  # ?
         )
