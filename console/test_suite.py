@@ -572,33 +572,62 @@ if True:  # fold
 
     def test_terminal_level_detection():
         terms = (
-            ('dumb', (TermLevel.DUMB, None)),
-            ('linux', (TermLevel.ANSI_BASIC, None)),
-            ('xterm-color', (TermLevel.ANSI_BASIC, None)),
+            ('dumb', (TermLevel.DUMB, ';')),
+            ('linux', (TermLevel.ANSI_BASIC, ';')),
+            ('xterm-color', (TermLevel.ANSI_BASIC, ';')),
             ('xterm-256color', (TermLevel.ANSI_EXTENDED, ';')),
             ('xterm-direct', (TermLevel.ANSI_DIRECT, ':')),
             ('fbterm', (TermLevel.ANSI_EXTENDED, ';')),
         )
-        for name, result in terms:
+        for name, expected in terms:
             detection.env = Environment(environ=dict(TERM=name))
             if name == 'fbterm':  # :-/
                 detection.is_fbterm = True
-            assert detection.detect_terminal_level() == result
+            assert detection.detect_terminal_level() == expected
 
         detection.env = Environment(environ=dict(COLORTERM='24bit'))
         detection.is_fbterm = False  # :-/
-        assert detection.detect_terminal_level() == (TermLevel.ANSI_DIRECT, ':')
+        assert detection.detect_terminal_level() == (TermLevel.ANSI_DIRECT, ';')
 
         from . import windows  # try win implementation
         terms = (
-            ('dumb', (TermLevel.DUMB, None)),
-            ('xterm-color', (TermLevel.ANSI_BASIC, None)),
+            ('dumb', (TermLevel.DUMB, ';')),
+            ('xterm-color', (TermLevel.ANSI_BASIC, ';')),
             ('xterm-256color', (TermLevel.ANSI_EXTENDED, ';')),
             ('cygwin', (TermLevel.ANSI_DIRECT, ';')),  # ?
         )
-        for name, result in terms:
+        for name, expected in terms:
             windows.env = Environment(environ=dict(TERM=name))
-            assert windows.detect_terminal_level() == result
+            assert windows.detect_terminal_level() == expected
+
+        windows.env = Environment(environ=dict(ANSICON='1'))
+        assert windows.detect_terminal_level() ==( TermLevel.ANSI_EXTENDED, ';')
+
+    def test_terminal_level_detection_override():
+        terms = (
+            ('dumb', (TermLevel.DUMB, '@')),
+            ('linux', (TermLevel.ANSI_BASIC, '@')),
+            ('xterm-color', (TermLevel.ANSI_BASIC, '@')),
+            ('xterm-256color', (TermLevel.ANSI_EXTENDED, '@')),
+            ('xterm-direct', (TermLevel.ANSI_DIRECT, '@')),
+            ('fbterm', (TermLevel.ANSI_EXTENDED, '@')),
+        )
+        for name, expected in terms:
+            detection.env = Environment(environ=dict(TERM=name, PY_CONSOLE_COLOR_SEP='@'))
+            if name == 'fbterm':  # :-/
+                detection.is_fbterm = True
+            assert detection.detect_terminal_level() == expected
+
+        from . import windows  # try win implementation
+        terms = (
+            ('dumb', (TermLevel.DUMB, '@')),
+            ('xterm-color', (TermLevel.ANSI_BASIC, '@')),
+            ('xterm-256color', (TermLevel.ANSI_EXTENDED, '@')),
+            ('cygwin', (TermLevel.ANSI_DIRECT, '@')),  # ?
+        )
+        for name, expected in terms:
+            windows.env = Environment(environ=dict(TERM=name, PY_CONSOLE_COLOR_SEP='@'))
+            assert windows.detect_terminal_level() == expected
 
         windows.env = Environment(environ=dict(ANSICON='1'))
         assert windows.detect_terminal_level() ==( TermLevel.ANSI_EXTENDED, ';')

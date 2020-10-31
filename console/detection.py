@@ -23,6 +23,7 @@ log = logging.getLogger(__name__)
 os_name = os.name  # frequent use
 color_sep = termios = tty = None
 is_fbterm = (env.TERM == 'fbterm')
+TERM_DIRECT_USES_COLONS = ('xterm-', 'kitty-', 'iterm2-', 'mintty-', 'mlterm-')
 
 if os_name == 'posix':  # Tron leotards
     import termios, tty
@@ -201,7 +202,7 @@ def detect_terminal_level():
     '''
     level = TermLevel.DUMB
     TERM = env.TERM.value or ''  # shortcut
-    color_sep = None
+    _color_sep = ';'
 
     if TERM.startswith(('xterm', 'linux')):
         level = TermLevel.ANSI_BASIC
@@ -209,20 +210,22 @@ def detect_terminal_level():
     # upgrades
     if TERM.endswith('-256color') or is_fbterm:
         level = TermLevel.ANSI_EXTENDED
-        color_sep = ';'
 
     # https://bugzilla.redhat.com/show_bug.cgi?id=1173688 - obsolete?
     if TERM.endswith('-direct') or env.COLORTERM in ('truecolor', '24bit'):
         level = TermLevel.ANSI_DIRECT
-        color_sep = ':'
-
+        for prefix in TERM_DIRECT_USES_COLONS:
+            if TERM.startswith(prefix):
+                _color_sep = ':'
+                break
+    _color_sep = env.PY_CONSOLE_COLOR_SEP or _color_sep  # local override
     log.debug(
         f'Terminal level: {level.name!r} ({os_name}, TERM={TERM!r}, '
         f'COLORTERM={env.COLORTERM.value!r}, '
         f'TERM_PROGRAM={env.TERM_PROGRAM.value!r}, '
-        f'color_sep={color_sep!r}) '
+        f'color_sep={_color_sep!r}) '
     )
-    return level, color_sep
+    return level, _color_sep
 
 
 def detect_terminal_level_terminfo():
@@ -235,7 +238,7 @@ def detect_terminal_level_terminfo():
                         i.e. ":" or ";".
     '''
     level = TermLevel.DUMB
-    color_sep = None
+    _color_sep = None
     try:
         # Even if curses is installed on Windows,
         # it (pdcurses) doesn't currently support terminfo
@@ -263,23 +266,24 @@ def detect_terminal_level_terminfo():
 
             # finding color_sep is a bit problematic
             if is_fbterm:
-                color_sep = ';'
+                _color_sep = ';'
             elif level >= TermLevel.ANSI_EXTENDED:
                 setaf = (tigetstr('setaf') or b'').decode('ascii')
                 # log.debug('tigetstr setaf: %r', setaf)
                 suffix = setaf.partition('38')[2]
                 if suffix:
-                    color_sep = suffix[0]  # first char after 38
+                    _color_sep = suffix[0]  # first char after 38
 
+        _color_sep = env.PY_CONSOLE_COLOR_SEP or _color_sep  # local override
         log.debug(
           f'Terminal level: {level.name!r} ({os_name}, '
-          f'TERM={env.TERM.value!r}, color_sep={color_sep!r})'
+          f'TERM={env.TERM.value!r}, color_sep={_color_sep!r})'
         )
-        return level, color_sep
+        return level, _color_sep
     except ModuleNotFoundError:
         # Fall back early when remoting to Windows w/o curses
         # TERM variable only clue:
-        return detect_terminal_level_posix()
+        return detect_terminal_level()
 
 
 def detect_unicode_support():

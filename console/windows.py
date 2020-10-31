@@ -117,7 +117,8 @@ def detect_terminal_level(basic_palette=None):
             color_sep   The extended color sequence separator character,
                         i.e. ":" or ";".
     '''
-    ansicon = color_sep = is_colorama = None
+    ansicon = is_colorama = None
+    _color_sep = env.PY_CONSOLE_COLOR_SEP or ';'  # supports only ; for now
     level = TermLevel.DUMB
     TERM = env.TERM.value or ''  # shortcut
 
@@ -137,15 +138,12 @@ def detect_terminal_level(basic_palette=None):
         if env.COLORTERM in ('truecolor', '24bit') or TERM == 'cygwin':
             level = TermLevel.ANSI_DIRECT
 
-    if level >= TermLevel.ANSI_EXTENDED:
-        color_sep = env.PY_CONSOLE_COLOR_SEP or ';'  # supports only ; for now
-
     log.debug(
         f'Term support: {level.name!r} (nt, TERM={TERM!r}, '
         f'COLORTERM={env.COLORTERM.value!r}, ANSICON={ansicon!r}, '
-        f'colorama={is_colorama}, color_sep={color_sep}) '
+        f'colorama={is_colorama}, color_sep={_color_sep}) '
     )
-    return level, color_sep
+    return level, _color_sep
 
 
 def detect_unicode_support(codepage='cp65001'):  # aka utf8
