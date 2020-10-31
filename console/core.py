@@ -311,7 +311,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             str_values = ';'.join(values)  # always semi-colon
             attr = _PaletteEntryFBTerm(self, name.upper(), str_values)
         else:
-            str_values = (self._color_sep or '').join(values)  # if None
+            str_values = self._color_sep.join(values)
             attr = _PaletteEntry(self, name.upper(), str_values)
         setattr(self, name, attr)  # now cached
         return attr

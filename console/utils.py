@@ -33,7 +33,7 @@ ansi_csi1_finder = re.compile(r'\x9b[0-?]*[ -/]*[@-~]')
 # ansi_osc0_finder = re.compile(r'(\x1b\][0-?]*\a?|\a)')  # TODO: leave title
 ansi_osc0_finder = re.compile(r'\x1b\].*?(\a|\x1b\\)')
 ansi_osc1_finder = re.compile(r'\x9b.*?(\a|\x9d)')
-_ansi_capable = 1 if _term_level else 0  # simplify comparison
+_ansi_capable = True if _term_level else False  # simplify comparison
 
 
 def clear_line(mode=2):

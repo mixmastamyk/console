@@ -127,6 +127,9 @@ class UnderlinePalette(_HighColorPaletteBuilder):
     _start_codes_extended_fbterm = ('2',)
     _start_codes_direct = ('58', '2')
 
+    def __init__(self, color_sep=':', **kwargs):  # uses :
+        super().__init__(color_sep=color_sep, **kwargs)
+
 
 class EffectsTerminator(_MonochromePaletteBuilder):
     ''' *"I'll be baaahhhck."*

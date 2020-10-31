@@ -5,7 +5,7 @@
 
     Testen-Sie, bitte.  Supported under Linux with a libvte terminal.
 '''
-from io import StringIO
+from io import StringIO, UnsupportedOperation
 
 import pytest
 try:
@@ -20,12 +20,13 @@ from .constants import TermLevel
 proximity.build_color_tables(base=color_tables.xterm_palette4)
 
 # configure our own - force all palettes on
-fg = style.ForegroundPalette(level=TermLevel.THE_FULL_MONTY)
-bg = style.BackgroundPalette(level=TermLevel.THE_FULL_MONTY)
+fg = style.ForegroundPalette(color_sep=';', level=TermLevel.THE_FULL_MONTY)
+bg = style.BackgroundPalette(color_sep=':', level=TermLevel.THE_FULL_MONTY)
 fx = style.EffectsPalette(level=TermLevel.THE_FULL_MONTY)
 ul = style.UnderlinePalette(level=TermLevel.THE_FULL_MONTY)
 defx = style.EffectsTerminator(level=TermLevel.THE_FULL_MONTY)
 sc = screen.Screen(force=True)
+utils._ansi_capable = True
 
 fg, bg, fx, defx, ul, pytest  # pyflakes
 
@@ -148,15 +149,15 @@ if True:  # fold
 
     def test_fgext_one_digit():
 
-        assert str(fg.i1) ==  CSI + '38:5:1m'
+        assert str(fg.i1) ==  CSI + '38;5;1m'
 
     def test_fgext_two_digit():
 
-        assert str(fg.i11) == CSI + '38:5:11m'
+        assert str(fg.i11) == CSI + '38;5;11m'
 
     def test_fgext_three_digits():
 
-        assert str(fg.i_111) == CSI + '38:5:111m'
+        assert str(fg.i_111) == CSI + '38;5;111m'
 
     def test_fgext_four_digits():
         with pytest.raises(AttributeError) as err:
@@ -198,7 +199,7 @@ if True:  # fold
 
     def test_fgextn_three_digits():
 
-        assert str(fg.nf0f) == CSI + '38:5:13m'
+        assert str(fg.nf0f) == CSI + '38;5;13m'
 
     def test_fgextn_four_digits():
         with pytest.raises(AttributeError) as err:
@@ -232,11 +233,11 @@ if True:  # fold
 
     def test_fgtrue_three_digits():
 
-        assert str(fg.tb0b) ==  CSI + '38:2::187:0:187m'
+        assert str(fg.tb0b) ==  CSI + '38;2;187;0;187m'
 
     def test_fgtrue_six_digits():
 
-        assert str(fg.t_ff00bb) ==  CSI + '38:2::255:0:187m'
+        assert str(fg.t_ff00bb) ==  CSI + '38;2;255;0;187m'
 
     def test_fgtrue_wrong_format():
         with pytest.raises(AttributeError) as err:
@@ -279,7 +280,7 @@ if True:  # fold
 
     def test_webcolors_bisque():
         if webcolors:
-            assert str(fg.bisque) == CSI + '38:2::255:228:196m'
+            assert str(fg.bisque) == CSI + '38;2;255;228;196m'
             assert str(bg.w_bisque) == CSI + '48:2::255:228:196m'
 
     def test_webcolors_xyzzyx():
@@ -504,14 +505,18 @@ if True:  # fold
             text + ' (fish)', text + ' (bash)', text + ' (Python)'
         )
         # best effort test
-        assert detection.get_title() in possible_results
+        try:
+            assert detection.get_title() in possible_results
+        except UnsupportedOperation:
+            pass
 
     def test_set_clipboard():
         data = 'collywobbles'
         result = utils.set_clipboard(data)
         # best effort test, may not be allowed to succeed:
-        assert utils.get_clipboard() in (None, data)
-        assert result == b'\x1b]52;c;Y29sbHl3b2JibGVz\x1b\\'
+        assert utils.get_clipboard() in (None, '', data)
+        if result is not None:
+            assert result == b'\x1b]52;c;Y29sbHl3b2JibGVz\x1b\\'
 
     # wait_key
     # pause
@@ -669,14 +674,19 @@ if True:  # fold
 
     def test_get_cursor_pos():
         # gets correct results on osx/iterm (81, 40)
-        detection.get_position()
+        # doesn't work under pytest under make
+        try:
+            result = detection.get_position()
+            assert isinstance(result, tuple)
+        except UnsupportedOperation:
+            pass
 
 # downgrade support:
 
     def test_downgrade():
-        bgall = style.BackgroundPalette(level=TermLevel.THE_FULL_MONTY)
-        bge = style.BackgroundPalette(level=TermLevel.ANSI_EXTENDED)
-        bgb = style.BackgroundPalette(level=TermLevel.ANSI_BASIC)
+        bgall = style.BackgroundPalette(color_sep=':', level=TermLevel.THE_FULL_MONTY)
+        bge = style.BackgroundPalette(color_sep=':', level=TermLevel.ANSI_EXTENDED)
+        bgb = style.BackgroundPalette(color_sep=':', level=TermLevel.ANSI_BASIC)
         E = CSI
 
         results = (
@@ -824,18 +834,18 @@ if True:  # fold
     def test_progress_solid():
 
         pb = ProgressBar(theme='solid')
-        assert str(pb(-2))  == '\r\x1b[0G\x1b[91m⏴\x1b[39m\x1b[48:5:236m                             \x1b[49m\x1b[2;38:5:236m▏\x1b[0m'
-        assert str(pb(0))   == '\r\x1b[0G\x1b[2;38:5:70m▕\x1b[0m\x1b[48:5:236m               0%            \x1b[49m\x1b[2;38:5:236m▏\x1b[0m'
-        assert str(pb(16))  == '\r\x1b[0G\x1b[2;38:5:70m▕\x1b[0m\x1b[48:5:70;30m     \x1b[0m\x1b[48:5:236m         16%            \x1b[49m\x1b[2;38:5:236m▏\x1b[0m'
-        assert str(pb(99))  == '\r\x1b[0G\x1b[2;38:5:70m▕\x1b[0m\x1b[48:5:22m                ✓            \x1b[49m\x1b[2;38:5:70m▏\x1b[0m'
-        assert str(pb(112)) == '\r\x1b[0G\x1b[2;38:5:70m▕\x1b[0m\x1b[48:5:22m                             \x1b[49m\x1b[91m⏵\x1b[39m'
+        assert str(pb(-2))  == '\r\x1b[0G\x1b[91m⏴\x1b[39m\x1b[48:5:236m                             \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
+        assert str(pb(0))   == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:236m               0%            \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
+        assert str(pb(16))  == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:70;30m     \x1b[0m\x1b[48:5:236m         16%            \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
+        assert str(pb(99))  == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:22m                ✓            \x1b[49m\x1b[2;38;5;70m▏\x1b[0m'
+        assert str(pb(112)) == '\r\x1b[0G\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:22m                             \x1b[49m\x1b[91m⏵\x1b[39m'
 
     def test_progress_hidef1():
 
         pb = HiDefProgressBar(clear_left=False, styles='greyen')
 
-        assert str(pb(-2))  == '\x1b[91m⏴\x1b[39m\x1b[38:5:236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38:5:236m▏\x1b[0m\x1b[91m  ✗ \x1b[39m'
-        assert str(pb(0))   == '\x1b[2;32m▕\x1b[0m\x1b[38:5:236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38:5:236m▏\x1b[0m  0%'
-        assert str(pb(18.1))  == '\x1b[2;32m▕\x1b[0m\x1b[32m▉▉▉▉\x1b[39m\x1b[32;48:5:236m▋\x1b[0m\x1b[38:5:236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38:5:236m▏\x1b[0m 18%'
+        assert str(pb(-2))  == '\x1b[91m⏴\x1b[39m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m\x1b[91m  ✗ \x1b[39m'
+        assert str(pb(0))   == '\x1b[2;32m▕\x1b[0m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m  0%'
+        assert str(pb(18.1))  == '\x1b[2;32m▕\x1b[0m\x1b[32m▉▉▉▉\x1b[39m\x1b[32;48:5:236m▋\x1b[0m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m 18%'
         assert str(pb(99))  == '\x1b[2;32m▕\x1b[0m\x1b[2;32m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[0m\x1b[2;32m▏\x1b[0m   ✓'
         assert str(pb(111.9)) == '\x1b[2;32m▕\x1b[0m\x1b[2;32m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[0m\x1b[91m⏵\x1b[39m\x1b[91m  ✗ \x1b[39m'

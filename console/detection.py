@@ -21,7 +21,8 @@ from .meta import __version__, defaults
 
 log = logging.getLogger(__name__)
 os_name = os.name  # frequent use
-color_sep = termios = tty = None
+color_sep = ';'
+termios = tty = None
 is_fbterm = (env.TERM == 'fbterm')
 TERM_DIRECT_USES_COLONS = ('xterm-', 'kitty-', 'iterm2-', 'mintty-', 'mlterm-')
 
@@ -509,6 +510,7 @@ def _read_clipboard(
 
         Warning: likely to block on incompatible terminals, use timeout.
     '''
+    resp = None
     query_sequence = f'{OSC}52;{source};?{ST}'
     try:
         with TermStack() as fd:
@@ -530,9 +532,6 @@ def _read_clipboard(
             resp = b64decode(resp.split(';', 3)[-1])
             if encoding:
                 resp = resp.decode(encoding)
-        else:
-            resp = None  # don't bother
-
     return resp
 
 

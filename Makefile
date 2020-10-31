@@ -61,7 +61,8 @@ test:
 	clear
 	-pyflakes *.py */*.py  # need better tool, flake8?
 	tput reset  # clear screen, scrollback
-	pytest --capture=no --color=no --showlocals -v
+#~ 	pytest --color=no --showlocals --verbose
+	pytest --color=no --verbose
 
 
 tests: test
