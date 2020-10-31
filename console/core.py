@@ -3,7 +3,7 @@
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
-    Complicated gobbyldegook supporting simple color/style interface
+    Complicated gobbyldegook supporting the simple color/style interface
     located here.
     Classes below are not meant to be instantiated by client code;
     see style.py.
@@ -170,7 +170,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         if _index_finder.match(name):       # Indexed aka Extended
             result = self._get_extended_palette_entry(name, key)
 
-        elif _nearest_finder.match(name):   # Nearest
+        elif _nearest_finder.match(name):   # Nearest index
             result = self._get_extended_palette_entry(name, key, is_hex=True)
 
         elif _true_finder.match(name):      # Direct color
@@ -334,7 +334,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
                 index += 92                     # (ANSI_BG_HI_BASE - 8)
         return [str(index)]
 
-    def clear(self):
+    def _clear(self):
         ''' "Cleanse the palette" to free memory.
             Useful for direct color, perhaps.
         '''
@@ -492,7 +492,7 @@ class _PaletteEntry:
             return result
 
     def __str__(self):
-        return f'{CSI}{";".join(self._codes)}m'
+        return f'{CSI}{";".join(self._codes)}m'  # not color_sep, styles also
 
     def __repr__(self):
         return repr(self.__str__())

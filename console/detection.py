@@ -140,7 +140,7 @@ def color_is_disabled(**envars):
                         equality, i.e. ``MYAPP_COLOR_DISABLED='1'``
 
         Returns:
-            None, Bool:  Disabled
+            disabled:   None or bool
     '''
     result = None
     if 'NO_COLOR' in env:
@@ -172,7 +172,7 @@ def color_is_forced(**envars):
             envars:     Additional environment variables as keyword arguments
                         to check for equality, i.e. ``MYAPP_COLOR_FORCED='1'``
         Returns:
-            Bool:  Forced
+            forced:     bool
     '''
     result = env.CLICOLOR_FORCE and (env.CLICOLOR_FORCE != '0')
     log.debug('%s (CLICOLOR_FORCE=%s)', result or None, env.CLICOLOR_FORCE or None)
@@ -187,7 +187,7 @@ def color_is_forced(**envars):
     return result
 
 
-def detect_terminal_level_posix():
+def detect_terminal_level():
     ''' Returns whether we think the terminal is dumb or supports basic,
         extended, or direct color sequences.  posix version.
 
@@ -201,7 +201,7 @@ def detect_terminal_level_posix():
     '''
     level = TermLevel.DUMB
     TERM = env.TERM.value or ''  # shortcut
-    _color_sep = None
+    color_sep = None
 
     if TERM.startswith(('xterm', 'linux')):
         level = TermLevel.ANSI_BASIC
@@ -209,23 +209,20 @@ def detect_terminal_level_posix():
     # upgrades
     if TERM.endswith('-256color') or is_fbterm:
         level = TermLevel.ANSI_EXTENDED
-        _color_sep = ';'
+        color_sep = ';'
 
     # https://bugzilla.redhat.com/show_bug.cgi?id=1173688 - obsolete?
     if TERM.endswith('-direct') or env.COLORTERM in ('truecolor', '24bit'):
         level = TermLevel.ANSI_DIRECT
-        _color_sep = ';' if is_fbterm else ':'
+        color_sep = ':'
 
     log.debug(
         f'Terminal level: {level.name!r} ({os_name}, TERM={TERM!r}, '
         f'COLORTERM={env.COLORTERM.value!r}, '
         f'TERM_PROGRAM={env.TERM_PROGRAM.value!r}, '
-        f'color_sep={_color_sep!r}) '
+        f'color_sep={color_sep!r}) '
     )
-    return level, _color_sep
-
-# alias to main function, shadowed on Windows
-detect_terminal_level = detect_terminal_level_posix
+    return level, color_sep
 
 
 def detect_terminal_level_terminfo():
@@ -238,7 +235,7 @@ def detect_terminal_level_terminfo():
                         i.e. ":" or ";".
     '''
     level = TermLevel.DUMB
-    _color_sep = None
+    color_sep = None
     try:
         # Even if curses is installed on Windows,
         # it (pdcurses) doesn't currently support terminfo
@@ -266,19 +263,19 @@ def detect_terminal_level_terminfo():
 
             # finding color_sep is a bit problematic
             if is_fbterm:
-                _color_sep = ';'
+                color_sep = ';'
             elif level >= TermLevel.ANSI_EXTENDED:
                 setaf = (tigetstr('setaf') or b'').decode('ascii')
                 # log.debug('tigetstr setaf: %r', setaf)
                 suffix = setaf.partition('38')[2]
                 if suffix:
-                     _color_sep = suffix[0]  # first char after 38
+                    color_sep = suffix[0]  # first char after 38
 
         log.debug(
           f'Terminal level: {level.name!r} ({os_name}, '
-          f'TERM={env.TERM.value!r}, color_sep={_color_sep!r})'
+          f'TERM={env.TERM.value!r}, color_sep={color_sep!r})'
         )
-        return level, _color_sep
+        return level, color_sep
     except ModuleNotFoundError:
         # Fall back early when remoting to Windows w/o curses
         # TERM variable only clue:
@@ -288,18 +285,18 @@ def detect_terminal_level_terminfo():
 def detect_unicode_support():
     ''' Try to detect unicode (utf8?) support in the terminal.
 
-        Checks the ``LANG`` environment variable or Windows code page,
+        Checks the ``LANG`` environment variable,
         falls back to an experimental method.
         Implementation idea is from the link below:
 
            https://unix.stackexchange.com/q/184345/
 
         Returns:
-            Boolean | None if not a TTY
+            support: Boolean | None if not a TTY
     '''
     result = None
 
-    if env.LANG and env.LANG.endswith('UTF-8'):  # first approximation
+    if env.LANG and env.LANG.upper().endswith('UTF-8'):  # first approximation
         result = True
 
     elif is_a_tty():  # kludge
@@ -346,7 +343,7 @@ def _find_basic_palette_from_os(level):
             basic_palette = color_tables.cmd1709_palette4
             level = TermLevel.ANSI_DIRECT  # override
         elif sys.platform.startswith('freebsd'):
-            pal_name = 'vga'  # TODO: is valid?  vga console
+            pal_name = 'vga'
             basic_palette = color_tables.vga_palette4
 
         # Look harder by querying terminal; get_color may timeout
@@ -384,12 +381,6 @@ def _find_basic_palette_from_term(term):
             break
 
     return pal_name, basic_palette
-
-
-def get_color_sep():
-
-
-    return env.PY_CONSOLE_COLOR_SEP or (';' if is_fbterm else ':')
 
 
 def is_a_tty(stream=sys.stdout):
