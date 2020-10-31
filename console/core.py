@@ -213,7 +213,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
             start_codes = self._start_codes_extended
             if is_fbterm:
                 start_codes = self._start_codes_extended_fbterm
-            values.extend(start_codes)
+            values.extend(start_codes)  # no colorspace param needed
             values.append(index)
 
         # downgrade section
@@ -240,6 +240,8 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
 
         if self._level >= TermLevel.ANSI_DIRECT:  # build entry
             values.extend(self._start_codes_direct)
+            if self._color_sep == ':':
+                values.append('')  # needs a colorspace param, ok if empty
             if digits_type is str:  # convert from hex string
                 if len(digits) == 3:
                     values.extend(str(int(ch + ch, 16)) for ch in digits)
