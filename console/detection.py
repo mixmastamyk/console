@@ -24,7 +24,7 @@ os_name = os.name  # frequent use
 color_sep = ';'
 termios = tty = None
 is_fbterm = (env.TERM == 'fbterm')
-TERM_DIRECT_USES_COLONS = ('xterm-', 'kitty-', 'iterm2-', 'mintty-', 'mlterm-')
+TERM_DIRECT_USES_COLONS = ('xterm-', 'iterm2-', 'kitty-', 'mintty-', 'mlterm-')
 
 
 if os_name == 'posix':  # Tron leotards
@@ -205,7 +205,7 @@ def detect_terminal_level():
     level = TermLevel.DUMB
     TERM = env.TERM.value or ''  # shortcut
     WSL = bool(env.WSLENV)  # Linux Subsystem for Winders
-    _color_sep = ';'
+    _color_sep = ';'  # char to separate color sequences
 
     if TERM.startswith(('xterm', 'linux')):
         level = TermLevel.ANSI_BASIC
@@ -221,10 +221,12 @@ def detect_terminal_level():
         or TERM.endswith('-direct')
     ):
         level = TermLevel.ANSI_DIRECT
+
+    if TERM.endswith('-direct'):  # need to check again
         for prefix in TERM_DIRECT_USES_COLONS:
             if TERM.startswith(prefix):
-                _color_sep = ':'
-                break
+                _color_sep = ':'; break
+
     _color_sep = env.PY_CONSOLE_COLOR_SEP or _color_sep  # local override
     log.debug(
         f'Terminal level: {level.name!r} ({os_name}{" WSL" if WSL else ""}, '
@@ -616,7 +618,7 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
 
     elif os_name == 'posix':
         if env.WSLENV or env.TERM_PROGRAM == 'vscode':
-            pass  # LSW, vscode on Linux hang on xterm query
+            pass  # LSW, vscode on Linux don't support xterm query
         elif env.TERM.startswith('xterm'):
             color = _get_color_xterm(name, number, timeout=timeout)
 
