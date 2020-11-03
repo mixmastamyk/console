@@ -34,7 +34,7 @@ if (_env.PY_CONSOLE_AUTODETECT.value is None or
     _env.PY_CONSOLE_AUTODETECT.truthy):
 
     # detect palette, other modules are dependent
-    from .detection import init as _init  # noqa
+    from .detection import init as _init
 
     _term_level = _init()
 
@@ -42,9 +42,16 @@ if (_env.PY_CONSOLE_AUTODETECT.value is None or
         # monochrome stuff first
         from .style import fx, defx
         from .screen import sc
+        from .detection import is_fbterm as _is_fbterm
 
         if _term_level > _TermLevel.ANSI_MONOCHROME:
-            from .style import fg, bg, ul  # Yo Iz, let's do this…
+            from .style import fg, bg  # Yo Iz, let's do this…
+
+        # curly, colored underlines not handled by linux consoles:
+        if _term_level > _TermLevel.ANSI_BASIC and not _is_fbterm:
+            from .style import ul
+        else:
+            fx.curly_underline = fx.underline  # downgrade
 
     fg, bg, ul, fx, defx, sc, TermStack  # quiet pyflakes
 

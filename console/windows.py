@@ -3,8 +3,8 @@
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
-    Module for Windows API crud.
-    Most of the time, it is not necessary to use this module directly;
+    Module for traditional Windows API crud (though not WSL).
+    Typically, it is not necessary to use this module directly;
     the detection module is preferred.
 
     https://docs.microsoft.com/en-us/windows/console/console-reference
@@ -154,14 +154,10 @@ def detect_unicode_support(codepage='cp65001'):  # aka utf8
     return result
 
 
-def _find_basic_palette_from_os(level):
+def _find_basic_palette_from_os():
     ''' Find the platform-dependent 16-color basic palette—Windows version.
 
         This is used for "downgrading to the nearest color" support.
-
-        Arguments:
-            level       This is passed through on the possibility it may need
-                        to be overridden, due to WSL oddities. (Compat. only)
     '''
     if sys.getwindowsversion()[2] >= 16299: # new palette after Win10 1709 FCU
         pal_name = 'cmd_1709'
@@ -170,7 +166,7 @@ def _find_basic_palette_from_os(level):
         pal_name = 'cmd_legacy'
         basic_palette = color_tables.cmd_palette4
 
-    return level, pal_name, basic_palette
+    return pal_name, basic_palette
 
 
 def enable_vt_processing():

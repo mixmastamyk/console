@@ -71,14 +71,13 @@ def run():
 
     print()
     print(make_header(i+1), 'with bg:')
+    msg = '\tCan I get the icon in Cornflower Blue?\n\tAbsolutely. :-D'
     try:
         with bg.cornflowerblue:
-            print('\tCan I get the icon in Cornflower Blue?\n\t'
-                  'Absolutely. :-D')
+            print(msg)
     except AttributeError:
         with bg.blue:
-            print('\tCan I get the icon in Cornflower Blue?\n\t'
-                  'Absolutely. :-D')
+            print(msg)
     print('\n')
 
     print(make_header(i+2), 'Foreground - 256 indexed colors:\n      ',
@@ -284,8 +283,14 @@ if __name__ == '__main__':
 
     from . import _term_level
     from .constants import BEL, TermLevel
-    from .detection import is_a_tty, get_color, get_theme
+    from .detection import is_a_tty, get_color, get_theme, is_fbterm
     from .screen import sc
     from .utils import set_title, strip_ansi, cls, make_hyperlink
+
+    # curly, colored underlines not handled by linux consoles:
+    if _term_level > TermLevel.ANSI_BASIC and not is_fbterm:
+        from .style import ul
+    else:
+        fx.curly_underline = fx.underline  # downgrade
 
     run()
