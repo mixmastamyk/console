@@ -616,7 +616,7 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
 
     elif os_name == 'posix':
         if env.WSLENV or env.TERM_PROGRAM == 'vscode':
-            pass  # LSW, vscode on Linux hangs
+            pass  # LSW, vscode on Linux hang on xterm query
         elif env.TERM.startswith('xterm'):
             color = _get_color_xterm(name, number, timeout=timeout)
 
@@ -733,16 +733,12 @@ def get_theme(timeout=defaults.READ_TIMEOUT):
 
     else:
         if env.TERM.startswith('xterm'):
-            # Python on Linux on Windows
-            if env.WSLENV or env.TERM_PROGRAM == 'vscode':
-                pass
-            else:
-                # try xterm query - find average across rgb
-                colors = get_color('background', timeout=timeout)  # bg wins
-                if colors:
-                    colors = tuple(int(hexclr[:2], 16) for hexclr in colors)
-                    avg = sum(colors) / len(colors)
-                    theme = 'dark' if avg < 128 else 'light'
+            # try xterm query - find average across rgb
+            colors = get_color('background', timeout=timeout)  # bg wins
+            if colors:
+                colors = tuple(int(hexclr[:2], 16) for hexclr in colors)
+                avg = sum(colors) / len(colors)
+                theme = 'dark' if avg < 128 else 'light'
         elif env.TERM.startswith(('linux', 'fbterm')):  # vga console
             theme = 'dark'
         #~ elif sys.platform.startswith('freebsd'):  # TODO: vga console?
