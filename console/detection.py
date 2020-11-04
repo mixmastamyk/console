@@ -342,7 +342,11 @@ def _find_basic_palette_from_os():
     pal_name = 'default (xterm)'
     basic_palette = DEFAULT_BASIC_PALETTE
 
-    if env.TERM.startswith('xterm'):
+    if env.WSLENV:
+        pal_name = 'cmd_1709'
+        basic_palette = color_tables.cmd1709_palette4
+
+    elif env.TERM.startswith('xterm'):
         if sys.platform.startswith('freebsd'):  # TODO: console, X?
             pal_name = 'vga'
             basic_palette = color_tables.vga_palette4
@@ -359,10 +363,6 @@ def _find_basic_palette_from_os():
                     raise RuntimeError('not a known color scheme.')
             except (IndexError, RuntimeError, termios.error) as err:
                 log.debug('get_color return value failed: %s', err)
-
-    elif env.WSLENV:
-        pal_name = 'cmd_1709'
-        basic_palette = color_tables.cmd1709_palette4
 
     elif env.TERM.startswith(('linux', 'fbterm')):
         pal_name = 'vtrgb'
