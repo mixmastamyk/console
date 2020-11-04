@@ -229,7 +229,7 @@ def detect_terminal_level():
 
     _color_sep = env.PY_CONSOLE_COLOR_SEP or _color_sep  # local override
     log.debug(
-        f'Terminal level: {level.name!r} ({os_name}{"-WSL" if WSL else ""}, '
+        f'Terminal level: {level.name!r} ({os_name}{"-wsl" if WSL else ""}, '
         f'TERM={TERM!r}, COLORTERM={env.COLORTERM.value!r}, '
         f'TERM_PROGRAM={env.TERM_PROGRAM.value!r}, '
         f'color_sep={_color_sep!r}) '
