@@ -202,7 +202,7 @@ def enable_vt_processing():
         else:
             results.append('Already Enabled')
     results = tuple(results)
-    log.debug('%s', results)
+    log.debug('%s %s', all(results), results)
     return results
 
 
@@ -217,7 +217,8 @@ def is_ansi_capable():
             result = True
         else:
             result = False
-        log.debug('%s (Windows version: %s)', result, CURRENT_VERS)
+        log.debug('%s (Windows version: %s > %s)',
+                  result, CURRENT_VERS, BUILD_ANSI_AVAIL)
         return result
     except AttributeError:
         pass
