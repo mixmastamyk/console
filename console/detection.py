@@ -342,7 +342,7 @@ def _find_basic_palette_from_os():
     pal_name = 'default (xterm)'
     basic_palette = DEFAULT_BASIC_PALETTE
 
-    if env.WSLENV:
+    if env.WSLENV:  # must go first since it uses TERM=xterm-
         pal_name = 'cmd_1709'
         basic_palette = color_tables.cmd1709_palette4
 
