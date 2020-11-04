@@ -121,8 +121,12 @@ def detect_terminal_level(basic_palette=None):
     _color_sep = env.PY_CONSOLE_COLOR_SEP or ';'  # supports only ; for now
     level = TermLevel.DUMB
     TERM = env.TERM.value or ''  # shortcut
+    if TERM == 'alacritty':  # try to alleviate issue #8
+        all_enabled = True
+    else:
+        all_enabled = all(enable_vt_processing())
 
-    if is_ansi_capable() and all(enable_vt_processing()):  # newfangled
+    if is_ansi_capable() and all_enabled:  # newfangled
         level = TermLevel.ANSI_DIRECT
     else:
         is_colorama = is_colorama_installed()
@@ -181,6 +185,7 @@ def enable_vt_processing():
             Tuple of status codes from SetConsoleMode for (stdout, stderr).
     '''
     results = []
+
     for stream in (STD_OUTPUT_HANDLE, STD_ERROR_HANDLE):
         handle = kernel32.GetStdHandle(stream)
         # get current mode

@@ -47,7 +47,7 @@ if (_env.PY_CONSOLE_AUTODETECT.value is None or
         if _term_level > _TermLevel.ANSI_MONOCHROME:
             from .style import fg, bg  # Yo Iz, let's do this…
 
-        # curly, colored underlines not handled by linux consoles:
+        # curly or colored underlines not handled well by linux consoles:
         if _term_level > _TermLevel.ANSI_BASIC and not _is_fbterm:
             from .style import ul
         else:
