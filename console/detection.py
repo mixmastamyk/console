@@ -207,7 +207,7 @@ def detect_terminal_level():
     WSL = bool(env.WSLENV)  # Linux Subsystem for Winders
     _color_sep = ';'  # color sequences delimiter
 
-    if TERM.startswith(('xterm', 'linux')):  # also freebsd
+    if TERM.startswith(('xterm', 'linux', 'vt')):
         level = TermLevel.ANSI_BASIC
 
     # upgrades
