@@ -344,7 +344,7 @@ under the lame (no-ANSI support) versions of Windows < 10
 
 Der ``console`` package has recently been tested on:
 
-- Ubuntu 19.10 - Python 3.7
+- Ubuntu Linux 20.04 - Python 3.8
 
   - xterm, mate-terminal, linux console, fbterm
   - Very occasionally on kitty, guake
