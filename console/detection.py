@@ -205,9 +205,9 @@ def detect_terminal_level():
     level = TermLevel.DUMB
     TERM = env.TERM.value or ''  # shortcut
     WSL = bool(env.WSLENV)  # Linux Subsystem for Winders
-    _color_sep = ';'  # char to separate color sequences
+    _color_sep = ';'  # color sequences delimiter
 
-    if TERM.startswith(('xterm', 'linux')):
+    if TERM.startswith(('xterm', 'linux')):  # also freebsd
         level = TermLevel.ANSI_BASIC
 
     # upgrades
@@ -342,7 +342,7 @@ def _find_basic_palette_from_os():
     pal_name = 'default (xterm)'
     basic_palette = DEFAULT_BASIC_PALETTE
 
-    if env.WSLENV:  # must go first since it uses TERM=xterm-
+    if env.WSLENV:  # must go first since Windows uses TERM=xterm…
         pal_name = 'cmd_1709'
         basic_palette = color_tables.cmd1709_palette4
 
@@ -613,12 +613,13 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
             # supports, though returns only two chars per
             color = _get_color_xterm(name, number, timeout=timeout)
 
-    #~ elif sys.platform.startswith('freebsd'):  # TODO, may not be console
-        #~ pass
-
     elif os_name == 'posix':
         if env.WSLENV or env.TERM_PROGRAM == 'vscode':
             pass  # LSW, vscode on Linux don't support xterm query
+
+        elif env.TERM =='xterm' and sys.platform.startswith('freebsd'):
+            pass  # freebsd console
+
         elif env.TERM.startswith('xterm'):
             color = _get_color_xterm(name, number, timeout=timeout)
 
@@ -726,7 +727,7 @@ def get_theme(timeout=defaults.READ_TIMEOUT):
             str, None:  'dark', 'light', or None if no information.
     '''
     theme = None
-    COLORFGBG = env.COLORFGBG
+    COLORFGBG = env.COLORFGBG.value
     log.debug('COLORFGBG: %s', COLORFGBG)
 
     if COLORFGBG:
@@ -734,17 +735,18 @@ def get_theme(timeout=defaults.READ_TIMEOUT):
         theme = 'dark' if BG < '8' else 'light'  # background wins
 
     else:
-        if env.TERM.startswith('xterm'):
+        TERM = env.TERM.value
+        if TERM =='xterm' and sys.platform.startswith('freebsd'):
+            theme = 'dark'
+        elif TERM.startswith('xterm'):
             # try xterm query - find average across rgb
             colors = get_color('background', timeout=timeout)  # bg wins
             if colors:
                 colors = tuple(int(hexclr[:2], 16) for hexclr in colors)
                 avg = sum(colors) / len(colors)
                 theme = 'dark' if avg < 128 else 'light'
-        elif env.TERM.startswith(('linux', 'fbterm')):  # vga console
+        elif TERM.startswith(('linux', 'fbterm')):  # vga console
             theme = 'dark'
-        #~ elif sys.platform.startswith('freebsd'):  # TODO: vga console?
-            #~ theme = 'dark'
 
     log.debug('%r', theme)
     return theme
