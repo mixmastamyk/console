@@ -207,7 +207,10 @@ def detect_terminal_level():
     WSL = bool(env.WSLENV)  # Linux Subsystem for Winders
     _color_sep = ';'  # color sequences delimiter
 
-    if TERM.startswith(('xterm', 'linux', 'vt')):
+    if TERM.startswith('vt'):  # openbsd, hardware
+        level = TermLevel.ANSI_MONOCHROME  # 525 had color
+
+    if TERM.startswith(('xterm', 'linux')):
         level = TermLevel.ANSI_BASIC
 
     # upgrades
@@ -347,7 +350,7 @@ def _find_basic_palette_from_os():
         basic_palette = color_tables.cmd1709_palette4
 
     elif env.TERM.startswith('xterm'):
-        if sys.platform.startswith('freebsd'):  # TODO: console, X?
+        if sys.platform.startswith('freebsd'):  # console
             pal_name = 'vga'
             basic_palette = color_tables.vga_palette4
         else:  # Look harder by querying terminal; get_color may timeout
@@ -736,7 +739,7 @@ def get_theme(timeout=defaults.READ_TIMEOUT):
 
     else:
         TERM = env.TERM.value
-        if TERM =='xterm' and sys.platform.startswith('freebsd'):
+        if TERM =='xterm' and sys.platform.startswith('freebsd'):  # console
             theme = 'dark'
         elif TERM.startswith('xterm'):
             # try xterm query - find average across rgb
@@ -746,6 +749,8 @@ def get_theme(timeout=defaults.READ_TIMEOUT):
                 avg = sum(colors) / len(colors)
                 theme = 'dark' if avg < 128 else 'light'
         elif TERM.startswith(('linux', 'fbterm')):  # vga console
+            theme = 'dark'
+        elif TERM.startswith('vt'):  # openbsd, hardware
             theme = 'dark'
 
     log.debug('%r', theme)
