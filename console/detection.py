@@ -350,7 +350,7 @@ def _find_basic_palette_from_os():
         basic_palette = color_tables.cmd1709_palette4
 
     elif env.TERM.startswith('xterm'):
-        if sys.platform.startswith('freebsd'):  # console
+        if sys.platform.startswith('freebsd'):  # can't differentiate console
             pal_name = 'vga'
             basic_palette = color_tables.vga_palette4
         else:  # Look harder by querying terminal; get_color may timeout
