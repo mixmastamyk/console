@@ -611,6 +611,8 @@ but you can run several of its modules for information and other functionality:
 
     python3 -m console.ascii4 [-l -u -n ]  # A four-column ascii chart
 
+    python3 -m console.line [ -h ]  # print a nifty full width line
+
     # demos
     python3 -m console.demos [-d]
     python3 -m console.printers  # more demos
@@ -622,6 +624,8 @@ but you can run several of its modules for information and other functionality:
 ``-d`` enables ``DEBUG`` logging.
 The ``3`` at the end of ``python3`` may not be necessary,
 e.g. on Windows or Arch Linux.
+
+Let me know in the issues if you'd really like a ``console`` command.
 
 
 Tips
