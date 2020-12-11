@@ -3,7 +3,7 @@
     .. © 2018-2020, Mike Miller - Released under the LGPL, version 3+.
 
     Cross-platform beep functions.
-    See BoomBox for audio file playback and tone-generation for sound effects.
+    See BoomBox for audio-file playback and tone-generation for sound effects.
 '''
 import logging
 import sys

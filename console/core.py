@@ -198,8 +198,8 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
 
             # Emerald city
             cname = self.__class__.__name__
-            raise AttributeError(f'{cname} - {name!r} is not a attribute name'
-                                 ' or recognized format.')
+            raise AttributeError(f'{cname} - {name!r} is not a recognized '
+                                 'color name or format.')
         return result
 
     def _get_extended_palette_entry(self, name, index, is_hex=False):

@@ -849,3 +849,39 @@ if True:  # fold
         assert str(pb(18.1))  == '\x1b[2;32m▕\x1b[0m\x1b[32m▉▉▉▉\x1b[39m\x1b[32;48:5:236m▋\x1b[0m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m 18%'
         assert str(pb(99))  == '\x1b[2;32m▕\x1b[0m\x1b[2;32m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[0m\x1b[2;32m▏\x1b[0m   ✓'
         assert str(pb(111.9)) == '\x1b[2;32m▕\x1b[0m\x1b[2;32m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[0m\x1b[91m⏵\x1b[39m\x1b[91m  ✗ \x1b[39m'
+
+
+# Line
+# ----------------------------------------------------------------------------
+if True:  # fold
+    from .line import make_line
+    _def_width = 80
+
+    def test_line_std():
+        expected = f'\x1b[2m{"─" * _def_width}\x1b[22m'
+        assert make_line() == expected
+
+    def test_line_color():
+        expected = f'\x1b[31m{"─" * _def_width}\x1b[39m'
+        assert make_line(color='red') == expected
+
+    def test_line_str():
+        char = '='
+        expected = f'\x1b[2m{char * _def_width}\x1b[22m'
+        assert make_line(string=char) == expected
+
+    def test_line_width():
+        width = 10
+        expected = f'\x1b[2m{"─" * width}\x1b[22m'
+        assert make_line(width=width) == expected
+
+    def test_line_center():
+        with pytest.raises(RuntimeError):
+            make_line(center=True)
+
+    def test_line_center_width():
+        width = 10
+        spacing = " " * 35  # from half _def_width - width
+        expected = f'{spacing}\x1b[2m{"─" * width}\x1b[22m{spacing}'
+        assert make_line(width=width, center=True) == expected
+
