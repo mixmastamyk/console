@@ -2,53 +2,14 @@
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018-2020, Mike Miller - Released under the LGPL, version 3+.
 
-    Prints fancy lines, similar to HTML header rules, for use in scripts.
+    Prints a fancy line (similar to HTML header rules) for use in scripts.
+
+    DEPRECATED - going to move this and others to a dedicated command.
 '''
 import sys, os
 
-from console import fg, fx
-from console.detection import get_size
-from console.meta import pkgname, __version__
-
-
-_FALLBACK_SIZE = (80, 20)
-
-
-def make_line(string='─', width=0, color=None, center=None):
-    ''' Build a header-rule style line, using Unicode characters.
-
-        New lines are handled by the caller.
-        If the default width of the terminal is used,
-        no newline is necessary.
-    '''
-    auto_width = None
-    columns = get_size(_FALLBACK_SIZE).columns
-
-    if width == 0:
-        auto_width = True
-        width = columns
-
-    line = string * width
-    orig_line_len = len(line)
-
-    if color:
-        line = getattr(fg, color)(line)
-    else:
-        line = fx.dim(line)
-
-    if center:
-        if auto_width:  # manual width not set
-            raise RuntimeError('center parameter must be given with width.')
-        else:
-            num_spaces = (columns - width) // 2  # floor
-            orig_line_len = num_spaces + orig_line_len + num_spaces
-            spacing = ' ' * num_spaces
-            line = spacing + line + spacing
-            if columns > orig_line_len:
-                line += ' '
-
-    return line
-
+from .meta import pkgname, __version__
+from .utils import make_line
 
 
 if __name__ == '__main__':
@@ -75,7 +36,7 @@ if __name__ == '__main__':
         # parse and validate
         try:
             args = parser.parse_args()
-            if args.center and 'width' not in args:
+            if 'center' in args and 'width' not in args:
                 parser.error('--center must be given with --width.')
 
         except SystemExit:
@@ -89,7 +50,8 @@ if __name__ == '__main__':
         status = os.EX_OK
         try:
             args = vars(args)
-            end = '\n' if args.get('width') else ''
+            #~ end = '\n' if args.get('width') else ''
+            end = ''
             print(make_line(**args), end=end)
 
         except Exception as err:

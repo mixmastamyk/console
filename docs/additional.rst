@@ -611,7 +611,7 @@ but you can run several of its modules for information and other functionality:
 
     python3 -m console.ascii4 [-l -u -n ]  # A four-column ascii chart
 
-    python3 -m console.line [ -h ]  # print a nifty full width line
+    python3 -m console.line [ -h ]  # print a nifty full-width line
 
     # demos
     python3 -m console.demos [-d]

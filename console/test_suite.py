@@ -854,7 +854,7 @@ if True:  # fold
 # Line
 # ----------------------------------------------------------------------------
 if True:  # fold
-    from .line import make_line
+    from .utils import make_line
     _def_width = 80
 
     def test_line_std():
@@ -875,13 +875,37 @@ if True:  # fold
         expected = f'\x1b[2m{"─" * width}\x1b[22m'
         assert make_line(width=width) == expected
 
-    def test_line_center():
+    def test_line_center_no_widt():
         with pytest.raises(RuntimeError):
             make_line(center=True)
 
-    def test_line_center_width():
-        width = 10
-        spacing = " " * 35  # from half _def_width - width
-        expected = f'{spacing}\x1b[2m{"─" * width}\x1b[22m{spacing}'
-        assert make_line(width=width, center=True) == expected
+    # helpers
+    _get_spacing = lambda columns, width: " " * ((columns - width) // 2)
+    _ansi_chars = 9  # len('\x1b[2m\x1b[22m')
 
+    def test_line_center_width_even():
+        width = 10  # even, even
+        spaces = _get_spacing(_def_width, width)
+        expected = f'\x1b[2m{spaces}{"─" * width}{spaces}\x1b[22m'
+        result = make_line(width=width, center=True)
+        assert result == expected
+
+    def test_line_center_columns_odd():
+        width = 10  # even
+        columns = 81  # odd
+        spaces = _get_spacing(columns, width)
+        expected = f'\x1b[2m{spaces}{"─" * width}{spaces} \x1b[22m' # 👀 space
+        result = make_line(width=width, center=True, _fallback=columns)
+
+        assert result == expected
+        assert len(result) == columns + _ansi_chars
+
+    def test_line_center_width_odd():
+        width = 11  # odd
+        columns = 80  # even
+        spaces = _get_spacing(columns, width)
+        expected = f'\x1b[2m{spaces}{"─" * width}{spaces} \x1b[22m' # 👀 SP
+        result = make_line(width=width, center=True, _fallback=columns)
+
+        assert result == expected
+        assert len(result) == columns + _ansi_chars

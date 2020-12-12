@@ -20,7 +20,7 @@ from urllib.parse import quote
 
 from .constants import OSC, ST, _MODE_MAP, _TITLE_MODE_MAP
 from .screen import sc
-from .detection import is_a_tty, os_name, _read_clipboard
+from .detection import get_size, is_a_tty, os_name, _read_clipboard
 from .meta import defaults
 from . import _term_level
 
@@ -212,6 +212,49 @@ def make_hyperlink(target, caption=None, icon='', **params):
 
     else:  # don't bother if redirected and/or ANSI disabled.
         return caption or ''
+
+
+def make_line(string='─', width=0, color=None, center=None, _fallback=80):
+    ''' Build a header-rule style line, using Unicode characters.
+
+        Arguments:
+            string      The character or short string to repeat.
+            color       A color name to assign to the line.
+            width       How long the line should be in characters,
+                        zero defaults to full width of the line.
+            center      If a specific width is given, center it between spaces.
+
+        New lines are handled by the caller.
+        If the default width of the terminal is used,
+        or center is given, no newline is necessary.
+    '''
+    auto_width = width < 1
+    columns = get_size((_fallback, 0)).columns  # _fallback supports testing
+
+    if auto_width:
+        width = columns
+
+    line = string * width
+    if center:
+        if auto_width:  # manual width not set
+            raise RuntimeError('center option needs a valid width.')
+        else:
+            num_spaces = (columns - width) // 2  # floor
+            spacing = ' ' * num_spaces
+            line = spacing + line + spacing
+
+            # if result is short from floor, we'll need another space
+            if len(line) != columns:
+                line += ' '
+
+    if _ansi_capable:
+        from . import fg, fx
+        if color:
+            line = getattr(fg, color)(line)
+        else:
+            line = fx.dim(line)
+
+    return line
 
 
 def notify_cwd(path=None):
