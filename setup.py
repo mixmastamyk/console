@@ -1,16 +1,17 @@
 import sys
-from os.path import dirname, join
-from setuptools import setup
-
 
 assert sys.version_info >= (3, 4, 0), "This package requires Python 3.4+"
-# avoid starting console detection:
-import imp
-meta = imp.load_source('meta', 'console/meta.py')
-
-
 if sys.version_info.major < 3:
     raise NotImplementedError('Sorry, only Python 3 and above is supported.')
+
+
+from os.path import dirname, join
+from setuptools import setup
+import imp
+
+# avoid starting console detection:
+meta = imp.load_source('meta', 'console/meta.py')
+
 
 # https://www.python.org/dev/peps/pep-0508/#environment-markers
 install_requires = (
@@ -44,8 +45,9 @@ setup(
     license             = 'LGPL 3',
     long_description    = slurp('readme.rst'),
     packages            = (meta.pkgname,),
-    url                 = meta.home_url,
     project_urls        = meta.project_urls,
+    scripts             = (join(meta.pkgname, meta.pkgname),),
+    url                 = meta.home_url,
     version             = meta.version,
 
     extras_require      = extras_require,
