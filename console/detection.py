@@ -626,6 +626,7 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
         elif env.TERM.startswith('xterm'):
             color = _get_color_xterm(name, number, timeout=timeout)
 
+    # Windows impl. uses its API, Terminal has begun support of xterm query
     log.debug('%s %s color: %r', name, number, color)
     return color
 

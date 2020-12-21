@@ -214,12 +214,12 @@ def make_hyperlink(target, caption=None, icon='', **params):
         return caption or ''
 
 
-def make_line(string='─', width=0, color=None, center=None, _fallback=80):
+def make_line(string='─', width=0, color=None, center=False, _fallback=80):
     ''' Build a header-rule style line, using Unicode characters.
 
         Arguments:
-            string      The character or short string to repeat.
-            color       A color name to assign to the line.
+            string      A character or short string to repeat.
+            color       A color name to assign to the line, defaults to dim.
             width       How long the line should be in characters,
                         zero defaults to full width of the line.
             center      If a specific width is given, center it between spaces.
@@ -235,6 +235,9 @@ def make_line(string='─', width=0, color=None, center=None, _fallback=80):
         width = columns
 
     line = string * width
+    if len(string) > 1:  # truncate line length if multi-char string
+        line = line[:width]
+
     if center:
         if auto_width:  # manual width not set
             raise RuntimeError('center option needs a valid width.')
