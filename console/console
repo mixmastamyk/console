@@ -4,13 +4,14 @@
     .. © 2018-2020, Mike Miller - Released under the LGPL, version 3+.
 
     Convenience command-line interface script for select utility functions and
-    methods.
+    methods that don't have common implementations.
 '''
 import sys, os
 import logging
 from importlib import import_module
 from inspect import signature
 
+import out
 
 __version__ = '0.50'
 log = logging.getLogger(__name__)
@@ -18,7 +19,31 @@ commands = (
     # module            function    aliases
     ('console.utils', 'make_line', ('line',)),
     ('console.utils', 'make_hyperlink', ('link',)),
+    ('console.utils', 'set_title', []),
+    ('console.utils', 'flash', []),
+    ('console.utils', 'clear_lines', []),
+    ('console.utils', 'notify_cwd', []),
 )
+
+
+def _parse_extras(parser, extras):
+    ''' function_doc '''
+    new = {}
+    keys = []
+    for arg in extras:
+        if arg.startswith('--'):
+            suffix = arg[2:]
+            key, _, val = suffix.partition('=')
+            if val:
+                new[key] = val
+            else:
+                keys.append(suffix)
+        elif keys:
+            new[keys.pop()] = arg
+        else:
+            parser.error('no extra positional arguments allowed: %r' % arg)
+
+    return new
 
 
 def setup():
@@ -28,7 +53,7 @@ def setup():
     parser = ArgumentParser(
         description=__doc__, formatter_class=RawTextHelpFormatter
     )
-    parsers = parser.add_subparsers(
+    subparser = parser.add_subparsers(
         description='the following subcommand actions are supported:',
         #~ dest='action',  # if action is needed
         required=True,
@@ -38,38 +63,34 @@ def setup():
 
     for modname, funcname, aliases in commands:
 
-        func_parser = parsers.add_parser(
+        sub_cmd_parser = subparser.add_parser(
             funcname,
             aliases=aliases,
             help=f'{funcname} help',
         )
         mod = import_module(modname)
         funk = getattr(mod, funcname)
-        func_parser.set_defaults(_funk=funk)
+        sub_cmd_parser.set_defaults(_funk=funk)
         sig = signature(funk)
 
         for param_name in sig.parameters:
 
             if param_name.startswith('_'):
                 continue
-
-            param = sig.parameters[param_name]
-            #~ print('  param:', param_name)
-            #~ print('    default: %r' % param.default)
-            #~ print('    annotat: ', param.annotation)
-            #~ print('    kind    :', param.kind)
-
             prefix = '--'
+            param = sig.parameters[param_name]
+
+            type_ = str  # default
             if param.annotation is not param.empty:  # allow override
                 type_ = param.annotation
+            elif param.kind.name == 'VAR_KEYWORD':  # **kwargs
+                continue  # handle these later, as extras
             elif param.default is None:
-                type_ = str
+                pass
             elif param.default is param.empty:
-                type_ = str
                 prefix = ''
             else:
                 type_ = type(param.default)
-            #~ print('    type   :', type_)
 
             sub_args = dict(
                 default=param.default,
@@ -83,8 +104,14 @@ def setup():
                 sub_args['type'] = type_
                 sub_args['metavar'] = param_name[0].upper()
 
-            #~ print('  subargs:', sub_args)
-            func_parser.add_argument(prefix + param_name, **sub_args)
+            if '-v' in sys.argv:
+                print('  param:', f'\x1b[1;32m{param_name}\x1b[m')
+                print('    default: %r' % param.default)
+                print('    annotat:', param.annotation)
+                print('    kind   :', param.kind.name)
+                print('    type   :', type_)
+                print('    sub add_argument:', sub_args)
+            sub_cmd_parser.add_argument(prefix + param_name, **sub_args)
 
     # common stuff
     parser.add_argument(
@@ -97,24 +124,27 @@ def setup():
     )
 
     # parse and validate
-    args = parser.parse_args()
+    #~ args = parser.parse_args()
+    args, extras = parser.parse_known_args()
     args.verbose = args.loglvl == logging.DEBUG
-    if args.verbose:
-        pass
+    log.debug('extr: %s', extras)
+    extras = _parse_extras(parser, extras)
 
     # start logging
-    logging.basicConfig(
-        level=args.loglvl,
-        stream=sys.stdout,
-        format='  %(levelname)-8.8s %(message)s',
-    )
+    out.configure(level=args.loglvl)
+    #~ logging.basicConfig(
+        #~ level=args.loglvl,
+        #~ stream=sys.stdout,
+        #~ format='  %(levelname)-8.8s %(message)s',
+    #~ )
     logging.captureWarnings(True)
+    log.debug('extr: %s', extras)
     log.debug('args: %s', args)
 
-    return args
+    return args, extras
 
 
-def main(args):
+def main(args, extras):
     ''' Tear the roof off the sucker… '''
     status = os.EX_OK
 
@@ -126,11 +156,14 @@ def main(args):
 
         if funk:
             log.debug('running: %s %s', funk, options)
-            print(funk(**options))
+            result = funk(**options, **extras)
+            print(result, end='\n')
+            log.debug('result: %r', result)
 
-    except Exception as err:
-        # os.EX_DATAERR os.EX_NOINPUT os.EX_CANTCREAT os.EX_IOERR os.EX_CONFIG
-        print(err)
+
+    except Exception:
+        log.exception('Unexpected error occurred:')
+        status = os.EX_SOFTWARE
 
     # You've got a real type of thing going down, gettin' down
     # There's a whole lot of rhythm going round…
@@ -140,4 +173,4 @@ def main(args):
 
 if __name__ == '__main__':
 
-    sys.exit(main(setup()))
+    sys.exit(main(*setup()))

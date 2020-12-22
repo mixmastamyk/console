@@ -600,32 +600,41 @@ And off you go.
 Command-line
 -------------------
 
-console doesn't currently provide direct scripts to use,
-but you can run several of its modules for information and other functionality:
+There is now a console command-line script for use interactively and
+shell-scripts etc:
 
 .. code-block:: shell
 
-    python3 -m console.detection  # shows console found in your environment
+    ⏵ console line [ -h ]  # print a nifty full-width line
+    ──────────────────────────…
 
-    python3 -m console.constants  # ANSI constants available
+    # make a ctrl-clickable link in supporting terminals
+    ⏵ console link http://example.com/ "Clicken-Sie hier!"
 
-    python3 -m console.ascii4 [-l -u -n ]  # A four-column ascii chart
 
-    python3 -m console.line [ -h ]  # print a nifty full-width line
+
+You can also run several of its modules for information and other functionality:
+
+.. code-block:: shell
+
+    ⏵ python3 -m console.detection  # shows console found in your environment
+
+    ⏵ python3 -m console.constants  # ANSI constants available
+
+    ⏵ python3 -m console.ascii4 [-l -u -n ]  # A four-column ascii chart
+
 
     # demos
-    python3 -m console.demos [-d]
-    python3 -m console.printers  # more demos
+    ⏵ python3 -m console.demos [-d]
+    ⏵ python3 -m console.printers  # more demos
 
-    python3 -m console.beep [-d]  # bidi-bidi-bidi…
-    python3 -m console.progress -l  # demo with labels
+    ⏵ python3 -m console.beep [-d]  # bidi-bidi-bidi…
+    ⏵ python3 -m console.progress -l  # demo with labels
 
 
 ``-d`` enables ``DEBUG`` logging.
 The ``3`` at the end of ``python3`` may not be necessary,
 e.g. on Windows or Arch Linux.
-
-Let me know in the issues if you'd really like a ``console`` command.
 
 
 Tips

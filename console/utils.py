@@ -58,11 +58,11 @@ def clear_line(mode=2):
     return text
 
 
-def clear_lines(lines, mode=2):
+def clear_lines(lines: int, mode=2):
     ''' Clear the given number of lines above.
 
         Arguments:
-            lines: int - number of lines above to clear.
+            lines: - number of lines above to clear.
             mode: int | str
 
                    | 0 | 'forward'  | 'right' - Clear cursor to end of line.
@@ -149,7 +149,9 @@ def get_clipboard(source='c', encoding='utf8',
                                max_bytes=max_bytes, timeout=timeout)
 
 
-def make_hyperlink(target, caption=None, icon='', **params):
+def make_hyperlink(target, caption=None, icon='',
+        _max_url_len=2083, _max_val_len=250, **params
+    ):
     ''' Returns a terminal hyperlink, given a link and caption text.
 
         Arguments:
@@ -163,6 +165,7 @@ def make_hyperlink(target, caption=None, icon='', **params):
                         Optional key word args, to be formatted as:
                         'id=xyz123:foo=bar:baz=quux'
                         (See note below.)
+            _max_url_len, _max_val_len:  spec recommendations
 
         Returns: text sequence to be written, caption, or empty string.
 
@@ -174,7 +177,7 @@ def make_hyperlink(target, caption=None, icon='', **params):
             link = make_hyperlink('ftp://ftp.netscape.com/…/navigator.tar.gz',
                                   'Blast from the past!')
             link_style = fg.blue + fx.underline
-            print(link_style(link))  # in full effect
+            print(link_style(link))  # full effect https://youtu.be/BPcr1EDohiQ
 
         Note:
             This function doesn't print the escape sequence so it may be styled
@@ -183,8 +186,6 @@ def make_hyperlink(target, caption=None, icon='', **params):
              https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
     '''
     if _ansi_capable:
-        MAX_URL = 2083  # spec recommendations
-        MAX_VAL = 250
         SAFE_CHARS = (  # ''.join([ chr(n) for n in range(32, 126) ])
             ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ'
             '[\\]^_`abcdefghijklmnopqrstuvwxyz{|}'
@@ -195,19 +196,18 @@ def make_hyperlink(target, caption=None, icon='', **params):
         if params:
             tokens = []
             for key, val in params.items():
-                if len(val) > MAX_VAL:
-                    val = val[:MAX_VAL]
+                if len(val) > _max_val_len:
+                    val = val[:_max_val_len]
                 for char in val:
                     if char in ('=', ':', ';'):
                         raise ValueError(f'illegal chars in val: {key}={val!r}')
                 tokens.append(f'{key}={val}')
             params = ':'.join(tokens)
 
-        if len(target) > MAX_URL:  # security limits
-            target = target[:MAX_URL]
+        if len(target) > _max_url_len:  # security limits
+            target = target[:_max_url_len]
 
         target = quote(target, safe=SAFE_CHARS)  # url encode
-
         return f'{OSC}8;{params or ""};{target}{ST}{caption}{icon}{OSC}8;;{ST}'
 
     else:  # don't bother if redirected and/or ANSI disabled.

@@ -418,7 +418,7 @@ if True:  # fold
     def test_utils_mk_hyperlink():
         utils._term_level = TermLevel.THE_FULL_MONTY  # force for make
         result = utils.make_hyperlink('ftp://netscape.com/…/navigator.tar.gz',
-                                      'Blast from the past!', icon='')
+                                      'Blast from the past!')
         assert result == (
             '\x1b]8;;ftp://netscape.com/%E2%80%A6/navigator.tar.gz'
             '\x1b\\Blast from the past!\x1b]8;;\x1b\\'
