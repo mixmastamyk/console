@@ -59,7 +59,9 @@ publish: test docs check_readme
 
 test:
 	clear
-	-pyflakes *.py */*.py  # need better tool, flake8?
+	# pyflakes: need better tool, flake8?
+	-pyflakes *.py */*.py console/console; \
+		if [ $$? -ne 0 ] ; then sleep 3 ; fi
 	tput reset  # clear screen, scrollback
 	pytest --color=no --showlocals --verbose
 #~ 	pytest --color=no --verbose

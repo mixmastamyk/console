@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 '''
-    .. console - Comprehensive utility library for ANSI terminals.
-    .. © 2018-2020, Mike Miller - Released under the LGPL, version 3+.
+    console - Comprehensive utility library for ANSI terminals.
+    © 2018-2020, Mike Miller - Released under the LGPL, version 3+.
 
     Convenience command-line interface script for select utility functions and
     methods that don't have common implementations.
-    Optional arguments may be shortened and are recognized when unique.
+    (Optional arguments may be shortened and are recognized when unique.)
 '''
 import sys, os
 import logging
@@ -18,17 +18,75 @@ from console.meta import __version__
 
 log = logging.getLogger(__name__)
 commands_dict = dict(
-    # function            module            source
+    # function            module or function
     clear_lines         = 'console.utils',
     flash               = 'console.utils',
+    line                = ('make_line',),  # alias
+    link                = ('make_hyperlink',),  # alias
     make_hyperlink      = 'console.utils',
     make_line           = 'console.utils',
     notify_cwd          = 'console.utils',
     set_title           = 'console.utils',
-    # aliases, TODO: don't need module again
-    line                = ('console.utils', 'make_line'),
-    link                = ('console.utils', 'make_hyperlink'),
 )
+if os.name == 'nt':
+    pass # os.EX_OK, os.EX_SOFTWARE = 0, 70  # :-/
+
+
+def _add_sub_args(parameters, sub_parser, allow_kwargs):
+    ''' Given function signature parameters, add to parser. '''
+
+    for name, param in parameters.items():
+
+        if name.startswith('_'):  # skip these
+            continue
+
+        prefix = '--'  # defaults
+        type_ = str
+        if param.annotation is not param.empty:  # allow override
+            type_ = param.annotation
+        elif param.kind.name == 'VAR_KEYWORD':  # **kwargs
+            allow_kwargs = True
+            continue
+        elif param.default is None:
+            pass
+        elif param.default is param.empty:
+            prefix = ''
+        else:
+            type_ = type(param.default)
+
+        # figure params to the sub_parser argument:
+        sub_args = dict(
+            default=param.default,
+            help=str(type_.__name__),
+        )
+        if type_ is bool:
+            sub_args['action'] = 'store_true'
+        elif param.default is param.empty:
+            sub_args['type'] = type_
+        else:
+            sub_args['type'] = type_
+            #~ sub_args['metavar'] = name[0].upper()
+            sub_args['metavar'] = type_.__name__[0].upper()
+
+        if '-v' in sys.argv:  # avoid passing another var :-/
+            print('  param:', (fg.green + fx.bold)(name))
+            print('    default: %r' % param.default)
+            print('    annotat:', param.annotation)
+            print('    kind   :', param.kind.name)
+            print('    type   :', type_)
+            print('    sub add_argument:', sub_args)
+
+        sub_parser.add_argument(prefix + name, **sub_args)
+
+    return allow_kwargs
+
+
+def _get_action_help(choices):
+    ''' Build the action list help string. '''
+    from textwrap import fill
+
+    actions = [ fg.green(ac) for ac in choices ]
+    return fill('{%s}' % ', '.join(actions), width=90)  # wider due to escapes
 
 
 def _parse_extras(parser, extras):
@@ -38,7 +96,7 @@ def _parse_extras(parser, extras):
     for arg in extras:
         if arg.startswith('--'):
             suffix = arg[2:]
-            key, _, val = suffix.partition('=')
+            key, _, val = suffix.partition('=')  # --name=value form?
             if val:
                 new[key] = val
             else:
@@ -54,19 +112,27 @@ def _parse_extras(parser, extras):
 def setup():
     ''' Parse command line, validate, initialize logging, etc. '''
     from argparse import ArgumentParser, RawTextHelpFormatter as RawFormatter
-    from textwrap import fill
 
-    action_choices = set(commands_dict)
-    action_help = fill(repr(action_choices).replace("'", ""), width=50)
+    # text styles
+    op, n = fx.dim, fx.end  # options, normal
+    opv = fx.italic + op  # variable/abstract in italic
+    ac = fg.lightgreen  # actions
+    acv = fx.italic + ac
+    _action = acv('action')
 
+    action_choices = sorted(set(commands_dict))
+    action_help = _get_action_help(action_choices)
+
+    # build top-level parser
     parser = ArgumentParser(
         add_help=False, description=__doc__, formatter_class=RawFormatter,
+        usage=f'%(prog)s {op}-v{n} {op}--version{n} {_action} {opv}options…{n}',
     )
     parser.add_argument(
         'action', nargs='?', choices=action_choices,
-        metavar='action',  # clear clumsy action help, better fmt-ing:
-        help='one of ' + action_help +
-            f'\nuse {fx.i}action{fx.end} -h for specific help',
+        metavar=_action + '  ',  # clear clumsy action help, better fmt-ing:
+        help='   one of ' + action_help +
+            f'\n(use {_action} {op}-h{n} for specific help)',
     )
     parser.add_argument(
         '-v', '--verbose', action='store_const', dest='loglvl',
@@ -101,8 +167,9 @@ def setup():
         # find module and function
         funcname = args.action
         modname = commands_dict[funcname]
-        if type(modname) is tuple:  # aliases, find real function name
-            modname, funcname = modname
+        if type(modname) is tuple:  # for aliases, modname is function name
+            funcname = modname[0]
+            modname = commands_dict[funcname]  # try again
 
         # load, store, and inspect signature
         mod = import_module(modname)
@@ -110,63 +177,23 @@ def setup():
         sub_parser.set_defaults(_funk=funk)
         sig = signature(funk)
 
-        for param_name in sig.parameters:
-
-            if param_name.startswith('_'):  # skip these
-                continue
-
-            param = sig.parameters[param_name]
-            prefix = '--'
-            type_ = str  # default
-            if param.annotation is not param.empty:  # allow override
-                type_ = param.annotation
-            elif param.kind.name == 'VAR_KEYWORD':  # **kwargs
-                allow_kwargs = True
-                continue
-            elif param.default is None:
-                pass
-            elif param.default is param.empty:
-                prefix = ''
-            else:
-                type_ = type(param.default)
-
-            # figure params to the sub argument:
-            sub_args = dict(
-                default=param.default,
-                help=str(type_.__name__),
-            )
-            if type_ is bool:
-                sub_args['action'] = 'store_true'
-            elif param.default is param.empty:
-                sub_args['type'] = type_
-            else:
-                sub_args['type'] = type_
-                sub_args['metavar'] = param_name[0].upper()
-
-            if '-v' in sys.argv:
-                print('  param:', (fg.green + fx.bold)(param_name))
-                print('    default: %r' % param.default)
-                print('    annotat:', param.annotation)
-                print('    kind   :', param.kind.name)
-                print('    type   :', type_)
-                print('    sub add_argument:', sub_args)
-
-            sub_parser.add_argument(prefix + param_name, **sub_args)
+        allow_kwargs = _add_sub_args(sig.parameters, sub_parser, allow_kwargs)
 
         # parse and validate again!
         if allow_kwargs:
             args, extras = sub_parser.parse_known_args(extras)
-            extras = _parse_extras(sub_parser, extras)
+            kwargs = _parse_extras(sub_parser, extras)
         else:
-            args, extras = sub_parser.parse_args(extras), {}
+            args, kwargs = sub_parser.parse_args(extras), {}
 
     else:
         parser.print_help()
+        sys.exit(os.EX_USAGE)
 
-    return args, extras
+    return args, kwargs
 
 
-def main(args, extras):
+def main(args, kwargs):
     ''' Tear the roof off the sucker… '''
     status = os.EX_OK
 
@@ -176,10 +203,9 @@ def main(args, extras):
 
         if funk:
             log.debug('running: %s %s', funk, options)
-            result = funk(**options, **extras)
+            result = funk(**options, **kwargs)
             print(result, end='\n')
             log.debug('result was: %r', result)
-
 
     except Exception:
         log.exception('Unexpected error occurred:')
