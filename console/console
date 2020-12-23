@@ -5,29 +5,34 @@
 
     Convenience command-line interface script for select utility functions and
     methods that don't have common implementations.
+    Optional arguments may be shortened and are recognized when unique.
 '''
 import sys, os
 import logging
 from importlib import import_module
 from inspect import signature
 
-import out
+from console import fg, fx
+from console.meta import __version__
 
-__version__ = '0.50'
+
 log = logging.getLogger(__name__)
-commands = (
-    # module            function    aliases
-    ('console.utils', 'clear_lines', []),
-    ('console.utils', 'flash', []),
-    ('console.utils', 'make_hyperlink', ('link',)),
-    ('console.utils', 'make_line', ('line',)),
-    ('console.utils', 'notify_cwd', []),
-    ('console.utils', 'set_title', []),
+commands_dict = dict(
+    # function            module            source
+    clear_lines         = 'console.utils',
+    flash               = 'console.utils',
+    make_hyperlink      = 'console.utils',
+    make_line           = 'console.utils',
+    notify_cwd          = 'console.utils',
+    set_title           = 'console.utils',
+    # aliases, TODO: don't need module again
+    line                = ('console.utils', 'make_line'),
+    link                = ('console.utils', 'make_hyperlink'),
 )
 
 
 def _parse_extras(parser, extras):
-    ''' Given a list of key, value strings, return a dictionary. '''
+    ''' Given a list of '--key', 'value' strings, return a dictionary. '''
     new = {}
     keys = []
     for arg in extras:
@@ -48,43 +53,76 @@ def _parse_extras(parser, extras):
 
 def setup():
     ''' Parse command line, validate, initialize logging, etc. '''
-    from argparse import ArgumentParser, RawTextHelpFormatter
+    from argparse import ArgumentParser, RawTextHelpFormatter as RawFormatter
+    from textwrap import fill
+
+    action_choices = set(commands_dict)
+    action_help = fill(repr(action_choices).replace("'", ""), width=50)
 
     parser = ArgumentParser(
-        description=__doc__, formatter_class=RawTextHelpFormatter
+        add_help=False, description=__doc__, formatter_class=RawFormatter,
     )
-    subparser = parser.add_subparsers(
-        description='the following subcommand actions are supported:',
-        #~ dest='action',  # if action is needed
-        required=True,
-        title='actions',
-        #~ help='action help',
+    parser.add_argument(
+        'action', nargs='?', choices=action_choices,
+        metavar='action',  # clear clumsy action help, better fmt-ing:
+        help='one of ' + action_help +
+            f'\nuse {fx.i}action{fx.end} -h for specific help',
     )
+    parser.add_argument(
+        '-v', '--verbose', action='store_const', dest='loglvl',
+        default=logging.INFO, const=logging.DEBUG,
+        help='print additional information',
+    )
+    parser.add_argument(
+        '--version', action='version', version='%(prog)s ' + __version__
+    )
+    # parse and validate
+    args, extras = parser.parse_known_args()  # don't complain about extras
 
-    for modname, funcname, aliases in commands:
+    # start logging
+    logging.basicConfig(
+        level=args.loglvl,
+        stream=sys.stdout,
+        format='  %(levelname)-8.8s %(message)s',
+    )
+    logging.captureWarnings(True)
+    log.debug('extr: %s', extras)
+    log.debug('args: %s', args)
 
-        sub_cmd_parser = subparser.add_parser(
-            funcname,
-            aliases=aliases,
-            help=f'{funcname} help',
+    if args.action:
+        # Build a sub parser with a new parser, so we don't have to build a
+        # sub parser for every conceivable command at start up only to
+        # pick one, also simplifies a few things:
+        sub_parser = ArgumentParser(
+            description=__doc__, formatter_class=RawFormatter,
+            usage='%%(prog)s %s [args…] [options…]' % args.action,
         )
+        allow_kwargs = False
+        # find module and function
+        funcname = args.action
+        modname = commands_dict[funcname]
+        if type(modname) is tuple:  # aliases, find real function name
+            modname, funcname = modname
+
+        # load, store, and inspect signature
         mod = import_module(modname)
         funk = getattr(mod, funcname)
-        sub_cmd_parser.set_defaults(_funk=funk)
+        sub_parser.set_defaults(_funk=funk)
         sig = signature(funk)
 
         for param_name in sig.parameters:
 
-            if param_name.startswith('_'):
+            if param_name.startswith('_'):  # skip these
                 continue
-            prefix = '--'
-            param = sig.parameters[param_name]
 
+            param = sig.parameters[param_name]
+            prefix = '--'
             type_ = str  # default
             if param.annotation is not param.empty:  # allow override
                 type_ = param.annotation
             elif param.kind.name == 'VAR_KEYWORD':  # **kwargs
-                continue  # handle these later, as extras
+                allow_kwargs = True
+                continue
             elif param.default is None:
                 pass
             elif param.default is param.empty:
@@ -92,6 +130,7 @@ def setup():
             else:
                 type_ = type(param.default)
 
+            # figure params to the sub argument:
             sub_args = dict(
                 default=param.default,
                 help=str(type_.__name__),
@@ -105,41 +144,24 @@ def setup():
                 sub_args['metavar'] = param_name[0].upper()
 
             if '-v' in sys.argv:
-                print('  param:', f'\x1b[1;32m{param_name}\x1b[m')
+                print('  param:', (fg.green + fx.bold)(param_name))
                 print('    default: %r' % param.default)
                 print('    annotat:', param.annotation)
                 print('    kind   :', param.kind.name)
                 print('    type   :', type_)
                 print('    sub add_argument:', sub_args)
-            sub_cmd_parser.add_argument(prefix + param_name, **sub_args)
 
-    # common stuff
-    parser.add_argument(
-        '-v', '--verbose', action='store_const', dest='loglvl',
-        default=logging.INFO, const=logging.DEBUG,
-        help='print additional information',
-    )
-    parser.add_argument(
-        '--version', action='version', version='%(prog)s ' + __version__
-    )
+            sub_parser.add_argument(prefix + param_name, **sub_args)
 
-    # parse and validate
-    #~ args = parser.parse_args()
-    args, extras = parser.parse_known_args()
-    args.verbose = args.loglvl == logging.DEBUG
-    log.debug('extr: %s', extras)
-    extras = _parse_extras(parser, extras)
+        # parse and validate again!
+        if allow_kwargs:
+            args, extras = sub_parser.parse_known_args(extras)
+            extras = _parse_extras(sub_parser, extras)
+        else:
+            args, extras = sub_parser.parse_args(extras), {}
 
-    # start logging
-    out.configure(level=args.loglvl)
-    #~ logging.basicConfig(
-        #~ level=args.loglvl,
-        #~ stream=sys.stdout,
-        #~ format='  %(levelname)-8.8s %(message)s',
-    #~ )
-    logging.captureWarnings(True)
-    log.debug('extr: %s', extras)
-    log.debug('args: %s', args)
+    else:
+        parser.print_help()
 
     return args, extras
 
@@ -151,14 +173,12 @@ def main(args, extras):
     try:  # Ow, we want the funk…
         options = vars(args)
         funk = options.pop('_funk', None)  # Give up the funk
-        del options['loglvl']
-        del options['verbose']
 
         if funk:
             log.debug('running: %s %s', funk, options)
             result = funk(**options, **extras)
             print(result, end='\n')
-            log.debug('result: %r', result)
+            log.debug('result was: %r', result)
 
 
     except Exception:
