@@ -160,7 +160,7 @@ def setup():
         # sub parser for every conceivable command at start up only to
         # pick one, also simplifies a few things:
         sub_parser = ArgumentParser(
-            description=__doc__, formatter_class=RawFormatter,
+            description=None, formatter_class=RawFormatter,
             usage='%%(prog)s %s [args…] [options…]' % args.action,
         )
         allow_kwargs = False
