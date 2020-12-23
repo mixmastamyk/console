@@ -17,17 +17,17 @@ __version__ = '0.50'
 log = logging.getLogger(__name__)
 commands = (
     # module            function    aliases
-    ('console.utils', 'make_line', ('line',)),
-    ('console.utils', 'make_hyperlink', ('link',)),
-    ('console.utils', 'set_title', []),
-    ('console.utils', 'flash', []),
     ('console.utils', 'clear_lines', []),
+    ('console.utils', 'flash', []),
+    ('console.utils', 'make_hyperlink', ('link',)),
+    ('console.utils', 'make_line', ('line',)),
     ('console.utils', 'notify_cwd', []),
+    ('console.utils', 'set_title', []),
 )
 
 
 def _parse_extras(parser, extras):
-    ''' function_doc '''
+    ''' Given a list of key, value strings, return a dictionary. '''
     new = {}
     keys = []
     for arg in extras:
