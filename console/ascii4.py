@@ -168,15 +168,15 @@ def print_ascii_chart(
                 fx.bold(f'Four-Column Grouped {ASCII} Table'), '\n'
             )
             Bin = bin_clr('Bin')
-            dc = dec_clr('Dc')
-            dec = dec_clr('Dec')
-            hx = hex_clr('Hx')
+            Dc = dec_clr('Dc')
+            Dec = dec_clr('Dec')
+            Hx = hex_clr('Hx')
             d, n = fx.dim, defx.dim
             print(hdr_style(
-                f'  {Bin}    {dc} {hx}  {bin_clr("00")} {d}Ctrl     '
-                f'{dc} {hx}  {bin_clr("01")} {d}Punct{n}    '
-                f'{dc} {hx}  {bin_clr("10")} {d}Upper{n}   '
-                f'{dec} {hx} {bin_clr("11")} {d}Lower{n}'
+                f' {Bin}    {Dc} {Hx}  {bin_clr("00")} {d}Ctrl{n}     '
+                f'{Dc} {Hx}  {bin_clr("01")} {d}Punct{n}    '
+                f'{Dc} {Hx}  {bin_clr("10")} {d}Upper{n}   '
+                f'{Dec} {Hx} {bin_clr("11")} {d}Lower{n} '
             ))
 
         # print each row
@@ -226,12 +226,12 @@ def print_ascii_chart(
                     symbol =  f'{i:<3c}'
 
                 record = (
-                    f'  {binary} {dec_clr}{i:>3} '
-                    f'{hex_clr}{i:02x}{fg.default}  {symbol:<3}    '
+                    f' {binary} {dec_clr}{i:>3} '
+                    f'{hex_clr}{i:02x}{fg.default}  {symbol:<3}     '
                 )
                 columns.append(record)
 
-            columns.append(str(bg.default))
+            columns.append(str(bg.default))  # extra padding at end
             print(''.join(columns), end='')
             print(bg.default)
 
