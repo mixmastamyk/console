@@ -70,10 +70,15 @@ def _add_sub_args(parameters, sub_parser, allow_kwargs, verbose):
         # figure params to the sub_parser argument:
         sub_args = dict(
             default=param.default,
-            help=str(type_.__name__),
+            help=f'{type_.__name__}',
         )
         if type_ is bool:
-            sub_args['action'] = 'store_true'
+            if param.default:  # default True, negate boolean flag
+                sub_args['action'] = 'store_false'
+                sub_args['dest'] = name
+                name = 'no-' + name
+            else:
+                sub_args['action'] = 'store_true'
         elif param.default is param.empty:
             sub_args['type'] = type_
         else:
@@ -228,7 +233,7 @@ def main(args, kwargs):
             log.debug('running: %s %s', funk, options)
             log.debug('-' * 60)
             result = funk(**options, **kwargs)
-            print(result, end='\n')
+            print(result, end='\n' if result else '')
             log.debug('result was: %r', result)
 
     except Exception:

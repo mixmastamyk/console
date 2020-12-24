@@ -6,7 +6,7 @@ from console.detection import get_theme
 from console.utils import make_hyperlink
 
 
-ASCII_MODE = 1
+ASCII_MODE = 1  # TODO: rm these
 UNICODE_MODE = 2
 
 _wp_base_url = 'https://en.wikipedia.org/wiki/'
@@ -36,6 +36,16 @@ _help_text = __doc__ + f'''
 
         • This is also why one can add 32/20h to the index of a capital to
           find the corresponding lower case letter.
+
+    Arguments:
+        link                Add hyperlinks to special characters.
+        no-headers          Skip informative headers.
+        unicode_symbols     Use symbols instead of Ctrl-char names.
+
+    Note:
+        The listing is relatively tall and is therefore difficult to see
+        everything at once on terminals under ~thirty-two lines in height.
+        The standard "ascii" linux command is recommended in shorter terminals.
 '''
 
 
@@ -122,12 +132,12 @@ class SilentString(str):
 
 # TODO, separate building from printing
 def print_ascii_chart(
-        use_unicode_symbols=False,
-        make_links=False,
-        print_headers=True,
+        link=False,
+        headers=True,
+        unicode_symbols=False,
     ):
     # see module doc string
-    mode = UNICODE_MODE if use_unicode_symbols else ASCII_MODE  # TODO
+    mode = UNICODE_MODE if unicode_symbols else ASCII_MODE  # TODO
     try:
         # Get theme - defaults
         bin_clr = dec_clr = hex_clr = hdr_style = SilentString()
@@ -152,13 +162,12 @@ def print_ascii_chart(
             evn_bg_clr = str(bg.i253)
             odd_bg_clr = str(bg.i255)
 
-        if print_headers:
+        if headers:
             ASCII = 'ASCII'
-            if make_links:
+            if link:
                 ASCII = make_hyperlink(_wp_base_url + 'ASCII', ASCII)
-            print(fx.bold(
-                    f'                        Four-Column Grouped {ASCII} Table'
-                ), '\n'
+            print('\n                       ',
+                fx.bold(f'Four-Column Grouped {ASCII} Table'), '\n'
             )
             bc = bin_clr('Bin')
             dc = dec_clr('Dc')
@@ -193,7 +202,7 @@ def print_ascii_chart(
                     symbol = f'{sinfo[mode]:<{padding}}'
                     if mode is ASCII_MODE:  # add italic
                         symbol = fx.italic + symbol + defx.italic
-                    if make_links:
+                    if link:
                         symbol = make_hyperlink(_wp_base_url + sinfo[3], symbol)
                     if mode is UNICODE_MODE:  # short chars, add margin
                         symbol += ' '
@@ -202,7 +211,7 @@ def print_ascii_chart(
                     padding = 2  # always
                     sinfo = ctrl_symbols[i]
                     symbol = f'{sinfo[mode]:<{padding}}'
-                    if make_links:
+                    if link:
                         symbol = make_hyperlink(_wp_base_url + sinfo[3], symbol)
                         symbol += ' '
 
@@ -211,7 +220,7 @@ def print_ascii_chart(
                     symbol = f'{symbol:<{padding}}'
                     if mode is ASCII_MODE:  # add italic
                         symbol = fx.italic + symbol + defx.italic
-                    if make_links:
+                    if link:
                         symbol = make_hyperlink(_wp_base_url + ctrl_symbols[-1][2],
                                                 symbol)
                 else:  # other groups
@@ -227,13 +236,10 @@ def print_ascii_chart(
             print(''.join(columns), end='')
             print(bg.default)
 
-        if print_headers:
-            print()
-
     except Exception as err:
         print(err)
 
-    return ''  # quiets console-cli
+    return ' ' if headers else ''  # quiets console-cli, empty avoids extra nl
 
 
 print_ascii_chart.__doc__ = _help_text
