@@ -3,8 +3,8 @@
     console - Comprehensive utility library for ANSI terminals.
     © 2018-2020, Mike Miller - Released under the LGPL, version 3+.
 
-    Convenience command-line interface script for select utility functions and
-    methods that don't have common implementations.
+    Convenience command-line interface script for select utility functions
+    and methods that don't have common implementations.
     (Optional arguments may be shortened and are recognized when unique.)
 '''
 import sys, os
@@ -17,22 +17,25 @@ from console.meta import __version__
 
 
 log = logging.getLogger(__name__)
-commands_dict = dict(
+actions = dict(
     # function            module or function
     clear_lines         = 'console.utils',
     flash               = 'console.utils',
-    line                = ('make_line',),  # alias
-    link                = ('make_hyperlink',),  # alias
+    line                = ['make_line'],        # alias
+    link                = ['make_hyperlink'],   # alias
     make_hyperlink      = 'console.utils',
     make_line           = 'console.utils',
     notify_cwd          = 'console.utils',
     set_title           = 'console.utils',
+
+    _init               = 'console.detection',  # hide
+    detect              = ['_init'],             # alias
 )
 if os.name == 'nt':
-    pass # os.EX_OK, os.EX_SOFTWARE = 0, 70  # :-/
+    pass  # os.EX_OK, os.EX_USAGE, os.EX_SOFTWARE = 0, 64, 70  # :-/
 
 
-def _add_sub_args(parameters, sub_parser, allow_kwargs):
+def _add_sub_args(parameters, sub_parser, allow_kwargs, verbose):
     ''' Given function signature parameters, add to parser. '''
 
     for name, param in parameters.items():
@@ -65,16 +68,15 @@ def _add_sub_args(parameters, sub_parser, allow_kwargs):
             sub_args['type'] = type_
         else:
             sub_args['type'] = type_
-            #~ sub_args['metavar'] = name[0].upper()
             sub_args['metavar'] = type_.__name__[0].upper()
 
-        if '-v' in sys.argv:  # avoid passing another var :-/
-            print('  param:', (fg.green + fx.bold)(name))
-            print('    default: %r' % param.default)
-            print('    annotat:', param.annotation)
-            print('    kind   :', param.kind.name)
-            print('    type   :', type_)
-            print('    sub add_argument:', sub_args)
+        if verbose:
+            log.debug('param: %s', (fg.green + fx.bold)(name))
+            log.debug('  default: %r' % param.default)
+            log.debug('  annotat: %r', param.annotation)
+            log.debug('  kind    %r:', param.kind.name)
+            log.debug('  type    %r:', type_)
+            log.debug('  sub add_argument: %r', sub_args)
 
         sub_parser.add_argument(prefix + name, **sub_args)
 
@@ -85,8 +87,8 @@ def _get_action_help(choices):
     ''' Build the action list help string. '''
     from textwrap import fill
 
-    actions = [ fg.green(ac) for ac in choices ]
-    return fill('{%s}' % ', '.join(actions), width=90)  # wider due to escapes
+    ac_list = [ fg.green(action) for action in choices ]
+    return fill('{%s}' % ', '.join(ac_list), width=90)  # wider due to escapes
 
 
 def _parse_extras(parser, extras):
@@ -120,7 +122,7 @@ def setup():
     acv = fx.italic + ac
     _action = acv('action')
 
-    action_choices = sorted(set(commands_dict))
+    action_choices = sorted(set(f for f in actions if not f.startswith('_')))
     action_help = _get_action_help(action_choices)
 
     # build top-level parser
@@ -144,6 +146,7 @@ def setup():
     )
     # parse and validate
     args, extras = parser.parse_known_args()  # don't complain about extras
+    verbose = args.loglvl == logging.DEBUG
 
     # start logging
     logging.basicConfig(
@@ -152,40 +155,46 @@ def setup():
         format='  %(levelname)-8.8s %(message)s',
     )
     logging.captureWarnings(True)
-    log.debug('extr: %s', extras)
     log.debug('args: %s', args)
+    if extras: log.debug('extr: %s', extras)
 
     if args.action:
         # Build a sub parser with a new parser, so we don't have to build a
         # sub parser for every conceivable command at start up only to
         # pick one, also simplifies a few things:
         sub_parser = ArgumentParser(
-            description=None, formatter_class=RawFormatter,
-            usage='%%(prog)s %s [args…] [options…]' % args.action,
+            formatter_class=RawFormatter,
+            usage=f'%(prog)s {ac(args.action)} {opv}args…{n} {opv}options…{n}',
         )
         allow_kwargs = False
         # find module and function
         funcname = args.action
-        modname = commands_dict[funcname]
-        if type(modname) is tuple:  # for aliases, modname is function name
-            funcname = modname[0]
-            modname = commands_dict[funcname]  # try again
+        value = actions[funcname]
+        if type(value) is list:  # for aliases, value is function name
+            funcname = value[0]
+            modname = actions[funcname]  # try again
+            funcname = funcname.lstrip('_')  # in case it was hidden
+        else:
+            modname = value
 
         # load, store, and inspect signature
         mod = import_module(modname)
         funk = getattr(mod, funcname)
-        sub_parser.set_defaults(_funk=funk)
-        sig = signature(funk)
+        if '-h' in sys.argv:  # avoid extra work when subparser not ready
+            from textwrap import dedent
+            sub_parser.description = dedent('       ' + funk.__doc__)
+        else:
+            sub_parser.set_defaults(_funk=funk)
+        allow_kwargs = _add_sub_args(  # configure sub parser
+            signature(funk).parameters, sub_parser, allow_kwargs, verbose
+        )
 
-        allow_kwargs = _add_sub_args(sig.parameters, sub_parser, allow_kwargs)
-
-        # parse and validate again!
+        # finally, parse and validate subcmd args
         if allow_kwargs:
             args, extras = sub_parser.parse_known_args(extras)
             kwargs = _parse_extras(sub_parser, extras)
         else:
             args, kwargs = sub_parser.parse_args(extras), {}
-
     else:
         parser.print_help()
         sys.exit(os.EX_USAGE)
@@ -203,6 +212,7 @@ def main(args, kwargs):
 
         if funk:
             log.debug('running: %s %s', funk, options)
+            log.debug('-' * 60)
             result = funk(**options, **kwargs)
             print(result, end='\n')
             log.debug('result was: %r', result)

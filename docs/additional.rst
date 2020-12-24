@@ -605,12 +605,15 @@ shell-scripts etc:
 
 .. code-block:: shell
 
-    ⏵ console line [ -h ]  # print a nifty full-width line
-    ──────────────────────────…
+    ⏵ console [-h]  # help and show all available sub-command actions
+    …
+
+    ⏵ console line [-h]  # print a nifty full-width line
+    ──────────────────────────────────────────────────────
 
     # make a ctrl-clickable link in supporting terminals
     ⏵ console link http://example.com/ "Clicken-Sie hier!"
-
+    Clicken-Sie hier!
 
 
 You can also run several of its modules for information and other functionality:

@@ -108,10 +108,8 @@ def clear_screen(mode=2):
 
 
 def flash(seconds=.1):
-    ''' Flash screen,
-        i.e. turn on reverse video and back again,
-        given a delay in floating-point seconds.
-        This can be useful as a visible bell.
+    ''' Flash screen, i.e. turn on reverse video and back again, given a delay
+        in floating-point seconds. Useful as a visible bell.
 
         Arguments:
             seconds:  float - how long to wait in reverse video
@@ -150,7 +148,8 @@ def get_clipboard(source='c', encoding='utf8',
 
 
 def make_hyperlink(target, caption=None, icon='',
-        _max_url_len=2083, _max_val_len=250, **params
+        _max_url_len=defaults.MAX_URL_LEN, _max_val_len=defaults.MAX_VAL_LEN,
+        **params,
     ):
     ''' Returns a terminal hyperlink, given a link and caption text.
 
@@ -165,7 +164,7 @@ def make_hyperlink(target, caption=None, icon='',
                         Optional key word args, to be formatted as:
                         'id=xyz123:foo=bar:baz=quux'
                         (See note below.)
-            _max_url_len, _max_val_len:  spec recommendations
+            _max_url_len, _max_val_len:  spec recommendations, see meta.py
 
         Returns: text sequence to be written, caption, or empty string.
 
@@ -221,7 +220,7 @@ def make_line(string='─', width=0, color=None, center=False, _fallback=80):
             string      A character or short string to repeat.
             color       A color name to assign to the line, defaults to dim.
             width       How long the line should be in characters,
-                        zero defaults to full width of the line.
+                        defaults (zero) to full width of terminal.
             center      If a specific width is given, center it between spaces.
 
         New lines are handled by the caller.

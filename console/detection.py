@@ -66,17 +66,15 @@ class TermStack:
         termios.tcsetattr(self.fd, termios.TCSADRAIN, self.orig_attrs)
 
 
-def init(stream=sys.stdout, basic_palette=None):
+def init(_stream=sys.stdout, _basic_palette=()):
     ''' Automatically determine whether to enable ANSI sequences, and if so,
         what level of functionality is available.
+        Takes a number of factors into account, e.g.:
 
-        Takes the following factors into account:
-
+        - Whether output stream is a TTY.
         - User preference environment variables:
 
             - ``CLICOLOR``, ``CLICOLOR_FORCE``, NO_COLOR``
-
-        - Whether output stream is a TTY.
 
         - Detection results:
 
@@ -88,29 +86,28 @@ def init(stream=sys.stdout, basic_palette=None):
                 - Are standard output streams wrapped by colorama on Windows?
 
         Arguments:
-            stream:             Which output file to check: stdout, stderr
-            basic_palette:      Force the platform-dependent 16 color palette,
+            _stream:            Which output file to check: stdout, stderr
+            _basic_palette:     Force the platform-dependent 16 color palette,
                                 for testing.  Tuple of 16 rgb-int tuples.
         Returns:
             level:              None or TermLevel member
 
         Note:
-            This is the main function of the module—\
-            meant to be used unless requirements are more specific.
+            This is the main function of the module—meant to be used unless
+            requirements are more specific.
     '''
-    level = None
-    basic_palette = pal_name = webcolors = None
+    level = pal_name = webcolors = None
     log.debug('console package, version: %s', __version__)
     log.debug('os.name/sys.platform: %s/%s', os_name, sys.platform)
 
     # find terminal capability level - given preferences and environment
-    if color_is_forced() or (not color_is_disabled() and is_a_tty(stream=stream)):
+    if color_is_forced() or (not color_is_disabled() and is_a_tty(stream=_stream)):
         global color_sep
 
         # detecten Sie, bitte - forced terminfo or remote
         if env.PY_CONSOLE_USE_TERMINFO.truthy or env.SSH_CLIENT:
             level, color_sep = detect_terminal_level_terminfo()
-            pal_name, basic_palette = _find_basic_palette_from_term(env.TERM)
+            pal_name, _basic_palette = _find_basic_palette_from_term(env.TERM)
 
         if level is None:  # didn't occur, fall back to platform inspection
             level, color_sep = detect_terminal_level()
@@ -118,14 +115,14 @@ def init(stream=sys.stdout, basic_palette=None):
         if level is TermLevel.ANSI_DIRECT:  # check for webcolors
             try: import webcolors
             except ImportError: pass
-        log.debug(f'webcolors={bool(webcolors)}')
+        log.debug(f'webcolors: {bool(webcolors)}')
 
         # find the platform-dependent 16-color basic palette
-        if level and not basic_palette:
-            pal_name, basic_palette = _find_basic_palette_from_os()
+        if level and not _basic_palette:
+            pal_name, _basic_palette = _find_basic_palette_from_os()
 
-        log.debug('Basic palette: %r %r', pal_name, basic_palette)
-        proximity.build_color_tables(basic_palette)  # for color downgrade
+        log.debug('Basic palette: %r %r', pal_name, _basic_palette)
+        proximity.build_color_tables(_basic_palette)  # for color downgrade
 
     level = level or TermLevel.DUMB
     log.debug('%s is available', level.name)
@@ -153,7 +150,7 @@ def color_is_disabled(**envars):
     elif env.CLICOLOR:
         result = False
 
-    log.debug('%r (NO_COLOR=%s, CLICOLOR=%s)',
+    log.debug('color_disabled: %r (NO_COLOR=%s, CLICOLOR=%s)',
         result, env.NO_COLOR or None, env.CLICOLOR or None,
     )
     # check custom variables
@@ -178,7 +175,8 @@ def color_is_forced(**envars):
             forced:     bool
     '''
     result = env.CLICOLOR_FORCE and (env.CLICOLOR_FORCE != '0')
-    log.debug('%s (CLICOLOR_FORCE=%s)', result or None, env.CLICOLOR_FORCE or None)
+    log.debug('color_forced: %s (CLICOLOR_FORCE=%s)', result or None,
+              env.CLICOLOR_FORCE or None)
 
     # check custom variables
     for name, value in envars.items():
@@ -400,7 +398,7 @@ def is_a_tty(stream=sys.stdout):
             Boolean, None: is tty or None if not found.
     '''
     result = stream.isatty() if hasattr(stream, 'isatty') else None
-    log.debug(result)
+    log.debug('tty: %s', result)
     return result
 
 
@@ -804,9 +802,8 @@ if __name__ == '__main__':
     # logs the detection information sequence
     print()  # space from warnings  :-/
 
-    print('about to import out')
     try:
-        #~ raise ImportError()
+        #~ raise ImportError()  # testing
         import out
         out.configure(level='debug')
     except ImportError:
