@@ -128,7 +128,6 @@ def get_clipboard(source='c', encoding='utf8',
     ''' Read string or byte data from the clipboard.
 
         Arguments:
-            data:  str
             source:  (int | str) of {c, p, q, s, 0-7}
                 (clipboard, primary, secondary, selection, buffers 0-7)
             encoding: str - decode to unicode or pass None for bytes.
@@ -138,9 +137,9 @@ def get_clipboard(source='c', encoding='utf8',
         Returns: data found
 
         Note:
+            Works on xterm, hterm, not many other terminals.
             https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
             #h3-Operating-System-Commands
-            Works on xterm, hterm.
     '''  # functionality in detection module:
     if _ansi_capable:
         return _read_clipboard(source=source, encoding=encoding,
@@ -315,6 +314,7 @@ def set_clipboard(data, destination='c', encoding='utf8',
         Returns: text sequence to be written or None, for testing.
 
         Note:
+            Works on xterm, not many other terminals.
             https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
             #h3-Operating-System-Commands
     '''
@@ -435,10 +435,9 @@ def wait_key(keys=None):
 
 
 def pause(message='Press any key to continue…'):
-    ''' Analogous to the ancient
+    ''' Analogous to the
         `DOS pause <https://en.wikipedia.org/wiki/List_of_DOS_commands#PAUSE>`_
-        command from olden times,
-        with a modifiable message.
+        command from olden times, with a modifiable message.
         *"Where's the any key?"*
 
         Arguments:

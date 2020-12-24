@@ -64,7 +64,7 @@ class TermLevel(_IntEnum):
 
 if __name__ == '__main__':
 
-    # print constants for convenience
+    ''' Print out constants for convenience. '''
     print('\nConstants:\n')
     _locals = locals()      # avoids issues
     for key in dir():

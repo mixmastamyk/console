@@ -21,15 +21,25 @@ actions = dict(
     # function            module or function
     clear_lines         = 'console.utils',
     flash               = 'console.utils',
+    get_clipboard       = 'console.utils',
+    #~ len_stripped        = 'console.utils',
     line                = ['make_line'],        # alias
     link                = ['make_hyperlink'],   # alias
     make_hyperlink      = 'console.utils',
     make_line           = 'console.utils',
     notify_cwd          = 'console.utils',
+    pause               = 'console.utils',
+    set_clipboard       = 'console.utils',
     set_title           = 'console.utils',
+    strip_ansi          = 'console.utils',
+    wait_key            = 'console.utils',
 
     _init               = 'console.detection',  # hide
-    detect              = ['_init'],             # alias
+    detect              = ['_init'],            # alias
+    get_theme           = 'console.detection',
+
+    _print_ascii_chart  = 'console.ascii4',
+    ascii               = ['_print_ascii_chart'],
 )
 if os.name == 'nt':
     pass  # os.EX_OK, os.EX_USAGE, os.EX_SOFTWARE = 0, 64, 70  # :-/
@@ -78,6 +88,7 @@ def _add_sub_args(parameters, sub_parser, allow_kwargs, verbose):
             log.debug('  type    %r:', type_)
             log.debug('  sub add_argument: %r', sub_args)
 
+        name = name.replace('_', '-')
         sub_parser.add_argument(prefix + name, **sub_args)
 
     return allow_kwargs
@@ -155,6 +166,7 @@ def setup():
         format='  %(levelname)-8.8s %(message)s',
     )
     logging.captureWarnings(True)
+    log.debug('console cli, version: %s', __version__)
     log.debug('args: %s', args)
     if extras: log.debug('extr: %s', extras)
 
@@ -181,8 +193,10 @@ def setup():
         mod = import_module(modname)
         funk = getattr(mod, funcname)
         if '-h' in sys.argv:  # avoid extra work when subparser not ready
-            from textwrap import dedent
-            sub_parser.description = dedent('       ' + funk.__doc__)
+            from textwrap import dedent, indent
+            sub_parser.description = indent(
+                dedent('       ' + funk.__doc__), '    '
+            )
         else:
             sub_parser.set_defaults(_funk=funk)
         allow_kwargs = _add_sub_args(  # configure sub parser

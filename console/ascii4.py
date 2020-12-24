@@ -1,9 +1,7 @@
-#!/usr/bin/env python3
 '''
     ascii4.py - "Þe Auld" Four-Column ASCII Table, FTW!
-'''
-help_text = __doc__ + '''
-    This table format in four groups of thirty-two helps illustrate the
+
+    This table format in four columns of thirty-two helps better illustrate the
     relationships between characters and control codes:
 
         • To find the binary representation of a character, concatenate the
@@ -23,9 +21,8 @@ help_text = __doc__ + '''
         • This is also why one can add 32/20h to the index of a capital to
           find the corresponding lower case letter.
 '''
-import os, sys
 from console import fg, bg, fx, defx
-from console.detection import get_theme, os_name
+from console.detection import get_theme
 from console.utils import make_hyperlink
 
 
@@ -116,51 +113,13 @@ class SilentString(str):
         return source
 
 
-def setup():
-    ''' Parse command-line and validate. '''
-    from argparse import ArgumentParser, RawTextHelpFormatter
-
-    parser = ArgumentParser(description=help_text,
-                            formatter_class=RawTextHelpFormatter,
-                            add_help=False,  # avoids early exit
-                            )
-    parser.add_argument('-l', '--make-links', action='store_true',
-                        help='Add hyperlinks, not often supported.')
-    parser.add_argument('-n', '--skip-headers', action='store_false',
-                        dest='print_headers',
-                        help='Skip headers for filtering output.')
-    parser.add_argument('-u', '--unicode', action='store_const',
-                        dest='character_mode',
-                        default=ASCII_MODE, const=UNICODE_MODE,
-                        help='Use Unicode symbols for control characters.')
-    parser.add_argument('-h', '--help', action='store_true', dest='print_help',
-                        help='Print out help text.')
-    parser.add_argument('--version', action='version',
-                        version='%(prog)s ' + __version__)
-    # parse and validate
-    args = parser.parse_args()
-    if args.print_help:
-        group_style = fg.red + fx.bold
-        parser.description = help_text.format(
-            fg.red('0'),
-            group_style('10'),
-            fg.red('01000'),
-            fg.red('0') + group_style('10') + fg.red('01000'),
-            fx.italic('^G'),
-            fx.italic('^H'),
-            fx.italic('^['),
-        )
-        parser.print_help()
-        print()
-    return args
-
-
-def main(args):
-    if os_name == 'nt':  # :-/
-        os.EX_OK, os.EX_SOFTWARE = 0, 70
-
-    status = os.EX_OK
-    mode = args.character_mode
+def print_ascii_chart(
+        character_mode=ASCII_MODE,
+        make_links=False,
+        print_headers=True,
+    ):
+    # see module doc string
+    mode = character_mode
     try:
         # Get theme - defaults
         bin_clr = dec_clr = hex_clr = hdr_style = SilentString()
@@ -185,9 +144,9 @@ def main(args):
             evn_bg_clr = str(bg.i253)
             odd_bg_clr = str(bg.i255)
 
-        if args.print_headers:
+        if print_headers:
             ASCII = 'ASCII'
-            if args.make_links:
+            if make_links:
                 ASCII = make_hyperlink(_wp_base_url + 'ASCII', ASCII)
             print(fx.bold(
                     f'                        Four-Column Grouped {ASCII} Table'
@@ -226,7 +185,7 @@ def main(args):
                     symbol = f'{sinfo[mode]:<{padding}}'
                     if mode is ASCII_MODE:  # add italic
                         symbol = fx.italic + symbol + defx.italic
-                    if args.make_links:
+                    if make_links:
                         symbol = make_hyperlink(_wp_base_url + sinfo[3], symbol)
                     if mode is UNICODE_MODE:  # short chars, add margin
                         symbol += ' '
@@ -235,7 +194,7 @@ def main(args):
                     padding = 2  # always
                     sinfo = ctrl_symbols[i]
                     symbol = f'{sinfo[mode]:<{padding}}'
-                    if args.make_links:
+                    if make_links:
                         symbol = make_hyperlink(_wp_base_url + sinfo[3], symbol)
                         symbol += ' '
 
@@ -244,7 +203,7 @@ def main(args):
                     symbol = f'{symbol:<{padding}}'
                     if mode is ASCII_MODE:  # add italic
                         symbol = fx.italic + symbol + defx.italic
-                    if args.make_links:
+                    if make_links:
                         symbol = make_hyperlink(_wp_base_url + ctrl_symbols[-1][2],
                                                 symbol)
                 else:  # other groups
@@ -260,16 +219,24 @@ def main(args):
             print(''.join(columns), end='')
             print(bg.default)
 
-        if args.print_headers:
+        if print_headers:
             print()
 
     except Exception as err:
         print(err)
-        status = os.EX_SOFTWARE
 
-    return status
+    return ''  # quiets console cli
 
 
-if __name__ == '__main__':
+_group_style = fg.red + fx.bold
+_kbd_style = fx.reverse + fx.italic
 
-    sys.exit(main(setup()))
+print_ascii_chart.__doc__ = __doc__.format(
+    fg.red('0'),
+    _group_style('10'),
+    fg.red('01000'),
+    fg.red('0') + _group_style('10') + fg.red('01000'),
+    _kbd_style('^G'),
+    _kbd_style('^H'),
+    _kbd_style('^['),
+)
