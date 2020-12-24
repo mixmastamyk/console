@@ -1,35 +1,42 @@
 '''
-    ascii4.py - "Þe Auld" Four-Column ASCII Table, FTW!
-
-    This table format in four columns of thirty-two helps better illustrate the
-    relationships between characters and control codes:
-
-        • To find the binary representation of a character, concatenate the
-          two digit group code above its column, with its five digit row code:
-
-          Optional 8th bit →  {}  {}  {}        ⇒  {}
-                     Group code ↗      ↑ Row code       ↑ Full byte, aka "H"
-
-        • To generate a control code, a key is pressed then AND-ed with the
-          control key group code of 00, forcing the sixth and seventh bits
-          to zero.  This is why, for example:
-
-          • BEL, the Bell may be activated with {} (look to right columns)
-          • BS, the Backspace key is represented by {}
-          • ESC, the Escape key is represented by {}  etc.
-
-        • This is also why one can add 32/20h to the index of a capital to
-          find the corresponding lower case letter.
+    ascii4 - "Þe Auld" Four-Column ASCII Table, FTW!
 '''
 from console import fg, bg, fx, defx
 from console.detection import get_theme
 from console.utils import make_hyperlink
 
 
-__version__ = '0.80'
-_wp_base_url = 'https://en.wikipedia.org/wiki/'
 ASCII_MODE = 1
 UNICODE_MODE = 2
+
+_wp_base_url = 'https://en.wikipedia.org/wiki/'
+# help styles
+_d, n = fg.red, fx.end  # digit, normal
+_bd = fx.bold + _d      # bright digit
+_i = fx.italic
+_kb = fx.reverse + fx.italic  # keyboard
+
+_help_text = __doc__ + f'''
+    This four-column table (of thirty-two rows each) helps better illustrate
+    relationships between characters and control codes:
+
+        • To find the binary representation of a character, concatenate the
+          two digit group code above its column, with its five digit row code:
+
+          {_i}Optional 8th bit{n} →  {_d}0{n}  {_bd}10{n}  {_d}01000{n}        ⇒  {_d}0{_bd}10{n}{_d}01000{n}
+                     {_i}Group code{n} ↗      ↑ {_i}Row code{n}       ↑ {_i}Full byte, aka "H"{n}
+
+        • To generate a control code, a key is pressed then AND-ed with the
+          control key group code of 00, forcing the sixth and seventh bits
+          to zero.  This is why, for example:
+
+          • {_i}BEL{n}, the Bell may be activated with {_kb}^G{n} {_i}(column to right){n}
+          • {_i}BS{n}, the Backspace key is represented by {_kb}^H{n}
+          • {_i}ESC{n}, the Escape key is represented by {_kb}^[{n} etc.
+
+        • This is also why one can add 32/20h to the index of a capital to
+          find the corresponding lower case letter.
+'''
 
 
 # A range of 0…128, rendered in a table with four columns of 32 rows
@@ -113,13 +120,14 @@ class SilentString(str):
         return source
 
 
+# TODO, separate building from printing
 def print_ascii_chart(
-        character_mode=ASCII_MODE,
+        use_unicode_symbols=False,
         make_links=False,
         print_headers=True,
     ):
     # see module doc string
-    mode = character_mode
+    mode = UNICODE_MODE if use_unicode_symbols else ASCII_MODE  # TODO
     try:
         # Get theme - defaults
         bin_clr = dec_clr = hex_clr = hdr_style = SilentString()
@@ -225,18 +233,7 @@ def print_ascii_chart(
     except Exception as err:
         print(err)
 
-    return ''  # quiets console cli
+    return ''  # quiets console-cli
 
 
-_group_style = fg.red + fx.bold
-_kbd_style = fx.reverse + fx.italic
-
-print_ascii_chart.__doc__ = __doc__.format(
-    fg.red('0'),
-    _group_style('10'),
-    fg.red('01000'),
-    fg.red('0') + _group_style('10') + fg.red('01000'),
-    _kbd_style('^G'),
-    _kbd_style('^H'),
-    _kbd_style('^['),
-)
+print_ascii_chart.__doc__ = _help_text
