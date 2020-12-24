@@ -148,19 +148,17 @@ def print_ascii_chart(
             bin_clr = fg.darkred
             dec_clr = fg.darkorange3
             hex_clr = fg.purple
-            hdr_style = bg.black + fx.dim
-
-            evn_bg_clr = str(bg.i235)
-            odd_bg_clr = str(bg.i233)
+            evn_bg_clr = str(bg.i233)
+            odd_bg_clr = str(bg.i235)
+            hdr_style = bg.i235 + fx.italic
 
         elif theme == 'light':
             bin_clr = fg.blue
             dec_clr = fg.green
             hex_clr = fg.cyan
-            hdr_style = bg.i255 + fx.dim
-
-            evn_bg_clr = str(bg.i253)
-            odd_bg_clr = str(bg.i255)
+            evn_bg_clr = str(bg.i255)
+            odd_bg_clr = str(bg.i253)
+            hdr_style = bg.i253 + fx.italic
 
         if headers:
             ASCII = 'ASCII'
@@ -169,15 +167,16 @@ def print_ascii_chart(
             print('\n                       ',
                 fx.bold(f'Four-Column Grouped {ASCII} Table'), '\n'
             )
-            bc = bin_clr('Bin')
+            Bin = bin_clr('Bin')
             dc = dec_clr('Dc')
             dec = dec_clr('Dec')
             hx = hex_clr('Hx')
+            d, n = fx.dim, defx.dim
             print(hdr_style(
-                f'  {bc}    {dc} {hx}  {bin_clr("00")} Ctrl     '
-                f'{dc} {hx}  {bin_clr("01")} Punct.   '
-                f'{dc} {hx}  {bin_clr("10")} Upper   '
-                f'{dec} {hx} {bin_clr("11")} Lower'
+                f'  {Bin}    {dc} {hx}  {bin_clr("00")} {d}Ctrl     '
+                f'{dc} {hx}  {bin_clr("01")} {d}Punct{n}    '
+                f'{dc} {hx}  {bin_clr("10")} {d}Upper{n}   '
+                f'{dec} {hx} {bin_clr("11")} {d}Lower{n}'
             ))
 
         # print each row
