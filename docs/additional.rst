@@ -601,31 +601,29 @@ Command-line
 -------------------
 
 There is now a console command-line script for use interactively and
-shell-scripts etc:
+shell-scripts,
+all sub-commands support help ``-h`` and verbose ``-v``:
 
 .. code-block:: shell
 
-    ⏵ console [-h]  # help and show all available sub-command actions
+    ⏵ console  # help and show all available sub-command actions
     …
 
-    ⏵ console line [-h]  # print a nifty full-width line
+    ⏵ console line  # print a nifty full-width line
     ──────────────────────────────────────────────────────
 
     # make a ctrl-clickable link in supporting terminals
     ⏵ console link http://example.com/ "Clicken-Sie hier!"
     Clicken-Sie hier!
 
+    ⏵ console ascii         # A four-column ascii chart
+    ⏵ console detect [-v]   # shows information found in your environs
 
 You can also run several of its modules for information and other functionality:
 
 .. code-block:: shell
 
-    ⏵ python3 -m console.detection  # shows console found in your environment
-
     ⏵ python3 -m console.constants  # ANSI constants available
-
-    ⏵ python3 -m console.ascii4 [-l -u -n ]  # A four-column ascii chart
-
 
     # demos
     ⏵ python3 -m console.demos [-d]

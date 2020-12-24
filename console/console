@@ -19,6 +19,9 @@ from console.meta import __version__
 log = logging.getLogger(__name__)
 actions = dict(
     # function            module or function
+    beep                = 'console.beep',
+    progress            = 'console.progress',
+
     clear_lines         = 'console.utils',
     flash               = 'console.utils',
     get_clipboard       = 'console.utils',
@@ -63,7 +66,7 @@ def _add_sub_args(parameters, sub_parser, allow_kwargs, verbose):
         elif param.default is None:
             pass
         elif param.default is param.empty:
-            prefix = ''
+            pass
         else:
             type_ = type(param.default)
 
@@ -79,11 +82,12 @@ def _add_sub_args(parameters, sub_parser, allow_kwargs, verbose):
                 name = 'no-' + name
             else:
                 sub_args['action'] = 'store_true'
-        elif param.default is param.empty:
-            sub_args['type'] = type_
         else:
+            if param.default is param.empty:
+                prefix = ''
+            else:
+                sub_args['metavar'] = type_.__name__[0].upper()
             sub_args['type'] = type_
-            sub_args['metavar'] = type_.__name__[0].upper()
 
         if verbose:
             log.debug('param: %s', (fg.green + fx.bold)(name))
@@ -204,17 +208,19 @@ def setup():
             )
         else:
             sub_parser.set_defaults(_funk=funk)
-        allow_kwargs = _add_sub_args(  # configure sub parser
+
+        # configure sub parser
+        allow_kwargs = _add_sub_args(
             signature(funk).parameters, sub_parser, allow_kwargs, verbose
         )
-
         # finally, parse and validate subcmd args
         if allow_kwargs:
             args, extras = sub_parser.parse_known_args(extras)
             kwargs = _parse_extras(sub_parser, extras)
         else:
             args, kwargs = sub_parser.parse_args(extras), {}
-    else:
+
+    else:  # no action, quit
         parser.print_help()
         sys.exit(os.EX_USAGE)
 
@@ -233,7 +239,8 @@ def main(args, kwargs):
             log.debug('running: %s %s', funk, options)
             log.debug('-' * 60)
             result = funk(**options, **kwargs)
-            print(result, end='\n' if result else '')
+            if result:
+                print(result)
             log.debug('result was: %r', result)
 
     except Exception:

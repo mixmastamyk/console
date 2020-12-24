@@ -51,11 +51,12 @@ _if, _ic, _ie, _il, _id, _iel, _ieh, _ieb = range(8)
 
 # styles
 _dim_green = fx.dim + fg.green
+_dim_amber = fx.dim + fg.i208
 _err_color = fg.lightred
 styles = dict(
     dumb        = (_empty,) * 6,
     amber       = (
-                    fx.dim + fg.i208,   # first
+                    _dim_amber,   # first
                     fg.i208,            # complete
                     fg.i172,            # empty
                     fx.dim + fg.i172,   # last
@@ -94,6 +95,14 @@ styles = dict(
                     _dim_green,         # done
                     _err_color,         # error
                   ),
+    greyam       = (
+                    _dim_amber,   # first
+                    fg.i208,            # complete
+                    fg.i236,            # empty
+                    fx.dim + fg.i236,   # last
+                    _dim_amber,         # done
+                    _err_color,         # error
+                  ),
     ocean       = (
                     _dim_green,         # first
                     fg.green,           # complete
@@ -120,7 +129,7 @@ styles = dict(
                   ),
     greyen_bg8   = (
                     fx.dim + fg.i70,    # first
-                    bg.i70 + fg.black,   # complete
+                    bg.i70 + fg.black,  # complete
                     bg.i236,            # empty
                     fx.dim + fg.i236,   # last
                     bg.i22,             # done
@@ -138,6 +147,8 @@ themes = dict(
     basic_color = dict(icons='ascii', styles='default'),
     basic = dict(icons='ascii', styles='dumb'),
     dies = dict(icons='dies', styles='simple'),
+    hd_amber = dict(icons='segmented', styles='greyam'),
+    hd_green = dict(icons='segmented', styles='greyen'),
     heavy_metal = dict(icons='horns', styles='reds'),
     shaded = dict(icons='shaded', styles='ocean'),
     solid = dict(icons='spaces', styles='greyen_bg'),
@@ -547,6 +558,30 @@ def install_resize_handler():
         signal.signal(signal.SIGWINCH, _window_resize_handler)
 
 
+def progress(value: float,
+        clear_left=ProgressBar._clear_left,
+        theme=ProgressBar.theme,
+        total=None,
+        width=ProgressBar.width,
+    ):
+    ''' Convenience function for building a one-off progress bar,
+        for scripts, etc.
+
+        Run ``python3 -m console.progress -l`` for a demo and list of themes.
+    '''
+    try:  # Yabba Dabba, DOO!
+        if theme == '':
+            bar = HiDefProgressBar(**locals())
+        elif theme == 'dies':
+            bar = HiDefProgressBar(partial_chars='⚀⚁⚂⚃⚄⚅',
+                                   partial_char_extra_style=None, **locals())
+        else:
+            bar = ProgressBar(**locals())
+        return bar(value)
+    except Exception as err:
+        return f'{err.__class__.__name__}: {err}'  # TODO: logging
+
+
 if __name__ == '__main__':
 
     import sys
@@ -563,10 +598,10 @@ if __name__ == '__main__':
         ('basic clr:',      ProgressBar(theme='basic_color')),
         ('* default:',      ProgressBar()),
         ('shaded:',         ProgressBar(theme='shaded')),
-        ('bullets:',        ProgressBar(icons='bullets', style='ocean8')),
+        ('bullets:',        ProgressBar(icons='bullets', styles='ocean8')),
         ('warm-shaded:',    ProgressBar(theme='warm_shaded')),
         ('faces:',          ProgressBar(theme='shaded', icons='faces')),
-        ('wide faces:',     ProgressBar(style='simple', icons='wide_faces')),
+        ('wide faces:',     ProgressBar(styles='simple', icons='wide_faces')),
         ('hvy-metal:',      ProgressBar(theme='heavy_metal')),
         ('segmented:',      ProgressBar(icons='segmented')),
         ('triangles:',      ProgressBar(theme='shaded', icons='triangles')),
