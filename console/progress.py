@@ -220,7 +220,7 @@ class ProgressBar:
             iterable: object        An object to iterate on.
             label_mode:  True       Enable progress percentage label
             oob_error:  False       Out of bounds error occurred
-            total:  100             Set the total number of items
+            total:  99              Set the total number of items
             unicode_support: bool   Detection result, determines default icons
             width: 32               Full width of bar, padding, and labels
 
@@ -297,7 +297,7 @@ class ProgressBar:
         self._first = _styles[_if](_icons[_if])
         self._last = _styles[_il](_icons[_il])
 
-        self.reset()  # start time
+        self.reset()  # start time  TODO: move to end
 
         # tqdm-style iterable interface
         if iterable and not self.total:
@@ -306,9 +306,9 @@ class ProgressBar:
             except (TypeError, AttributeError):
                 self.total = None
             self.iterable = iterable
-            self(self._iter_n)  # call() set initial
+            self(self._iter_n)  # call() with initial value of 0
         elif self.total:
-            self.total = self.total - 1
+            self.total = self.total - 1  # zero based
         elif self.total is None:
             self.total = 99
 
@@ -573,6 +573,7 @@ def install_resize_handler():
 
 def progress(value: float,
         clear_left=ProgressBar._clear_left,
+        debug=bool(ProgressBar.debug),
         list_themes=False,
         theme=ProgressBar.theme,
         total: int=None,

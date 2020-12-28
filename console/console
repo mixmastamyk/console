@@ -40,6 +40,7 @@ actions = dict(
     link                = ['make_hyperlink'],   # alias
     make_hyperlink      = 'console.utils',
     make_line           = 'console.utils',
+    measure             = 'console.utils',
     notify_cwd          = 'console.utils',
     pause               = 'console.utils',
     set_clipboard       = 'console.utils',
