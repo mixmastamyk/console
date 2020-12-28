@@ -17,6 +17,7 @@ import re
 import sys, os
 from time import sleep
 from urllib.parse import quote
+from itertools import zip_longest, chain
 
 from .constants import OSC, ST, _MODE_MAP, _TITLE_MODE_MAP
 from .screen import sc
@@ -258,71 +259,55 @@ def make_line(string='─', width=0, color=None, center=False, _fallback=80):
     return line
 
 
-def measure(start=0):
-    ''' Print a measurement line.
+def measure(start=0, limit=200, newlines=True):
+    ''' Returns a ruler-style line of measurement across the width of the
+        terminal.  Each column number should be read top down::
 
-        This is for debugging, few apps will need.
+            # ↓  Column 124
+            ..1.
+            ..2.
+            ..4.
+
+        Arguments:
+            start           The number to start with, e.g. 0 or 1
+            limit           The column to end at.
+            newlines        Whether to insert newlines after each line.
+                            Not strictly needed but helps when window is
+                            cromulently embiggened.
+        Note:
+
+            This function for debugging, few apps will need it.
     '''
     from . import fg, bg, fx
-    width = min(200, get_size((80, 0)).columns)  # limit to 200
-    digits_list = []
+    width = min(limit, get_size().columns)
     results = []
     odd_style = fg.i244 + bg.i236
     evn_style = fg.i236 + bg.i244
 
-    # TODO: refactor this :-/
     for i in range(start, width + start):
         digits = str(i)
-        digits_list.append(digits)
+        styled_digits = []
 
-    # ones
-    for i, digits in enumerate(digits_list):
-        digit = digits[0]
+        for j, digit in enumerate(digits):
 
-        if not i % 10: # mult of 10
-            digit = fx.reverse(digit)
-        elif i % 2:  # odd
-            digit = odd_style(digit)
-        else:  # even
-            digit = evn_style(digit)
-
-        results.append(digit)
-
-    # tens
-    for i, digits in enumerate(digits_list):
-        if i < 10:
-            digit = ' '
-        else:
-            digit = digits[1]
-
-        if not i % 10: # mult of 10
-            digit = fx.reverse(digit)
-        elif i % 2:  # odd
-            digit = odd_style(digit)
-        else:  # even
-            digit = evn_style(digit)
-
-        results.append(digit)
-
-    # hundreds
-    if width > 100:
-        for i, digits in enumerate(digits_list):
-
-            if i < 100:
-                digit = ' '
-            else:
-                digit = digits[2]
-
-            if not i % 10:  # mult of 10
+            # style digit
+            if not i % 10: # mult of 10
                 digit = fx.reverse(digit)
             elif i % 2:  # odd
                 digit = odd_style(digit)
             else:  # even
                 digit = evn_style(digit)
 
-            results.append(digit)
+            styled_digits.append(digit)
 
-    return ''.join(results)
+        results.append(styled_digits)
+
+    if newlines:
+        results.append('\n\n')
+
+    # transpose and concatenate
+    results = zip_longest(*results, fillvalue=' ')
+    return ''.join(chain.from_iterable(results))
 
 
 def notify_cwd(path=None):
