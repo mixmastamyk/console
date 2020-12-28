@@ -573,8 +573,9 @@ def install_resize_handler():
 
 def progress(value: float,
         clear_left=ProgressBar._clear_left,
+        list_themes=False,
         theme=ProgressBar.theme,
-        total=None,
+        total: int=None,
         width=ProgressBar.width,
     ):
     ''' Convenience function for building a one-off progress bar,
@@ -583,6 +584,11 @@ def progress(value: float,
         Run ``python3 -m console.progress -l`` for a demo and list of themes.
     '''
     try:  # Yabba Dabba, DOO!
+        if list_themes:
+            return 'themes: ' + ' '.join(themes.keys())
+        else:
+            del list_themes
+
         if theme in ('hd_green', 'dies'):
             bar = HiDefProgressBar(**locals())
         else:
@@ -601,7 +607,7 @@ if __name__ == '__main__':
     # set defaults
     ProgressBar.debug = '-d' in sys.argv
     ProgressBar.label_mode = '-l' in sys.argv
-    ProgressBar._clear_left = False  # class default
+    ProgressBar._clear_left = False  # new class default
 
     bars = [
         ('basic, expanded:\n',
@@ -613,7 +619,7 @@ if __name__ == '__main__':
         ('warm_shaded:',    ProgressBar(theme='warm_shaded')),
         ('faces:',          ProgressBar(theme='shaded', icons='faces')),
         ('wide_faces:',     ProgressBar(styles='simple', icons='wide_faces')),
-        ('hv_metal:',       ProgressBar(theme='heavy_metal')),
+        ('hvy_metal:',      ProgressBar(theme='heavy_metal')),
         ('segmented:',      ProgressBar(icons='segmented')),
         ('triangles:',      ProgressBar(theme='shaded', icons='triangles')),
         ('solid, expanded:\n',
