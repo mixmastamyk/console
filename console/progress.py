@@ -54,7 +54,25 @@ _dim_green = fx.dim + fg.green
 _dim_amber = fx.dim + fg.i208
 _err_color = fg.lightred
 styles = dict(
-    dumb        = (_empty,) * 6,
+    dumb        = (_empty,) * 6,  # monochrome
+    # basic, 16 colors or less
+    simple      = ( # str no longer works, call broke fbterm, so using ''
+                    str,                # first,
+                    str,                # complete
+                    fx.dim,             # empty
+                    str,                # last
+                    fx.dim,             # done
+                    _err_color,         # error
+                  ),
+    ocean       = (
+                    _dim_green,         # first
+                    fg.green,           # complete
+                    fg.blue,            # empty
+                    fx.dim + fg.blue,   # last
+                    _dim_green,         # done
+                    _err_color,         # error
+                  ),
+    # eight-bit color or higher
     amber       = (
                     _dim_amber,   # first
                     fg.i208,            # complete
@@ -79,14 +97,6 @@ styles = dict(
                     fg.red,             # done
                     _err_color,         # error
                   ),
-    simple      = ( # str no longer works, call broke fbterm, so using ''
-                    str,                # first,
-                    str,                # complete
-                    fx.dim,             # empty
-                    str,                # last
-                    fx.dim,             # done
-                    _err_color,         # error
-                  ),
     greyen      = (
                     _dim_green,         # first
                     fg.green,           # complete
@@ -101,14 +111,6 @@ styles = dict(
                     fg.i236,            # empty
                     fx.dim + fg.i236,   # last
                     _dim_amber,         # done
-                    _err_color,         # error
-                  ),
-    ocean       = (
-                    _dim_green,         # first
-                    fg.green,           # complete
-                    fg.blue,            # empty
-                    fx.dim + fg.blue,   # last
-                    _dim_green,         # done
                     _err_color,         # error
                   ),
     ocean8       = (
@@ -137,16 +139,11 @@ styles = dict(
                   ),
 )
 
-# figure default styles
-icons['default']  = icons['ascii']
-unicode_support = detect_unicode_support()
-if unicode_support:
-    icons['default']  = icons['blocks']
-
 themes = dict(
-    basic_color = dict(icons='ascii', styles='default'),
+    basic_color = dict(icons='ascii', styles='ocean'),
     basic = dict(icons='ascii', styles='dumb'),
-    dies = dict(icons='dies', styles='simple'),
+    dies = dict(icons='dies', styles='simple',
+                partial_chars='⚀⚁⚂⚃⚄⚅', partial_char_extra_style=fg.white),
     hd_amber = dict(icons='segmented', styles='greyam'),
     hd_green = dict(icons='segmented', styles='greyen'),
     heavy_metal = dict(icons='horns', styles='reds'),
@@ -155,18 +152,22 @@ themes = dict(
     warm_shaded = dict(icons='shaded', styles='amber'),
 )
 
-if _term_level and _term_level >= TermLevel.ANSI_EXTENDED:
-    styles['default'] = styles['ocean8']
-    themes['basic_color']['styles'] = 'ocean8'  # update with hi color
-    themes['solid']['styles'] = 'greyen_bg8'   # update with hi color
-elif _term_level:
-    styles['default'] = styles['ocean']
-    themes['basic_color']['styles'] = 'ocean'
-    themes['solid']['styles'] = 'greyen_bg'
-else:
-    styles['default'] = styles['dumb']
+# figure defaults, icons and styles
+styles['default'] = styles['dumb']
+icons['default']  = icons['ascii']
+themes['default'] = dict(icons='default', styles='default')  # loaded later
+_unicode_support = detect_unicode_support()
 
-themes['default'] = themes['basic_color']
+# U-P-G-R-A-Y-E-D-D, a double-dose of unicode and colors…
+if _unicode_support:
+    icons['default']  = icons['blocks']
+
+if _term_level >= TermLevel.ANSI_BASIC:
+    styles['default'] = styles['ocean']
+
+if _term_level >= TermLevel.ANSI_EXTENDED:
+    styles['default'] = styles['ocean8']
+    themes['solid']['styles'] = 'greyen_bg8'   # upgrade to hi color
 
 
 class ProgressBar:
@@ -242,7 +243,7 @@ class ProgressBar:
     oob_error = False
     timedeltas = TIMEDELTAS
     total = None
-    unicode_support = unicode_support
+    unicode_support = _unicode_support
     width = 32
 
     theme = 'default'
@@ -366,7 +367,6 @@ class ProgressBar:
     def __call__(self, complete):
         ''' Sets the value of the bar graph. '''
         # convert ints to float from 0…1 per-one-tage
-        #~ complete = complete + 1  # zero-based
         self.ratio = ratio = complete / self.total
         if self.expand:
             if term_width != _term_width_orig:  # unix change
@@ -400,14 +400,17 @@ class ProgressBar:
     def clear_left(self, value):
         ''' Converts a given integer to an escape sequence. '''
         if value is True:
-            value = 0
-        if type(value) is int:
-            #~ self._clear_left = f'{clear_line(1)}{sc.mv_x(value)}'
-            self._clear_left = f'\r{sc.mv_x(value)}'
-        elif type(value) in (bool, type(None)):
+            self._clear_left = '\r'  # do not use mv_x, if term=dumb
+        elif type(value) is int:
+            mv_x = sc.mv_x
+            if mv_x is _empty:  # TERM=dumb
+                self._clear_left = f'\r{" " * value}'
+            else:  # = f'{clear_line(1)}{sc.mv_x(value)}'  # not needed
+                self._clear_left = f'\r{sc.mv_x(value)}'
+        elif value in (False, None):
             self._clear_left = value
         else:
-            raise TypeError('type %s not valid.' % type(value))
+            raise TypeError('clear_left: type %s is not valid.' % type(value))
 
     def reset(self):
         ''' Reset the bar, start time only for now. '''
@@ -511,8 +514,18 @@ class HiDefProgressBar(ProgressBar):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        if 'partial_chars' in kwargs:  # re-calc
-            self.partial_chars_len = len(self.partial_chars)
+        # partial chars may be in theme or passed as kwargs
+        if 'theme' in kwargs:
+            partial_chars = themes[kwargs['theme']].get('partial_chars')
+            if partial_chars:
+                self.partial_chars = partial_chars
+                self.partial_chars_len = len(partial_chars)  # re-calc
+            pc_es = themes[kwargs['theme']].get('partial_char_extra_style')
+            if pc_es:
+                self.partial_char_extra_style = pc_es
+
+        if 'partial_chars' in kwargs:
+            self.partial_chars_len = len(self.partial_chars)  # re-calc
 
     def _get_ncc(self, width, ratio):
         ''' Get the number of complete chars.
@@ -570,14 +583,12 @@ def progress(value: float,
         Run ``python3 -m console.progress -l`` for a demo and list of themes.
     '''
     try:  # Yabba Dabba, DOO!
-        if theme == '':
+        if theme in ('hd_green', 'dies'):
             bar = HiDefProgressBar(**locals())
-        elif theme == 'dies':
-            bar = HiDefProgressBar(partial_chars='⚀⚁⚂⚃⚄⚅',
-                                   partial_char_extra_style=None, **locals())
         else:
             bar = ProgressBar(**locals())
-        return bar(value)
+        result = bar(value)
+        return result
     except Exception as err:
         return f'{err.__class__.__name__}: {err}'  # TODO: logging
 
@@ -599,20 +610,19 @@ if __name__ == '__main__':
         ('* default:',      ProgressBar()),
         ('shaded:',         ProgressBar(theme='shaded')),
         ('bullets:',        ProgressBar(icons='bullets', styles='ocean8')),
-        ('warm-shaded:',    ProgressBar(theme='warm_shaded')),
+        ('warm_shaded:',    ProgressBar(theme='warm_shaded')),
         ('faces:',          ProgressBar(theme='shaded', icons='faces')),
-        ('wide faces:',     ProgressBar(styles='simple', icons='wide_faces')),
-        ('hvy-metal:',      ProgressBar(theme='heavy_metal')),
+        ('wide_faces:',     ProgressBar(styles='simple', icons='wide_faces')),
+        ('hv_metal:',       ProgressBar(theme='heavy_metal')),
         ('segmented:',      ProgressBar(icons='segmented')),
         ('triangles:',      ProgressBar(theme='shaded', icons='triangles')),
         ('solid, expanded:\n',
                             ProgressBar(theme='solid', expand=True)),
         ('solid mono:',     ProgressBar(theme='solid', styles='amber_mono')),
 
-        ('high-def:',       HiDefProgressBar(styles='greyen')),
+        ('hd_green:',       HiDefProgressBar(styles='greyen')),
         ('dies:',           HiDefProgressBar(theme='dies', # clear_left=4,
-                                             partial_chars='⚀⚁⚂⚃⚄⚅',
-                                             partial_char_extra_style=None)),
+                                             partial_char_extra_style=fg.lightred)),
     ]
 
     # print each in progress
@@ -624,7 +634,7 @@ if __name__ == '__main__':
             for i in range(100):
                 print()
                 for label, bar in bars:
-                    print(f' {label:12}', bar(i), sep='')  #, end='', flush=True)
+                    print(f' {label:12}', bar(i), sep='')
 
                 sleep(.1)
                 if i < 99:

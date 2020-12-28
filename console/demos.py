@@ -259,7 +259,7 @@ if __name__ == '__main__':
         try:
             if not env.ANSICON:
                 import colorama
-                colorama.init()
+                colorama.init()  # is this run unnecessarily on newer Windows?
         except ImportError:
             pass
 
@@ -272,9 +272,11 @@ if __name__ == '__main__':
 
     # detection already happened - need to run this again to log it. :-/
     from .detection import init
+    from .detection import detect_unicode_support
     from . import style
 
     init()
+    detect_unicode_support()
     fg = style.ForegroundPalette()
     bg = style.BackgroundPalette()
     fx = style.EffectsPalette()

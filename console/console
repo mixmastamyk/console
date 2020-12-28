@@ -19,7 +19,17 @@ from console.meta import __version__
 log = logging.getLogger(__name__)
 actions = dict(
     # function            module or function
+    _print_ascii_chart  = 'console.ascii4',         # hide
+    ascii               = ['_print_ascii_chart'],   # alias
+
     beep                = 'console.beep',
+    _init               = 'console.detection',  # hide
+    detect              = ['_init'],            # alias
+    get_theme           = 'console.detection',
+
+    _detect_unicode_support = 'console.detection',  # hide
+    detect_unicode = ['_detect_unicode_support'],   # alias
+
     progress            = 'console.progress',
 
     clear_lines         = 'console.utils',
@@ -36,13 +46,6 @@ actions = dict(
     set_title           = 'console.utils',
     strip_ansi          = 'console.utils',
     wait_key            = 'console.utils',
-
-    _init               = 'console.detection',  # hide
-    detect              = ['_init'],            # alias
-    get_theme           = 'console.detection',
-
-    _print_ascii_chart  = 'console.ascii4',
-    ascii               = ['_print_ascii_chart'],
 )
 if os.name == 'nt':
     pass  # os.EX_OK, os.EX_USAGE, os.EX_SOFTWARE = 0, 64, 70  # :-/
@@ -223,7 +226,6 @@ def setup():
     else:  # no action, quit
         parser.print_help()
         sys.exit(os.EX_USAGE)
-
     return args, kwargs
 
 

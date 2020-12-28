@@ -300,7 +300,7 @@ def detect_unicode_support():
     ''' Try to detect unicode (utf8?) support in the terminal.
 
         Checks the ``LANG`` environment variable,
-        falls back to an experimental method.
+        falls back to an experimental method utilizing cursor position.
         Implementation idea is from the link below:
 
            https://unix.stackexchange.com/q/184345/
@@ -315,10 +315,10 @@ def detect_unicode_support():
         result = True
 
     elif is_a_tty():  # kludge
-        out = sys.stdout
+        stdout = sys.stdout
         x, _ = get_position()
-        out.write('é')
-        out.flush()
+        stdout.write('é')
+        stdout.flush()
         x2, _ = get_position()
 
         difference = x2 - x
@@ -328,8 +328,8 @@ def detect_unicode_support():
             result = False
 
         # clean up
-        out.write(BS)
-        out.flush()
+        stdout.write(BS)
+        stdout.flush()
 
     log.debug(str(result))
     return result

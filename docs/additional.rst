@@ -617,7 +617,9 @@ all sub-commands support help ``-h`` and verbose ``-v``:
     Clicken-Sie hier!
 
     ⏵ console ascii         # A four-column ascii chart
-    ⏵ console detect [-v]   # shows information found in your environs
+    ⏵ console beep          # bidi-bidi-bidi…
+    ⏵ console detect [-v]   # term level and optionally environ. info
+    ⏵ console progress      # show a progress bar
 
 You can also run several of its modules for information and other functionality:
 
@@ -629,7 +631,6 @@ You can also run several of its modules for information and other functionality:
     ⏵ python3 -m console.demos [-d]
     ⏵ python3 -m console.printers  # more demos
 
-    ⏵ python3 -m console.beep [-d]  # bidi-bidi-bidi…
     ⏵ python3 -m console.progress -l  # demo with labels
 
 
