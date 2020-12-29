@@ -14,6 +14,7 @@
         - Gradients/rainbar
         - Additional tests
 '''
+import logging
 import time
 
 from . import fg, bg, fx, sc, _term_level
@@ -27,6 +28,7 @@ DEF_WIDTH = 32
 MIN_WIDTH = 12
 TIMEDELTAS = (60, 300)  # accuracy thresholds, in seconds, one and five minutes
 term_width = _term_width_orig = get_size()[0]
+log = logging.getLogger(__name__)
 
 # Theme-ing info:
 icons = dict(
@@ -573,15 +575,25 @@ def install_resize_handler():
 
 def progress(value: float,
         clear_left=ProgressBar._clear_left,
-        debug=bool(ProgressBar.debug),
+        expand=ProgressBar.expand,
         label_mode=ProgressBar.label_mode,
         list_themes=False,
         theme=ProgressBar.theme,
         total: int=DEF_TOTAL,
         width=ProgressBar.width,
+        debug=bool(ProgressBar.debug),
     ):
     ''' Convenience function for building a one-off progress bar,
         for scripts and CLI, etc.
+
+        Arguments:
+            value                   The current value.
+            clear_left: True        True to clear and mv to 0, or int offset
+            debug: None             Enable debug output
+            expand: False           Set width to full terminal width
+            label_mode:  True       Enable progress percentage label
+            total:  99              Set the total number of items
+            width: 32               Full width of bar, padding, and labels
 
         Note:
 
@@ -592,6 +604,7 @@ def progress(value: float,
 
         Run ``python3 -m console.progress -l`` for a demo.
     '''
+    debug = debug or log.isEnabledFor(logging.DEBUG)  # -v
     try:  # Yabba Dabba, DOO!
         if list_themes:
             return 'themes: ' + ' '.join(themes.keys())
@@ -605,7 +618,7 @@ def progress(value: float,
         result = bar(value)
         return result
     except Exception as err:
-        return f'{err.__class__.__name__}: {err}'  # TODO: logging
+        log.exception(f'{err.__class__.__name__}: {err}')
 
 
 if __name__ == '__main__':

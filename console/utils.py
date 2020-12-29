@@ -259,7 +259,7 @@ def make_line(string='─', width=0, color=None, center=False, _fallback=80):
     return line
 
 
-def measure(start=0, limit=200, offset=0, newlines=True):
+def measure(start=1, limit=200, offset=0, newlines=True):
     ''' Returns a ruler-style line of measurement across the width of the
         terminal.  Each column number should be read top down::
 
@@ -270,7 +270,7 @@ def measure(start=0, limit=200, offset=0, newlines=True):
 
         Arguments:
             start           The number to start with, e.g. 0 or 1
-            limit           The column to end at.
+            limit           The column to limit to or end at.
             offset          Number of spaces to push to the right.
             newlines        Whether to insert newlines after each line.
                             Not strictly needed but helps when the window is
