@@ -49,7 +49,7 @@ actions = dict(
     wait_key            = 'console.utils',
 )
 if os.name == 'nt':
-    pass  # os.EX_OK, os.EX_USAGE, os.EX_SOFTWARE = 0, 64, 70  # :-/
+    os.EX_OK, os.EX_USAGE, os.EX_SOFTWARE = 0, 64, 70  # :-/
 
 
 def _add_sub_args(parameters, sub_parser, allow_kwargs, verbose):
