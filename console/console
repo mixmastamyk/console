@@ -77,12 +77,13 @@ def _add_sub_args(parameters, sub_parser, allow_kwargs, verbose):
         # figure params to the sub_parser argument:
         sub_args = dict(
             default=param.default,
-            help=f'{type_.__name__}',
+            help=f'{type_.__name__}, defaults to {param.default!r}',
         )
         if type_ is bool:
             if param.default:  # default True, negate boolean flag
                 sub_args['action'] = 'store_false'
                 sub_args['dest'] = name
+                sub_args['help'] = f'{type_.__name__}, negates default'
                 name = 'no-' + name
             else:
                 sub_args['action'] = 'store_true'

@@ -22,8 +22,10 @@ from .detection import detect_unicode_support, get_size, os_name
 from .disabled import empty as _empty
 from .utils import len_stripped
 
-TIMEDELTAS = (60, 300)  # accuracy thresholds, in seconds, one and five minutes
+DEF_TOTAL = 99
+DEF_WIDTH = 32
 MIN_WIDTH = 12
+TIMEDELTAS = (60, 300)  # accuracy thresholds, in seconds, one and five minutes
 term_width = _term_width_orig = get_size()[0]
 
 # Theme-ing info:
@@ -244,7 +246,7 @@ class ProgressBar:
     timedeltas = TIMEDELTAS
     total = None
     unicode_support = _unicode_support
-    width = 32
+    width = DEF_WIDTH
 
     theme = 'default'
     icons = icons[theme]
@@ -307,10 +309,8 @@ class ProgressBar:
                 self.total = None
             self.iterable = iterable
             self(self._iter_n)  # call() with initial value of 0
-        elif self.total:
-            self.total = self.total - 1  # zero based
         elif self.total is None:
-            self.total = 99
+            self.total = DEF_TOTAL
 
     def _set_bar_width(self, width=None):
         ''' Determine the width of the bar only, without labels. '''
@@ -322,7 +322,7 @@ class ProgressBar:
         if width < self._min_width:
             width = self._min_width
 
-        self._bwidth_base = width - self.padding - 1  # for cursor
+        self._bwidth_base = width - self.padding
         return self._bwidth_base
 
     def __len__(self):
@@ -353,10 +353,10 @@ class ProgressBar:
         self._cached_str = rendered = ''.join(pieces)
         if self.debug:
             pieces.append(
-                f'⇱ r:{self.ratio:5.2f} ncc:{self._num_complete_chars:2d} '
+                f'⇱ r:{self.ratio:5.3f} ncc:{self._num_complete_chars:2d} '
                 f'rm:{self._remainder!r} '
                 f'nec:{self._num_empty_chars:2d} '
-                f'l:{len_stripped(rendered)}'
+                f'l:{len_stripped(rendered.lstrip(chr(13)))}'  # '\r' aka CR
             )
             self._cached_str = rendered = ''.join(pieces)  # again :-/
         return rendered
@@ -574,15 +574,19 @@ def install_resize_handler():
 def progress(value: float,
         clear_left=ProgressBar._clear_left,
         debug=bool(ProgressBar.debug),
+        label_mode=ProgressBar.label_mode,
         list_themes=False,
         theme=ProgressBar.theme,
-        total: int=None,
+        total: int=DEF_TOTAL,
         width=ProgressBar.width,
     ):
     ''' Convenience function for building a one-off progress bar,
-        for scripts, etc.
+        for scripts and CLI, etc.
 
-        Run ``python3 -m console.progress -l`` for a demo and list of themes.
+        Value parameter is 0-based, think 0-99, rather than 1-100.
+        If you'd like ``value`` to be a percentage, pass ``--total 100`` also.
+
+        Run ``python3 -m console.progress -l`` for a demo.
     '''
     try:  # Yabba Dabba, DOO!
         if list_themes:

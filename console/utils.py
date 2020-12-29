@@ -259,7 +259,7 @@ def make_line(string='─', width=0, color=None, center=False, _fallback=80):
     return line
 
 
-def measure(start=0, limit=200, newlines=True):
+def measure(start=0, limit=200, offset=0, newlines=True):
     ''' Returns a ruler-style line of measurement across the width of the
         terminal.  Each column number should be read top down::
 
@@ -271,8 +271,9 @@ def measure(start=0, limit=200, newlines=True):
         Arguments:
             start           The number to start with, e.g. 0 or 1
             limit           The column to end at.
+            offset          Number of spaces to push to the right.
             newlines        Whether to insert newlines after each line.
-                            Not strictly needed but helps when window is
+                            Not strictly needed but helps when the window is
                             cromulently embiggened.
         Note:
 
@@ -280,9 +281,9 @@ def measure(start=0, limit=200, newlines=True):
     '''
     from . import fg, bg, fx
     width = min(limit, get_size().columns)
-    results = []
-    odd_style = fg.i244 + bg.i236
     evn_style = fg.i236 + bg.i244
+    odd_style = fg.i244 + bg.i236
+    results = []
 
     for i in range(start, width + start):
         digits = str(i)
@@ -307,7 +308,14 @@ def measure(start=0, limit=200, newlines=True):
 
     # transpose and concatenate
     results = zip_longest(*results, fillvalue=' ')
-    return ''.join(chain.from_iterable(results))
+
+    if offset:
+        offset = ' ' * offset
+        return ''.join(chain.from_iterable(  # prepend each line with offset
+            chain(offset, result) for result in results
+        ))
+    else:
+        return ''.join(chain.from_iterable(results))
 
 
 def notify_cwd(path=None):

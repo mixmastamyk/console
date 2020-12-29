@@ -825,40 +825,39 @@ if True:  # fold
     def test_progress_ascii():
 
         pb = ProgressBar(clear_left=False, theme='basic', width=36)
-        assert str(pb(-7))  == '<-----------------------------] ERR'
-        assert str(pb(0))   == '[-----------------------------]  0%'
-        assert str(pb(55))  == '[################-------------] 56%'
-        assert str(pb(99))  == '[#############################]   +'
-        assert str(pb(103)) == '[#############################> ERR'
+        assert str(pb(-7))  == '<------------------------------] ERR'
+        assert str(pb(0))   == '[------------------------------]  0%'
+        assert str(pb(55))  == '[#################-------------] 56%'
+        assert str(pb(99))  == '[##############################]   +'
+        assert str(pb(103)) == '[##############################> ERR'
 
     def test_progress_solid():
 
         pb = ProgressBar(theme='solid')
-        assert str(pb(-2))  == '\r\x1b[91m⏴\x1b[39m\x1b[48:5:236m                             \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
-        assert str(pb(0))   == '\r\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:236m               0%            \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
-        assert str(pb(16))  == '\r\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:70;30m     \x1b[0m\x1b[48:5:236m         16%            \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
-        assert str(pb(99))  == '\r\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:22m                ✓            \x1b[49m\x1b[2;38;5;70m▏\x1b[0m'
-        assert str(pb(112)) == '\r\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:22m                             \x1b[49m\x1b[91m⏵\x1b[39m'
+        assert str(pb(-2))  == '\r\x1b[91m⏴\x1b[39m\x1b[48:5:236m                              \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
+        assert str(pb(0))   == '\r\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:236m               0%             \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
+        assert str(pb(16))  == '\r\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:70;30m     \x1b[0m\x1b[48:5:236m         16%             \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
+        assert str(pb(99))  == '\r\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:22m                ✓             \x1b[49m\x1b[2;38;5;70m▏\x1b[0m'
+        assert str(pb(112)) == '\r\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:22m                              \x1b[49m\x1b[91m⏵\x1b[39m'
 
     def test_progress_solid_clear_4():
 
         pb = ProgressBar(theme='solid', clear_left=4)
-        assert str(pb(-2))  == '\r\x1b[4G\x1b[91m⏴\x1b[39m\x1b[48:5:236m                             \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
-        assert str(pb(0))   == '\r\x1b[4G\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:236m               0%            \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
-        assert str(pb(16))  == '\r\x1b[4G\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:70;30m     \x1b[0m\x1b[48:5:236m         16%            \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
-        assert str(pb(99))  == '\r\x1b[4G\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:22m                ✓            \x1b[49m\x1b[2;38;5;70m▏\x1b[0m'
-        assert str(pb(112)) == '\r\x1b[4G\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:22m                             \x1b[49m\x1b[91m⏵\x1b[39m'
+        assert str(pb(-2))  == '\r\x1b[4G\x1b[91m⏴\x1b[39m\x1b[48:5:236m                              \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
+        assert str(pb(0))   == '\r\x1b[4G\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:236m               0%             \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
+        assert str(pb(16))  == '\r\x1b[4G\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:70;30m     \x1b[0m\x1b[48:5:236m         16%             \x1b[49m\x1b[2;38;5;236m▏\x1b[0m'
+        assert str(pb(99))  == '\r\x1b[4G\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:22m                ✓             \x1b[49m\x1b[2;38;5;70m▏\x1b[0m'
+        assert str(pb(112)) == '\r\x1b[4G\x1b[2;38;5;70m▕\x1b[0m\x1b[48:5:22m                              \x1b[49m\x1b[91m⏵\x1b[39m'
 
     def test_progress_hidef1():
 
         pb = HiDefProgressBar(clear_left=False, styles='greyen')
 
-        assert str(pb(-2))  == '\x1b[91m⏴\x1b[39m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m\x1b[91m  ✗ \x1b[39m'
-        assert str(pb(0))   == '\x1b[2;32m▕\x1b[0m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m  0%'
-        assert str(pb(18.1))  == '\x1b[2;32m▕\x1b[0m\x1b[32m▉▉▉▉\x1b[39m\x1b[32;48:5:236m▋\x1b[0m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m 18%'
-        assert str(pb(99))  == '\x1b[2;32m▕\x1b[0m\x1b[2;32m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[0m\x1b[2;32m▏\x1b[0m   ✓'
-        assert str(pb(111.9)) == '\x1b[2;32m▕\x1b[0m\x1b[2;32m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[0m\x1b[91m⏵\x1b[39m\x1b[91m  ✗ \x1b[39m'
-
+        assert str(pb(-2))  == '\x1b[91m⏴\x1b[39m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m\x1b[91m  ✗ \x1b[39m'
+        assert str(pb(0))   == '\x1b[2;32m▕\x1b[0m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m  0%'
+        assert str(pb(18.1))  == '\x1b[2;32m▕\x1b[0m\x1b[32m▉▉▉▉\x1b[39m\x1b[32;48:5:236m▊\x1b[0m\x1b[38;5;236m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[39m\x1b[2;38;5;236m▏\x1b[0m 18%'
+        assert str(pb(99))  == '\x1b[2;32m▕\x1b[0m\x1b[2;32m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[0m\x1b[2;32m▏\x1b[0m   ✓'
+        assert str(pb(111.9)) == '\x1b[2;32m▕\x1b[0m\x1b[2;32m▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉\x1b[0m\x1b[91m⏵\x1b[39m\x1b[91m  ✗ \x1b[39m'
 
 # Line
 # ----------------------------------------------------------------------------
