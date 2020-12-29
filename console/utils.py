@@ -417,7 +417,7 @@ def set_title(title, mode=0):
     '''
     if os_name == 'nt':
         from .windows import set_title
-        return set_title(title)
+        set_title(title)  # returns a status code, not a string
     else:
         text = f'{OSC}{_TITLE_MODE_MAP.get(mode, mode)};{title}{ST}'
         if _ansi_capable:
