@@ -26,6 +26,11 @@ extras_require = dict(
     webcolors=('webcolors',),
     win_terminfo=('jinxed',),  # for ssh into windows
 )
+entry_points = dict(
+    console_scripts=(
+        f'{meta.pkgname} = {meta.pkgname}.cli:setuptools_entry_point',
+    ),
+)
 
 
 def slurp(filename):
@@ -46,7 +51,8 @@ setup(
     long_description    = slurp('readme.rst'),
     packages            = (meta.pkgname,),
     project_urls        = meta.project_urls,
-    scripts             = (join(meta.pkgname, meta.pkgname),),
+    #~ scripts             = (join(meta.pkgname, meta.pkgname),),
+    entry_points        = entry_points,
     url                 = meta.home_url,
     version             = meta.version,
 
