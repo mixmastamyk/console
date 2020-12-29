@@ -619,8 +619,11 @@ all sub-commands support help ``-h`` and verbose ``-v``:
     ⏵ console ascii         # A four-column ascii chart
     ⏵ console beep          # bidi-bidi-bidi…
     ⏵ console detect [-v]   # term level and optionally environ. info
+    ⏵ console flash         # Bam!
+    ⏵ console pause         # Press any key to continue…
     ⏵ console progress      # show a progress bar
 
+And many more.
 You can also run several of its modules for information and other functionality:
 
 .. code-block:: shell
