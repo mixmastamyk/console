@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 '''
     console - Comprehensive utility library for ANSI terminals.
     © 2018-2020, Mike Miller - Released under the LGPL, version 3+.
@@ -255,6 +254,12 @@ def main(args, kwargs):
     # There's a whole lot of rhythm going round…
     log.debug('done, with status: %r', status)
     return status
+
+
+def setuptools_entry_point():
+    ''' This is the new way to get an .exe on Windows.  :-/ '''
+
+    return main(*setup())
 
 
 if __name__ == '__main__':
