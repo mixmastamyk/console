@@ -583,8 +583,12 @@ def progress(value: float,
     ''' Convenience function for building a one-off progress bar,
         for scripts and CLI, etc.
 
-        Value parameter is 0-based, think 0-99, rather than 1-100.
-        If you'd like ``value`` to be a percentage, pass ``--total 100`` also.
+        Note:
+
+            The value parameter is 0-based, therefore think 0-99,
+            rather than 1-100.
+            If you'd like ``value`` to signify a percentage instead,
+            pass ``--total 100`` or other round number as well.
 
         Run ``python3 -m console.progress -l`` for a demo.
     '''
