@@ -3,14 +3,12 @@
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2020, Mike Miller - Released under the LGPL, version 3+.
 
-    This module contains an HTML to ANSI sequence printer.
+    This module contains an HTML to ANSI sequence converter.
     It supports quick rich text in scripting applications for those familiar
     with HTML.  Why invent another styling language?
 
     No CSS class support yet,
     but many inline styles that correspond to terminal capabilities work.
-
-    TODO: maybe lists
 '''
 import re
 import logging
@@ -26,9 +24,9 @@ debug = log.debug
 fx_tags = ('b', 'i', 's', 'u', 'em', 'h1', 'h2', 'h3', 'strong')
 skip_data_tags = ('script', 'style', 'title')
 block_tags = '''address article aside canvas dd div dl dt fieldset figcaption
-figure footer form header li main nav noscript ol p sectiontable tfoot ul
-video'''.split()
-# h1-h6 hr pre blockquote https://www.w3schools.com/htmL/html_blocks.asp
+figure footer form header main nav noscript p sectiontable tfoot video
+'''.split()
+# blockquote h1-h6 hr pre ul ol li https://www.w3schools.com/htmL/html_blocks.asp
 multi_whitespace_hunter = re.compile(r'\s\s+')
 
 
