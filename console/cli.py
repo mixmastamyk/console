@@ -35,8 +35,10 @@ actions = dict(
     flash               = 'console.utils',
     get_clipboard       = 'console.utils',
     #~ len_stripped        = 'console.utils',
+    sized               = ['make_sized'],       # alias
     line                = ['make_line'],        # alias
     link                = ['make_hyperlink'],   # alias
+    make_sized          = 'console.utils',
     make_hyperlink      = 'console.utils',
     make_line           = 'console.utils',
     measure             = 'console.utils',
@@ -162,6 +164,10 @@ def setup():
             f'\n(use {_action} {op}-h{n} for specific help)',
     )
     parser.add_argument(
+        '-n', action='store_const', dest='newline', default='\n', const='',
+        help='do not output the trailing newline',
+    )
+    parser.add_argument(
         '-v', '--verbose', action='store_const', dest='loglvl',
         default=logging.INFO, const=logging.DEBUG,
         help='print additional information',
@@ -172,6 +178,7 @@ def setup():
     # parse and validate
     args, extras = parser.parse_known_args()  # don't complain about extras
     verbose = args.loglvl == logging.DEBUG
+    newline = args.newline
 
     # start logging
     logging.basicConfig(
@@ -224,10 +231,12 @@ def setup():
             kwargs = _parse_extras(sub_parser, extras)
         else:
             args, kwargs = sub_parser.parse_args(extras), {}
+        args._newline = newline  # copy from original
 
     else:  # no action, quit
         parser.print_help()
         sys.exit(os.EX_USAGE)
+
     return args, kwargs
 
 
@@ -238,13 +247,14 @@ def main(args, kwargs):
     try:  # Ow, we want the funk…
         options = vars(args)
         funk = options.pop('_funk', None)  # Give up the funk
+        nl = options.pop('_newline', None)
 
         if funk:
             log.debug('running: %s %s', funk, options)
             log.debug('-' * 60)
             result = funk(**options, **kwargs)
             if result:
-                print(result)
+                print(result, end=nl)
             log.debug('result was: %r', result)
 
     except Exception:

@@ -15,7 +15,7 @@ meta = imp.load_source('meta', 'console/meta.py')
 
 # https://www.python.org/dev/peps/pep-0508/#environment-markers
 install_requires = (
-    'ezenv>=0.91',
+    'ezenv>=0.92',
     'future_fstrings;     python_version < "3.6" ',
     'typing;              python_version < "3.5" ',  # seems future-fs related.
     'colorama;            os_name == "nt" and platform_version < "10.0.10586" ',

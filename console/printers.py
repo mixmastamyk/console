@@ -12,9 +12,10 @@
 '''
 import re
 import logging
+from os.path import splitext
 
 from console import fg, bg, fx, defx
-from console.utils import make_hyperlink, make_line
+from console.utils import make_hyperlink, make_line, make_sized
 
 from html.parser import HTMLParser
 
@@ -28,7 +29,6 @@ figure footer form header main nav noscript p sectiontable tfoot video
 '''.split()
 # blockquote h1-h6 hr pre ul ol li https://www.w3schools.com/htmL/html_blocks.asp
 multi_whitespace_hunter = re.compile(r'\s\s+')
-
 
 class StringCache(dict):
     ''' Used to cache rendered ANSI color/fx strings with a dictionary lookup
@@ -79,6 +79,7 @@ class LiteHTMLParser(HTMLParser):
     _preformatted_data = None
     _list_mode = None
     _blockquote = None
+    _in_header = None
 
     def _set_fg_color(self, val):
         self.tokens.append(fg_cache[val])
@@ -157,6 +158,15 @@ class LiteHTMLParser(HTMLParser):
             pass
         elif self._anchor:
             self._anchor.append(data)  # caption
+        elif self._in_header:  # add styling
+            if self._in_header == 'h1':
+                self.tokens.append(make_sized(data, double=True))
+            elif self._in_header == 'h2':
+                self.tokens.append(make_sized(data, double=False, wide=True))
+            elif self._in_header == 'h3':
+                self.tokens.append(data.upper())
+            else:
+                self.tokens.append(data)
         elif self._preformatted_data:
             self.tokens.append(data)
         else:
@@ -176,7 +186,7 @@ class LiteHTMLParser(HTMLParser):
 
             # consolidate remaining whitespace to a single space:
             data = multi_whitespace_hunter.sub(' ', data)
-            if self._blockquote:
+            if self._blockquote:  # seems to come in lines
                 data = (f'    {fx_cache["dim"]}│{dx_cache["dim"]} '
                         f'{fx_cache["i"]}{data}{dx_cache["i"]}')
 
@@ -188,6 +198,7 @@ class LiteHTMLParser(HTMLParser):
         if tag in fx_tags:
             if tag.startswith('h'):
                 self._new_paragraph()
+                self._in_header = tag
             self.tokens.append(fx_cache[tag])
         else:
             if tag == 'span':
@@ -265,6 +276,7 @@ class LiteHTMLParser(HTMLParser):
         if tag in fx_tags:
             self.tokens.append(dx_cache[tag])
             if tag.startswith('h'):
+                self._in_header = False
                 self._new_paragraph(desc='  end')
         else:
             if tag == 'span':  # no elifs, could be multiple
@@ -331,9 +343,9 @@ class LiteHTMLParser(HTMLParser):
 
 fg_cache = StringCache(fg)
 bg_cache = StringCache(bg)
-fx_cache = StringCache(fx, em='i', h1='b,u', h2='b', h3='i', strong='b')
+fx_cache = StringCache(fx, em='i', h1='b', h2='b', h3='b', strong='b')
 # disables individual styles:
-dx_cache = StringCache(defx, em='i', h1='b,u', h2='b', h3='i', strong='b')
+dx_cache = StringCache(defx, em='i', h1='b', h2='b', h3='b', strong='b')
 parser = LiteHTMLParser()
 
 
@@ -365,10 +377,11 @@ def view(path):
         Currently supports limited HTML only.
     '''
     result = ''
-    with open(path) as f:
-        parser.feed(f.read())
-        result = ''.join(parser.tokens)
-        parser.tokens.clear()
+    if splitext(path)[1] in ('.html', '.htm'):
+        with open(path) as infile:
+            parser.feed(infile.read())
+            result = ''.join(parser.tokens)
+            parser.tokens.clear()
     return result
 
 
@@ -390,7 +403,7 @@ if __name__ == '__main__':
     html = '''
     <script> var Mr_Bill = "Oh No!"; // nothing to see here </script>
     <style foo=bar>Dad { how-bout-you: "shut yer big YAPPER" !important; }</style>
-    <h1>HTML Print Test:</h1>
+    <h1><c lightgreen>H1. HTML Print Test</c></h1>
     <c dim>fx:</c> <b>bold</b> <i>italic</i><em>/em</em> <s>strike</s>
     <u>undy</u><br>
     ¶<c dim>(span tag)</c>
@@ -408,7 +421,7 @@ if __name__ == '__main__':
     <c orange>l'orange</c>
     <c black on bisque3>bisque3</c>
     <hr>
-    <h2>Part II:</h2>
+    <h2>H2. Part II</h2>
     <c #b0b>B0B</c> -&gt; <a href="http://example.com/">click here!</a>
     <p>
         A bit of <q>plain text</q> in its own paragraph.
@@ -425,6 +438,7 @@ if __name__ == '__main__':
         This is a long line.
     </blockquote>
     <!-- nothing in this comment should be shown, Buh-BYE ! -->
-    Hello <h2>world!</h2> ;-)
+    Hello <h3>woild!</h3> ;-)
+    More affter
     '''
     print(html)

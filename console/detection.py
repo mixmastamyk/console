@@ -24,7 +24,9 @@ os_name = os.name  # frequent use
 color_sep = ';'
 termios = tty = None
 is_fbterm = (env.TERM == 'fbterm')
+is_xterm = env.XTERM_VERSION.bool  # the real thing
 TERM_DIRECT_USES_COLONS = ('xterm-', 'iterm2-', 'kitty-', 'mintty-', 'mlterm-')
+_sized_char_support = is_xterm or env.TERM.startswith('konsole')
 
 
 if os_name == 'posix':  # Tron leotards

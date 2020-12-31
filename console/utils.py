@@ -21,7 +21,8 @@ from itertools import zip_longest, chain
 
 from .constants import OSC, ST, _MODE_MAP, _TITLE_MODE_MAP
 from .screen import sc
-from .detection import get_size, is_a_tty, os_name, _read_clipboard
+from .detection import (get_size, is_a_tty, os_name, _read_clipboard,
+                        _sized_char_support)
 from .meta import defaults
 from . import _term_level
 
@@ -257,6 +258,27 @@ def make_line(string='─', width=0, color=None, center=False, _fallback=80):
             line = fx.dim(line)
 
     return line
+
+
+def make_sized(text, double=True, wide=False):
+    ''' Returns a sequence to print wide and/or double-sized text.
+        Pertains to the whole line, doesn't reset to normal until a newline
+        occurs.
+
+        Note:
+
+            - DEC sequences supported on xterm and Konsole, possibly others.
+            - Double is also wide so both together are redundant.
+              Wide takes precedence.
+    '''
+    result = text
+    if _ansi_capable and _sized_char_support:
+        if wide:
+            result =  f'\x1b#6{text}'
+        elif double:
+            result = f'\x1b#3{text}\n\x1b#4{text}'
+
+    return result
 
 
 def measure(start=1, limit=200, offset=0, newlines=True):
