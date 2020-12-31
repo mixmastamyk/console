@@ -27,7 +27,7 @@ actions = dict(
     get_theme           = 'console.detection',
 
     _detect_unicode_support = 'console.detection',  # hide
-    detect_unicode = ['_detect_unicode_support'],   # alias
+    detect_unicode      = ['_detect_unicode_support'],  # alias
 
     progress            = 'console.progress',
 
@@ -46,6 +46,7 @@ actions = dict(
     set_title           = 'console.utils',
     strip_ansi          = 'console.utils',
     wait_key            = 'console.utils',
+    view                = 'console.printers',
 )
 if os.name == 'nt':
     os.EX_OK, os.EX_USAGE, os.EX_SOFTWARE = 0, 64, 70  # :-/

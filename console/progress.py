@@ -36,6 +36,7 @@ icons = dict(
     ascii       = ('[', '#', '-', ']', '+', '<', '>', 'ERR'),
     blocks      = (' ', '▮', '▯', ' ', '✓', '⏴', '⏵', '✗'),
     # empty white bullet is the wrong size, breaks alignment:
+    boxes       = (' ', '▣', '□', ' ', '✓', '⏴', '⏵', '✗'),
     bullets     = (' ', '•', '•', ' ', '✓', '⏴', '⏵', '✗'),
     dies        = (' ', '⚅', '⚀', ' ', '✓', '⏴', '⏵', '✗'),
     horns       = ('🤘', '⛧', '⛤', '🤘', '✓', '⏴', '⏵', '✗'),
@@ -146,6 +147,7 @@ styles = dict(
 themes = dict(
     basic_color = dict(icons='ascii', styles='ocean'),
     basic = dict(icons='ascii', styles='dumb'),
+    boxes = dict(icons='boxes', styles='default'),
     dies = dict(icons='dies', styles='simple',
                 partial_chars='⚀⚁⚂⚃⚄⚅', partial_char_extra_style=fg.white),
     hd_amber = dict(icons='segmented', styles='greyam'),

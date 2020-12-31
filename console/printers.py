@@ -16,7 +16,7 @@ import re
 import logging
 
 from console import fg, bg, fx, defx
-from console.utils import make_hyperlink
+from console.utils import make_hyperlink, make_line
 
 from html.parser import HTMLParser
 
@@ -25,7 +25,10 @@ log = logging.getLogger(__name__)
 debug = log.debug
 fx_tags = ('b', 'i', 's', 'u', 'em', 'h1', 'h2', 'h3', 'strong')
 skip_data_tags = ('script', 'style', 'title')
-hr_txt = str(fx.dim('∙' * 72))
+block_tags = '''address article aside canvas dd div dl dt fieldset figcaption
+figure footer form header li main nav noscript ol p sectiontable tfoot ul
+video'''.split()
+# h1-h6 hr pre blockquote https://www.w3schools.com/htmL/html_blocks.asp
 multi_whitespace_hunter = re.compile(r'\s\s+')
 
 
@@ -75,6 +78,9 @@ class LiteHTMLParser(HTMLParser):
     _setting_font_style = _setting_font_weight = None
     _setting_text_decoration_u = _setting_text_decoration_o = None
     _skip_data = None
+    _preformatted_data = None
+    _list_mode = None
+    _blockquote = None
 
     def _set_fg_color(self, val):
         self.tokens.append(fg_cache[val])
@@ -94,15 +100,24 @@ class LiteHTMLParser(HTMLParser):
 
     def _new_paragraph(self, desc='start'):  # max two newlines at a time
         tokens = self.tokens
-        if tokens:
-            last = tokens[-1]
-            if last.endswith('\n\n'):   # cap newlines at two
-                pass
-            elif last.endswith('\n'):   # ends with
-                tokens.append('\n')
+        try:
+            if tokens:
+                last = tokens[-1]
+                if last.endswith('\n'):
+                    if last.endswith('\n\n'):   # cap newlines at two
+                        pass
+                    elif last == '\n':
+                        if tokens[-2].endswith('\n'):  # penultimate
+                            pass
+                        else:
+                            tokens.append('\n')
+                    else:
+                        tokens.append('\n')
+                else:
+                    tokens.append('\n\n')   # in full effect
             else:
-                tokens.append('\n\n')   # in full effect
-        else:
+                tokens.append('\n')
+        except IndexError:
             tokens.append('\n')
 
     def _handle_start_span(self, attrs):
@@ -144,6 +159,8 @@ class LiteHTMLParser(HTMLParser):
             pass
         elif self._anchor:
             self._anchor.append(data)  # caption
+        elif self._preformatted_data:
+            self.tokens.append(data)
         else:
             tokens = self.tokens
             new_line = tokens and tokens[-1].endswith('\n')
@@ -161,6 +178,10 @@ class LiteHTMLParser(HTMLParser):
 
             # consolidate remaining whitespace to a single space:
             data = multi_whitespace_hunter.sub(' ', data)
+            if self._blockquote:
+                data = (f'    {fx_cache["dim"]}│{dx_cache["dim"]} '
+                        f'{fx_cache["i"]}{data}{dx_cache["i"]}')
+
             tokens.append(data)
         debug('tokens: %r\n', self.tokens)
 
@@ -201,15 +222,41 @@ class LiteHTMLParser(HTMLParser):
                     if key == 'color':
                         self._set_fg_color(val)
 
-            elif tag == 'p':
-                self._new_paragraph()
-
             elif tag == 'q':
                 self.tokens.append('“')
 
             elif tag == 'hr':
                 self._new_paragraph()
-                self.tokens.append(hr_txt)
+                self.tokens.append(make_line())
+                self._new_paragraph()
+
+            elif tag == 'pre':
+                self._new_paragraph()
+                self._preformatted_data = True
+
+            elif tag == 'blockquote':
+                self._new_paragraph()
+                #~ self.tokens.append('“')
+                self._blockquote = True
+
+            elif tag == 'ul':
+                self._new_paragraph()
+                self._list_mode = 'ul'
+
+            elif tag == 'ol':
+                self._new_paragraph()
+                self._list_mode = 1
+
+            elif tag == 'li':
+                mode = self._list_mode
+                if mode == 'ul':
+                    bullet = '•'
+                else:
+                    bullet = f'{mode}.'
+                    self._list_mode += 1
+                self.tokens.append(f'  {bullet} ')
+
+            elif tag in block_tags:  # behind pre, hr, etc
                 self._new_paragraph()
 
             elif tag in skip_data_tags:
@@ -259,11 +306,27 @@ class LiteHTMLParser(HTMLParser):
                 if self._setting_fg_color:
                     self._set_fg_color_default()
 
-            elif tag == 'p':
-                self._new_paragraph()
-
             elif tag == 'q':
                 self.tokens.append('”')
+
+            elif tag == 'pre':
+                self._preformatted_data = False
+                self._new_paragraph()
+
+            elif tag == 'blockquote':
+                self._blockquote = False
+                #~ self.tokens.append('”')
+                self._new_paragraph()
+
+            elif tag in ('ul', 'ol'):
+                self._list_mode = None
+                self._new_paragraph()
+
+            elif tag == 'li':
+                self.tokens.append('\n')
+
+            elif tag in block_tags:
+                self._new_paragraph()
 
             elif tag in skip_data_tags:
                 self._skip_data = False
@@ -297,6 +360,18 @@ def hprint(*args, **kwargs):
 # aliases
 _print = print
 print = hprint  # default
+
+
+def view(path):
+    ''' Display text files, converting formatting to equivalent ANSI escapes.
+        Currently supports limited HTML only.
+    '''
+    result = ''
+    with open(path) as f:
+        parser.feed(f.read())
+        result = ''.join(parser.tokens)
+        parser.tokens.clear()
+    return result
 
 
 if __name__ == '__main__':
@@ -335,10 +410,22 @@ if __name__ == '__main__':
     <c orange>l'orange</c>
     <c black on bisque3>bisque3</c>
     <hr>
+    <h2>Part II:</h2>
     <c #b0b>B0B</c> -&gt; <a href="http://example.com/">click here!</a>
     <p>
         A bit of <q>plain text</q> in its own paragraph.
     </p>
+    <pre>
+        var canvas = document.getElementById('myCanvas');
+        var context = canvas.getContext('2d');
+    </pre>
+    <blockquote>
+        This is a long line.
+        This is a long line.<br>
+        This is a long line.
+        This is a long line.
+        This is a long line.
+    </blockquote>
     <!-- nothing in this comment should be shown, Buh-BYE ! -->
     Hello <h2>world!</h2> ;-)
     '''

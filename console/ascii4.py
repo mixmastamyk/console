@@ -11,10 +11,10 @@ UNICODE_MODE = 2
 
 _wp_base_url = 'https://en.wikipedia.org/wiki/'
 # help styles
-_d, n = fg.red, fx.end  # digit, normal
-_bd = fx.bold + _d      # bright digit
+_d, n = fg.green, fx.end  # digit, normal
+_bd = fx.bold + _d      # bold and/or bright digit
 _i = fx.italic
-_kb = fx.reverse + fx.italic  # keyboard
+_kb = fx.reverse  # keyboard
 
 _help_text = __doc__ + f'''
     This four-column table (of thirty-two rows each) helps better illustrate
@@ -24,7 +24,7 @@ _help_text = __doc__ + f'''
           two digit group code above its column, with its five digit row code:
 
           {_i}Optional 8th bit{n} →  {_d}0{n}  {_bd}10{n}  {_d}01000{n}        ⇒  {_d}0{_bd}10{n}{_d}01000{n}
-                     {_i}Group code{n} ↗      ↑ {_i}Row code{n}       ↑ {_i}Full byte, aka "H"{n}
+                     {_i}Group code{n} ↗      ↑ {_i}Row code{n}      ↑ {_i}Full byte, aka "H"{n}
 
         • To generate a control code, a key is pressed then AND-ed with the
           control key group code of 00, forcing the sixth and seventh bits
@@ -40,12 +40,14 @@ _help_text = __doc__ + f'''
     Arguments:
         link                Add hyperlinks to special characters.
         no-headers          Skip informative headers.
-        unicode_symbols     Use symbols instead of Ctrl-char names.
+        unicode_symbols     Use symbols instead of names for control-chars.
 
     Note:
-        The listing is relatively tall and is therefore difficult to see
-        everything at once on terminals under ~thirty-two lines in height.
-        The standard "ascii" linux command is recommended in shorter terminals.
+        The listing in this format is relatively tall and it is therefore
+        difficult to see everything at once on terminals under ~thirty-two
+        lines in height. The standard eight-column "ascii" command for
+        Unix-likes is recommended under shorter terminals when a complete view
+        is desired.
 '''
 
 
