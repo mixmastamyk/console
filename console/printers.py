@@ -3,8 +3,8 @@
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2020, Mike Miller - Released under the LGPL, version 3+.
 
-    This module contains an HTML to ANSI sequence converter.
-    It supports quick rich text in scripting applications for those familiar
+    This EXPERIMENTAL module contains an HTML to ANSI sequence converter.
+    It supports quick rich-text in scripting applications for those familiar
     with HTML.  Why invent another styling language?
 
     No CSS class support yet,
@@ -13,22 +13,58 @@
 import re
 import logging
 from os.path import splitext
+from enum import Enum, auto
 
-from console import fg, bg, fx, defx
-from console.utils import make_hyperlink, make_line, make_sized
+from . import fg, bg, fx, defx
+from .utils import make_hyperlink, make_line, make_sized
+from .detection import _sized_char_support, get_size
 
 from html.parser import HTMLParser
 
 
 log = logging.getLogger(__name__)
 debug = log.debug
-fx_tags = ('b', 'i', 's', 'u', 'em', 'h1', 'h2', 'h3', 'strong')
+fx_tags = ('b', 'i', 's', 'u', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'strong')
 skip_data_tags = ('script', 'style', 'title')
 block_tags = '''address article aside canvas dd div dl dt fieldset figcaption
 figure footer form header main nav noscript p sectiontable tfoot video
 '''.split()
 # blockquote h1-h6 hr pre ul ol li https://www.w3schools.com/htmL/html_blocks.asp
 multi_whitespace_hunter = re.compile(r'\s\s+')
+_width = get_size().columns
+
+# find html header mode for rendering
+class HeaderMode(Enum):
+    NORMAL = auto()
+    FIGLET = auto()
+    DOUBLE = auto()
+
+
+if _sized_char_support:
+    header_mode = HeaderMode.DOUBLE
+    _double_fonts = dict(
+        h1=dict(double=True),  # + bold
+        h2=dict(double=True),
+        h3=dict(double=False, wide=True),  # + bold
+        h4=dict(double=False, wide=True),
+    )
+
+else:
+    try:
+        import sys
+        if '-i' in sys.argv:  # testing
+            raise ImportError
+        from pyfiglet import Figlet  # gettin' figgy with it, nana nana na na
+        header_mode = HeaderMode.FIGLET
+        Figlet.render = Figlet.renderText
+        _figlet_fonts = dict(
+            h1=Figlet(font='standard', width=_width),
+            h2=Figlet(font='small', width=_width),
+            #~ h3=Figlet(font='wideterm', width=_width),
+        )
+    except ImportError:
+        header_mode = HeaderMode.NORMAL
+
 
 class StringCache(dict):
     ''' Used to cache rendered ANSI color/fx strings with a dictionary lookup
@@ -41,6 +77,10 @@ class StringCache(dict):
 
     def __missing__(self, key):
         ''' Not found, render, save, return. '''
+        if _sized_char_support and key[0] == 'h':
+            if key[1] in '24':  # disable styles on even headers
+                return ''
+
         key = self._renames.get(key, key)
         if key.startswith('#'):                 # handle hex colors
             key = 't' + key[1:]
@@ -145,6 +185,34 @@ class LiteHTMLParser(HTMLParser):
                             self.tokens.append(fx_cache['overline'])
                             self._setting_text_decoration_o = True
 
+    def _handle_header(self, tag, data):
+        ''' Header Styles.  Styles had to be moved in here. '''
+        if header_mode is HeaderMode.DOUBLE:
+            font = _double_fonts.get(tag)
+            if font:
+                data = make_sized(data, **font)
+            else:
+                data = data.upper()
+            styled_data = f'{fx_cache[tag]}{data}{dx_cache[tag]}'
+            self.tokens.append(styled_data)
+
+        elif header_mode is HeaderMode.FIGLET and tag in ('h1', 'h2'):
+            font = _figlet_fonts.get(tag)
+            if font:
+                self.tokens.append(font.render(data))
+            else:
+                self.tokens.append(data.upper())
+
+        elif tag == 'h1':  # style first, then center.  not as easy as it looks
+            data = data.upper()
+            styled_data = f'{fx_cache[tag]}  {data}  {dx_cache[tag]}'
+            centered_data = data.center(_width)
+            centered_data = centered_data.replace(data, styled_data)
+            self.tokens.append(centered_data)
+        else:
+            styled_data = f'{fx_cache[tag]}{data}{dx_cache[tag]}'
+            self.tokens.append(styled_data)
+
     def handle_data(self, data):
         ''' Deals with text between and outside the tags.  Cases:
             ' '
@@ -158,15 +226,8 @@ class LiteHTMLParser(HTMLParser):
             pass
         elif self._anchor:
             self._anchor.append(data)  # caption
-        elif self._in_header:  # add styling
-            if self._in_header == 'h1':
-                self.tokens.append(make_sized(data, double=True))
-            elif self._in_header == 'h2':
-                self.tokens.append(make_sized(data, double=False, wide=True))
-            elif self._in_header == 'h3':
-                self.tokens.append(data.upper())
-            else:
-                self.tokens.append(data)
+        elif self._in_header:  # tag, add styling
+            self._handle_header(self._in_header, data)
         elif self._preformatted_data:
             self.tokens.append(data)
         else:
@@ -199,7 +260,8 @@ class LiteHTMLParser(HTMLParser):
             if tag.startswith('h'):
                 self._new_paragraph()
                 self._in_header = tag
-            self.tokens.append(fx_cache[tag])
+            else:
+                self.tokens.append(fx_cache[tag])
         else:
             if tag == 'span':
                 self._handle_start_span(attrs)
@@ -245,7 +307,6 @@ class LiteHTMLParser(HTMLParser):
 
             elif tag == 'blockquote':
                 self._new_paragraph()
-                #~ self.tokens.append('“')
                 self._blockquote = True
 
             elif tag == 'ul':
@@ -261,8 +322,8 @@ class LiteHTMLParser(HTMLParser):
                 if mode == 'ul':
                     bullet = '•'
                 else:
-                    bullet = f'{mode}.'
-                    self._list_mode += 1
+                    bullet = f'{mode}.'  # below could be nested  :-/
+                    self._list_mode = (self._list_mode or 0) + 1
                 self.tokens.append(f'  {bullet} ')
 
             elif tag in block_tags:  # behind pre, hr, etc
@@ -274,10 +335,14 @@ class LiteHTMLParser(HTMLParser):
     def handle_endtag(self, tag):
         debug('end tag: %s', tag)
         if tag in fx_tags:
-            self.tokens.append(dx_cache[tag])
             if tag.startswith('h'):
-                self._in_header = False
                 self._new_paragraph(desc='  end')
+                self._in_header = False
+            else:
+                self.tokens.append(dx_cache[tag])
+            if tag == 'h1' and _sized_char_support:  # xterm: one more nl,
+                self.tokens.append('\n')  # underline is too close
+
         else:
             if tag == 'span':  # no elifs, could be multiple
                 if self._setting_fg_color:
@@ -299,7 +364,8 @@ class LiteHTMLParser(HTMLParser):
 
             elif tag == 'a':
                 self._set_fg_color('lightblue')
-                self.tokens.append(make_hyperlink(*self._anchor, icon='🔗'))
+                target, caption = self._anchor[0], ''.join(self._anchor[1:])
+                self.tokens.append(make_hyperlink(target, caption, icon='🔗'))  # ?
                 self._set_fg_color_default()
                 self._anchor.clear()
 
@@ -343,9 +409,13 @@ class LiteHTMLParser(HTMLParser):
 
 fg_cache = StringCache(fg)
 bg_cache = StringCache(bg)
-fx_cache = StringCache(fx, em='i', h1='b', h2='b', h3='b', strong='b')
-# disables individual styles:
-dx_cache = StringCache(defx, em='i', h1='b', h2='b', h3='b', strong='b')
+fx_cache = StringCache(
+    fx, em='i', h1='b,u', h2='b', h3='b', h4='i', h5='b', h6='i', strong='b'
+)
+# disables individual styles, must match above
+dx_cache = StringCache(
+    defx, em='i', h1='b,u', h2='b', h3='b', h4='i', h5='b', h6='i', strong='b'
+)
 parser = LiteHTMLParser()
 
 
@@ -374,7 +444,7 @@ print = hprint  # default
 
 def view(path):
     ''' Display text files, converting formatting to equivalent ANSI escapes.
-        Currently supports limited HTML only.
+        Currently supports limited-HTML only.
     '''
     result = ''
     if splitext(path)[1] in ('.html', '.htm'):
@@ -403,7 +473,7 @@ if __name__ == '__main__':
     html = '''
     <script> var Mr_Bill = "Oh No!"; // nothing to see here </script>
     <style foo=bar>Dad { how-bout-you: "shut yer big YAPPER" !important; }</style>
-    <h1><c lightgreen>H1. HTML Print Test</c></h1>
+    <h1>H1. HTML Print Test</h1>
     <c dim>fx:</c> <b>bold</b> <i>italic</i><em>/em</em> <s>strike</s>
     <u>undy</u><br>
     ¶<c dim>(span tag)</c>
@@ -431,14 +501,14 @@ if __name__ == '__main__':
         var context = canvas.getContext('2d');
     </pre>
     <blockquote>
-        This is a long line.
+        This is a blockquote.
         This is a long line.<br>
         This is a long line.
         This is a long line.
         This is a long line.
     </blockquote>
     <!-- nothing in this comment should be shown, Buh-BYE ! -->
-    Hello <h3>woild!</h3> ;-)
-    More affter
-    '''
+    Hello <h3>H3. woild!</h3><h4>H4. Heré</h4><h5>H5. Here</h5><h6>H6. Here</h6>
+    ;-) '''
     print(html)
+    print('**** header mode:', header_mode)

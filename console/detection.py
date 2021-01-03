@@ -19,13 +19,14 @@ from .constants import (BS, BEL, CSI, ESC, ENQ, OSC, RS, ST, TermLevel,
 from .meta import __version__, defaults
 
 
-log = logging.getLogger(__name__)
-os_name = os.name  # frequent use
+TERM_DIRECT_USES_COLONS = ('xterm-', 'iterm2-', 'kitty-', 'mintty-', 'mlterm-')
 color_sep = ';'
 termios = tty = None
+
 is_fbterm = (env.TERM == 'fbterm')
 is_xterm = env.XTERM_VERSION.bool  # the real thing
-TERM_DIRECT_USES_COLONS = ('xterm-', 'iterm2-', 'kitty-', 'mintty-', 'mlterm-')
+log = logging.getLogger(__name__)
+os_name = os.name  # frequent use
 _sized_char_support = is_xterm or env.TERM.startswith('konsole')
 
 

@@ -32,7 +32,6 @@ log = logging.getLogger(__name__)
 ansi_csi0_finder = re.compile(r'\x1b\[[0-?]*[ -/]*[@-~]')
 ansi_csi1_finder = re.compile(r'\x9b[0-?]*[ -/]*[@-~]')
 
-# ansi_osc0_finder = re.compile(r'(\x1b\][0-?]*\a?|\a)')  # TODO: leave title
 ansi_osc0_finder = re.compile(r'\x1b\].*?(\a|\x1b\\)')
 ansi_osc1_finder = re.compile(r'\x9b.*?(\a|\x9d)')
 _ansi_capable = True if _term_level else False  # simplify comparison
@@ -265,11 +264,16 @@ def make_sized(text, double=True, wide=False):
         Pertains to the whole line, doesn't reset to normal until a newline
         occurs.
 
+        Arguments:
+            text           The text to change size.
+            double         Use the double-sized font.
+            wide           Use the double-wide font.
+
         Note:
 
             - DEC sequences supported on xterm and Konsole, possibly others.
-            - Double is also wide so both together are redundant.
-              Wide takes precedence.
+            - Double text is also wide so both options together are redundant.
+              Wide therefore takes precedence.
     '''
     result = text
     if _ansi_capable and _sized_char_support:
