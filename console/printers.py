@@ -7,7 +7,7 @@
     It supports quick rich-text in scripting applications for those familiar
     with HTML.  Why invent another styling language?
 
-    No CSS class support yet,
+    Currently is partially useful.  No CSS class support yet,
     but many inline styles that correspond to terminal capabilities work.
 '''
 import re
@@ -22,6 +22,8 @@ from .detection import _sized_char_support, get_size
 from html.parser import HTMLParser
 
 
+HALF2FULL = dict((i, i + 0xFEE0) for i in range(0x21, 0x7F))  # Wide ASCII
+HALF2FULL[0x20] = 0x3000
 log = logging.getLogger(__name__)
 debug = log.debug
 fx_tags = ('b', 'i', 's', 'u', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'strong')
@@ -54,7 +56,7 @@ else:
         import sys
         if '-i' in sys.argv:  # testing
             raise ImportError
-        from pyfiglet import Figlet  # gettin' figgy with it, nana nana na na
+        from pyfiglet import Figlet  # gettin' figgy with it, na na na…
         header_mode = HeaderMode.FIGLET
         Figlet.render = Figlet.renderText
         _figlet_fonts = dict(
@@ -121,6 +123,17 @@ class LiteHTMLParser(HTMLParser):
     _blockquote = None
     _in_header = None
 
+    def _to_full_width(self, data, is_ascii):
+        ''' Converts ASCII characters to their full-width counterpart,
+            adds spaces for the rest.
+            https://stackoverflow.com/a/36693548/450917
+        '''
+        if is_ascii:
+            data = data.translate(HALF2FULL)  # widen with wide chars
+        else:
+            data = ' '.join(data)  # widen with spaces
+        return data
+
     def _set_fg_color(self, val):
         self.tokens.append(fg_cache[val])
         self._setting_fg_color = True
@@ -185,33 +198,54 @@ class LiteHTMLParser(HTMLParser):
                             self.tokens.append(fx_cache['overline'])
                             self._setting_text_decoration_o = True
 
-    def _handle_header(self, tag, data):
-        ''' Header Styles.  Styles had to be moved in here. '''
-        if header_mode is HeaderMode.DOUBLE:
+    def _handle_header_styles(self, tag, data):
+        ''' Header shizzle moved in here. '''
+        # inspect data to find best rendition
+        is_ascii = data.isascii()
+        if is_ascii:
+            is_latin1 = False
+        else:
+            try:
+                data.encode('latin1', errors='strict')
+                is_latin1 = True
+            except UnicodeEncodeError:
+                is_latin1 = False
+
+        # -- Double DECember -------------------------------------------------
+        if header_mode is HeaderMode.DOUBLE and (is_ascii or is_latin1):
             font = _double_fonts.get(tag)
             if font:
                 data = make_sized(data, **font)
             else:
-                data = data.upper()
+                data = self._to_full_width(data, is_ascii)
             styled_data = f'{fx_cache[tag]}{data}{dx_cache[tag]}'
             self.tokens.append(styled_data)
 
-        elif header_mode is HeaderMode.FIGLET and tag in ('h1', 'h2'):
+        # -- Figlet Shizzle --------------------------------------------------
+        elif (
+                header_mode is HeaderMode.FIGLET and
+                tag in _figlet_fonts.keys() and
+                is_ascii
+            ):
             font = _figlet_fonts.get(tag)
             if font:
                 self.tokens.append(font.render(data))
-            else:
-                self.tokens.append(data.upper())
 
-        elif tag == 'h1':  # style first, then center.  not as easy as it looks
-            data = data.upper()
-            styled_data = f'{fx_cache[tag]}  {data}  {dx_cache[tag]}'
-            centered_data = data.center(_width)
-            centered_data = centered_data.replace(data, styled_data)
-            self.tokens.append(centered_data)
-        else:
-            styled_data = f'{fx_cache[tag]}{data}{dx_cache[tag]}'
-            self.tokens.append(styled_data)
+        # -- Text + ANSI -----------------------------------------------------
+        else:  # normal
+            if tag in ('h1', 'h2'):
+                data = data.upper()
+
+            data = self._to_full_width(data, is_ascii)
+            if tag == 'h1':  # Style first, then center, harder than it sounds:
+                len_data = len(data) * 2  # wide ascii, but not asian widths
+                padding = (_width - len_data) // 2
+                styled_data = f'{fx_cache[tag]}{data}{dx_cache[tag]}'
+                centered_data = f'{padding * " "}{styled_data}'
+                self.tokens.append(centered_data)
+            else:
+                styled_data = f'{fx_cache[tag]}{data}{dx_cache[tag]}'
+                self.tokens.append(styled_data)
 
     def handle_data(self, data):
         ''' Deals with text between and outside the tags.  Cases:
@@ -227,9 +261,9 @@ class LiteHTMLParser(HTMLParser):
         elif self._anchor:
             self._anchor.append(data)  # caption
         elif self._in_header:  # tag, add styling
-            self._handle_header(self._in_header, data)
+            self._handle_header_styles(self._in_header, data)
         elif self._preformatted_data:
-            self.tokens.append(data)
+            self.tokens.append(data.lstrip('\n'))  # new para already
         else:
             tokens = self.tokens
             new_line = tokens and tokens[-1].endswith('\n')
@@ -342,7 +376,6 @@ class LiteHTMLParser(HTMLParser):
                 self.tokens.append(dx_cache[tag])
             if tag == 'h1' and _sized_char_support:  # xterm: one more nl,
                 self.tokens.append('\n')  # underline is too close
-
         else:
             if tag == 'span':  # no elifs, could be multiple
                 if self._setting_fg_color:
@@ -365,7 +398,7 @@ class LiteHTMLParser(HTMLParser):
             elif tag == 'a':
                 self._set_fg_color('lightblue')
                 target, caption = self._anchor[0], ''.join(self._anchor[1:])
-                self.tokens.append(make_hyperlink(target, caption, icon='🔗'))  # ?
+                self.tokens.append(make_hyperlink(target, caption, icon=''))  # 🔗?
                 self._set_fg_color_default()
                 self._anchor.clear()
 
@@ -474,6 +507,7 @@ if __name__ == '__main__':
     <script> var Mr_Bill = "Oh No!"; // nothing to see here </script>
     <style foo=bar>Dad { how-bout-you: "shut yer big YAPPER" !important; }</style>
     <h1>H1. HTML Print Test</h1>
+    <h1>I ♥ ラーメン</h1>
     <c dim>fx:</c> <b>bold</b> <i>italic</i><em>/em</em> <s>strike</s>
     <u>undy</u><br>
     ¶<c dim>(span tag)</c>
@@ -511,4 +545,3 @@ if __name__ == '__main__':
     Hello <h3>H3. woild!</h3><h4>H4. Heré</h4><h5>H5. Here</h5><h6>H6. Here</h6>
     ;-) '''
     print(html)
-    print('**** header mode:', header_mode)

@@ -4,7 +4,6 @@ assert sys.version_info >= (3, 4, 0), "This package requires Python 3.4+"
 if sys.version_info.major < 3:
     raise NotImplementedError('Sorry, only Python 3 and above is supported.')
 
-
 from os.path import dirname, join
 from setuptools import setup
 import imp
@@ -23,8 +22,9 @@ install_requires = (
 )
 tests_require = ('pyflakes', 'pytest', 'readme_renderer'),
 extras_require = dict(
+    figlet=('pyfiglet',),
     webcolors=('webcolors',),
-    win_terminfo=('jinxed',),  # for ssh into windows
+    win_terminfo=('jinxed',),  # for ssh into windows, tbd
 )
 entry_points = dict(
     console_scripts=(
