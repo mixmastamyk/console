@@ -520,7 +520,7 @@ def wait_key(keys=None):
             return _get_char()
 
 
-def pause(message='Press any key to continue…'):
+def pause(message='Press any key to continue…', _return_key=False):
     ''' Analogous to the
         `DOS pause <https://en.wikipedia.org/wiki/List_of_DOS_commands#PAUSE>`_
         command from olden times, with a modifiable message.
@@ -533,10 +533,9 @@ def pause(message='Press any key to continue…'):
             str, None:  One character or ESC - depending on key hit.
             None - immediately under i/o redirection, not an interactive tty.
     '''
-    key = None
     print(message, end=' ', flush=True)
-    if is_a_tty():  # not sure if both of these should check
-        key = wait_key()
+    key = wait_key()
 
     print()
-    return key
+    if _return_key:  # for testing purposes; command shouldn't return it
+        return key
