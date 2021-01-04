@@ -4,6 +4,7 @@ assert sys.version_info >= (3, 4, 0), "This package requires Python 3.4+"
 if sys.version_info.major < 3:
     raise NotImplementedError('Sorry, only Python 3 and above is supported.')
 
+from itertools import chain
 from os.path import dirname, join
 from setuptools import setup
 import imp
@@ -25,7 +26,9 @@ extras_require = dict(
     figlet=('pyfiglet',),
     webcolors=('webcolors',),
     win_terminfo=('jinxed',),  # for ssh into windows, tbd
-)
+)  # build entry for all extras:
+extras_require['all'] = tuple(chain.from_iterable(extras_require.values()))
+
 entry_points = dict(
     console_scripts=(
         f'{meta.pkgname} = {meta.pkgname}.cli:setuptools_entry_point',
