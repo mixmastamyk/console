@@ -1,0 +1,11 @@
+
+
+Windows Terminfo:
+
+    package
+
+
+cli:
+
+    console view file.html file.md file.rst
+
