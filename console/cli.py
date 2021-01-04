@@ -77,9 +77,14 @@ def _add_sub_args(parameters, sub_parser, allow_kwargs, verbose):
             type_ = type(param.default)
 
         # figure params to the sub_parser argument:
+        if param.default is param.empty:
+            default_text = ''
+        else:
+            default_text = f', defaults to {param.default!r}'
+
         sub_args = dict(
             default=param.default,
-            help=f'{type_.__name__}, defaults to {param.default!r}',
+            help=f'{type_.__name__}{default_text}',
         )
         if type_ is bool:
             if param.default:  # default True, negate boolean flag
