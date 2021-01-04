@@ -3,7 +3,7 @@
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2020, Mike Miller - Released under the LGPL, version 3+.
 
-    This EXPERIMENTAL module contains an HTML to ANSI sequence converter.
+    An EXPERIMENTAL module containing an HTML to ANSI sequence converter.
     It supports quick rich-text in scripting applications for those familiar
     with HTML.  Why invent another styling language?
 
@@ -22,8 +22,8 @@ from .detection import _sized_char_support, get_size
 from html.parser import HTMLParser
 
 
-HALF2FULL = dict((i, i + 0xFEE0) for i in range(0x21, 0x7F))  # Wide ASCII
-HALF2FULL[0x20] = 0x3000
+HALF2FULL = dict((i, i + 0xFEE0) for i in range(0x21, 0x7F))  # Wide ASCII map
+HALF2FULL[0x20] = 0x3000  # https://stackoverflow.com/a/36693548/450917
 log = logging.getLogger(__name__)
 debug = log.debug
 fx_tags = ('b', 'i', 's', 'u', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'strong')
@@ -34,6 +34,7 @@ figure footer form header main nav noscript p sectiontable tfoot video
 # blockquote h1-h6 hr pre ul ol li https://www.w3schools.com/htmL/html_blocks.asp
 multi_whitespace_hunter = re.compile(r'\s\s+')
 _width = get_size().columns
+
 
 # find html header mode for rendering
 class HeaderMode(Enum):
@@ -221,7 +222,7 @@ class LiteHTMLParser(HTMLParser):
             styled_data = f'{fx_cache[tag]}{data}{dx_cache[tag]}'
             self.tokens.append(styled_data)
 
-        # -- Figlet Shizzle --------------------------------------------------
+        # -- Figlet ----------------------------------------------------------
         elif (
                 header_mode is HeaderMode.FIGLET and
                 tag in _figlet_fonts.keys() and
