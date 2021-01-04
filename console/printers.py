@@ -202,7 +202,15 @@ class LiteHTMLParser(HTMLParser):
     def _handle_header_styles(self, tag, data):
         ''' Header shizzle moved in here. '''
         # inspect data to find best rendition
-        is_ascii = data.isascii()
+        try:
+            is_ascii = data.isascii()   # 3.7
+        except AttributeError:          # :-/
+            try:
+                data.encode('ascii')
+                is_ascii = True
+            except UnicodeEncodeError:
+                is_ascii = False
+
         if is_ascii:
             is_latin1 = False
         else:
