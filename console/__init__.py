@@ -2,8 +2,6 @@
     | console - Comprehensive utility library for ANSI terminals.
     | © 2018, Mike Miller - Released under the LGPL, version 3+.
 '''
-import sys as _sys
-
 import env as _env
 
 from .constants import TermLevel as _TermLevel
@@ -11,12 +9,18 @@ from .disabled import empty_bin as _empty_bin
 
 
 _term_level = None
-# Define pass-thru objects for streams/dumb terminals:
+# Define pass-thru palette objects for streams and dumb terminals:
 fg = bg = ul = fx = defx = sc = _empty_bin
 
 
 # Py3.6+ - set up a dummy future-fstrings encoding that is really utf8
-if _sys.version_info >= (3, 6):
+#~ import sys as _sys
+#~ if _sys.version_info >= (3, 6):
+# issue #12 - lets install it if need be, to be removed in a later version
+try:
+    from codecs import lookup as _lookup
+    _lookup('future-fstrings')
+except LookupError:
     import codecs as _codecs
     import encodings as _encodings
 
