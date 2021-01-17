@@ -450,7 +450,7 @@ Maybe you have some existing HTML laying around?
 
 .. code-block:: python
 
-    >>> from console.printers import print
+    >>> from console.printers import hprint as print
     >>> print(html_doc)
 
 

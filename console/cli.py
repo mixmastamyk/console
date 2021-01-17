@@ -49,6 +49,9 @@ actions = dict(
     strip_ansi          = 'console.utils',
     wait_key            = 'console.utils',
     view                = 'console.printers',
+
+    _hrender            = 'console.printers',   # hide
+    echo                = ['_hrender'],         # alias
 )
 if os.name == 'nt':
     os.EX_OK, os.EX_USAGE, os.EX_SOFTWARE = 0, 64, 70  # :-/

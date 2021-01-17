@@ -461,27 +461,29 @@ dx_cache = StringCache(
 parser = LiteHTMLParser()
 
 
-def hprint(*args, **kwargs):
+def hprint(*args, newline=False, **kwargs):
     ''' Print function for terminals, with limited HTML support. '''
     end = kwargs.pop('end', None)
 
     for arg in args:
-        result = ''
-        if isinstance(arg, str) and '<' in arg:
-            parser.feed(arg)
-            result = ''.join(parser.tokens)
-            parser.tokens.clear()
-        else:
-            result = arg
+        result = hrender(arg)
 
         debug('called with: %r %s', result, kwargs)
-        _print(result, end='', **kwargs)
-    _print(end=end)
+        print(result, end='', **kwargs)
+
+    if not newline:
+        print(end=end)
 
 
-# aliases
-_print = print
-print = hprint  # default
+def hrender(text):
+    ''' Renders HTML to an ANSI-compatible string. '''
+    if '<' in text:
+        parser.feed(text)
+        result = ''.join(parser.tokens)
+        parser.tokens.clear()
+    else:
+        result = text
+    return result
 
 
 def view(path):
