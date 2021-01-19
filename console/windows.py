@@ -98,7 +98,7 @@ class CONSOLE_SCREEN_BUFFER_INFO(Structure):
 
 
 def add_os_sysexits():
-    ''' Make the sysexit constants available under Windows. '''
+    ''' Make the sysexit.h exit-status constants available under Windows. '''
     import os
 
     os.EX_OK            = 0     # successful termination
