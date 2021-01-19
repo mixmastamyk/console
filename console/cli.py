@@ -11,8 +11,8 @@ import logging
 from importlib import import_module
 from inspect import signature
 
-from console import fg, fx
-from console.meta import __version__
+from . import fg, fx
+from .meta import __version__
 
 
 log = logging.getLogger(__name__)
@@ -53,8 +53,9 @@ actions = dict(
     _hrender            = 'console.viewers',    # hide
     echo                = ['_hrender'],         # alias
 )
-if os.name == 'nt':
-    os.EX_OK, os.EX_USAGE, os.EX_SOFTWARE = 0, 64, 70  # :-/
+if os.name == 'nt':  # :-/
+    from .windows import add_os_sysexits
+    add_os_sysexits()
 
 
 def _add_sub_args(parameters, sub_parser, allow_kwargs, verbose):
@@ -251,6 +252,7 @@ def setup():
 def main(args, kwargs):
     ''' Tear the roof off the sucker… '''
     status = os.EX_OK
+    print_err = lambda err: print(f'{err.__class__.__name__}: {err}')
 
     try:  # Ow, we want the funk…
         options = vars(args)
@@ -265,8 +267,19 @@ def main(args, kwargs):
                 print(result, end=nl)
             log.debug('result was: %r', result)
 
-    except Exception:
-        log.exception('Unexpected error occurred:')
+    except FileNotFoundError as err:
+        print_err(err)
+        status = os.EX_NOINPUT
+
+    except IOError as err:
+        print_err(err)
+        status = os.EX_IOERR
+
+    except Exception as err:
+        if log.isEnabledFor(logging.DEBUG):
+            log.exception('Unexpected error occurred:')
+        else:
+            print_err(err)
         status = os.EX_SOFTWARE
 
     # You've got a real type of thing going down, gettin' down

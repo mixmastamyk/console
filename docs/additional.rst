@@ -551,8 +551,7 @@ Here's a short script to show off console's full-screen abilities:
                               f'{fx.i}fullscreen{defx.i} app! **'),
                 screen.mv_x(5),  # back up, then down
                 screen.down(5),
-                fg.yellow(f'(Hit the {fx.reverse}ESC{defx.reverse}'
-                           ' key to exit): '),
+                fg.yellow(f'(Hit the {fx.reverse("ESC")} key to exit): '),
                 end='', flush=True,  # optional
             )
 
@@ -593,6 +592,7 @@ For example:
 
     import tty, termios
     from console import TermStack
+    from console.constants import CSI
 
     with TermStack() as fd:
         # shut off echo

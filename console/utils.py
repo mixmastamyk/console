@@ -1,7 +1,7 @@
 # -*- coding: future_fstrings -*-
 '''
     .. console - Comprehensive utility library for ANSI terminals.
-    .. © 2018-2020, Mike Miller - Released under the LGPL, version 3+.
+    .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     This module contains cross-platform utility and convenience functions for
     use under ANSI-compatible terminals.
