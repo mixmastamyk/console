@@ -48,9 +48,9 @@ actions = dict(
     set_title           = 'console.utils',
     strip_ansi          = 'console.utils',
     wait_key            = 'console.utils',
-    view                = 'console.printers',
+    view                = 'console.viewers',
 
-    _hrender            = 'console.printers',   # hide
+    _hrender            = 'console.viewers',    # hide
     echo                = ['_hrender'],         # alias
 )
 if os.name == 'nt':

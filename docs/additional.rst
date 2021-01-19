@@ -441,7 +441,7 @@ in addition to the standard ``fx.u(…)``:
     </pre>
 
 
-HTML Printer
+HTML Viewers
 ~~~~~~~~~~~~~~~~~~~
 
 Would you like to print some rich text to the terminal,
@@ -466,6 +466,7 @@ and converts entities:
 - a *(see above)*
 - br *(+newline)*
 - b, strong
+- blockquote
 - hr *(+newlines)*
 - h1, h2, h3 *(+newlines)*
 - i, em
@@ -474,6 +475,7 @@ and converts entities:
 - span
 - s, strike
 - u
+- ul, ol, li
 
 It handles a few inline style attributes as well:
 
@@ -497,6 +499,12 @@ and the word "dim":
     <c black on bisque3>bisque3</c>
     <c #b0b>deadbeefcafe</c>
     <c dim>text</c>
+
+
+.. rubric:: Viewing a file
+
+Viewing a file is also available with the ``viewers.view(filename)`` function
+or via command-line (see below).
 
 
 Context Managers
@@ -622,6 +630,7 @@ all sub-commands support help ``-h`` and verbose ``-v``:
     ⏵ console flash         # Bam!
     ⏵ console pause         # Press any key to continue…
     ⏵ console progress      # show a progress bar
+    ⏵ console view          # view a file, ex: *.html
 
 And many more.
 You can also run several of its modules for information and other functionality:
