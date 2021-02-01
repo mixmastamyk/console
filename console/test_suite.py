@@ -465,6 +465,20 @@ if True:  # fold
             text = utils.clear_screen(mode)
             assert text == CSI + str(i) + end
 
+    def test_notify_progress():
+        cases = (
+            (-1, '\x1b]9;4;2;99\x1b\\'),
+            (00, '\x1b]9;4;0;0\x1b\\'),
+            (50, '\x1b]9;4;1;50\x1b\\'),
+            (99, '\x1b]9;4;1;99\x1b\\'),
+            (100, '\x1b]9;4;0;0\x1b\\'),
+            (101, '\x1b]9;4;2;99\x1b\\'),
+            (200, '\x1b]9;4;2;99\x1b\\'),
+        )
+        for value, expected in cases:
+            text = utils.notify_progress(value)
+            assert text == expected
+
     def test_strip_ansi():
         text = 'Hang \x1b[34;4;5mLoose\x1b[0m, Hawaii'
         assert 'Hang Loose, Hawaii' == utils.strip_ansi(text)
@@ -518,11 +532,8 @@ if True:  # fold
         if result is not None:
             assert result == b'\x1b]52;c;Y29sbHl3b2JibGVz\x1b\\'
 
-    # wait_key
-    # pause
     def test_wait_pause():
         ''' weak test, make sure funcs exist. '''
-
         utils.wait_key
         utils.pause
         if not detection.is_a_tty():

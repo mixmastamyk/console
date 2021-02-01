@@ -370,6 +370,61 @@ def notify_cwd(path=None):
     return text
 
 
+def notify_message(message):
+    ''' Notify the user with the given message.
+
+        Arguments:
+            path:  str
+
+        Returns: text sequence to be written, for testing.
+
+        Notes:
+            https://gitlab.freedesktop.org/terminal-wg/specifications/-/issues/20
+            https://gitlab.com/gnachman/iterm2/-/issues/3939
+    '''
+    pass
+    #~ # encode as url
+    #~ scheme = 'file://'
+    #~ if not path.startswith(scheme):
+        #~ path = scheme + path
+    #~ path = quote(path)
+    #~ text = f'{OSC}7;{path}{ST}'
+    #~ if _ansi_capable:
+        #~ print(text, end='', flush=True)
+    #~ return text
+
+
+def notify_progress(value):
+    ''' Notify the terminal and user of the current progress,
+        via the desktop taskbar.
+
+        Arguments:
+            value:  int 0-100,  A value of 0 or 100 will disable the progress
+                                indicator.
+                                Outside this range will set error mode,
+                                e.g. 911
+
+        Returns: text sequence to be written, for testing.
+
+        Notes:
+            Currently known to be useful only on Windows.
+            https://conemu.github.io/en/AnsiEscapeCodes.html#ConEmu_specific_OSC
+
+    '''
+    status = 1  # set progress
+    if value in (0, 100):
+        status = 0  # clear, done
+        value = 0
+    elif value < 0 or value > 100:  # error
+        status = 2  # Danger Will Robinson!  Danger!
+        value = 99  # paint full bar red, 2 bytes
+
+    text = f'{OSC}9;4;{status};{value}{ST}'
+    if _ansi_capable:
+        print(text, end='', flush=True)
+    return text
+
+
 def reset_terminal():
     ''' Reset the terminal/console screen. (Also aliased to cls.)
 

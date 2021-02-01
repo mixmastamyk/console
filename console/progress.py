@@ -16,12 +16,13 @@
 '''
 import logging
 import time
+from math import floor
 
 from . import fg, bg, fx, sc, _term_level
 from .constants import TermLevel
 from .detection import detect_unicode_support, get_size, os_name
 from .disabled import empty as _empty
-from .utils import len_stripped
+from .utils import len_stripped, notify_progress
 
 DEF_TOTAL = 99
 DEF_WIDTH = 32
@@ -354,6 +355,9 @@ class ProgressBar:
         else:
             pieces.append(self._render())  # external
 
+        #~ if os_name == 'nt':  # Windows taskbar progress
+        notify_progress(floor(self.ratio * 100))
+
         self._cached_str = rendered = ''.join(pieces)
         if self.debug:
             pieces.append(
@@ -363,6 +367,7 @@ class ProgressBar:
                 f'l:{len_stripped(rendered.lstrip(chr(13)))}'  # '\r' aka CR
             )
             self._cached_str = rendered = ''.join(pieces)  # again :-/
+
         return rendered
 
     def __repr__(self):
@@ -598,10 +603,9 @@ def progress(value: float,
             width: 32               Full width of bar, padding, and labels
 
         Note:
-
             The value parameter is 0-based, therefore think 0-99,
             rather than 1-100.
-            If you'd like ``value`` to signify a percentage instead,
+            If you'd like value to signify a percentage instead,
             pass ``--total 100`` or other round number as well.
 
         Run ``python3 -m console.progress -l`` for a demo.
