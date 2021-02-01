@@ -278,9 +278,9 @@ def make_sized(text, double=True, wide=False):
     result = text
     if _ansi_capable and _sized_char_support:
         if wide:
-            result =  f'\x1b#6{text}'
+            result =  f'\x1b#6{text}'  # DECDWL
         elif double:
-            result = f'\x1b#3{text}\n\x1b#4{text}'
+            result = f'\x1b#3{text}\n\x1b#4{text}'  # DECDHL, DECDHL
 
     return result
 
@@ -345,7 +345,7 @@ def measure(start=1, limit=200, offset=0, newlines=True):
 
 
 def notify_cwd(path=None):
-    ''' Notify the terminal of the current working directory.
+    ''' Notify the terminal of the current working directory. EXPERIMENTAL
 
         Arguments:
             path:  str
@@ -354,72 +354,92 @@ def notify_cwd(path=None):
 
         Notes:
             https://gitlab.freedesktop.org/terminal-wg/specifications/-/issues/20
-            https://gitlab.com/gnachman/iterm2/-/issues/3939
+            https://conemu.github.io/en/AnsiEscapeCodes.html#OSC_Operating_system_commands
     '''
     if not path:
         path = os.getcwd()
 
-    # encode as url
-    scheme = 'file://'
-    if not path.startswith(scheme):
-        path = scheme + path
-    path = quote(path)
-    text = f'{OSC}7;{path}{ST}'
+    if os_name == 'nt':
+        code = '9;9'
+        path = f'"{path}"'
+    else:
+        code = '7'
+        # encode as path as an url
+        scheme = 'file://'
+        if not path.startswith(scheme):
+            path = scheme + path
+        path = quote(path)
+
+    text = f'{OSC}{code};{path}{ST}'
     if _ansi_capable:
         print(text, end='', flush=True)
     return text
 
 
-def notify_message(message):
-    ''' Notify the user with the given message.
+def notify_message(message, title=''):
+    ''' Notify the user with the given message. EXPERIMENTAL
 
         Arguments:
-            path:  str
+            message:  str
+            title:    str     rxvt-unicode only.
 
         Returns: text sequence to be written, for testing.
 
         Notes:
-            https://gitlab.freedesktop.org/terminal-wg/specifications/-/issues/20
-            https://gitlab.com/gnachman/iterm2/-/issues/3939
+            https://gitlab.freedesktop.org/terminal-wg/specifications/-/issues/13
     '''
-    pass
-    #~ # encode as url
-    #~ scheme = 'file://'
-    #~ if not path.startswith(scheme):
-        #~ path = scheme + path
-    #~ path = quote(path)
-    #~ text = f'{OSC}7;{path}{ST}'
-    #~ if _ansi_capable:
-        #~ print(text, end='', flush=True)
-    #~ return text
+    import env
+    if env.TERM.startswith('rxvt'):
+        code = '777'
+        message = f'notify;{title};{message};'
+    else:
+        code = '9'
+
+    text = f'{OSC}{code};{message}{ST}'
+    if _ansi_capable:
+        print(text, end='', flush=True)
+    return text
 
 
-def notify_progress(value):
+def notify_progress(value=None, error=False, indeterminate=False, paused=False):
     ''' Notify the terminal and user of the current progress,
-        via the desktop taskbar.
+        via the desktop taskbar.  EXPERIMENTAL
 
         Arguments:
             value:  int 0-100,  A value of 0 or 100 will disable the progress
                                 indicator.
-                                Outside this range will set error mode,
-                                e.g. 911
+                                Outside this range will set error mode.
+            error:  bool        Set explicitly.
+            indeterminate: bool Set explicitly.
+            paused:  bool       Set explicitly.
 
         Returns: text sequence to be written, for testing.
 
         Notes:
             Currently known to be useful only on Windows.
             https://conemu.github.io/en/AnsiEscapeCodes.html#ConEmu_specific_OSC
+            https://gitlab.freedesktop.org/terminal-wg/specifications/-/issues/29
 
     '''
-    status = 1  # set progress
-    if value in (0, 100):
-        status = 0  # clear, done
+    CLEAR, PROGRESS, ERROR, INDETERMINATE, PAUSED = range(5)  # modes
+    mode = PROGRESS
+
+    if error:  # error
+        mode = ERROR  # Danger Will Robinson!
+        value = 99
+    elif indeterminate:
+        mode = INDETERMINATE
+        value = 0
+    elif paused:
+        mode = PAUSED
+    elif value in (0, 100):
+        mode = CLEAR
         value = 0
     elif value < 0 or value > 100:  # error
-        status = 2  # Danger Will Robinson!  Danger!
+        mode = ERROR  # Danger!
         value = 99  # paint full bar red, 2 bytes
 
-    text = f'{OSC}9;4;{status};{value}{ST}'
+    text = f'{OSC}9;4;{mode};{value}{ST}'
     if _ansi_capable:
         print(text, end='', flush=True)
     return text

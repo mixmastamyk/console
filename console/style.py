@@ -157,6 +157,7 @@ class EffectsTerminator(_MonochromePaletteBuilder):
     italic          = 23
     underline       = 24
     blink           = 25
+    # vspacing        = 26  # ?
     reverse         = 27
     conceal         = 28
     hide            = conceal
@@ -172,6 +173,7 @@ class EffectsTerminator(_MonochromePaletteBuilder):
     frame           = 54
     encircle        = frame
     overline        = 55
+    ul_color        = UnderlinePalette.default
     ideogram        = 65
 
 
@@ -234,6 +236,9 @@ class EffectsPalette(_MonochromePaletteBuilder):
     frame           = (51, EffectsTerminator.frame)
     encircle        = (52, EffectsTerminator.frame)
     overline        = (53, EffectsTerminator.overline)
+
+    # reserved      = 56
+    # reserved      = 57
 
     # should these ideogram codes be enabled?
     # ideogram_ul     = (60, EffectsTerminator.ideogram)  # own terminator?
