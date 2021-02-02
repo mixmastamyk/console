@@ -479,6 +479,14 @@ if True:  # fold
             text = utils.notify_progress(value)
             assert text == expected
 
+    def test_notify_message():
+        cases = (
+            ('hi', '\x1b]9;hi\x1b\\'),
+        )
+        for value, expected in cases:
+            text = utils.notify_message(value)
+            assert text == expected
+
     def test_strip_ansi():
         text = 'Hang \x1b[34;4;5mLoose\x1b[0m, Hawaii'
         assert 'Hang Loose, Hawaii' == utils.strip_ansi(text)

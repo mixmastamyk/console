@@ -736,7 +736,7 @@ def get_theme(timeout=defaults.READ_TIMEOUT):
     log.debug('COLORFGBG: %s', COLORFGBG)
 
     if COLORFGBG:
-        FG, _, BG = COLORFGBG.partition(';')
+        FG, _, BG = COLORFGBG.partition(';')     # TODO: rxvt default;default
         theme = 'dark' if BG < '8' else 'light'  # background wins
 
     else:

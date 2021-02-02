@@ -386,13 +386,14 @@ def notify_message(message, title=''):
         Returns: text sequence to be written, for testing.
 
         Notes:
+            iterm2, rxvt with plugin, kitty
             https://gitlab.freedesktop.org/terminal-wg/specifications/-/issues/13
     '''
     import env
     if env.TERM.startswith('rxvt'):
         code = '777'
         message = f'notify;{title};{message};'
-    else:
+    else:  # iterm2 style
         code = '9'
 
     text = f'{OSC}{code};{message}{ST}'
