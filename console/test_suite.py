@@ -465,19 +465,19 @@ if True:  # fold
             text = utils.clear_screen(mode)
             assert text == CSI + str(i) + end
 
-    def test_notify_progress():
-        cases = (
-            (-1, '\x1b]9;4;2;99\x1b\\'),
-            (00, '\x1b]9;4;0;0\x1b\\'),
-            (50, '\x1b]9;4;1;50\x1b\\'),
-            (99, '\x1b]9;4;1;99\x1b\\'),
-            (100, '\x1b]9;4;0;0\x1b\\'),
-            (101, '\x1b]9;4;2;99\x1b\\'),
-            (200, '\x1b]9;4;2;99\x1b\\'),
-        )
-        for value, expected in cases:
-            text = utils.notify_progress(value)
-            assert text == expected
+    #~ def test_notify_progress():  # only on windows
+        #~ cases = (
+            #~ (-1, '\x1b]9;4;2;99\x1b\\'),
+            #~ (00, '\x1b]9;4;0;0\x1b\\'),
+            #~ (50, '\x1b]9;4;1;50\x1b\\'),
+            #~ (99, '\x1b]9;4;1;99\x1b\\'),
+            #~ (100, '\x1b]9;4;0;0\x1b\\'),
+            #~ (101, '\x1b]9;4;2;99\x1b\\'),
+            #~ (200, '\x1b]9;4;2;99\x1b\\'),
+        #~ )
+        #~ for value, expected in cases:
+            #~ text = utils.notify_progress(value)
+            #~ assert text == expected
 
     def test_notify_message():
         cases = (

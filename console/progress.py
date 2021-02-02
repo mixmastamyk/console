@@ -355,8 +355,8 @@ class ProgressBar:
         else:
             pieces.append(self._render())  # external
 
-        #~ if os_name == 'nt':  # Windows taskbar progress
-        notify_progress(floor(self.ratio * 100))
+        if os_name == 'nt':  # Windows taskbar progress
+            notify_progress(floor(self.ratio * 100))
 
         self._cached_str = rendered = ''.join(pieces)
         if self.debug:

@@ -424,8 +424,8 @@ class _PaletteEntry:
             # Render initial values once as string and place as first code:
             newcodes = self._codes + other._codes
             new_entry = _PaletteEntry(self._parent, self.name,
-                                      ';'.join(newcodes)) # _not_ color_sep
-
+                                      ';'.join(newcodes))   # _not_ color_sep
+                                                            # different type
             if not self.default == other.default:   # not in same class,
                 new_entry.default = ANSI_RESET      # switch to full reset
 

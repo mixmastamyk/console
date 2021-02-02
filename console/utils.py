@@ -389,8 +389,7 @@ def notify_message(message, title=''):
             iterm2, rxvt with plugin, kitty
             https://gitlab.freedesktop.org/terminal-wg/specifications/-/issues/13
     '''
-    import env
-    if env.TERM.startswith('rxvt'):
+    if os.environ.get('TERM', '').startswith('rxvt'):
         code = '777'
         message = f'notify;{title};{message};'
     else:  # iterm2 style
@@ -402,48 +401,104 @@ def notify_message(message, title=''):
     return text
 
 
-def notify_progress(value=None, error=False, indeterminate=False, paused=False):
-    ''' Notify the terminal and user of the current progress,
-        via the desktop taskbar.  EXPERIMENTAL
+if os_name == 'nt':
 
-        Arguments:
-            value:  int 0-100,  A value of 0 or 100 will disable the progress
-                                indicator.
-                                Outside this range will set error mode.
-            error:  bool        Set explicitly.
-            indeterminate: bool Set explicitly.
-            paused:  bool       Set explicitly.
+    def notify_cwd(path=None):
+        ''' Notify the terminal of the current working directory. EXPERIMENTAL
 
-        Returns: text sequence to be written, for testing.
+            Arguments:
+                path:  str
 
-        Notes:
-            Currently known to be useful only on Windows.
-            https://conemu.github.io/en/AnsiEscapeCodes.html#ConEmu_specific_OSC
-            https://gitlab.freedesktop.org/terminal-wg/specifications/-/issues/29
+            Returns: text sequence to be written, for testing.
 
-    '''
-    CLEAR, PROGRESS, ERROR, INDETERMINATE, PAUSED = range(5)  # modes
-    mode = PROGRESS
+            Notes:
+                https://conemu.github.io/en/AnsiEscapeCodes.html#OSC_Operating_system_commands
+                https://gitlab.freedesktop.org/terminal-wg/specifications/-/issues/20
+        '''
+        if not path:
+            path = os.getcwd()
 
-    if error:  # error
-        mode = ERROR  # Danger Will Robinson!
-        value = 99
-    elif indeterminate:
-        mode = INDETERMINATE
-        value = 0
-    elif paused:
-        mode = PAUSED
-    elif value in (0, 100):
-        mode = CLEAR
-        value = 0
-    elif value < 0 or value > 100:  # error
-        mode = ERROR  # Danger!
-        value = 99  # paint full bar red, 2 bytes
+        text = f'{OSC}9;9;"{path}"{ST}'
+        if _ansi_capable:
+            print(text, end='', flush=True)
+        return text
 
-    text = f'{OSC}9;4;{mode};{value}{ST}'
-    if _ansi_capable:
-        print(text, end='', flush=True)
-    return text
+
+    def notify_progress(value=None, error=False, indeterminate=False, paused=False):
+        ''' Notify the terminal and user of the current progress,
+            via the desktop taskbar.  EXPERIMENTAL
+
+            Arguments:
+                value:  int 0-100,  A value of 0 or 100 will disable the progress
+                                    indicator.
+                                    Outside this range will set error mode.
+                error:  bool        Set explicitly.
+                indeterminate: bool Set explicitly.
+                paused:  bool       Set explicitly.
+
+            Returns: text sequence to be written, for testing.
+
+            Notes:
+                Currently known to be useful only on Windows.
+                Conflicts with iterm2 use of OSC9 for notifications.
+                https://conemu.github.io/en/AnsiEscapeCodes.html#ConEmu_specific_OSC
+                https://gitlab.freedesktop.org/terminal-wg/specifications/-/issues/29
+
+        '''
+        CLEAR, PROGRESS, ERROR, INDETERMINATE, PAUSED = range(5)  # modes
+        mode = PROGRESS
+
+        if error:  # error
+            mode = ERROR  # Danger Will Robinson!
+            value = 99
+        elif indeterminate:
+            mode = INDETERMINATE
+            value = 0
+        elif paused:
+            mode = PAUSED
+        elif value in (0, 100):
+            mode = CLEAR
+            value = 0
+        elif value < 0 or value > 100:  # error
+            mode = ERROR  # Danger!
+            value = 99  # paint full bar red, 2 bytes
+
+        text = f'{OSC}9;4;{mode};{value}{ST}'
+        if _ansi_capable:
+            print(text, end='', flush=True)
+        return text
+
+else:
+    def notify_cwd(path=None):
+        ''' Notify the terminal of the current working directory. EXPERIMENTAL
+
+            Arguments:
+                path:  str, do not url encode.
+
+            Returns: text sequence to be written, for testing.
+
+            Notes:
+                https://gitlab.freedesktop.org/terminal-wg/specifications/-/issues/20
+                https://conemu.github.io/en/AnsiEscapeCodes.html#OSC_Operating_system_commands
+        '''
+        if not path:
+            path = os.getcwd()
+
+        # encode as path as an url
+        scheme = 'file://'
+        if not path.startswith(scheme):
+            path = scheme + path
+        path = quote(path)
+
+        text = f'{OSC}7;{path}{ST}'
+        if _ansi_capable:
+            print(text, end='', flush=True)
+        return text
+
+
+    def notify_progress(*args, **kwargs):
+        ''' Function not implemented. '''
+        raise NotImplementedError('only available on Windows.')
 
 
 def reset_terminal():
@@ -574,6 +629,27 @@ elif os_name == 'posix':
     from .detection import _get_char
 
 
+def pause(message='Press any key to continue…', _return_key=False):
+    ''' Analogous to the
+        `DOS pause <https://en.wikipedia.org/wiki/List_of_DOS_commands#PAUSE>`_
+        command from olden times, with a modifiable message.
+        *"Where's the any key?"*
+
+        Arguments:
+            message:  str
+
+        Returns:
+            str, None:  One character or ESC - depending on key hit.
+            None - immediately under i/o redirection, not an interactive tty.
+    '''
+    print(message, end=' ', flush=True)
+    key = wait_key()
+
+    print()
+    if _return_key:  # for testing purposes; command shouldn't return it
+        return key
+
+
 def wait_key(keys=None):
     ''' Waits for a keypress at the console and returns it.
 
@@ -594,24 +670,3 @@ def wait_key(keys=None):
                     return key
         else:
             return _get_char()
-
-
-def pause(message='Press any key to continue…', _return_key=False):
-    ''' Analogous to the
-        `DOS pause <https://en.wikipedia.org/wiki/List_of_DOS_commands#PAUSE>`_
-        command from olden times, with a modifiable message.
-        *"Where's the any key?"*
-
-        Arguments:
-            message:  str
-
-        Returns:
-            str, None:  One character or ESC - depending on key hit.
-            None - immediately under i/o redirection, not an interactive tty.
-    '''
-    print(message, end=' ', flush=True)
-    key = wait_key()
-
-    print()
-    if _return_key:  # for testing purposes; command shouldn't return it
-        return key
