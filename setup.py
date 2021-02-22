@@ -7,10 +7,12 @@ if sys.version_info.major < 3:
 from itertools import chain
 from os.path import dirname, join
 from setuptools import setup
-import imp
 
 # avoid starting console detection:
-meta = imp.load_source('meta', 'console/meta.py')
+# import imp
+# meta = imp.load_source('meta', 'console/meta.py')
+from importlib import import_module
+meta = import_module('console.meta')
 
 
 # https://www.python.org/dev/peps/pep-0508/#environment-markers

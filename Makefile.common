@@ -1,0 +1,110 @@
+#  Makefile.common - Self-documenting, common functionality
+#
+# To use, put the next line in new Makefiles:
+# include Makefile.common
+#
+# Option ideas: https://tech.davis-hansson.com/p/make/
+.ONESHELL:
+
+# The variables below may be overridden in the client Makefile
+# wildcard finds first one of the list that exists:
+# ANSI light green:
+target_color := \033[92m
+# how much space to give target names:
+target_width := 25
+common_file := $(wildcard ../Makefile.common ../../Makefile.common)
+prj_pattern := full_name # <-- extra space at end
+ver_pattern := version # <-- extra space at end
+ver_file := */meta.py
+
+# live variables, expanded on use:
+prj_name = $(shell /bin/grep "${prj_pattern}" ${ver_file} | cut -d "'" -f 2)
+prj_width = $(shell expr $(target_width) - 2)
+version = $(shell /bin/grep "${ver_pattern}" ${ver_file} | cut -d "'" -f 2)
+
+
+# Default action is to update the local copy of Makefile.common,
+# then print out help text from documented ## actions
+help-default: Makefile.common ## Display this list of actions.
+	@
+	clear -x  # not scrollback
+	echo
+	printf '\e[1m⚙ %-${prj_width}s\e[m Version ${version}\n\n' '${prj_name}'
+	printf '\e[2;3m%-${target_width}s Description   \e[m\n' Actions
+
+	# parse Makefiles, print actions and help text from after ## markers
+	for file in ${common_file} Makefile; do
+		awk --field-separator ":.*?## "  '      # split target from comment
+			/^[a-zA-Z0-9._-]+:.*?## / {         # select lines with targets
+				sub("-default$$", "", $$1);     # delete target suffix
+				printf "${target_color}%-${target_width}s\033[m %s\n", $$1, $$2
+			}
+		' $$file | sort
+		echo
+	done
+
+
+# double colon targets run both instead of overriding
+clean-default:  ## Sweep up detritus
+	rm -rf build dist readme.html .pytest_cache .eggs htmlcov
+	@-find -type d -name __pycache__ -exec rm -rf '{}' \;
+	git gc
+
+
+check-readme-default: readme.rst  ## Check readme for syntax errors.
+	# requires readme_renderer from PyPi
+	python3 setup.py check --restructuredtext --strict
+
+
+docs-default:  ## Build documents
+	make -C docs html
+	-refresh.sh Console
+
+
+publish-default: test check-readme docs ## Upload to PyPi.
+	rm -rf build  # possible wheel bug, still needed?
+	git push  # any stragglers
+	python3 setup.py sdist bdist_wheel --universal upload
+
+	pip3 install --user -e .  # fix bug on next invocation, still needed?
+
+
+readme.html: readme.rst  ## Build readme.html
+	rst2html.py readme.rst > readme.html
+	-refresh.sh Firefox
+
+
+tag-default:  ## Tag in git with current version and push.
+	@
+	echo ⏵ git tag -a ${version} -m \"version ${version}\"
+	git tag -a ${version} -m "version ${version}"
+	echo
+	echo ⏵ git push --tags
+	git push --tags
+
+
+test-default:  ## Basic tests
+	pyflakes *.py */*.py
+
+
+Makefile.common: ${common_file}
+	@/bin/cp --update --preserve=all $< $@ 2> /dev/null  || true
+
+
+# The rule below converts the *-default targets above to non-suffixed versions,
+# avoiding the dreaded `warning: overriding recipe ...` messages
+# in client Makefiles that include this one.
+%:  %-default
+	@true
+
+
+.PHONY: check-readme-default
+.PHONY: clean-default
+.PHONY: docs-default
+.PHONY: docs-default
+.PHONY: help-default
+.PHONY: publish-default
+.PHONY: tag-default
+.PHONY: test-default
+.PHONY: update-common-default
+#~ .PHONY: $(MAKECMDGOALS)

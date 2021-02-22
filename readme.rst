@@ -92,7 +92,7 @@ That's why you're here, right?
     When you see "😉" in a comment, that's a reminder you're not getting
     the full monty.*
 
-**Call Form**
+**Call() Form**
 
 Above, ``fx.end`` is a convenient object to note---\
 it ends all styles and fore/background colors at once,
@@ -116,11 +116,13 @@ This is neat because call-form will end specific colors/styles and not
 interfere with others.
 
 There's also a rich-text printer that handles basic HTML
-(and even hyperlinks if your terminal supports it):
+(and even
+`hyperlinks <https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda>`_
+if your terminal supports it):
 
 .. code-block:: python
 
-    >>> from console.printers import print
+    >>> from console.viewers import hprint as print
     >>> print('<i>Hello <b>World!</b> ;-)</i>')
 
     *Hello World! ;-)*  # 😉
@@ -249,10 +251,10 @@ below:
 
     - Basic, the original 8/16 ANSI named colors
     - Extended, a set of 256 indexed colors
-    - "True", a.k.a. 16 million colors, consisting of either:
+    - "True" or "Direct", a.k.a. 16 million colors, consisting of either:
 
       - RGB specified colors
-      - X11-named colors (now built-in), or
+      - X11-named colors (built-in), or
       - Webcolors-named colors
 
 As mentioned,
@@ -286,7 +288,7 @@ For example:
     bg.n_f0f       nHHH   # Hex to *nearest* indexed color
 
     # Truecolor
-    bg.t_ff00bb    tHHH   # Truecolor, 3 or 6 digits
+    bg.t_ff00bb    tHHH   # Direct/true color, 3 or 6 digits
     bg.x_navyblue  x_NM   # Force an X11 color name (built-in)
     bg.w_bisque    w_NM   # Force Webcolors, if installed
 
@@ -298,7 +300,7 @@ ambiguity—\
 X11 and Webcolors
 `differ <https://en.wikipedia.org/wiki/X11_color_names#Clashes_between_web_and_X11_colors_in_the_CSS_color_scheme>`_
 on a few obscure colors.
-Though nothing beats "þe olde" hexdigits for certainty.
+Though nothing beats "þe auld" hexdigits for certainty.
 
 .. note::
 
@@ -480,11 +482,14 @@ You can:
 A four-column ASCII table in fruity flavors is provided for your convenience
 and teaching opportunities.
 This format is great for spotting Control key correspondence with letters,
-e.g.: Ctrl+M=Enter, Ctrl+H=Backspace, etc:
+e.g.: Ctrl+M=Enter, Ctrl+H=Backspace, etc.
+
+This might be a good time for a quick mention of the console command-line
+program that runs quite a few of these utility functions and methods:
 
 .. code-block:: shell
 
-    ⏵ python3 -m console.ascii4 [-h]
+    ⏵ console ascii --link
 
     00111   7 07  BEL         39 27  '           71 47  G          103 67  g
     …  # 😉
@@ -530,7 +535,7 @@ Legalese
 
 *"Stickin' it to the Man"*
 
-- Copyright 2018-2020, Mike Miller
+- Copyright 2018-2021, Mike Miller
 - Released under the LGPL, version 3+.
 - Enterprise Pricing:
 
