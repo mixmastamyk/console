@@ -1,8 +1,8 @@
 
-# runs twice
+# how to run a command for variable
 #~ VERSION := `python3 -c 'from console.constants import __version__ as v; print(v)'`
 
-# Python script to render a Jinja template, work around PyPI limitations
+# Python script to render a Jinja template, works around PyPI limitations
 define JINJA_FU
 from os import environ
 from jinja2 import Environment
@@ -39,7 +39,7 @@ clean:
 	-find -type d -name __pycache__ -exec rm -rf '{}' \;
 
 
-demos:
+demo:
 	CLICOLOR_FORCE=1 python3 -m console.demos
 
 
