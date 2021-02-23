@@ -22,8 +22,8 @@ description     = ('Comprehensive, composable utility library for ANSI terminals
                    ' Better, stronger, faster.  Tch-tch-tch-tch…')
 email           = 'mixmastamyk@github.com'
 license         = 'LGPL 3',
-keywords        = ('ansi color detection escape terminal console sequence '
-                   'cursor style screen shell xterm')
+keywords        = ('ansi terminal emulator console color detection '
+                   'escape sequence cursor style screen shell xterm')
 
 # online repo information
 repo_account    = 'mixmastamyk'
