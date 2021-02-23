@@ -34,7 +34,7 @@ help-default: Makefile.common ## Display this list of actions.
 	printf '\e[2;3m%-${target_width}s Description   \e[m\n' Actions
 
 	# parse Makefiles, print actions and help text from after ## markers
-	for file in ${common_file} Makefile; do
+	for file in Makefile.common Makefile; do
 		awk --field-separator ":.*?## "  '      # split target from comment
 			/^[a-zA-Z0-9._-]+:.*?## / {         # select lines with targets
 				sub("-default$$", "", $$1);     # delete target suffix
