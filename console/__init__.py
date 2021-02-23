@@ -1,6 +1,6 @@
 '''
     | console - Comprehensive utility library for ANSI terminals.
-    | © 2018, Mike Miller - Released under the LGPL, version 3+.
+    | © 2018-2021, Mike Miller - Released under the LGPL, version 3+.
 '''
 import env as _env
 

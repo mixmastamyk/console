@@ -1,6 +1,6 @@
 '''
-    console - Comprehensive utility library for ANSI terminals.
-    © 2018-2020, Mike Miller - Released under the LGPL, version 3+.
+    .. console - Comprehensive utility library for ANSI terminals.
+    .. © 2020, Mike Miller - Released under the LGPL, version 3+.
 
     Convenience command-line interface script for select utility functions
     and methods that don't have common implementations.
