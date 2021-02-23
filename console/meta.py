@@ -12,7 +12,7 @@ from time import localtime as _localtime
 
 pkgname         = 'console'
 full_name       = 'Console'  # rendered for Makefile
-__version__     = version = '0.9906a4'
+__version__     = version = '0.9906'
 __author__      = authors = ', '.join([
                                 'Mike Miller',
                                 #~ 'and contributors',

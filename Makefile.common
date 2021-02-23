@@ -64,11 +64,11 @@ docs-default:  ## Build documents
 
 
 publish-default: test check-readme docs ## Upload to PyPi.
-	rm -rf build  # possible wheel bug, still needed?
+	rm -rf build
 	git push  # any stragglers
 	python3 setup.py sdist bdist_wheel --universal upload
 
-	pip3 install --user -e .  # fix bug on next invocation, still needed?
+	# pip3 install --user -e .  # fix bug on next invocation, still needed?
 
 
 readme.html: readme.rst  ## Build readme.html

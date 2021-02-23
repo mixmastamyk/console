@@ -33,7 +33,11 @@ readme.rst: docs/readme.templ
 
 
 publish: publish-default
-	cd ../../mixmastamyk.bitbucket.org/console/ && git add . && git commit -m . && git push
+	DOC_DIR='../../mixmastamyk.bitbucket.org/console/'
+	if [ -d "$DOC_DIR" ]; then
+		cd ../../mixmastamyk.bitbucket.org/console/ \
+			&& git add . && git commit -m . && git push
+	fi
 
 
 test:  ## Test suite
