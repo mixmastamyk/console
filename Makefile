@@ -17,7 +17,7 @@ export JINJA_FU
 
 
 demos:  ## Show various functionality
-	CLICOLOR_FORCE=1 python3 -m console.demos  # kinda weird under make
+	CLICOLOR_FORCE=1 python3 -m console.demos  # works oddly under make
 
 
 docs: docs/readme.rst readme.rst docs-default
