@@ -38,8 +38,8 @@ def beep_posix(**kwargs):
     ''' Simple system beep for POSIX terminals, may be disabled. '''
     import env
     if env.TERM in ('linux', 'fbterm'):
-        log.debug('Warning: console beep may require `modprobe pcspkr` or an '
-                  'audio playback module such as BoomBox.')
+        log.debug('Warning: console beep may require `sudo modprobe pcspkr` '
+                  'or an audio playback module such as BoomBox.')
     log.debug('outputting BEL…')
     stdout.write(BEL)
     stdout.flush()
