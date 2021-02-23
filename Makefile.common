@@ -4,6 +4,7 @@
 # include Makefile.common
 #
 # Option ideas: https://tech.davis-hansson.com/p/make/
+# need to upgrade ancient make on MacOS for ONESHELL to work:
 .ONESHELL:
 
 # The variables below may be overridden in the client Makefile
