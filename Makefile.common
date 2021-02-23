@@ -16,11 +16,13 @@ common_file := $(wildcard ../Makefile.common ../../Makefile.common)
 prj_pattern := full_name # <-- extra space at end
 ver_pattern := version # <-- extra space at end
 ver_file := */meta.py
+grep := $(wildcard /bin/grep /usr/bin/grep)  # portability
+
 
 # live variables, expanded on use:
-prj_name = $(shell /bin/grep "${prj_pattern}" ${ver_file} | cut -d "'" -f 2)
+prj_name = $(shell ${grep} "${prj_pattern}" ${ver_file} | cut -d "'" -f 2)
 prj_width = $(shell expr $(target_width) - 2)
-version = $(shell /bin/grep "${ver_pattern}" ${ver_file} | cut -d "'" -f 2)
+version = $(shell ${grep} "${ver_pattern}" ${ver_file} | cut -d "'" -f 2)
 
 
 # Default action is to update the local copy of Makefile.common,

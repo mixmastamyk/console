@@ -9,7 +9,6 @@ import logging
 import sys
 from sys import stdout
 
-
 from console.detection import os_name
 from console.constants import BEL
 from console.meta import version
