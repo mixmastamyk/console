@@ -555,4 +555,4 @@ if __name__ == '__main__':
     <!-- nothing in this comment should be shown, Buh-BYE ! -->
     Hello <h3>H3. woild!</h3><h4>H4. Heré</h4><h5>H5. Here</h5><h6>H6. Here</h6>
     ;-) '''
-    print(html)
+    hprint(html)
