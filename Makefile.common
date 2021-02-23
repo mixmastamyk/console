@@ -46,7 +46,7 @@ help-default: Makefile.common ## Display this list of actions.
 
 # double colon targets run both instead of overriding
 clean-default:  ## Sweep up detritus
-	rm -rf build dist readme.html .pytest_cache .eggs htmlcov
+	rm -rf build dist readme.html .pytest_cache .eggs htmlcov docs/_build
 	@-find -type d -name __pycache__ -exec rm -rf '{}' \;
 	git gc
 
