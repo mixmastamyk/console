@@ -12,7 +12,7 @@ import logging
 
 import env
 
-from . import color_tables, proximity
+from . import color_tables
 from console.color_tables import DEFAULT_BASIC_PALETTE, term_palette_map
 from .constants import (BS, BEL, CSI, ESC, ENQ, OSC, RS, ST, TermLevel,
                         _COLOR_CODE_MAP)
@@ -99,7 +99,7 @@ def init(_stream=sys.stdout, _basic_palette=()):
             This is the main function of the module—meant to be used unless
             requirements are more specific.
     '''
-    level = pal_name = webcolors = None
+    level = pal_name = webcolors = using_terminfo = None
     log.debug('console package, version: %s', __version__)
     log.debug('os.name/sys.platform: %s/%s', os_name, sys.platform)
 
@@ -109,8 +109,10 @@ def init(_stream=sys.stdout, _basic_palette=()):
 
         # detecten Sie, bitte - forced terminfo or remote
         if env.PY_CONSOLE_USE_TERMINFO.truthy or env.SSH_CLIENT:
+            using_terminfo = True
             level, color_sep = detect_terminal_level_terminfo()
-            pal_name, _basic_palette = _find_basic_palette_from_term(env.TERM)
+            if level >= TermLevel.ANSI_BASIC:
+                pal_name, _basic_palette = _find_basic_palette_from_term(env.TERM)
 
         if level is None:  # didn't occur, fall back to platform inspection
             level, color_sep = detect_terminal_level()
@@ -121,11 +123,13 @@ def init(_stream=sys.stdout, _basic_palette=()):
         log.debug(f'webcolors: {bool(webcolors)}')
 
         # find the platform-dependent 16-color basic palette
-        if level and not _basic_palette:
+        if level and not using_terminfo:
             pal_name, _basic_palette = _find_basic_palette_from_os()
 
         log.debug('Basic palette: %r %r', pal_name, _basic_palette)
-        proximity.build_color_tables(_basic_palette)  # for color downgrade
+        if _basic_palette:
+            from .proximity import build_color_tables
+            build_color_tables(_basic_palette)  # for color downgrade
 
     level = level or TermLevel.DUMB
     log.debug('%s is available', level.name)
@@ -267,6 +271,7 @@ def detect_terminal_level_terminfo():
                 level = TermLevel.ANSI_MONOCHROME
 
             num_colors = tigetnum('colors')
+            log.debug('tigetnum("colors") = %s', num_colors)
             # -1 means not set, leaving level unchanged from above.
             if -1 < num_colors < 50:
                 level = TermLevel.ANSI_BASIC
@@ -277,10 +282,11 @@ def detect_terminal_level_terminfo():
             elif 16777216 <= num_colors:
                 level = TermLevel.ANSI_DIRECT
 
-            # finding color_sep is a bit problematic
-            if is_fbterm:
+            if level >= TermLevel.ANSI_BASIC:
                 _color_sep = ';'
-            elif level >= TermLevel.ANSI_EXTENDED:
+
+            # finding color_sep is a bit problematic
+            if level >= TermLevel.ANSI_EXTENDED:
                 setaf = (tigetstr('setaf') or b'').decode('ascii')
                 # log.debug('tigetstr setaf: %r', setaf)
                 suffix = setaf.partition('38')[2]
@@ -296,6 +302,7 @@ def detect_terminal_level_terminfo():
     except ModuleNotFoundError:
         # Fall back early when remoting to Windows w/o curses
         # TERM variable only clue:
+        log.warn('terminfo not available.')
         return detect_terminal_level()
 
 
@@ -370,7 +377,7 @@ def _find_basic_palette_from_os():
 
     elif env.TERM.startswith(('linux', 'fbterm')):
         pal_name = 'vtrgb'
-        basic_palette = parse_vtrgb()
+        basic_palette = parse_vtrgb() or basic_palette
 
     return pal_name, basic_palette
 
@@ -381,7 +388,7 @@ def _find_basic_palette_from_term(term):
 
         This is used for "downgrading to the nearest color" support.
     '''
-    from fnmatch import fnmatchcase
+    from fnmatch import fnmatchcase  # case sensitive
 
     pal_name = 'xterm'
     basic_palette = DEFAULT_BASIC_PALETTE
@@ -406,8 +413,12 @@ def is_a_tty(stream=sys.stdout):
 
 
 def parse_vtrgb(path='/etc/vtrgb'):
-    ''' Parse the color table for the Linux console. '''
-    palette = ()
+    ''' Parse the color table for the Linux console.
+
+        Returns:
+            palette or None if not found.
+    '''
+    palette = None
     table = []
     try:
         with open(path) as infile:
@@ -418,9 +429,8 @@ def parse_vtrgb(path='/etc/vtrgb'):
                     break
 
         palette = tuple(zip(*table))  # swap rows to columns
-
     except IOError:
-        palette = color_tables.vga_palette4
+        pass
 
     return palette
 
