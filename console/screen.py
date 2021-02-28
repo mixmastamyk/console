@@ -6,9 +6,10 @@
     This module generates ANSI character codes to manage terminal screens and
     move the cursor around.
 
-    Note: The attributes of the Screen container currently are not directly
-    composable with the core._PaletteEntry due to the fact that many of them
-    need parameters.  This may change in the future.
+    A Screen instance often requires numeric parameters and self-prints for
+    convenience,
+    therefore composing with style objects would be awkward and is not
+    supported.
 
     Context-managers with contextlib inspired by:
 
@@ -23,10 +24,6 @@
         :copyright: Copyright 2011-2018, Erik Rose
         :license: MIT License (MIT)
 
-    Note: these could probably be loaded from curses/terminfo,
-          but haven't yet found a need.
-
-    TODO:  These objects don't compose like the core objects.
 '''
 import sys
 from contextlib import contextmanager
@@ -245,9 +242,9 @@ class Screen:
     def rare_mode(self):
         ''' Context Manager that temporarily turns off echo and line-editing
             functionality; still recognizes Ctrl-C break, Ctrl-Z suspend, etc.
-            Also known as "cbreak" mode.
+            Also known as "cbreak" mode.  POSIX only.
 
-            POSIX only. See getpass for a simple function.
+            See getpass for a usage example.
 
             .. code-block:: python
 
@@ -269,9 +266,8 @@ class Screen:
     @contextmanager
     def raw_mode(self):
         ''' Context Manager that temporarily that temporarily sets terminal
-            to raw mode.
+            to raw mode. POSIX only.
 
-            POSIX only.
             See utils.wait_key() if looking for a simple read-key function.
 
             .. code-block:: python

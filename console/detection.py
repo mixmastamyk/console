@@ -99,17 +99,16 @@ def init(_stream=sys.stdout, _basic_palette=()):
             This is the main function of the module—meant to be used unless
             requirements are more specific.
     '''
-    level = pal_name = webcolors = using_terminfo = None
+    level = pal_name = webcolors = None
     log.debug('console package, version: %s', __version__)
     log.debug('os.name/sys.platform: %s/%s', os_name, sys.platform)
 
     # find terminal capability level - given preferences and environment
     if color_is_forced() or (not color_is_disabled() and is_a_tty(stream=_stream)):
-        global color_sep
+        global color_sep  # makes available
 
-        # detecten Sie, bitte - forced terminfo or remote
-        if env.PY_CONSOLE_USE_TERMINFO.truthy or env.SSH_CLIENT:
-            using_terminfo = True
+        _using_terminfo = using_terminfo()
+        if _using_terminfo:
             level, color_sep = detect_terminal_level_terminfo()
             if level >= TermLevel.ANSI_BASIC:
                 pal_name, _basic_palette = _find_basic_palette_from_term(env.TERM)
@@ -123,7 +122,7 @@ def init(_stream=sys.stdout, _basic_palette=()):
         log.debug(f'webcolors: {bool(webcolors)}')
 
         # find the platform-dependent 16-color basic palette
-        if level and not using_terminfo:
+        if level and not _using_terminfo:
             pal_name, _basic_palette = _find_basic_palette_from_os()
 
         log.debug('Basic palette: %r %r', pal_name, _basic_palette)
@@ -769,6 +768,20 @@ def get_theme(timeout=defaults.READ_TIMEOUT):
     return theme
 
 
+def using_terminfo():
+    ''' Returns whether directed or deemed necessary to query the terminfo
+        database to define command sequences.
+
+        Note: The PY_CONSOLE_USE_TERMINFO and SSH_CLIENT environment variables
+              are consulted to determine this.
+    '''
+    result = False
+    if env.PY_CONSOLE_USE_TERMINFO.truthy or env.SSH_CLIENT:
+        result = True
+    # log.debug(str(result))
+    return result
+
+
 # Override default implementations
 
 if os_name == 'nt':  # I'm a PC
@@ -806,7 +819,7 @@ elif sys.platform == 'darwin':  # Think different
 elif os_name == 'posix':  # Tron leotards
     pass
 
-else:  # Amiga/Atari - The Wonder Computer of the 1980s :-D
+else:  # Commodore/Amiga/Atari - The Wonder Computer of the 1980s :-D
     log.warn('Unexpected OS: os.name: %s', os_name)
 
 

@@ -8,11 +8,12 @@
 '''
 from os.path import join as _join
 from time import localtime as _localtime
+from types import SimpleNamespace as _Namespace
 
 
 pkgname         = 'console'
 full_name       = 'Console'  # rendered for Makefile
-__version__     = version = '0.9906'
+__version__     = version = '0.9907a1'
 __author__      = authors = ', '.join([
                                 'Mike Miller',
                                 #~ 'and contributors',
@@ -51,11 +52,12 @@ trove_classifiers = [
     'Topic :: Terminals',
 ]
 
-class defaults:
-    CURSOR_POS_FALLBACK = (0, 0)
-    MAX_CLIPBOARD_SIZE = 65536  # 64k by default
-    MAX_NL_SEARCH = 4096
-    MAX_URL_LEN = 2083
-    MAX_VAL_LEN = 250
-    READ_TIMEOUT = .200  # select read timeout in float seconds
-    TERM_SIZE_FALLBACK = (80, 24)
+defaults = _Namespace(
+    CURSOR_POS_FALLBACK = (0, 0),
+    MAX_CLIPBOARD_SIZE = 65536,  # 64k by default
+    MAX_NL_SEARCH = 4096,
+    MAX_URL_LEN = 2083,
+    MAX_VAL_LEN = 250,
+    READ_TIMEOUT = .200,  # select read timeout in float seconds
+    TERM_SIZE_FALLBACK = (80, 24),
+)
