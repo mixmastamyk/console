@@ -6,6 +6,9 @@
     This module generates ANSI character codes to manage terminal screens and
     move the cursor around.
 
+    Note: the names on this module have changed from previous versions—
+    let me know if you need a compatibility class or similar.
+
     Context-managers with contextlib inspired by:
 
     .. code-block:: text
