@@ -409,13 +409,13 @@ class ProgressBar:
     def clear_left(self, value):
         ''' Converts a given integer to an escape sequence. '''
         if value is True:
-            self._clear_left = '\r'  # do not use mv_x, if term=dumb
+            self._clear_left = '\r'  # do not use move_x, if term=dumb
         elif type(value) is int:
-            mv_x = sc.mv_x
-            if mv_x is _empty:  # TERM=dumb
+            move_x = sc.move_x
+            if move_x is _empty:  # TERM=dumb
                 self._clear_left = f'\r{" " * value}'
-            else:  # = f'{clear_line(1)}{sc.mv_x(value)}'  # not needed
-                self._clear_left = f'\r{sc.mv_x(value)}'
+            else:  # = f'{clear_line(1)}{sc.move_x(value)}'  # not needed
+                self._clear_left = f'\r{sc.move_x(value)}'
         elif value in (False, None):
             self._clear_left = value
         else:

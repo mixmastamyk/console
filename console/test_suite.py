@@ -358,25 +358,24 @@ if True:  # fold
         text = muy_importante(msg, fx.u)
         assert text == f'{CSI}37;1;41;4m{msg}{CSI}0m'
 
-
 # Screen
 # ----------------------------------------------------------------------------
 if True:  # fold
 
-    # reprs prevent interpretation of sequences
-    def test_screen_eraseline():
-        assert sc.erase_line(1) == CSI + '1K'
+    # ** repr's below prevent interpretation of sequences **
+    def test_screen_clearline():
+        assert sc.clear_line(1) == CSI + '1K'
 
     def test_screen_pos():
-        assert sc.mv(20, 11) == CSI + '20;11H'  # y, x
+        assert sc.move_to(20, 11) == CSI + '20;11H'  # y, x
 
     def test_screen_save_restore():
-        assert repr(sc.alt_screen_enable) == "'\\x1b[?1049h'"
-        assert repr(sc.alt_screen_disable) == "'\\x1b[?1049l'"
+        assert repr(sc.enable_alt_screen) == "'\\x1b[?1049h'"
+        assert repr(sc.disable_alt_screen) == "'\\x1b[?1049l'"
 
     def test_screen_save_restore_pos():
-        assert repr(sc.save_pos) == "'\\x1b7'"
-        assert repr(sc.rest_pos) == "'\\x1b8'"
+        assert repr(sc.save_cursor) == "'\\x1b7'"
+        assert repr(sc.restore_cursor) == "'\\x1b8'"
 
     def test_screen_reset():
         assert repr(sc.reset) == "'\\x1bc'"
@@ -385,21 +384,15 @@ if True:  # fold
         bpon = "'\\x1b[?2004h'"
         bpoff = "'\\x1b[?2004l'"
 
-        text = sc.bracketedpaste_enable
+        text = sc.enable_bracketed_paste
         assert repr(text) == bpon
 
-        text = sc.bpon
-        assert repr(text) == bpon
-
-        text = sc.bracketedpaste_disable
-        assert repr(text) == bpoff
-
-        text = sc.bpoff
+        text = sc.disable_bracketed_paste
         assert repr(text) == bpoff
 
     def test_reverse_screen():
-        assert sc.reverse_video == '\x1b[?5h'
-        assert sc.normal_video == '\x1b[?5l'
+        assert sc.enable_flash == '\x1b[?5h'
+        assert sc.disable_flash == '\x1b[?5l'
 
     def test_screen_cursor():
         for val in (2,3,5):

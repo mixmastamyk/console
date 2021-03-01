@@ -53,7 +53,7 @@ def clear_line(mode=2):
         Note:
             Cursor position does not change.
     '''
-    text = sc.erase_line(_MODE_MAP.get(mode, mode))
+    text = sc.clear_line(_MODE_MAP.get(mode, mode))
     if _ansi_capable:
         print(text, end='', flush=True)
     return text
@@ -73,7 +73,7 @@ def clear_lines(lines: int, mode=2):
         Returns: text sequence to be written, for testing.
     '''
     mode = _MODE_MAP.get(mode, mode)
-    erase_cmd = sc.erase_line(mode)
+    erase_cmd = sc.clear_line(mode)
     up_cmd = sc.up(1)
     commands = []
 
@@ -102,7 +102,7 @@ def clear_screen(mode=2):
 
         Returns: text sequence to be written, for testing.
     '''
-    text = sc.erase(_MODE_MAP.get(mode, mode))
+    text = sc.clear(_MODE_MAP.get(mode, mode))
     if _ansi_capable:
         print(text, end='', flush=True)
     return text
@@ -118,10 +118,10 @@ def flash(seconds=.1):
         Returns: text sequence to be written, for testing.
     '''
     if _ansi_capable:
-        print(sc.reverse_video, end='', flush=True)
+        print(sc.enable_flash, end='', flush=True)
         sleep(seconds)
-        print(sc.normal_video, end='', flush=True)
-        return sc.reverse_video + sc.normal_video  # for testing
+        print(sc.disable_flash, end='', flush=True)
+        return sc.enable_flash + sc.disable_flash  # for testing
 
 
 def get_clipboard(source='c', encoding='utf8',

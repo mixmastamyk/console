@@ -259,10 +259,10 @@ package as well:
 
     >>> from console import sc
 
-    >>> sc.eraseline(1)  # mode 1, clear to left
+    >>> sc.erase_line(1)  # mode 1, clear to left
     '\x1b[1K'
 
-    >>> print('already deleted!', sc.eraseline(1))
+    >>> print('already deleted!', sc.erase_line(1))
 
     >>>  # this space intentionally left blank ;-)
 

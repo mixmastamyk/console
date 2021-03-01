@@ -6,11 +6,6 @@
     This module generates ANSI character codes to manage terminal screens and
     move the cursor around.
 
-    A Screen instance often requires numeric parameters and self-prints for
-    convenience,
-    therefore composing with style objects would be awkward and is not
-    supported.
-
     Context-managers with contextlib inspired by:
 
     .. code-block:: text
@@ -33,121 +28,73 @@ from .constants import CSI, ESC, RIS
 from .disabled import empty_bin
 
 
-class _TemplateString(str):  # Callable[[str], str]
-    ''' A template string that renders itself with default arguments when
-        created, and may also be called with other arguments.
-    '''
-    def __new__(cls, endcode, arg='%s'):
-        self = str.__new__(cls, CSI + arg + endcode)
-        self.endcode = endcode
-        return self
+# Mapping of convenience names to terminfo capabilities:
+NAME_TO_TINFO_MAP = dict(
+    up          = 'cuu',
+    down        = 'cud',
+    right       = 'cuf',
+    forward     = 'cuf',
+    left        = 'cub',
+    backward    = 'cub',
 
-    def __call__(self, *args):
-        return self % args
+    clear       = 'ed',
+    clear_line  = 'el',
+    erase_char  = 'ech',
+    insert_line = 'il',
+    delete_char = 'dch',
+    delete_line = 'dl',
 
-    def __str__(self):
-        try:
-            return self % 1  # default move 1 cell
-        except TypeError:
-            return self
+    move_to     = 'cup',
+    move_x      = 'hpa',
+    move_y      = 'vpa',
+    scroll_down = 'sd',
+    scroll_up   = 'su',
+
+    hide_cursor = 'civis',
+    show_cursor = 'cnorm',
+    save_cursor = 'sc',
+    restore_cursor = 'rc',
+
+    enable_alt_screen  = 'smcup',
+    disable_alt_screen = 'rmcup',
+
+)
 
 
-class Screen:
-    ''' Convenience class for cursor and screen manipulation.
+class _ContextMixin:
+    ''' Various context handlers are defined here. '''
+    # The following don't need parameter wrapping, all start with ESC
+    sc      = ESC + '7'  # save cursor position
+    rc      = ESC + '8'  # restore
 
-        https://en.wikipedia.org/wiki/ANSI_escape_code#CSI_sequences
-    '''
-    up          = cuu = 'A'
-    down        = cud = 'B'
-    right       = cuf = forward = 'C'
-    left        = cub = backward = 'D'
+    cnorm   = CSI + '?25h'
+    civis   = CSI + '?25l'
 
-    next_line   = cnl = 'E'
-    prev_line   = cpl = 'F'
+    # alt screen
+    smcup = CSI + '?1049h'
+    rmcup = CSI + '?1049l'
 
-    mv_x        = cha = hpa = 'G'
-    mv_y        = cva = vpa = 'd'
-    mv          = cup = ('H', '%s;%s')      # double trouble - move to pos
-    mv2         = hvp = ('f', '%s;%s')      # ""
-
-    erase       = ed = 'J'
-    erase_line  = el = 'K'
-
-    scroll_up   = su = 'S'
-    scroll_down = sd = 'T'
-
-    save_title  = ('t', '22;%s')
-    restore_title = ('t', '23;%s')
-
-    # The following don't need parameter wrapping.  All start with ESC
-    auxoff      = CSI + '4i'
-    auxon       = CSI + '5i'
-    dsr         = loc = CSI + '6n'          # device status rpt, see detection
-
-    reset       = RIS                       # Esc + c
-
-    # cursor config
-    save_pos    = ESC + '7'                 # position
-    rest_pos    = ESC + '8'
-    save_pos2   = scp = CSI + 's'
-    rest_pos2   = rcp = CSI + 'u'
-
-    # DEC Private Mode Set (DECSET)
-    # https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
-    show_cursor = CSI + '?25h'
-    hide_cursor = CSI + '?25l'
-
-    reverse_video = CSI + '?5h'  # "flash" screen
-    normal_video = CSI + '?5l'
+    # -- below don't yet have terminfo names ---------------------------------
+    enable_flash = CSI + '?5h'      # terminfo cap name, only single "flash"
+    disable_flash = CSI + '?5l'
 
     # https://cirw.in/blog/bracketed-paste
-    bracketedpaste_enable = bpon = CSI + '?2004h'
-    bracketedpaste_disable = bpoff = CSI + '?2004l'
+    enable_bracketed_paste = CSI + '?2004h'
+    disable_bracketed_paste = CSI + '?2004l'
 
-    alt_screen_enable = ason = CSI + '?1049h'
-    alt_screen_disable = asoff = CSI + '?1049l'
-
-    def __new__(cls, force=False):
-        ''' Override new() to replace the class entirely on deactivation.
-
-            Complies with palette detection, unless force is on:
-
-            Arguments:
-                force           - Force on.
-        '''
-        self = super().__new__(cls)
-
-        if not force:
-            if not _term_level:
-                self = empty_bin    # None, deactivate completely
-        # else: continue on unabated
-        return self
-
-    def __init__(self, stream=sys.stdout, **kwargs):
-        self._stream = stream
-        # look for attributes to wrap in a _TemplateString:
-        for name in dir(self):
-            if not name.startswith('_'):
-                value = getattr(self, name)
-
-                if type(value) is str and not value.startswith(ESC):
-                    attr = _TemplateString(value)
-                    setattr(self, name, attr)
-
-                elif type(value) is tuple:
-                    attr = _TemplateString(*value)
-                    setattr(self, name, attr)
+    save_title = ('t', '22;%s')
+    restore_title =  ('t', '23;%s')
 
     def __enter__(self):
         ''' Go full-screen and save title. '''
-        self._stream.write(self.alt_screen_enable)
+        self._stream.write(self.enable_alt_screen)
         self._stream.write(str(self.save_title(0)))     # 0 = both icon, title
         self._stream.flush()
         return self
 
     def __exit__(self, type_, value, traceback):
         ''' Return to normal screen, restore title. '''
-        self._stream.write(self.alt_screen_disable)
+        self._stream.write(self.disable_alt_screen)
         self._stream.write(str(self.restore_title(0)))  # 0 = both icon, title
         self._stream.flush()
 
@@ -183,13 +130,13 @@ class Screen:
                     print('Hello, world!')
         '''
         stream = self._stream
-        stream.write(self.alt_screen_enable)
+        stream.write(self.enable_alt_screen)
         stream.write(str(self.save_title(0)))     # 0 = both icon, title
         stream.flush()
         try:
             yield self
         finally:
-            stream.write(self.alt_screen_disable)
+            stream.write(self.disable_alt_screen)
             stream.write(str(self.restore_title(0)))  # 0 = icon & title
             stream.flush()
 
@@ -222,20 +169,20 @@ class Screen:
                     print('Hello, world!')
         '''
         stream = self._stream
-        stream.write(self.save_pos)  # cursor position
+        stream.write(self.save_cursor)  # cursor position
 
         if x is not None and y is not None:
-            stream.write(self.mv(y, x))
+            stream.write(self.move_to(y, x))
         elif x is not None:
-            stream.write(self.mv_x(x))
+            stream.write(self.move_x(x))
         elif y is not None:
-            stream.write(self.mv_y(y))
+            stream.write(self.move_y(y))
 
         stream.flush()
         try:
             yield self
         finally:
-            stream.write(self.rest_pos)
+            stream.write(self.restore_cursor)
             stream.flush()
 
     @contextmanager
@@ -285,6 +232,108 @@ class Screen:
             yield self                          # wait
         finally:  # restore
             termios.tcsetattr(fd, termios.TCSADRAIN, orig_attrs)
+
+
+class Screen(_ContextMixin):
+    ''' Convenience class for cursor and screen manipulation.
+
+        https://en.wikipedia.org/wiki/ANSI_escape_code#CSI_sequences
+    '''
+    cuu = 'A'
+    cud = 'B'
+    cuf = 'C'
+    cub = 'D'
+
+    cnl = 'E'  # col 1
+    cpl = 'F'  # col 1
+
+    hpa = 'G'  # cha not set?
+    cup = ('H', '%s;%s')      # double trouble - move to pos
+
+    vpa = 'd'  # cva?
+    hvp = ('f', '%s;%s')      # ""
+
+    cht = 'I'
+    ed  = 'J'    # clear, 1 from start, 2 whole, 3 scrollback
+    el  = 'K'    # line
+
+    ich = '@'
+    il  = 'L'
+    dl  = 'M'
+    dch = 'P'
+
+    su  = 'S'
+    sd  = 'T'
+
+    ech = 'X'
+    cbt = 'Z'
+
+    # The following don't need parameter wrapping, start with ESC
+    loc = CSI + '6n'                # see detection
+    reset = RIS                     # Esc + c
+
+    def __new__(cls, force=False):
+        ''' Override new() to replace the class entirely on deactivation.
+
+            Complies with palette detection, unless force is on:
+
+            Arguments:
+                force           - Force on.
+        '''
+        self = super().__new__(cls)
+
+        if not force:
+            if not _term_level:
+                self = empty_bin    # None, deactivate completely
+        # else: continue on unabated
+        return self
+
+    def __init__(self, stream=sys.stdout, **kwargs):
+        self._stream = stream
+        # look for attributes to wrap in a _TemplateString:
+        for name in dir(self):
+            if not name.startswith('_'):
+                value = getattr(self, name)
+
+                if type(value) is str and not value.startswith(ESC):
+                    attr = _TemplateString(value)
+                    setattr(self, name, attr)
+
+                elif type(value) is tuple:
+                    attr = _TemplateString(*value)
+                    setattr(self, name, attr)
+
+    def __getattr__(self, attr):
+        # when attr missing, look in convenience map
+        capability_name = NAME_TO_TINFO_MAP.get(attr)
+        if capability_name:  # cache and return
+            value = getattr(self, capability_name)
+            setattr(self, attr, value)
+            return value
+        else:
+            class_name = self.__class__.__name__
+            msg = f'{class_name!r} object has no attribute {attr!r}'
+            raise AttributeError(msg)
+
+
+class _TemplateString(str):  # Callable[[str], str]
+    ''' A template string that renders itself with given or default arguments.
+    '''
+    _default = 1
+
+    def __new__(cls, endcode, arg='%s'):
+        self = str.__new__(cls, CSI + arg + endcode)
+        self.endcode = endcode
+        return self
+
+    def __call__(self, *args):
+        return self % args
+
+    def __str__(self):
+        try:
+            return self % self._default  # default move 1 cell
+        except TypeError:
+            return self
 
 
 # It's Automatic:  https://youtu.be/y5ybok6ZGXk
