@@ -74,7 +74,7 @@ def clear_lines(lines: int, mode=2):
     '''
     mode = _MODE_MAP.get(mode, mode)
     erase_cmd = sc.clear_line(mode)
-    up_cmd = sc.up(1)
+    up_cmd = sc.move_up(1)
     commands = []
 
     for line in range(lines):

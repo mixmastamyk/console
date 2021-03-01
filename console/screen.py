@@ -28,36 +28,35 @@ from .constants import CSI, ESC, RIS
 from .disabled import empty_bin
 
 
-# Mapping of convenience names to terminfo capabilities:
+# Mapping of convenience names to terminfo capabilities,
+# using verb_object form:
 NAME_TO_TINFO_MAP = dict(
-    up          = 'cuu',
-    down        = 'cud',
-    right       = 'cuf',
-    forward     = 'cuf',
-    left        = 'cub',
-    backward    = 'cub',
+    clear               = 'ed',
+    clear_line          = 'el',
+    delete_char         = 'dch',
+    delete_line         = 'dl',
+    erase_char          = 'ech',
+    insert_line         = 'il',
 
-    clear       = 'ed',
-    clear_line  = 'el',
-    erase_char  = 'ech',
-    insert_line = 'il',
-    delete_char = 'dch',
-    delete_line = 'dl',
+    move_to             = 'cup',
+    move_x              = 'hpa',
+    move_y              = 'vpa',
+    move_up             = 'cuu',
+    move_down           = 'cud',
+    move_right          = 'cuf',
+    move_forward        = 'cuf',
+    move_left           = 'cub',
+    move_backward       = 'cub',
+    scroll_down         = 'sd',
+    scroll_up           = 'su',
 
-    move_to     = 'cup',
-    move_x      = 'hpa',
-    move_y      = 'vpa',
-    scroll_down = 'sd',
-    scroll_up   = 'su',
+    hide_cursor         = 'civis',
+    show_cursor         = 'cnorm',
+    save_position       = 'sc',
+    restore_position    = 'rc',
 
-    hide_cursor = 'civis',
-    show_cursor = 'cnorm',
-    save_cursor = 'sc',
-    restore_cursor = 'rc',
-
-    enable_alt_screen  = 'smcup',
-    disable_alt_screen = 'rmcup',
-
+    enable_alt_screen   = 'smcup',
+    disable_alt_screen  = 'rmcup',
 )
 
 
@@ -169,7 +168,7 @@ class _ContextMixin:
                     print('Hello, world!')
         '''
         stream = self._stream
-        stream.write(self.save_cursor)  # cursor position
+        stream.write(self.save_position)
 
         if x is not None and y is not None:
             stream.write(self.move_to(y, x))
@@ -182,7 +181,7 @@ class _ContextMixin:
         try:
             yield self
         finally:
-            stream.write(self.restore_cursor)
+            stream.write(self.restore_position)
             stream.flush()
 
     @contextmanager

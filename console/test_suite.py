@@ -374,8 +374,8 @@ if True:  # fold
         assert repr(sc.disable_alt_screen) == "'\\x1b[?1049l'"
 
     def test_screen_save_restore_pos():
-        assert repr(sc.save_cursor) == "'\\x1b7'"
-        assert repr(sc.restore_cursor) == "'\\x1b8'"
+        assert repr(sc.save_position) == "'\\x1b7'"
+        assert repr(sc.restore_position) == "'\\x1b8'"
 
     def test_screen_reset():
         assert repr(sc.reset) == "'\\x1bc'"
@@ -397,7 +397,7 @@ if True:  # fold
     def test_screen_cursor():
         for val in (2,3,5):
             for name in ('up', 'down', 'left', 'right'):
-                attr = getattr(sc, name)
+                attr = getattr(sc, 'move_' + name)
                 text = attr(val)
                 assert repr(text) == "'\\x1b[%s%s'" % (val, attr.endcode)
 
