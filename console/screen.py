@@ -289,14 +289,11 @@ class Screen(_ContextMixin):
 
         if not force:
             if not _ansi_capable:
-                #~ from .disabled import _EmptyBin, _EmptyScreenAttribute
                 from .disabled import empty_scr_bin
                 # Screen is a bit different than the empty styles.
                 # Methods need to return a blank string, not the argument
                 # Make new empties to deactivate completely:
-                #~ self = _EmptyBin(_EmptyScreenAttribute())
                 self = empty_scr_bin
-
 
         # else: continue on unabated
         return self
