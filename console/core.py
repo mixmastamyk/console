@@ -12,7 +12,7 @@ import sys
 import logging
 import re
 
-from . import _term_level
+from . import term_level as _term_level
 from .constants import (CSI, ANSI_BG_LO_BASE, ANSI_FG_LO_BASE, ANSI_RESET,
                         TermLevel)
 from .disabled import empty_bin, empty

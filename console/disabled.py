@@ -36,6 +36,16 @@ class _EmptyAttribute(str):
         return ''
 
 
+class _EmptyScreenAttribute(_EmptyAttribute):
+    ''' A passive, empty, and "falsey" string.
+
+        Screen methods need to return blank strings, even when passed integer
+        arguments.
+    '''
+    def __call__(self, *args, **kwargs):
+        return ''
+
+
 class _EmptyBin:
     ''' Collection that returns EmptyAttributes on any attribute access. '''
     def __init__(self, an_empty):
@@ -56,5 +66,8 @@ class _EmptyBin:
     def __repr__(self):
         return f'{self.__class__.__name__}()'
 
+
+# It's Automatic:  https://youtu.be/y5ybok6ZGXk
 empty = _EmptyAttribute()
 empty_bin = _EmptyBin(empty)
+empty_scr_bin = _EmptyBin(_EmptyScreenAttribute())

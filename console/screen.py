@@ -26,20 +26,21 @@
 import sys
 from contextlib import contextmanager
 
-from . import _term_level
+from . import ansi_capable as _ansi_capable
 from .constants import CSI, ESC, RIS
-from .disabled import empty_bin
+from .detection import get_position as _get_position
 
 
 # Mapping of convenience names to terminfo capabilities,
 # using verb_object form:
-NAME_TO_TINFO_MAP = dict(
+NAME_TO_TERMINFO_MAP = dict(
     clear               = 'ed',
     clear_line          = 'el',
     delete_char         = 'dch',
     delete_line         = 'dl',
     erase_char          = 'ech',
     insert_line         = 'il',
+    reset               = 'rs1',
 
     move_to             = 'cup',
     move_x              = 'hpa',
@@ -55,7 +56,9 @@ NAME_TO_TINFO_MAP = dict(
 
     hide_cursor         = 'civis',
     show_cursor         = 'cnorm',
-    save_position       = 'sc',
+    save_cursor         = 'sc',
+    save_position       = 'sc',     # alias
+    restore_cursor      = 'rc',     # alias
     restore_position    = 'rc',
 
     enable_alt_screen   = 'smcup',
@@ -241,6 +244,7 @@ class Screen(_ContextMixin):
 
         https://en.wikipedia.org/wiki/ANSI_escape_code#CSI_sequences
     '''
+    # The class attributes below will be wrapped with a _TemplateString on init
     cuu = 'A'
     cud = 'B'
     cuf = 'C'
@@ -249,7 +253,7 @@ class Screen(_ContextMixin):
     cnl = 'E'  # col 1
     cpl = 'F'  # col 1
 
-    hpa = 'G'  # cha not set?
+    hpa = 'G'  # cha?
     cup = ('H', '%s;%s')      # double trouble - move to pos
 
     vpa = 'd'  # cva?
@@ -270,9 +274,8 @@ class Screen(_ContextMixin):
     ech = 'X'
     cbt = 'Z'
 
-    # The following don't need parameter wrapping, start with ESC
-    loc = CSI + '6n'                # see detection
-    reset = RIS                     # Esc + c
+    # Any following don't need parameter wrapping (already start with ESC)
+    rs1 = RIS
 
     def __new__(cls, force=False):
         ''' Override new() to replace the class entirely on deactivation.
@@ -285,8 +288,16 @@ class Screen(_ContextMixin):
         self = super().__new__(cls)
 
         if not force:
-            if not _term_level:
-                self = empty_bin    # None, deactivate completely
+            if not _ansi_capable:
+                #~ from .disabled import _EmptyBin, _EmptyScreenAttribute
+                from .disabled import empty_scr_bin
+                # Screen is a bit different than the empty styles.
+                # Methods need to return a blank string, not the argument
+                # Make new empties to deactivate completely:
+                #~ self = _EmptyBin(_EmptyScreenAttribute())
+                self = empty_scr_bin
+
+
         # else: continue on unabated
         return self
 
@@ -307,15 +318,25 @@ class Screen(_ContextMixin):
 
     def __getattr__(self, attr):
         # when attr missing, look in convenience map
-        capability_name = NAME_TO_TINFO_MAP.get(attr)
-        if capability_name:  # cache and return
+        capability_name = NAME_TO_TERMINFO_MAP.get(attr)
+        if capability_name:
             value = getattr(self, capability_name)
-            setattr(self, attr, value)
+            setattr(self, attr, value)  # cache
             return value
         else:
             class_name = self.__class__.__name__
             msg = f'{class_name!r} object has no attribute {attr!r}'
             raise AttributeError(msg)
+
+
+# Rather than define get_position() under Screen,
+# we let detection pick the implementation,
+# as it is different under Windows.  Then we attach it here.
+if _ansi_capable:
+    Screen.get_position = staticmethod(_get_position)
+else:
+    from .meta import defaults
+    Screen.get_position = lambda *args, **kwargs: defaults.CURSOR_POS_FALLBACK
 
 
 class _TemplateString(str):  # Callable[[str], str]

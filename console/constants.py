@@ -18,9 +18,9 @@ FF  = '\f'          #:  12   014   0x0C    ^L     Formfeed (also: New page NP)
 CR  = '\r'          #:  13   015   0x0D    ^M     Carriage return
 
 ESC = '\x1b'        #:  27   033           ^[     Escape character
-FS  = '\x1c'        #:  28   034                  Field Separator
-GS  = '\x1d'        #:  29   035                  Group Separator
-RS  = '\x1e'        #:  30   036                  Record Separator
+FS  = '\x1c'        #:  28   034           ^\     Field Separator
+GS  = '\x1d'        #:  29   035           ^]     Group Separator
+RS  = '\x1e'        #:  30   036           ^^     Record Separator
 
 DEL = '\177'        #: 127   177   0x7F           Delete character
 

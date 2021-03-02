@@ -646,19 +646,19 @@ def get_position(fallback=defaults.CURSOR_POS_FALLBACK):
         Used to figure out if we need to print an extra newline.
 
         Returns:
-            tuple(int): (x, y) | (,)  - empty, if an error occurred.
+            tuple(int): (x, y) | (0, 0)  - fallback, if an error occurred.
     '''
-    values = fallback
+    values, resp = None, ''
     try:
         with TermStack() as fd:
             termios.tcflush(fd, termios.TCIFLUSH)   # clear input
             tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
-            sys.stdout.write(CSI + '6n')            # screen.dsr, avoid import
+            sys.stdout.write(CSI + '6n')
             sys.stdout.flush()
             log.debug('about to read get_position response…')
             resp = _read_until_select(max_bytes=10, end='R')
     except AttributeError:  # no .fileno()
-        return values
+        return fallback
 
     # parse response
     resp = resp.lstrip(CSI)

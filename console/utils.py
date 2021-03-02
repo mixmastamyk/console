@@ -19,12 +19,12 @@ from time import sleep
 from urllib.parse import quote
 from itertools import zip_longest, chain
 
+from . import ansi_capable as _ansi_capable
 from .constants import OSC, ST, _MODE_MAP, _TITLE_MODE_MAP
 from .screen import sc
 from .detection import (get_size, is_a_tty, os_name, _read_clipboard,
                         _sized_char_support)
 from .meta import defaults
-from . import _term_level
 
 
 log = logging.getLogger(__name__)
@@ -34,7 +34,6 @@ ansi_csi1_finder = re.compile(r'\x9b[0-?]*[ -/]*[@-~]')
 
 ansi_osc0_finder = re.compile(r'\x1b\].*?(\a|\x1b\\)')
 ansi_osc1_finder = re.compile(r'\x9b.*?(\a|\x9d)')
-_ansi_capable = True if _term_level else False  # simplify comparison
 
 
 def clear_line(mode=2):
