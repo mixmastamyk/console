@@ -23,10 +23,6 @@
 Console
 ============
 
-.. ~ Need to be up here for readme check:
-..    - *"So hot, totally hot…"—Olivia Newton-John*
-..    - *"Suddenly, the wheels are in motion…"—Olivia Newton-John*
-
 .. sidebar:: **Testimonials**
 
     - *"👍 Ayyyyyy… 👍"—The Fonz*
@@ -485,6 +481,8 @@ modules.
 There's also logging done—\
 enable the debug level before loading the console package and you'll see the
 results of the queries from the detection module.
+See below for a ready-made CLI example.
+
 
 .. rubric:: **Constants**
 
@@ -503,10 +501,10 @@ You can:
     print(f'Ring my {BEL}… Ring my {BEL}')  # ring-a-ling-a-ling…
 
 
-.. rubric:: **ASCII Table**
+.. rubric:: **ASCII Table, and Command-Line Interface**
 
 A four-column ASCII table in fruity flavors is provided for your convenience
-and teaching opportunities.
+and learning opportunities.
 This format is great for spotting Control key correspondence with letters,
 e.g.: Ctrl+M=Enter, Ctrl+H=Backspace, etc.
 
@@ -518,12 +516,18 @@ program that runs quite a few of these utility functions and methods:
     ⏵ console ascii --link
 
     00111   7 07  BEL         39 27  '           71 47  G          103 67  g
-    …  # 😉
+    ...  # 😉
+
+Remember the detection CLI we mentioned above?  Here's how to use it:
+
+.. code-block:: shell
+
+    ⏵ console detect -v
 
 
 .. rubric:: **The Rest**
 
-See the Advanced page for more detail.
+See the Advanced page for more details.
 
 
 Demos and Tests
@@ -546,6 +550,10 @@ tests can be run from the install folder.
 The Makefile in the repo at github has more details on such topics.
 
 
+Wrapping Up
+----------------
+
+
 Contributions
 ~~~~~~~~~~~~~~~~
 
@@ -554,6 +562,22 @@ Contributions
 Could use some help testing on Windows and MacOS as my daily driver is a 🐧 Tux
 racer.
 Can you help?
+
+
+Release Notes
+~~~~~~~~~~~~~~~~
+
+- Version 0.9907 - Apologies, the Screen class will have a few changes in the
+  names of attributes to make them more consistent.
+  Stick with 0.9906 until older code can be ported.
+  This should be rare before 1.0 and non-existent afterwards.
+
+
+Documentation
+~~~~~~~~~~~~~~~~
+
+Additional docs may be found
+`here at bitbucket. <https://mixmastamyk.bitbucket.io/console/>`_
 
 
 Legalese

@@ -138,7 +138,9 @@ See troubleshooting below to enable DEBUG logging.
 To disable automatic detection of terminal capabilities at import time the
 environment variable
 ``PY_CONSOLE_AUTODETECT`` may be set to ``0``.
-Writing a bug at the console repo would help also.
+Writing a bug at the
+`console repo <https://github.com/mixmastamyk/console/issues/>`_
+would help also.
 
 Forcing the support of all palettes ON can also be done externally with an
 environment variable,
@@ -160,11 +162,11 @@ one may build palette objects yourself:
 
 .. code-block:: python
 
-    from console.constants import ALL_PALETTES
+    from console.constants import TermLevel
     from console.style import BackgroundPalette
 
     # e.g. force all palettes on:
-    fullbg = BackgroundPalette(palettes=ALL_PALETTES)
+    fullbg = BackgroundPalette(level=TermLevel.THE_FULL_MONTY)
 
 
 
@@ -211,10 +213,12 @@ behavior:
 
 Operating System:
 
-    - ``TERM``, basic category of terminal, more info is often needed.
-    - ``TERM_PROGRAM``, for hints on what it supports
-    - ``SSH_CLIENT``, when remote, downgrade to simple support
-    - ``LANG``, is Unicode available?
+    - ``TERM`` - basic category of terminal, more info is often needed due to
+      most terminals lying that they are an xterm.
+    - ``TERM_PROGRAM`` - for hints on what it supports
+    - ``SSH_CLIENT`` - when remote, downgrade to terminfo detection potentially
+      simpler support.
+    - ``LANG`` - is Unicode available?
 
 Color-specific:
 
@@ -226,21 +230,21 @@ Color-specific:
 
 Windows:
 
-    - ``ANSICON``, shim to render ANSI on older Windows is recognized.
+    - ``ANSICON`` - a shim to render ANSI on older Windows is recognized.
 
 MacOS:
 
-    - ``TERM_PROGRAM_*``, more specific program information
+    - ``TERM_PROGRAM_*`` - is looked at for more specific program information.
 
 Console itself:
 
-    - ``PY_CONSOLE_AUTODETECT``, Disables automatic detection routines.
+    - ``PY_CONSOLE_AUTODETECT`` - Disables automatic detection routines.
 
-    .. ~ - ``PY_CONSOLE_COLOR_SEP``, inner separator char for extended color
+    .. ~ - ``PY_CONSOLE_COLOR_SEP`` - inner separator char for extended color
       .. ~ sequences.
       .. ~ Typically ``:``, but may need to be changed to ``;`` under legacy terms.
 
-    - ``PY_CONSOLE_USE_TERMINFO``, Enables terminfo lookup for many
+    - ``PY_CONSOLE_USE_TERMINFO`` - Enables terminfo lookup for many
       capabilities.
 
 
@@ -259,10 +263,10 @@ package as well:
 
     >>> from console import sc
 
-    >>> sc.erase_line(1)  # mode 1, clear to left
+    >>> sc.clear_line(1)  # mode 1, clear to left
     '\x1b[1K'
 
-    >>> print('already deleted!', sc.erase_line(1))
+    >>> print('already deleted!', sc.clear_line(1))
 
     >>>  # this space intentionally left blank ;-)
 
@@ -342,7 +346,7 @@ Some examples:
 though Lucida Console is a bit more comprehensive than Consolas.
 ProgressBar defaults to an ASCII representation in that environment.)
 
-A more robust use of the module is illustrated below::
+A more robust use of the modules is illustrated below::
 
     from time import sleep  # demo purposes only
     from console.screen import sc
@@ -350,8 +354,8 @@ A more robust use of the module is illustrated below::
 
     with sc.hidden_cursor():  # "Ooooohh, I'm tellin' Mama!"
 
-        items = range(256)      # example tasks
-        bar = ProgressBar(total=len(items))  # set total
+        items = range(256)      # example tasks, set total
+        bar = ProgressBar(total=len(items)-1)
 
         # simple loop
         for i in items:
@@ -363,12 +367,13 @@ A more robust use of the module is illustrated below::
         for i in items:
             print(bar(i), f' copying: /path/to/img_{i:>04}.jpg',
                   end='', flush=True)
-            sleep(.1)
+            sleep(.05)
         print()
 
         # or use as a simple tqdm-style iterable wrapper, sans print
         for i in ProgressBar(range(100)):
-            sleep(.1)
+            sleep(.05)
+
 
 
 Not all of this code is required, of course.
@@ -382,7 +387,7 @@ See the docs (:mod:`console.progress`) and source for more details.
 Experimental Stuff
 -------------------
 
-    *“Well, kiss my grits.”—Flo*
+    *“Well, kiss my grits!”—Flo*
 
 
 Hyperlinks
@@ -450,7 +455,7 @@ Maybe you have some existing HTML laying around?
 
 .. code-block:: python
 
-    >>> from console.printers import hprint as print
+    >>> from console.viewers import hprint as print
     >>> print(html_doc)
 
 
@@ -488,12 +493,13 @@ It handles a few inline style attributes as well:
 
 As you can see,
 setting text color is *very* verbose,
-so unfortunately broke down and implemented a ``c`` tag for color.
+so you guessed it,
+I unfortunately broke down and implemented a concise ``c`` tag for color.
 Like the inline-CSS above,
 it handles X11 or Webcolors (if installed) color names, hex digits,
 and the word "dim":
 
-.. code-block:: html
+.. code-block:: plain
 
     <c orange>l'orange</c>
     <c black on bisque3>bisque3</c>
@@ -503,7 +509,8 @@ and the word "dim":
 
 .. rubric:: Viewing a file
 
-Viewing a file is also available with the ``viewers.view(filename)`` function
+Viewing an html file on the terminal is also available with the
+``viewers.view(filename)`` function
 or via command-line (see below).
 
 
@@ -526,7 +533,7 @@ able to be redirected outside the process:
         print('Infield: Garvey, Lopes, Russel, Cey, Yeager')
         print('Outfield: Baker, Monday, Smith')
 
-(This feature is somewhat experimental for now. ;-)
+(This feature is experimental for now. ;-)
 
 
 .. rubric:: Fullscreen Apps, a la Blessings
@@ -536,21 +543,21 @@ Here's a short script to show off console's full-screen abilities:
 .. code-block:: python
 
     from console import fg, fx, defx
-    from console.screen import sc as screen
+    from console.screen import Screen
     from console.utils import wait_key, set_title
     from console.constants import ESC
 
     exit_keys = (ESC, 'q', 'Q')
 
-    with screen:  # or screen.fullscreen():
+    with Screen() as screen:  # or screen.fullscreen():
 
         set_title(' 🤓 Hi, from console!')
         with screen.location(5, 4):
             print(
                 fg.lightgreen('** Hi from a '
                               f'{fx.i}fullscreen{defx.i} app! **'),
-                screen.mv_x(5),  # back up, then down
-                screen.down(5),
+                screen.move_x(5),  # back up, then down
+                screen.move_down(5),
                 fg.yellow(f'(Hit the {fx.reverse("ESC")} key to exit): '),
                 end='', flush=True,  # optional
             )
@@ -578,13 +585,13 @@ After hitting the ESC key your terminal shall be restored:
     </pre>
 
 
-.. rubric:: TermStack, this one *not* experimental. ;-)
+.. rubric:: TermStack
 
 TermStack is a content-manager for making temporary modifications to the
 terminal via termios,
 that copies the original settings and restores them when finished.
 
-It's in the detection module because that's where it's used,
+It's in the detection module because that's where it's used often,
 but also aliased to the package namespace.
 For example:
 
@@ -595,8 +602,7 @@ For example:
     from console.constants import CSI
 
     with TermStack() as fd:
-        # shut off echo
-        tty.setcbreak(fd, termios.TCSANOW)
+        tty.setcbreak(fd, termios.TCSANOW)  # echo off
         sys.stdout.write(f'{CSI}6n')  # do something
         sys.stdout.flush()
 
@@ -617,23 +623,24 @@ all sub-commands support help ``-h`` and verbose ``-v``:
     ⏵ console  # help and show all available sub-command actions
     …
 
-    ⏵ console line  # print a nifty full-width line
+    ⏵ console line  # print a nifty full-width line, such as:
     ──────────────────────────────────────────────────────
 
     # make a ctrl-clickable link in supporting terminals
-    ⏵ console link http://example.com/ "Clicken-Sie hier!"
-    Clicken-Sie hier!
+    ⏵ console link http://example.com/ "Klicken-Sie hier!"
+    Klicken-Sie hier!
 
-    ⏵ console ascii         # A four-column ascii chart
+    ⏵ console ascii         # A four-column chart, -l for links!
     ⏵ console beep          # bidi-bidi-bidi…
-    ⏵ console detect [-v]   # term level and optionally environ. info
+    ⏵ console detect [-v]   # prints term level and environ. info
     ⏵ console flash         # Bam!
     ⏵ console pause         # Press any key to continue…
     ⏵ console progress      # show a progress bar
-    ⏵ console view          # view a file, ex: *.html
+    ⏵ console view [file]   # view a file, e.g.: foo.html
 
-And many more.
-You can also run several of its modules for information and other functionality:
+And more.
+You can also run several console modules for information and other
+functionality:
 
 .. code-block:: shell
 
@@ -641,12 +648,22 @@ You can also run several of its modules for information and other functionality:
 
     # demos
     ⏵ python3 -m console.demos [-d]
-    ⏵ python3 -m console.printers  # more demos
+    ⏵ python3 -m console.viewers  # more demos
 
     ⏵ python3 -m console.progress -l  # demo with labels
 
+    # ANSI constants in Python syntax can be printed via:
+    ⏵ python3 -m console.constants
+    CSI = '\x1b['
+    ESC = '\x1b'
+    LF = '\n'
+    OSC = '\x1b]'
+    ST = '\x1b\\'
+    VT = '\x0b'
+    # etc…
 
-``-d`` enables ``DEBUG`` logging.
+
+``-d`` often enables ``DEBUG`` logging.
 The ``3`` at the end of ``python3`` may not be necessary,
 e.g. on Windows or Arch Linux.
 
@@ -668,40 +685,13 @@ Tips
   keep in mind that some folks will have dark backgrounds and some light---\
   which could make your fancy colors unreadable.
 
-  Checking the background with the detection module is one strategy,
+  Make two themes preferably and check the background via
+  ``detection.get_theme()``.
+  This is one strategy,
   though not available on every terminal.
-  An argument to change the theme may also be in order.
-  (Console does acknowledge several environment variables like ``COLORFGBG``
+  An application argument to change the theme may also be in order.
+  (Console does recognize several environment variables like ``COLORFGBG``
   as well.)
-
-- ANSI constants in Python syntax can be printed via:
-
-  .. code-block:: shell
-
-        ⏵ python3 -m console.constants
-        CSI = '\x1b['
-        ESC = '\x1b'
-        LF = '\n'
-        OSC = '\x1b]'
-        ST = '\x1b\\'
-        VT = '\x0b'
-        # etc…
-
-- For more information,
-  a four-column grouped ASCII table in fruity colors,
-  including the full set of control characters and their relationships,
-  may be summoned with the following incantation.
-  This format is great for spotting Control key correspondence with letters,
-  e.g.: Ctrl+M=Enter, Ctrl+H=Backspace, etc:
-
-
-  ::
-
-      ⏵ python3 -m console.ascii4 -h  # use -l for hyper-links!
-
-        0 00  NUL       32 20            64 40  @        96 60  `
-        7 07  BEL       39 27  '         71 47  G        103 67  g
-        …  # 😉
 
 - X11 color names may be searched with this command:
 
@@ -715,7 +705,9 @@ Tips
         darkorange4 (139, 69, 0)
 
 - ANSI support may be enabled on Windows 10 legacy console via the following
-  incantation::
+  incantation:
+
+  .. code-block:: python
 
     >>> import console.windows as cw
 
@@ -747,41 +739,9 @@ Troubleshooting
     (and possibly configure them)
     yourself.
 
-- Try to avoid this type of ambiguous addition operation:
+- Another way to do the same thing in your own program.
 
-  .. code-block:: python
-
-    fg.white + bg.red('Hello\nWorld')
-
-  Why is it ambiguous?
-  Well, the left operand is a palette entry object,
-  while the second reduces to an ANSI escaped string.
-  Did you mean to add a sequence just to the beginning of the string,
-  or every line of it?
-  Remember paging?
-  Also, what about the ending sequence?
-  Should it reset the foreground, background, styles, or everything?
-  Hard to know because there's not enough information here to decide.
-
-  Console warns you about this.
-  It also does its best to divvy up the string,
-  add the first operand to every line,
-  and fix the reset-to-default sequence at the end.
-  So it *might* work as expected,
-  possibly not.
-  It's not very efficient either.
-  Best to use one of these explicit forms instead:
-
-  .. code-block:: python
-
-    # create a new anonymous style, apply it:
-    (pal.style1 + pal.style2)(msg)
-
-    # or add it in via a "mixin" style
-    pal.style2(msg, pal.style1)
-
-
-- If console isn't working as you'd expect,
+  If console isn't working as you'd expect,
   turn on DEBUG logging before loading it to see what it finds.
   A sample script is below::
 
@@ -804,6 +764,43 @@ Troubleshooting
     )
 
 
+- Try to avoid this type of ambiguous addition operation:
+
+  .. code-block:: python
+
+    fg.white + bg.red('Hello\nWorld')
+
+  Why is it ambiguous?
+  Well, the left operand is a palette entry object,
+  while the second reduces to an ANSI escaped string.
+  Did you mean to add a sequence just to the beginning of the string,
+  or every line of it?
+  Remember paging?
+  Also, what about the ending sequence?
+  Should it reset the foreground, background, styles, or everything?
+  Hard to know because there's not enough information here to decide.
+
+  Console warns you about this.
+  It also does its best to divvy up the second object (string),
+  add the first operand to every line,
+  and fix the reset-to-default sequence at the end.
+  So it *might* work as expected,
+  possibly not.
+  It's not very efficient either.
+  Best to use one of these explicit forms instead:
+
+  .. code-block:: python
+
+    # create a new anonymous style, apply it:
+    (pal.style1 + pal.style2)(msg)
+
+    # or add it in via a "mixin" style
+    pal.style2(msg, pal.style1)
+
+You could also wrap it around,
+in call form,
+but these will be more efficient.
+
 Deeper Dive
 ------------
 
@@ -824,14 +821,14 @@ be found below:
 
 .. rubric:: Aside - Warm Colors
 
-Did you know that thirty years before
+Did you know that thirty+ years before
 `f.lux <https://en.wikipedia.org/wiki/F.lux>`_
 and
 `redshift <https://en.wikipedia.org/wiki/Redshift_(software)>`_
 debuted that
 `Amber Monochrome monitors <https://www.google.com/search?q=amber+monochrome+monitor&tbm=isch>`_
 with a dark background were known as the
-"ergonomic" choice?
+*"ergonomic choice?"*  ``;-)``
 
 Easier on the eyes for extended periods (i.e. late nights) they said.
 Interesting knowledge rediscovered perhaps.
@@ -842,13 +839,15 @@ Interesting knowledge rediscovered perhaps.
 
     or not!"
 
-    ---Jack Palance, on `Ripley's <https://youtu.be/o4ELw6kCEDs>`_
+    .. ~ ---Jack Palance, on `Ripley's <https://youtu.be/o4ELw6kCEDs>`_
+        .. ~ allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+
+    ---Jack Palance, on `Ripley's <https://youtu.be/HVT3kOxqStA>`_
 
 .. raw:: html
 
-    <iframe width="45%" height="auto" frameborder="0" class="mt mb"
-        src="https://www.youtube.com/embed/o4ELw6kCEDs"
-        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+    <iframe width="50%" height="auto" frameborder="0" class="mt mb"
+        src="https://www.youtube.com/embed/HVT3kOxqStA"
         allowfullscreen>
     </iframe>
 
@@ -860,7 +859,7 @@ Interesting knowledge rediscovered perhaps.
 .. raw:: html
 
     <pre class=center>
-       ♫♪ .ılılıll|̲̅̅●̲̅̅|̲̅̅=̲̅̅|̲̅̅●̲̅̅|llılılı. ♫♪&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+       ♫♪ .ılılıll |̲̅̅●̲̅̅|̲̅̅=̲̅̅|̲̅̅●̲̅̅| llılılı. ♫♪&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     </pre>
 
 
@@ -892,33 +891,61 @@ with an actor as President!
 
 |br-all|
 
+
+.. raw:: html
+
+    <pre class=center>
+    ¸¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸.·´¯`·.¸¸¸.·´¯`·.¸¸¸
+    </pre>
+
+
 |br-all|
 
 
 .. raw:: html
 
-    <pre style="color: #6bc; background: #111">
-    LOGON: Joshua
+
+    <div id=source style="display: none">Joshua
 
 
-    Greetings, Professor Falken.
+    ​​​​​​​​​Greetings, Professor Falken.
 
     Would you like to play a game?
 
 
-    ⏵ How about Global Thermonuclear War?
+    ​​​​​​⏵ How about​​ Global Thermo​​nuclear​​ War?
 
-    Wouldn't you prefer a nice game of chess?
-
-
-    ⏵ Later. Right now let's play Global Thermonuclear War.
-
-    Fine…
-
-    </pre>
+    ​​​​​​​​​​Wouldn't you prefer a nice game of chess?
 
 
+    ​​​​​​⏵ Later.​​ Right now​ let's play​​​​ Global​ Thermo​​nuclear​​ War.
 
-.. raw:: html
+    ​​​​​​​​​​Fine…
+    </div>
 
-    <br clear=all>
+    <pre id=dest style="color: #6bc; background: #111; min-height: 26em">
+    LOGON: </pre>
+
+    <script type="text/javascript">
+        let i = 0;
+        let source = document.getElementById("source").innerHTML;
+        let speed = 100; // ms
+        let dest = document.getElementById("dest");
+
+        function type_writer() {
+            if (i < source.length) {
+                dest.append(source.charAt(i));
+                i++;
+                setTimeout(type_writer, speed);
+            } else {
+                 document.getElementById("connect_but").disabled = false;
+            }
+        }
+    </script>
+    <button
+        id="connect_but" stylez="margin: 0 auto; display: block;"
+        onclick="type_writer(); this.disabled = true;"
+    > 🖳 Connect Terminal </button>
+
+
+|br-all|

@@ -67,7 +67,7 @@ NAME_TO_TERMINFO_MAP = dict(
 
 
 class _ContextMixin:
-    ''' Various context handlers are defined here. '''
+    ''' Various Blessings-inspired context handlers are defined here. '''
     # The following don't need parameter wrapping, all start with ESC
     sc      = ESC + '7'  # save cursor position
     rc      = ESC + '8'  # restore

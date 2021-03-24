@@ -18,7 +18,7 @@ import logging
 import time
 from math import floor
 
-from . import fg, bg, fx, sc, _term_level
+from . import fg, bg, fx, sc, term_level as _term_level
 from .constants import TermLevel
 from .detection import detect_unicode_support, get_size, os_name
 from .disabled import empty as _empty

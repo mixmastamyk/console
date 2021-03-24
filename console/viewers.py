@@ -105,12 +105,13 @@ class StringCache(dict):
 class LiteHTMLParser(HTMLParser):
     ''' Parses simple HTML tags, returns as text and ANSI sequences.
 
-        Exmaple:
+        Exmaple::
 
             parser = LiteHTMLParser()
             parser.feed(text)
             result = ''.join(parser.tokens)  # build and return final string
             parser.tokens.clear()
+
     '''
     _anchor = []
     tokens = []
@@ -257,12 +258,14 @@ class LiteHTMLParser(HTMLParser):
                 self.tokens.append(styled_data)
 
     def handle_data(self, data):
-        ''' Deals with text between and outside the tags.  Cases:
-            ' '
-            ' word\n    '
-            '\n    '
-            '\n    word'
-            'word', 'word ', ' word'
+        ''' Deals with text between and outside the tags.  Cases::
+
+                ' '
+                ' word\n    '
+                '\n    '
+                '\n    word'
+                'word', 'word ', ' word'
+
         '''
         debug('data0: %r', data)
         if self._skip_data:

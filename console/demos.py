@@ -283,7 +283,7 @@ if __name__ == '__main__':
     ul = style.UnderlinePalette()
     defx = style.EffectsTerminator()
 
-    from . import _term_level
+    from . import term_level as _term_level
     from .constants import BEL, TermLevel
     from .detection import is_a_tty, get_color, get_theme, is_fbterm
     from .screen import sc

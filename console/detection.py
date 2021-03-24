@@ -19,8 +19,8 @@ from .constants import (BS, BEL, CSI, ESC, ENQ, OSC, RS, ST, TermLevel,
 from .meta import __version__, defaults
 
 
-TERM_DIRECT_USES_COLONS = ('xterm-', 'iterm2-', 'kitty-', 'mintty-', 'mlterm-')
-color_sep = ';'
+TERMS_DIRECT_COLON = ('xterm-', 'iterm2-', 'kitty-', 'mintty-', 'mlterm-')
+color_sep = ';'  # the above prefer to use colons as the direct color separator
 termios = tty = None
 
 is_fbterm = (env.TERM == 'fbterm')
@@ -230,7 +230,7 @@ def detect_terminal_level():
         level = TermLevel.ANSI_DIRECT
 
     if TERM.endswith('-direct'):  # need to check again
-        for prefix in TERM_DIRECT_USES_COLONS:
+        for prefix in TERMS_DIRECT_COLON:
             if TERM.startswith(prefix):
                 _color_sep = ':'; break
 

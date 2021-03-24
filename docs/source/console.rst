@@ -18,7 +18,7 @@ console.color_tables module
 console.ascii4 module
 ------------------------
 
-.. automodule:: console.constants
+.. automodule:: console.ascii4
     :members:
     :undoc-members:
     :show-inheritance:
@@ -37,6 +37,15 @@ console.constants module
 ------------------------
 
 .. automodule:: console.constants
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+console.cli module
+-------------------
+
+.. automodule:: console.cli
     :members:
     :undoc-members:
     :show-inheritance:
@@ -85,16 +94,16 @@ console.disabled module
     .. autodata:: empty
 
 
-console.printers module
+console.viewers module
 ------------------------
 
-.. automodule:: console.printers
+.. automodule:: console.viewers
     :members:
     :undoc-members:
     :show-inheritance:
     :exclude-members:
 
-    .. autoclass:: LiteHTMLParser
+    .. ~ .. autoclass:: LiteHTMLParser
 
 
 console.progress module

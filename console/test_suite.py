@@ -409,7 +409,7 @@ if True:  # fold
            '\x1b]L-OSC-C0-\x1b\\ | \x1b]L-OSC-C0-7-\a | \x9bL-OSC-C1-\x9d END')
 
     def test_utils_mk_hyperlink():
-        utils._term_level = TermLevel.THE_FULL_MONTY  # force for make
+        utils._ansi_capable = True  # force for make
         result = utils.make_hyperlink('ftp://netscape.com/…/navigator.tar.gz',
                                       'Blast from the past!')
         assert result == (
@@ -504,7 +504,7 @@ if True:  # fold
         assert utils.len_stripped(text) == 18
 
     def test_set_cwd():
-        utils._term_level = TermLevel.THE_FULL_MONTY  # force for make
+        utils._ansi_capable = True  # force for make
         result = utils.notify_cwd('/foo/bar/baz')
         assert result == '\x1b]7;file%3A///foo/bar/baz\x1b\\'
 
@@ -831,7 +831,7 @@ if True:  # fold
     console.fx = fx
     console.bg = bg
     console.sc = sc
-    console._term_level = TermLevel.ANSI_EXTENDED  # patch for hicolor theme
+    console.term_level = TermLevel.ANSI_EXTENDED  # patch for hicolor theme
     from console.progress import ProgressBar, HiDefProgressBar
 
     def test_progress_ascii():

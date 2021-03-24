@@ -52,10 +52,10 @@ Background
 
 So ANSI escape codes for terminals have been standard on UNIX
 with the belt-and-suspenders crowd since the late seventies,
-and even saw use on DOS, the Amiga, and BBSs back in the day.
+and even saw use on DOS, VMS, the Amiga, and BBSs back in the day.
 With the advent of macOS X (ten),
 a whole new generation of lumber-sexuals have exposed themselves(?)
-to the terminal environment and command-line
+to the terminal environment, command-line shells…
 *and liked it*.
  🤔
 
@@ -63,7 +63,7 @@ to the terminal environment and command-line
     :align: center
     :figwidth: 80%
 
-    Dilbert, on `1995-06-24 <https://dilbert.com/strip/1995-06-24>`_
+    Dilbert, desde `1995-06-24 <https://dilbert.com/strip/1995-06-24>`_
 
 
 "I'm a PC"
@@ -72,7 +72,7 @@ to the terminal environment and command-line
     *“Oooh! Oooh! Oooh!”—Arnold Horshack*\
     `† <https://www.vulture.com/2012/08/why-welcome-back-kotters-horshack-mattered.html>`_
 
-Not on Windows NT, tho'.
+Not on Windows NT, though.
 Amazingly,
 with recent versions of Windows 10
 the Ballmer/Suit barrier was finally breached,
@@ -84,17 +84,16 @@ Often still known as the "DOS Prompt" since it has been frozen that long.
 Vaguely analogous to today's virtual terminals,
 as a Yugo might compare to a classic BMW.
 But now, it's supercharged with VT power.
-
 But, don't bother with it, it's kind of a waste of time.
-Why?
-Now that `Windows Terminal <https://en.wikipedia.org/wiki/Windows_Terminal>`
-exists, I'd recommend that instead.
-Even though not currently complete,
-it is much better than "a souped up Yugo."
 
-So, now all the top/extant platforms support ANSI escape sequences.
-Again!
-What's old is new again.
+Why?
+Now that `Windows Terminal <https://en.wikipedia.org/wiki/Windows_Terminal>`_
+exists, I'd recommend that instead 1000%.
+Even though not currently complete,
+it is getting there quickly and much better than a "souped up Yugo."
+
+So, now all the top/extant platforms support ANSI escape sequences, again!
+What's old is new… err, again.
 Add in Unicode and millions of colors and it's now better than ever.
 
 We need great command-line/TUI tools and that's where ``console`` fits in.
@@ -128,7 +127,8 @@ beyond curses and termios
 
 Those are low-level interfaces however,
 focused on "full screen" terminal apps and tty control respectively,
-while continuing to abstract hardware that now only exists in museums.
+while continuing to abstract hardware that now only exists in
+`museums. <https://en.wikipedia.org/wiki/List_of_computer_museums>`_
 
 The ANSI standard may have won,
 but styling a text snippet here and there or setting a title without a bunch
@@ -140,7 +140,7 @@ trivial perhaps.
 Besides the difficulty factor mentioned,
 this classic answer to this problem also suffers in that it is:
 
-- Not installed on Windows
+- Not available or installed on Windows
 
 - Not up to date on older OS variants
 
@@ -154,19 +154,26 @@ this classic answer to this problem also suffers in that it is:
 
     - Tons of obsolete capabilities are supported, crowding the docs
 
-    - New or experimental capabilities not supported, eg:
+    - New or experimental capabilities are *not* supported, eg:
 
         - Bracketed paste
         - Clipboard
         - Curly/colored underlines
         - Hyper-links
 
+      (And the maintainers have been resistant to add them.)
+
 Turns out that terminfo is a big pain in the butt and not even a full solution
 for all the trouble.
-The console package has implemented some support,
-but it's a bit of a curiosity at this point.
+The console package has implemented some support.
 Use ``import console.terminfo`` first thing or
 set ``PY_CONSOLE_USE_TERMINFO=1`` to try it out.
+
+However, generally the local detection should work fine on common terminal
+emulators.
+console will default to terminfo if it sees that the terminal is remote via an
+SSH connection,
+or the above environment variable has been set.
 
 
 Meanwhile, over at the Cheeseshop…
@@ -217,11 +224,11 @@ one or more important items are often missing:
       - 256 extended color - rare
       - Nearest 8-bit color - rarer
       - 16M color - rarer
-      - Standard color names, like X11 & Webcolors - rarest
+      - Standard color names, like X11 & Webcolors - rarest/None
 
     - Querying the terminal, auto-detection, support and deactivation.
     - Python3 support/still maintained
-    - Has tests
+    - Have tests
 
 
 Nice to haves

@@ -169,11 +169,14 @@ div.highlight, pre.highlight { background: inherit; }
     color: #c8c8c8;
     font-weight: normal;
 }
-.highlight .s1 {
+.highlight .s1, .highlight .sa, .highlight .si {
     color: FireBrick;
 }
 .highlight .se {
     color: IndianRed;
+}
+.highlight .si {
+    font-style: normal;
 }
 
 .italic {  /* workaround rst/sphinx lack of link styling. */
