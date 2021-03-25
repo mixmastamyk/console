@@ -116,12 +116,12 @@ class _ContextMixin:
                     print('Hit me with your best shot…')
         '''
         stream = self._stream
-        stream.write(self.bracketedpaste_enable)
+        stream.write(self.enable_bracketed_paste)
         stream.flush()
         try:
             yield self
         finally:
-            stream.write(self.bracketedpaste_disable)
+            stream.write(self.disable_bracketed_paste)
             stream.flush()
 
     @contextmanager
@@ -241,6 +241,10 @@ class _ContextMixin:
 
 class Screen(_ContextMixin):
     ''' Convenience class for cursor and screen manipulation.
+
+        Short names (terminfo capnames) are defined below,
+        while the NAME_TO_TERMINFO_MAP mapping defines easier to remember
+        verbose names.
 
         https://en.wikipedia.org/wiki/ANSI_escape_code#CSI_sequences
     '''

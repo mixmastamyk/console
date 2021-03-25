@@ -42,7 +42,151 @@ Additional Topics
 
     *"Can You Dig It?"*
 
-.. rubric:: How do the styles work?
+
+Automatic Detection
+------------------------
+
+Console takes a look at its environment at start up time (see below).
+This allows it to decide automatically what level of ANSI the terminal supports.
+
+If you'd like to take that information into account yourself,
+rather than (more simply) letting console objects and functions deactivate
+themselves,
+there are two public values,
+``term_level`` and the mildly-redundant ``ansi_capable``,
+to help in this case.
+
+The first is assigned to one of the members of the Enum shown below,
+the second is similar,
+but reduced to a boolean for simple comparisons.
+For example:
+
+.. code-block:: python
+
+    class TermLevel(IntEnum):
+        DUMB            = 0     # Stream/not a tty, disabled, or ASCII teleprinter
+        ANSI_MONOCHROME = 1     # Text effects but no color, e.g. vt220
+        ANSI_BASIC      = 2     # + 3,4 Bit, 8/16 indexed colors
+        ANSI_EXTENDED   = 3     # + 8 bit, 256 indexed colors
+        ANSI_DIRECT     = 4     # + 24 bit, 16m direct colors, aka "true"
+        THE_FULL_MONTY  = 9     # + Bleeding edge (not yet a determining factor)
+
+.. code-block:: python
+
+    from console.constants import TermLevel
+    from console import term_level, ansi_capable
+
+    if term_level > TermLevel.ANSI_MONOCHROME:
+        print('Using color! :-D')
+    elif ansi_capable:
+        print('Using bold!')
+    else:
+        print('Using plain text. :-/')
+
+
+As mentioned previously,
+it can also take the terminfo database into account.
+By default under SSH,
+or via the variables below.
+
+
+Environment Variables
+-----------------------
+
+    | *"But I took them away from all that, and now they work for me.*
+    | *My name is Charlie."*
+
+The following standard variables are noted by ``console`` and affect its
+behavior:
+
+Operating System:
+
+    - ``TERM`` - basic category of terminal, more info is often needed due to
+      most terminals lying that they are an xterm.
+    - ``TERM_PROGRAM`` - for hints on what it supports
+    - ``SSH_CLIENT`` - when remote, downgrade to terminfo detection, with
+      potentially simpler support.
+    - ``LANG`` - is Unicode available?
+
+Color-specific:
+
+    - ``CLICOLOR``, 1/0 - Enable or disable ANSI sequences if on a tty
+    - ``CLICOLOR_FORCE`` - Force it on anyway
+    - ``COLORTERM`` - "truecolor", "direct", aka "24bit" support.
+    - ``NO_COLOR`` - None, dammit!
+    - ``COLORFGBG`` - Light or dark background?
+
+Windows:
+
+    - ``ANSICON`` - a shim to render ANSI on older Windows is recognized.
+
+MacOS:
+
+    - ``TERM_PROGRAM_*`` - is looked at for more specific program information.
+
+Console itself:
+
+    - ``PY_CONSOLE_AUTODETECT`` - Disables automatic detection routines.
+
+    - ``PY_CONSOLE_COLOR_SEP`` - The inner separator char for extended color
+      sequences.
+      Often ``:``, but may need to be changed to ``;`` under legacy terms.
+
+    - ``PY_CONSOLE_USE_TERMINFO`` - Enables terminfo lookup for many
+      capabilities.
+
+
+Custom Initialization
+------------------------
+
+    *"I hope you know this violates my warranty!"—Twiki*
+
+
+On terminals advertising xterm compatibility (though incomplete) color
+detection may hang and need to be disabled.
+Recent versions of console implement a blacklist and timeout to
+alleviate/mitigate this issue.
+If you notice that console startup stutters briefly at import time,
+you might be affected.
+See troubleshooting below to enable DEBUG logging.
+
+To disable automatic detection of terminal capabilities at import time the
+environment variable
+``PY_CONSOLE_AUTODETECT`` may be set to ``0``.
+Writing a bug at the
+`console repo <https://github.com/mixmastamyk/console/issues/>`_
+may help as well.
+
+Forcing the support of all palettes ON can also be done externally with an
+environment variable,
+such as ``CLICOLOR_FORCE``,
+if desired.
+
+
+.. rubric:: Initializing Your Own
+
+*"I love the smell of napalm in the morning."—Lt. Col. Kilgore*
+
+To configure auto-detection, palette support,
+or detect other output streams besides stdout,
+one may build palette objects yourself:
+
+.. code-block:: shell
+
+    ⏵ env PY_CONSOLE_AUTODETECT='0' script.py
+
+.. code-block:: python
+
+    from console.constants import TermLevel
+    from console.style import BackgroundPalette
+
+    # e.g. force all palettes on:
+    fullbg = BackgroundPalette(level=TermLevel.THE_FULL_MONTY)
+
+
+
+How do the styles work?
+------------------------
 
 Behind the scenes in
 :mod:`console.core`
@@ -95,81 +239,6 @@ Similar functionality is available from
 :mod:`console.screen`'s screen object.
 
 
-.. rubric:: Automatic Detection
-
-When automatic detection is used and palettes are found not to be supported,
-palette entries are replaced instead with "dummy" blank objects that render to
-nothing.
-Well, more specifically empty strings.
-
-
-.. raw:: html
-
-    <div class="center rounded dark p1">
-        <div class=pacman>
-            <span class=pline>╭───────────────────────────╮&nbsp;&nbsp;<br>
-            │
-            </span>
-            <span class=dots>·····•·····</span>
-            <span id=pac>ᗤ</span>&nbsp;
-            <span id=sha>ᗣ</span><span id=spe>ᗣ</span>
-            <span id=bas>ᗣ</span><span id=pok>ᗣ</span>
-            <span class=pline>│&nbsp;&nbsp;<br>
-            </span>
-            <i style="opacity: .7">…waka waka waka…</i>&nbsp;&nbsp;
-        </div>
-    </div>
-
-
-Custom Initialization
-------------------------
-
-    *"I hope you know this violates my warranty!"—Twiki*
-
-
-On terminals advertising xterm compatibility (though incomplete) color
-detection may hang and need to be disabled.
-Recent versions of console implement a blacklist and timeout to
-alleviate/mitigate this.
-If you notice that console startup stutters briefly at import time,
-you might be affected.
-See troubleshooting below to enable DEBUG logging.
-
-To disable automatic detection of terminal capabilities at import time the
-environment variable
-``PY_CONSOLE_AUTODETECT`` may be set to ``0``.
-Writing a bug at the
-`console repo <https://github.com/mixmastamyk/console/issues/>`_
-would help also.
-
-Forcing the support of all palettes ON can also be done externally with an
-environment variable,
-such as ``CLICOLOR_FORCE``,
-if desired.
-
-
-.. rubric:: Initializing Your Own
-
-*"I love the smell of napalm in the morning."—Lt. Col. Kilgore*
-
-To configure auto-detection, palette support,
-or detect other output streams besides stdout,
-one may build palette objects yourself:
-
-.. code-block:: shell
-
-    ⏵ env PY_CONSOLE_AUTODETECT='0' script.py
-
-.. code-block:: python
-
-    from console.constants import TermLevel
-    from console.style import BackgroundPalette
-
-    # e.g. force all palettes on:
-    fullbg = BackgroundPalette(level=TermLevel.THE_FULL_MONTY)
-
-
-
 Palette Downgrade
 ----------------------
 
@@ -197,55 +266,37 @@ Unless someone would like to write a highly optimized implementation in
 C or Assembler for kicks,
 it doesn't seem worth the trouble for this library.
 
+
+Palette Deactivation
+----------------------
+
+When automatic detection is used and palettes are found not to be supported,
+palette entries are replaced instead with "dummy" blank objects that render to
+nothing.
+Well, more specifically empty strings.
+
+
+.. raw:: html
+
+    <div class="center rounded dark p1">
+        <div class=pacman>
+            <span class=pline>╭───────────────────────────╮&nbsp;&nbsp;<br>
+            │
+            </span>
+            <span class=dots>·····•·····</span>
+            <span id=pac>ᗤ</span>&nbsp;
+            <span id=sha>ᗣ</span><span id=spe>ᗣ</span>
+            <span id=bas>ᗣ</span><span id=pok>ᗣ</span>
+            <span class=pline>│&nbsp;&nbsp;<br>
+            </span>
+            <i style="opacity: .7">…waka waka waka…</i>&nbsp;&nbsp;
+        </div>
+    </div>
+
+
 ::
 
     ¸¸¸¸,ø¤º°`°º¤ø,¸¸,ø¤º°`°º¤ø,¸,ø¤°º¤ø,¸¸,ø¤º°`°º¤ø,¸¸¸¸
-
-
-Environment Variables
------------------------
-
-    | *"But I took them away from all that, and now they work for me.*
-    | *My name is Charlie."*
-
-The following standard variables are noted by ``console`` and affect its
-behavior:
-
-Operating System:
-
-    - ``TERM`` - basic category of terminal, more info is often needed due to
-      most terminals lying that they are an xterm.
-    - ``TERM_PROGRAM`` - for hints on what it supports
-    - ``SSH_CLIENT`` - when remote, downgrade to terminfo detection potentially
-      simpler support.
-    - ``LANG`` - is Unicode available?
-
-Color-specific:
-
-    - ``CLICOLOR``, 1/0 - Enable or disable ANSI sequences if on a tty
-    - ``CLICOLOR_FORCE`` - Force it on anyway
-    - ``COLORTERM`` - "truecolor" or "24bit" support
-    - ``NO_COLOR`` - None, dammit!
-    - ``COLORFGBG`` - Light or dark background?
-
-Windows:
-
-    - ``ANSICON`` - a shim to render ANSI on older Windows is recognized.
-
-MacOS:
-
-    - ``TERM_PROGRAM_*`` - is looked at for more specific program information.
-
-Console itself:
-
-    - ``PY_CONSOLE_AUTODETECT`` - Disables automatic detection routines.
-
-    .. ~ - ``PY_CONSOLE_COLOR_SEP`` - inner separator char for extended color
-      .. ~ sequences.
-      .. ~ Typically ``:``, but may need to be changed to ``;`` under legacy terms.
-
-    - ``PY_CONSOLE_USE_TERMINFO`` - Enables terminfo lookup for many
-      capabilities.
 
 
 Screen Stuff
