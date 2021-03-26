@@ -270,6 +270,8 @@ it doesn't seem worth the trouble for this library.
 Palette Deactivation
 ----------------------
 
+    *I got a pocket full of quarters, and I'm headed to the arcade…*
+
 When automatic detection is used and palettes are found not to be supported,
 palette entries are replaced instead with "dummy" blank objects that render to
 nothing.
@@ -294,11 +296,6 @@ Well, more specifically empty strings.
     </div>
 
 
-::
-
-    ¸¸¸¸,ø¤º°`°º¤ø,¸¸,ø¤º°`°º¤ø,¸,ø¤°º¤ø,¸¸,ø¤º°`°º¤ø,¸¸¸¸
-
-
 Screen Stuff
 -------------------
 
@@ -321,7 +318,8 @@ package as well:
 
     >>>  # this space intentionally left blank ;-)
 
-There are several blessings-inspired context managers as well:
+There are several blessings-inspired context managers as well.
+See below for more.
 
 - ``sc.bracketed_paste()``
 - ``sc.fullscreen()``
@@ -329,6 +327,55 @@ There are several blessings-inspired context managers as well:
 - ``sc.location(x, y)``
 - ``sc.rare_mode()  # aka "cbreak mode"``
 - ``sc.raw_mode()``
+
+
+.. rubric:: Fullscreen Apps, a la Blessings
+
+Here's a short script to show off console's full-screen abilities:
+
+.. code-block:: python
+
+    from console import fg, fx, defx
+    from console.screen import Screen
+    from console.utils import wait_key, set_title
+    from console.constants import ESC
+
+    exit_keys = (ESC, 'q', 'Q')
+
+    with Screen() as screen:  # or screen.fullscreen():
+
+        set_title(' 🤓 Hi, from console!')
+        with screen.location(5, 4):
+            print(
+                fg.lightgreen('** Hi from a '
+                              f'{fx.i}fullscreen{defx.i} app! **'),
+                screen.move_x(5),  # back up, then down
+                screen.move_down(5),
+                fg.yellow(f'(Hit the {fx.reverse("ESC")} key to exit): '),
+                end='', flush=True,  # optional
+            )
+
+        with screen.hidden_cursor():
+            wait_key(exit_keys)
+
+The text below should appear.
+Check the title too!
+After hitting the ESC key your terminal shall be restored:
+
+.. raw:: html
+
+    <pre>
+
+    <div style="color: green; ">
+     * Hi, from a <i>fullscreen</i> app! **
+    </div>
+
+
+
+    <div style="color: #ba0; ">
+      (Hit the <span style="background: #ba0; color: black">ESC</span> key to exit):
+    </div>
+    </pre>
 
 
 Progress Bars
@@ -565,8 +612,8 @@ Viewing an html file on the terminal is also available with the
 or via command-line (see below).
 
 
-Context Managers
-~~~~~~~~~~~~~~~~~~~
+More Context Managers
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. rubric:: Configuring Output
 
@@ -585,55 +632,6 @@ able to be redirected outside the process:
         print('Outfield: Baker, Monday, Smith')
 
 (This feature is experimental for now. ;-)
-
-
-.. rubric:: Fullscreen Apps, a la Blessings
-
-Here's a short script to show off console's full-screen abilities:
-
-.. code-block:: python
-
-    from console import fg, fx, defx
-    from console.screen import Screen
-    from console.utils import wait_key, set_title
-    from console.constants import ESC
-
-    exit_keys = (ESC, 'q', 'Q')
-
-    with Screen() as screen:  # or screen.fullscreen():
-
-        set_title(' 🤓 Hi, from console!')
-        with screen.location(5, 4):
-            print(
-                fg.lightgreen('** Hi from a '
-                              f'{fx.i}fullscreen{defx.i} app! **'),
-                screen.move_x(5),  # back up, then down
-                screen.move_down(5),
-                fg.yellow(f'(Hit the {fx.reverse("ESC")} key to exit): '),
-                end='', flush=True,  # optional
-            )
-
-        with screen.hidden_cursor():
-            wait_key(exit_keys)
-
-The text below should appear.
-Check the title too!
-After hitting the ESC key your terminal shall be restored:
-
-.. raw:: html
-
-    <pre>
-
-    <div style="color: green; ">
-     * Hi, from a <i>fullscreen</i> app! **
-    </div>
-
-
-
-    <div style="color: #ba0; ">
-      (Hit the <span style="background: #ba0; color: black">ESC</span> key to exit):
-    </div>
-    </pre>
 
 
 .. rubric:: TermStack
@@ -660,6 +658,11 @@ For example:
     # Back to normal
 
 And off you go.
+
+::
+
+    ¸¸¸¸,ø¤º°`°º¤ø,¸¸,ø¤º°`°º¤ø,¸,ø¤°º¤ø,¸¸,ø¤º°`°º¤ø,¸¸¸¸
+
 
 
 Command-line

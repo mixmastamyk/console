@@ -28,7 +28,7 @@ from contextlib import contextmanager
 
 from . import ansi_capable as _ansi_capable
 from .constants import CSI, ESC, RIS
-from .detection import get_position as _get_position
+from .detection import get_position as _get_position, TermStack
 
 
 # Mapping of convenience names to terminfo capabilities,
@@ -93,14 +93,14 @@ class _ContextMixin:
     def __enter__(self):
         ''' Go full-screen and save title. '''
         self._stream.write(self.enable_alt_screen)
-        self._stream.write(str(self.save_title(0)))     # 0 = both icon, title
+        self._stream.write(self.save_title(0))          # 0 = both icon, title
         self._stream.flush()
         return self
 
     def __exit__(self, type_, value, traceback):
         ''' Return to normal screen, restore title. '''
         self._stream.write(self.disable_alt_screen)
-        self._stream.write(str(self.restore_title(0)))  # 0 = both icon, title
+        self._stream.write(self.restore_title(0))       # 0 = both icon, title
         self._stream.flush()
 
     @contextmanager
@@ -136,13 +136,13 @@ class _ContextMixin:
         '''
         stream = self._stream
         stream.write(self.enable_alt_screen)
-        stream.write(str(self.save_title(0)))     # 0 = both icon, title
+        stream.write(self.save_title(0))            # 0 = both icon, title
         stream.flush()
         try:
             yield self
         finally:
             stream.write(self.disable_alt_screen)
-            stream.write(str(self.restore_title(0)))  # 0 = icon & title
+            stream.write(self.restore_title(0))     # 0 = icon & title
             stream.flush()
 
     @contextmanager
@@ -205,15 +205,10 @@ class _ContextMixin:
         '''
         import termios, tty  # defer
 
-        fd = self._stream.fileno()
-        orig_attrs = termios.tcgetattr(fd)      # save
-        termios.tcflush(fd, termios.TCIFLUSH)   # clear input
-        tty.setcbreak(fd, termios.TCSANOW)      # aka rare mode
-        try:
-            yield self                          # wait
-
-        finally:  # restore
-            termios.tcsetattr(fd, termios.TCSADRAIN, orig_attrs)
+        with TermStack() as fd:
+            termios.tcflush(fd, termios.TCIFLUSH)   # clear Input
+            tty.setcbreak(fd, termios.TCSANOW)
+            yield self                              # wait
 
     @contextmanager
     def raw_mode(self):
@@ -229,14 +224,10 @@ class _ContextMixin:
         '''
         import termios, tty  # defer
 
-        fd = self._stream.fileno()
-        orig_attrs = termios.tcgetattr(fd)      # save
-        termios.tcflush(fd, termios.TCIFLUSH)   # clear input
-        tty.setraw(fd, termios.TCSANOW)
-        try:
-            yield self                          # wait
-        finally:  # restore
-            termios.tcsetattr(fd, termios.TCSADRAIN, orig_attrs)
+        with TermStack() as fd:
+            termios.tcflush(fd, termios.TCIFLUSH)   # clear Input
+            tty.setraw(fd, termios.TCSANOW)
+            yield self                              # wait
 
 
 class Screen(_ContextMixin):

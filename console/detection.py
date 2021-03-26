@@ -40,6 +40,7 @@ class TermStack:
 
         Arguments::
             stream      - The file object to operate on, defaulting to stdin.
+            exit_mode   - Mode to exit with: now, drain, or flush default.
 
         Raises:
             AttributeError: when stream has no attribute 'fileno'
@@ -53,20 +54,22 @@ class TermStack:
                     tty.setraw(fd)
                     print(sys.stdin.read(1))
     '''
-    def __init__(self, stream=sys.stdin):
+    def __init__(self, stream=sys.stdin, exit_mode='flush'):
         if not termios:
             raise EnvironmentError('The termios module was not loaded, is '
-                                   'this a POSIX environment?')
+                                   'this a POSIX-compatible environment?')
         self.fd = stream.fileno()
+        self._exit_mode = exit_mode.upper()
 
     def __enter__(self):
         # save
-        self.orig_attrs = termios.tcgetattr(self.fd)
+        self._orig_attrs = termios.tcgetattr(self.fd)
         return self.fd
 
     def __exit__(self, *args):
         # restore
-        termios.tcsetattr(self.fd, termios.TCSADRAIN, self.orig_attrs)
+        mode = getattr(termios, f'TCSA{self._exit_mode}')
+        termios.tcsetattr(self.fd, mode, self._orig_attrs)
 
 
 def init(_stream=sys.stdout, _basic_palette=()):

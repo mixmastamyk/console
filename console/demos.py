@@ -43,8 +43,8 @@ def run():
         f'↑ Title: {set_title("Console FTW! 🤣")!r} (gone in a µs.)',
         f'Combined, bold + underline + red: {fx.bold + fx.underline + fg.red}' +
             f'Merry {fg.green}X-Mas{fg.default}!{fx.end}',
-        f'Cursor right → : [{sc.right}] (<-- one space between brackets)',
-        f'Cursor down ↓ 2: {sc.down(2)}',
+        f'Cursor right → : [{sc.move_right}] (<-- one space between brackets)',
+        f'Cursor down ↓ 2: {sc.move_down(2)}',
 
         'Text wrap: ' + fg.purple('Fill my eyes with that Double Vision…'
                             + BEL, fx.underline, fx.italic, fx.overline),
