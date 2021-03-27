@@ -26,7 +26,7 @@
 import sys
 from contextlib import contextmanager
 
-from . import ansi_capable as _ansi_capable
+from . import ansi_capable as _ansi_capable, using_terminfo
 from .constants import CSI, ESC, RIS
 from .detection import get_position as _get_position, TermStack
 
@@ -293,7 +293,7 @@ class Screen(_ContextMixin):
         # else: continue on unabated
         return self
 
-    def __init__(self, stream=sys.stdout, **kwargs):
+    def __init__(self, stream=sys.stdout):
         self._stream = stream
         # look for attributes to wrap in a _TemplateString:
         for name in dir(self):
@@ -309,7 +309,7 @@ class Screen(_ContextMixin):
                     setattr(self, name, attr)
 
     def __getattr__(self, attr):
-        # when attr missing, look in convenience map
+        # when attr is *missing*, look in convenience map:
         capability_name = NAME_TO_TERMINFO_MAP.get(attr)
         if capability_name:
             value = getattr(self, capability_name)
@@ -321,19 +321,104 @@ class Screen(_ContextMixin):
             raise AttributeError(msg)
 
 
-# Rather than define get_position() under Screen,
-# we let detection pick the implementation,
-# as it is different under Windows.  Then we attach it here.
-if _ansi_capable:
-    Screen.get_position = staticmethod(_get_position)
-else:
-    from .meta import defaults
-    Screen.get_position = lambda *args, **kwargs: defaults.CURSOR_POS_FALLBACK
+class ScreenTermInfo(_ContextMixin):
+    ''' Convenience class for cursor and screen manipulation.
 
+        Short names (terminfo capnames) are available,
+        while the NAME_TO_TERMINFO_MAP mapping defines several easier to
+        remember verbose names.
 
-class _TemplateString(str):  # Callable[[str], str]
-    ''' A template string that renders itself with given or default arguments.
+        This implementation uses Terminfo instead of hard-coded ANSI sequences.
+
+        Example::
+
+            sc.move_to
+            '\x1b[%i%p1%d;%p2%dH'
+
+            >>> sc.move_to(3, 5)
+            '\x1b[4;6H'
+
+        https://en.wikipedia.org/wiki/Terminfo
     '''
+    def __init__(self, stream=sys.stdout):
+        ''' Do not wrap up class members here as done in the parent class. '''
+        self._stream = stream
+
+    #~ def __getattribute__(self, attr):
+        #~ ''' All attribute access is done here '''
+        #~ return super().__getattribute__(attr)
+
+    def __new__(cls, force=False):
+        ''' Override new() to replace the class entirely on deactivation.
+
+            Complies with palette detection, unless force is on:
+
+            Arguments:
+                force           - Force on.
+        '''
+        self = super().__new__(cls)
+
+        if not force:
+            if not _ansi_capable:
+                from .disabled import empty_scr_bin
+                # Screen is a bit different than the empty styles.
+                # Methods need to return a blank string, not the argument
+                # Make new empties to deactivate completely:
+                self = empty_scr_bin
+
+        # else: continue on unabated
+        return self
+
+    def __getattr__(self, attr):
+        # when attribute is *missing*
+        if using_terminfo:
+            cap_name = NAME_TO_TERMINFO_MAP.get(attr, attr)
+
+            # search terminfo
+            value = None
+            for get_cap in _ti_query_functions:
+                value = get_cap(cap_name)
+                if value is None:
+                    continue
+                elif value in (-1, -2):
+                    value = None
+                else:  # found
+                    break
+
+            if value is None:  # didn't find it, return None or raise?
+                #~ class_name = self.__class__.__name__
+                #~ raise AttributeError(f'{class_name!r} object has no attribute {cap_name!r}')
+                pass
+            else:  # convert, cache, and return
+                if b'%' in value:  # tparm!
+                    value = _TemplateStringTermInfo(value)
+                else:
+                    value = value.decode('ascii')
+
+                setattr(self, cap_name, value)  # short name
+                if cap_name != attr:  # long name also
+                    setattr(self, attr, value)
+            return value
+        else:
+            raise RuntimeError('Terminfo is not available, use the standard '
+                               'Screen class instead.')
+
+
+class _TemplateStringTermInfo(str):
+    ''' A callable template string that renders itself with given args. '''
+
+    def __new__(cls, value):
+        self = str.__new__(cls, value.decode('ascii'))  # as str
+        self._byte_str = value  # orig as bytes
+        return self
+
+    def __call__(self, *args):
+        ''' Run the tparm! '''
+        return _tparm(self._byte_str, *args).decode('ascii')  # to string
+
+
+class _TemplateString(str):
+    ''' A template string that renders itself with given or default args. '''
     _default = 1
 
     def __new__(cls, endcode, arg='%s'):
@@ -351,5 +436,33 @@ class _TemplateString(str):  # Callable[[str], str]
             return self
 
 
+# Rather than define get_position() under Screen,
+# we let detection pick the implementation,
+# as it is different under Windows.  Then we attach it here.
+if _ansi_capable:
+    Screen.get_position = ScreenTermInfo.get_position = (
+        staticmethod(_get_position)
+    )
+    #~ ScreenTermInfo.get_position = staticmethod(_get_position)
+else:
+    from .meta import defaults
+    Screen.get_position = ScreenTermInfo.get_position = (
+        lambda *args, **kwargs: defaults.CURSOR_POS_FALLBACK
+    )
+    #~ ScreenTermInfo.get_position = (
+        #~ lambda *args, **kwargs: defaults.CURSOR_POS_FALLBACK
+    #~ )
+
 # It's Automatic:  https://youtu.be/y5ybok6ZGXk
-sc = Screen()
+if using_terminfo:
+    from . import _curses
+
+    _ti_query_functions = (
+        _curses.tigetstr, _curses.tigetnum, _curses.tigetflag
+    )
+    _tparm = _curses.tparm
+    sc = ScreenTermInfo()
+    print('loaded ScreenTermInfo.')
+else:
+    sc = Screen()
+    print('loaded Screen.')

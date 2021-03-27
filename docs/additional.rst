@@ -52,8 +52,9 @@ This allows it to decide automatically what level of ANSI the terminal supports.
 If you'd like to take that information into account yourself,
 rather than (more simply) letting console objects and functions deactivate
 themselves,
-there are two public values,
-``term_level`` and the mildly-redundant ``ansi_capable``,
+there are a few public values,
+``term_level``, the mildly-redundant ``ansi_capable``,
+and ``using_terminfo``,
 to help in this case.
 
 The first is assigned to one of the members of the Enum shown below,
@@ -63,6 +64,7 @@ For example:
 
 .. code-block:: python
 
+    # console.constants
     class TermLevel(IntEnum):
         DUMB            = 0     # Stream/not a tty, disabled, or ASCII teleprinter
         ANSI_MONOCHROME = 1     # Text effects but no color, e.g. vt220

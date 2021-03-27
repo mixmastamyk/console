@@ -29,11 +29,11 @@ try:
     constants.LF = tigetstr('ind')
 
     # ------------------------------------------------------
-    from . import screen
+    #~ from . import screen
 
-    Screen = screen.Screen
+    #~ Screen = screen.Screen
 
-    Screen.cuu = tigetstr('cuu')
+    #~ Screen.cuu = tigetstr('cuu')
 
 
 except ModuleNotFoundError:

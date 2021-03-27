@@ -8,7 +8,7 @@ from .constants import TermLevel as _TermLevel
 from .disabled import empty_bin as _empty_bin, empty_scr_bin as _empty_scr_bin
 
 
-term_level = ansi_capable = None
+term_level = ansi_capable = using_terminfo = None
 # Define pass-thru palette objects for streams and dumb terminals:
 fg = bg = ul = fx = defx = sc = _empty_bin
 sc = _empty_scr_bin
@@ -30,6 +30,20 @@ except LookupError:
     _codecs.register(_codec_map.get)
 
 
+# Experimental terminfo support, under construction  :-)
+if _env.PY_CONSOLE_USE_TERMINFO.truthy or _env.SSH_CLIENT:
+    try:
+        import curses as _curses
+    except ImportError:
+        try:
+            import jinxed as _curses
+        except ImportError:
+            raise ImportError('curses not available, try installing jinxed.')
+
+    _curses.setupterm()
+    using_terminfo = True
+
+
 # defer imports for proper ordering
 from .detection import TermStack
 
@@ -41,7 +55,7 @@ if (_env.PY_CONSOLE_AUTODETECT.value is None or
     # detect palette, other modules are dependent
     from .detection import init as _init
 
-    term_level = _init()
+    term_level = _init(using_terminfo=using_terminfo)
 
     if term_level:  # may now import other modules
         ansi_capable = True  # simplify comparisons
@@ -63,10 +77,3 @@ if (_env.PY_CONSOLE_AUTODETECT.value is None or
 
     fg, bg, ul, fx, defx, sc, TermStack  # quiet pyflakes
 
-
-
-# Experimental terminfo support, under construction
-if _env.PY_CONSOLE_USE_TERMINFO.truthy:
-
-    from . import terminfo
-    terminfo  # quiet pyflakes

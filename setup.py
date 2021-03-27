@@ -20,6 +20,7 @@ install_requires = (
     'ezenv>=0.92',
     'future_fstrings;     python_version < "3.6" ',
     'typing;              python_version < "3.5" ',  # seems future-fs related.
+    'jinxed;              os_name == "nt" ',  # for ssh into windows
     'colorama;            os_name == "nt" and platform_version < "10.0.10586" ',
     'win_unicode_console; os_name == "nt" and python_version < "3.6" ',
 )
@@ -27,7 +28,6 @@ tests_require = ('pyflakes', 'pytest', 'readme_renderer'),
 extras_require = dict(
     figlet=('pyfiglet',),
     webcolors=('webcolors',),
-    win_terminfo=('jinxed',),  # for ssh into windows, tbd
 )  # build entry for all extras:
 extras_require['all'] = tuple(chain.from_iterable(extras_require.values()))
 
@@ -63,7 +63,7 @@ setup(
 
     extras_require      = extras_require,
     install_requires    = install_requires,
-    python_requires     = '>=3.4',  # untested below that
+    python_requires     = '>=3.4',  # untested below that, future_fstrings
     setup_requires      = install_requires,
     tests_require       = tests_require,
     classifiers         = meta.trove_classifiers,
