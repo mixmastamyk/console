@@ -5,6 +5,7 @@
     Constants needed cross-package.
 '''
 from enum import IntEnum as _IntEnum
+from . import using_terminfo as _using_terminfo
 
 
 # ASCII Constants      DEC   OCT    HEX   CTL     DESC
@@ -22,7 +23,7 @@ FS  = '\x1c'        #:  28   034           ^\     Field Separator
 GS  = '\x1d'        #:  29   035           ^]     Group Separator
 RS  = '\x1e'        #:  30   036           ^^     Record Separator
 
-DEL = '\177'        #: 127   177   0x7F           Delete character
+DEL = '\x7f'        #: 127   177                  Delete character
 
 # ANSI Constants
 CSI = ESC + '['     #: Control Sequence Introducer
@@ -35,7 +36,6 @@ CSI_C1 = '\x9b'
 OSC_C1 = '\x9d'
 ST_C1  = '\x9c'
 
-
 # Where ANSI codes start, floor values:
 ANSI_FG_LO_BASE = 30
 ANSI_FG_HI_BASE = 90
@@ -44,7 +44,18 @@ ANSI_BG_HI_BASE = 100
 
 ANSI_RESET = CSI + '0m'
 
-# Various maps for xterm funcionality.
+
+# update several constants via terminfo, needs improvement
+if _using_terminfo:
+    from . import _curses
+    BEL = _curses.tigetstr('bel')
+    BS = _curses.tigetstr('kbs')
+    CR = _curses.tigetstr('cr')
+    HT = _curses.tigetstr('ht')
+    LF = _curses.tigetstr('ind')
+
+
+# Mappings for xterm funcionality:
 _COLOR_CODE_MAP = dict(foreground='10', fg='10', background='11', bg='11')
 _MODE_MAP = dict(
     forward='0', backward='1', right='0', left='1', full='2', history='3'

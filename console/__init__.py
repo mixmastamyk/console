@@ -4,13 +4,12 @@
 '''
 import env as _env
 
-from .constants import TermLevel as _TermLevel
 from .disabled import empty_bin as _empty_bin, empty_scr_bin as _empty_scr_bin
 
 
 term_level = ansi_capable = using_terminfo = None
 # Define pass-thru palette objects for streams and dumb terminals:
-fg = bg = ul = fx = defx = sc = _empty_bin
+fg = bg = ul = fx = defx = _empty_bin
 sc = _empty_scr_bin
 
 
@@ -45,10 +44,11 @@ if _env.PY_CONSOLE_USE_TERMINFO.truthy or _env.SSH_CLIENT:
 
 
 # defer imports for proper ordering
+from .constants import TermLevel as _TermLevel  # reads using_terminfo
 from .detection import TermStack
 
 
-# detection defaults to True if not explicitly disabled
+# detection is performed if not explicitly disabled
 if (_env.PY_CONSOLE_AUTODETECT.value is None or
     _env.PY_CONSOLE_AUTODETECT.truthy):
 
@@ -57,7 +57,7 @@ if (_env.PY_CONSOLE_AUTODETECT.value is None or
 
     term_level = _init(using_terminfo=using_terminfo)
 
-    if term_level:  # may now import other modules
+    if term_level:  # > 0, may now import other modules
         ansi_capable = True  # simplify comparisons
         # monochrome stuff first
         from .style import fx, defx
@@ -76,4 +76,3 @@ if (_env.PY_CONSOLE_AUTODETECT.value is None or
         ansi_capable = False  # simplify comparisons
 
     fg, bg, ul, fx, defx, sc, TermStack  # quiet pyflakes
-

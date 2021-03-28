@@ -56,7 +56,7 @@ NAME_TO_TERMINFO_MAP = dict(
 
     hide_cursor         = 'civis',
     show_cursor         = 'cnorm',
-    save_cursor         = 'sc',
+    save_cursor         = 'sc',     # color as well
     save_position       = 'sc',     # alias
     restore_cursor      = 'rc',     # alias
     restore_position    = 'rc',
@@ -68,18 +68,8 @@ NAME_TO_TERMINFO_MAP = dict(
 
 class _ContextMixin:
     ''' Various Blessings-inspired context handlers are defined here. '''
-    # The following don't need parameter wrapping, all start with ESC
-    sc      = ESC + '7'  # save cursor position
-    rc      = ESC + '8'  # restore
 
-    cnorm   = CSI + '?25h'
-    civis   = CSI + '?25l'
-
-    # alt screen
-    smcup = CSI + '?1049h'
-    rmcup = CSI + '?1049l'
-
-    # -- below don't yet have terminfo names ---------------------------------
+    # these don't have terminfo names to associate with
     enable_flash = CSI + '?5h'      # terminfo cap name, only single "flash"
     disable_flash = CSI + '?5l'
 
@@ -269,8 +259,18 @@ class Screen(_ContextMixin):
     ech = 'X'
     cbt = 'Z'
 
-    # Any following don't need parameter wrapping (already start with ESC)
+    # The following don't need parameter wrapping, all start with ESC
     rs1 = RIS
+    sc  = ESC + '7'  # save cursor position
+    rc  = ESC + '8'  # restore
+
+    cnorm = CSI + '?25h'
+    civis = CSI + '?25l'
+
+    # alt screen
+    smcup = CSI + '?1049h'
+    rmcup = CSI + '?1049l'
+
 
     def __new__(cls, force=False):
         ''' Override new() to replace the class entirely on deactivation.
@@ -280,20 +280,24 @@ class Screen(_ContextMixin):
             Arguments:
                 force           - Force on.
         '''
-        self = super().__new__(cls)
+        #~ self = super().__new__(cls)
 
-        if not force:
-            if not _ansi_capable:
-                from .disabled import empty_scr_bin
-                # Screen is a bit different than the empty styles.
-                # Methods need to return a blank string, not the argument
-                # Make new empties to deactivate completely:
-                self = empty_scr_bin
+        #~ if not force:
+            #~ if not _ansi_capable:
+                #~ from .disabled import empty_scr_bin
+                #~ # Makes new empties to deactivate completely:
+                #~ self = empty_scr_bin
 
-        # else: continue on unabated
+        if _ansi_capable or force:
+            self = super().__new__(cls)
+        else:
+            from .disabled import empty_scr_bin
+            # Makes new empties to deactivate completely:
+            self = empty_scr_bin
+
         return self
 
-    def __init__(self, stream=sys.stdout):
+    def __init__(self, stream=sys.stdout, force=None):
         self._stream = stream
         # look for attributes to wrap in a _TemplateString:
         for name in dir(self):
@@ -340,14 +344,6 @@ class ScreenTermInfo(_ContextMixin):
 
         https://en.wikipedia.org/wiki/Terminfo
     '''
-    def __init__(self, stream=sys.stdout):
-        ''' Do not wrap up class members here as done in the parent class. '''
-        self._stream = stream
-
-    #~ def __getattribute__(self, attr):
-        #~ ''' All attribute access is done here '''
-        #~ return super().__getattribute__(attr)
-
     def __new__(cls, force=False):
         ''' Override new() to replace the class entirely on deactivation.
 
@@ -356,18 +352,20 @@ class ScreenTermInfo(_ContextMixin):
             Arguments:
                 force           - Force on.
         '''
-        self = super().__new__(cls)
+        if _ansi_capable or force:
+            self = super().__new__(cls)
+        else:
+            from .disabled import empty_scr_bin
+            # Makes new empties to deactivate completely:
+            self = empty_scr_bin
 
-        if not force:
-            if not _ansi_capable:
-                from .disabled import empty_scr_bin
-                # Screen is a bit different than the empty styles.
-                # Methods need to return a blank string, not the argument
-                # Make new empties to deactivate completely:
-                self = empty_scr_bin
-
-        # else: continue on unabated
         return self
+
+    def __init__(self, stream=sys.stdout, force=None):
+        ''' Do not wrap up class members here as done in the Screen class.
+            Force is for __new__ unused here.
+        '''
+        self._stream = stream
 
     def __getattr__(self, attr):
         # when attribute is *missing*
@@ -436,22 +434,19 @@ class _TemplateString(str):
             return self
 
 
-# Rather than define get_position() under Screen,
+# Rather than define get_position() under Screen*,
 # we let detection pick the implementation,
 # as it is different under Windows.  Then we attach it here.
 if _ansi_capable:
     Screen.get_position = ScreenTermInfo.get_position = (
         staticmethod(_get_position)
     )
-    #~ ScreenTermInfo.get_position = staticmethod(_get_position)
 else:
     from .meta import defaults
     Screen.get_position = ScreenTermInfo.get_position = (
         lambda *args, **kwargs: defaults.CURSOR_POS_FALLBACK
     )
-    #~ ScreenTermInfo.get_position = (
-        #~ lambda *args, **kwargs: defaults.CURSOR_POS_FALLBACK
-    #~ )
+
 
 # It's Automatic:  https://youtu.be/y5ybok6ZGXk
 if using_terminfo:
@@ -462,7 +457,5 @@ if using_terminfo:
     )
     _tparm = _curses.tparm
     sc = ScreenTermInfo()
-    print('loaded ScreenTermInfo.')
 else:
     sc = Screen()
-    print('loaded Screen.')

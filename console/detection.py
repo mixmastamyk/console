@@ -92,6 +92,7 @@ def init(using_terminfo=False, _stream=sys.stdout, _basic_palette=()):
                 - Are standard output streams wrapped by colorama on Windows?
 
         Arguments:
+            using_terminfo:     2B || !2B  # that is the question…
             _stream:            Which output file to check: stdout, stderr
             _basic_palette:     Force the platform-dependent 16 color palette,
                                 for testing.  Tuple of 16 rgb-int tuples.
@@ -118,7 +119,7 @@ def init(using_terminfo=False, _stream=sys.stdout, _basic_palette=()):
         if level is None:  # didn't occur, fall back to platform inspection
             level, color_sep = detect_terminal_level()
 
-        if level is TermLevel.ANSI_DIRECT:  # check for webcolors
+        if level >= TermLevel.ANSI_DIRECT:  # check for webcolors
             try: import webcolors
             except ImportError: pass
         log.debug(f'webcolors: {bool(webcolors)}')
@@ -241,7 +242,7 @@ def detect_terminal_level():
         f'Terminal level: {level.name!r} ({os_name}{"-wsl" if WSL else ""}, '
         f'TERM={TERM!r}, COLORTERM={env.COLORTERM.value!r}, '
         f'TERM_PROGRAM={env.TERM_PROGRAM.value!r}, '
-        f'color_sep={_color_sep!r}) '
+        f'color_sep={_color_sep!r}, source=console) '
     )
     return level, _color_sep
 
@@ -258,20 +259,15 @@ def detect_terminal_level_terminfo():
     level = TermLevel.DUMB
     _color_sep = None
     try:
-        # Even if curses is installed on Windows,
-        # it (pdcurses) doesn't currently support terminfo
-        if os_name == 'nt':
-            raise ModuleNotFoundError()
-        from curses import setupterm, tigetnum, tigetstr
+        from . import _curses
 
-        setupterm()
-        has_underline = tigetstr('smul')
+        has_underline = _curses.tigetstr('smul')
         if has_underline:   # This first test could be more granular,
                             # but it is so rare today we won't bother:
             if has_underline.startswith(bytes(CSI, 'ascii')):
                 level = TermLevel.ANSI_MONOCHROME
 
-            num_colors = tigetnum('colors')
+            num_colors = _curses.tigetnum('colors')
             log.debug('tigetnum("colors") = %s', num_colors)
             # -1 means not set, leaving level unchanged from above.
             if -1 < num_colors < 50:
@@ -288,7 +284,7 @@ def detect_terminal_level_terminfo():
 
             # finding color_sep is a bit problematic
             if level >= TermLevel.ANSI_EXTENDED:
-                setaf = (tigetstr('setaf') or b'').decode('ascii')
+                setaf = (_curses.tigetstr('setaf') or b'').decode('ascii')
                 # log.debug('tigetstr setaf: %r', setaf)
                 suffix = setaf.partition('38')[2]
                 if suffix:
@@ -297,11 +293,11 @@ def detect_terminal_level_terminfo():
         _color_sep = env.PY_CONSOLE_COLOR_SEP or _color_sep  # local override
         log.debug(
           f'Terminal level: {level.name!r} ({os_name}, '
-          f'TERM={env.TERM.value!r}, color_sep={_color_sep!r})'
+          f'TERM={env.TERM.value!r}, color_sep={_color_sep!r}, source=terminfo) '
         )
         return level, _color_sep
     except ModuleNotFoundError:
-        # Fall back early when remoting to Windows w/o curses
+        # Fall back early when remoting to Windows w/o curses/jinxed
         # TERM variable only clue:
         log.warn('terminfo not available.')
         return detect_terminal_level()
@@ -808,7 +804,7 @@ elif os_name == 'posix':  # Tron leotards
     pass
 
 else:  # Commodore/Amiga/Atari - The Wonder Computer of the 1980s :-D
-    log.warn('Unexpected OS: os.name: %s', os_name)
+    log.warning('Unexpected OS: os.name: %s', os_name)
 
 
 if __name__ == '__main__':
@@ -824,4 +820,5 @@ if __name__ == '__main__':
         fmt = '  %(levelname)-7.7s %(module)s/%(funcName)s:%(lineno)s %(message)s'
         logging.basicConfig(level=logging.DEBUG, format=fmt)
 
-    init()  # run again so detection gets logged
+    from . import using_terminfo as _using_terminfo
+    init(using_terminfo=_using_terminfo)  # run again so detection gets logged

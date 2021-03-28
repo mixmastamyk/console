@@ -3,7 +3,8 @@
     .. © 2020, Mike Miller - Released under the LGPL, version 3+.
 
     Convenience command-line interface script for select utility functions
-    and methods that don't have common implementations.
+    and methods that don't have common implementations,
+    such as tput.
     (Optional arguments may be shortened and are recognized when unique.)
 '''
 import sys, os
