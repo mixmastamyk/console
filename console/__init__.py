@@ -37,8 +37,9 @@ if _env.PY_CONSOLE_USE_TERMINFO.truthy or _env.SSH_CLIENT:
         try:
             import jinxed as _curses
         except ImportError:
-            raise ImportError('curses not available, try installing jinxed.')
-
+            raise ImportError(
+                'curses not available, try installing it or jinxed on Windows.'
+            )
     _curses.setupterm()
     using_terminfo = True
 

@@ -280,14 +280,6 @@ class Screen(_ContextMixin):
             Arguments:
                 force           - Force on.
         '''
-        #~ self = super().__new__(cls)
-
-        #~ if not force:
-            #~ if not _ansi_capable:
-                #~ from .disabled import empty_scr_bin
-                #~ # Makes new empties to deactivate completely:
-                #~ self = empty_scr_bin
-
         if _ansi_capable or force:
             self = super().__new__(cls)
         else:
