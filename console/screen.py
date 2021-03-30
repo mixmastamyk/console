@@ -4,10 +4,16 @@
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
 
     This module generates ANSI character codes to manage terminal screens and
-    move the cursor around.
+    move the cursor around, via a Screen class.
 
-    Note: the names on this module have changed from previous versions—
-    let me know if you need a compatibility class or similar.
+    For the cursor and view "move to" instruction,
+    Screen classes default to standard (x, y) coordinate order and also use
+    0-based locations as does Python curses.
+    This means the coordinates of the the ``cup`` and ``hvp`` instructions
+    will also have 1 added to each value on output.
+
+    If you'd prefer a (y, x) coordinate order as in the ANSI/Curses sequences,
+    pass the parameter swap=False on initialization.
 
     Context-managers with contextlib inspired by:
 
@@ -227,6 +233,20 @@ class Screen(_ContextMixin):
         while the NAME_TO_TERMINFO_MAP mapping defines easier to remember
         verbose names.
 
+        ScreenTermInfo defaults to standard (x, y) coordinate order and uses
+        0-based locations as does Python curses.
+
+        Example::
+
+            from console.screen import sc
+
+            >>> sc.move_to
+            '\x1b[%s;%sH'
+
+            >>> sc.move_to(3, 6)
+            '\x1b[7;4H'  # swapped and incremented to ANSI format.
+
+
         https://en.wikipedia.org/wiki/ANSI_escape_code#CSI_sequences
     '''
     # The class attributes below will be wrapped with a _TemplateString on init
@@ -242,7 +262,7 @@ class Screen(_ContextMixin):
     cup = ('H', '%s;%s')      # double trouble - move to pos
 
     vpa = 'd'  # cva?
-    hvp = ('f', '%s;%s')      # ""
+    hvp = ('f', '%s;%s')      # "", appears to move the view rather than cursor
 
     cht = 'I'
     ed  = 'J'    # clear, 1 from start, 2 whole, 3 scrollback
@@ -272,13 +292,13 @@ class Screen(_ContextMixin):
     rmcup = CSI + '?1049l'
 
 
-    def __new__(cls, force=False):
+    def __new__(cls, force=None, **kwargs):
         ''' Override new() to replace the class entirely on deactivation.
 
-            Complies with palette detection, unless force is on:
+            Complies with terminal level detection, unless force is on:
 
             Arguments:
-                force           - Force on.
+                force           - Force sequences on.
         '''
         if _ansi_capable or force:
             self = super().__new__(cls)
@@ -289,8 +309,16 @@ class Screen(_ContextMixin):
 
         return self
 
-    def __init__(self, stream=sys.stdout, force=None):
+    def __init__(self, stream=sys.stdout, swap=True, **kwargs):
+        '''
+            Arguments:
+                stream          - For context managers
+                swap            - Coordinate order, i.e. Given in:
+                                    True    # Standard order, needs swapping.
+                                    False   # ANSI/Curses format
+        '''
         self._stream = stream
+
         # look for attributes to wrap in a _TemplateString:
         for name in dir(self):
             if not name.startswith('_'):
@@ -300,21 +328,46 @@ class Screen(_ContextMixin):
                     attr = _TemplateString(value)
                     setattr(self, name, attr)
 
+                # only cup and hvp need to worry about coordinates:
                 elif type(value) is tuple:
-                    attr = _TemplateString(*value)
+                    attr = _TemplateString(*value, swap=swap)
                     setattr(self, name, attr)
 
     def __getattr__(self, attr):
         # when attr is *missing*, look in convenience map:
-        capability_name = NAME_TO_TERMINFO_MAP.get(attr)
-        if capability_name:
-            value = getattr(self, capability_name)
+        cap_name = NAME_TO_TERMINFO_MAP.get(attr)
+        if cap_name:
+            value = getattr(self, cap_name)
             setattr(self, attr, value)  # cache
             return value
         else:
             class_name = self.__class__.__name__
             msg = f'{class_name!r} object has no attribute {attr!r}'
             raise AttributeError(msg)
+
+
+class _TemplateString(str):
+    ''' A template string that renders itself with given or default args. '''
+    _default = 1
+
+    def __new__(cls, endcode, arg='%s', swap=None):
+        self = str.__new__(cls, CSI + arg + endcode)
+        self.endcode = endcode  # used in test
+        self._swap = swap
+        return self
+
+    def __call__(self, *args):
+        if len(args) == 2:
+            if self._swap:  # swap standard coordinate order backwards
+                args = args[::-1]
+            args = (args[0] + 1, args[1] + 1)  # use 1-based coordinate origin
+        return self % args
+
+    def __str__(self):
+        try:
+            return self % self._default  # default move 1 cell
+        except TypeError:
+            return self
 
 
 class ScreenTermInfo(_ContextMixin):
@@ -326,20 +379,24 @@ class ScreenTermInfo(_ContextMixin):
 
         This implementation uses Terminfo instead of hard-coded ANSI sequences.
 
+        ScreenTermInfo defaults to standard (x, y) coordinate order and uses
+        0-based locations as does Python curses.
+        Use swap=False to reverse that.
+
         Example::
 
-            sc.move_to
+            >>> sc.move_to
             '\x1b[%i%p1%d;%p2%dH'
 
-            >>> sc.move_to(3, 5)
-            '\x1b[4;6H'
+            >>> sc.move_to(3, 6)
+            '\x1b[7;4H'  # swap and incremented to ANSI format.
 
         https://en.wikipedia.org/wiki/Terminfo
     '''
-    def __new__(cls, force=False):
+    def __new__(cls, force=False, **kwargs):
         ''' Override new() to replace the class entirely on deactivation.
 
-            Complies with palette detection, unless force is on:
+            Complies with terminfo details, unless force is on:
 
             Arguments:
                 force           - Force on.
@@ -353,11 +410,16 @@ class ScreenTermInfo(_ContextMixin):
 
         return self
 
-    def __init__(self, stream=sys.stdout, force=None):
-        ''' Do not wrap up class members here as done in the Screen class.
-            Force is for __new__ unused here.
+    def __init__(self, stream=sys.stdout, swap=True, **kwargs):
+        '''
+            Arguments:
+                stream          - For context managers
+                swap            - Coordinate order, i.e. Given in:
+                                    True    # Standard order, needs swapping.
+                                    False   # ANSI/Curses format
         '''
         self._stream = stream
+        self._swap = swap
 
     def __getattr__(self, attr):
         # when attribute is *missing*
@@ -381,7 +443,7 @@ class ScreenTermInfo(_ContextMixin):
                 pass
             else:  # convert, cache, and return
                 if b'%' in value:  # tparm!
-                    value = _TemplateStringTermInfo(value)
+                    value = _TemplateStringTermInfo(value, swap=self._swap)
                 else:
                     value = value.decode('ascii')
 
@@ -397,33 +459,17 @@ class ScreenTermInfo(_ContextMixin):
 class _TemplateStringTermInfo(str):
     ''' A callable template string that renders itself with given args. '''
 
-    def __new__(cls, value):
+    def __new__(cls, value, swap=None):
         self = str.__new__(cls, value.decode('ascii'))  # as str
         self._byte_str = value  # orig as bytes
+        self._swap = swap
         return self
 
     def __call__(self, *args):
         ''' Run the tparm! '''
+        if len(args) == 2 and self._swap:
+            args = args[::-1]  # swap standard coordinate order backwards
         return _tparm(self._byte_str, *args).decode('ascii')  # to string
-
-
-class _TemplateString(str):
-    ''' A template string that renders itself with given or default args. '''
-    _default = 1
-
-    def __new__(cls, endcode, arg='%s'):
-        self = str.__new__(cls, CSI + arg + endcode)
-        self.endcode = endcode
-        return self
-
-    def __call__(self, *args):
-        return self % args
-
-    def __str__(self):
-        try:
-            return self % self._default  # default move 1 cell
-        except TypeError:
-            return self
 
 
 # Rather than define get_position() under Screen*,

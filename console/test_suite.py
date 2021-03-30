@@ -26,6 +26,7 @@ fx = style.EffectsPalette(level=TermLevel.THE_FULL_MONTY)
 ul = style.UnderlinePalette(level=TermLevel.THE_FULL_MONTY)
 defx = style.EffectsTerminator(level=TermLevel.THE_FULL_MONTY)
 sc = screen.Screen(force=True)
+scs = screen.Screen(force=True, swap=False)
 utils._ansi_capable = True
 
 fg, bg, fx, defx, ul, pytest  # pyflakes
@@ -366,8 +367,11 @@ if True:  # fold
     def test_screen_clearline():
         assert sc.clear_line(1) == CSI + '1K'
 
-    def test_screen_pos():
-        assert sc.move_to(20, 11) == CSI + '20;11H'  # y, x
+    def test_screen_pos_std():
+        assert sc.move_to(10, 20) == CSI + '21;11H'  # x, y  ->  y, x
+
+    def test_screen_pos_swapped():
+        assert scs.move_to(10, 20) == CSI + '11;21H'
 
     def test_screen_save_restore():
         assert repr(sc.enable_alt_screen) == "'\\x1b[?1049h'"
