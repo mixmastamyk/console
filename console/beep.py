@@ -11,7 +11,8 @@ from sys import stdout
 
 import env
 
-from console.detection import os_name, using_terminfo
+from . import using_terminfo
+from console.detection import os_name
 from console.constants import BEL
 from console.meta import version
 
@@ -66,7 +67,7 @@ if os_name == 'nt':             # I'm a PC
     beep = beep_windows
 
 else:
-    if using_terminfo():
+    if using_terminfo:
         import curses
         curses.initscr()
         beep = beep_curses

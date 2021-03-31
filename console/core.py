@@ -124,7 +124,6 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
     '''
     def __init__(self, downgrade_method='euclid', **kwargs):
         super().__init__(**kwargs)
-
         self._dg_method = downgrade_method
 
     def __getattr__(self, name):
