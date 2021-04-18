@@ -48,12 +48,16 @@ ANSI_RESET = CSI + '0m'
 # update several constants via terminfo, needs improvement
 if _using_terminfo:
     from . import _curses
-    BEL = _curses.tigetstr('bel')
-    BS = _curses.tigetstr('kbs')
-    CR = _curses.tigetstr('cr')
-    HT = _curses.tigetstr('ht')
-    LF = _curses.tigetstr('ind')
+    def _get_val(name, default):  # walrus >= 3.8
+        value = _curses.tigetstr(name)
+        return value.decode('ascii') if value else default
 
+    BEL = _get_val('bel', BEL)
+    BS = _get_val('kbs', BS)
+    CR = _get_val('cr', CR)
+    HT = _get_val('ht', HT)
+    LF = _get_val('ind', LF)
+    del _get_val
 
 # Mappings for xterm funcionality:
 _COLOR_CODE_MAP = dict(foreground='10', fg='10', background='11', bg='11')
