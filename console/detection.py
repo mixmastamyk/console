@@ -112,9 +112,13 @@ def init(using_terminfo=False, _stream=sys.stdout, _basic_palette=()):
         global color_sep  # makes available
 
         if using_terminfo:
-            level, color_sep = detect_terminal_level_terminfo()
-            if level >= TermLevel.ANSI_BASIC:
-                pal_name, _basic_palette = _find_basic_palette_from_term(env.TERM)
+            if (not env.PY_CONSOLE_AUTODETECT.truthy  # set via ssh, not manually
+                and env.LC_TERMINAL == 'iTerm2'):  # a recent iterm
+                level, color_sep = TermLevel.ANSI_DIRECT, ':'  # upgrayyed
+            else:
+                level, color_sep = detect_terminal_level_terminfo()
+                if level >= TermLevel.ANSI_BASIC:
+                    pal_name, _basic_palette = _find_basic_palette_from_term(env.TERM)
 
         if level is None:  # didn't occur, fall back to platform inspection
             level, color_sep = detect_terminal_level()
