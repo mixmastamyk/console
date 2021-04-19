@@ -44,8 +44,10 @@ if _env.PY_CONSOLE_USE_TERMINFO.truthy or _env.SSH_CLIENT:
         try:
             import jinxed as _curses
         except ImportError:
-            raise ImportError('terminfo not available, try installing ncurses.'
-                ' On Windows, install the package from PyPI named "jinxed".')
+            raise ImportError(
+                'terminfo not available, try installing ncurses.'
+                ' On Windows, install the package from PyPI named "jinxed".'
+            )
     _curses.setupterm()
     using_terminfo = True
 
