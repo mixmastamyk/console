@@ -33,13 +33,19 @@ except LookupError:
 if _env.PY_CONSOLE_USE_TERMINFO.truthy or _env.SSH_CLIENT:
     try:
         import curses as _curses
+        # a stub terminfo may have been installed with curses on windows, check
+        from os import name as _os_name
+        if _os_name == 'nt':
+            from _curses import tigetstr as _tigetstr
+            _curses.setupterm()
+            if not _tigetstr('cr'):  # supports carriage return
+                raise ImportError('this curses has a bum terminfo…')
     except ImportError:
         try:
             import jinxed as _curses
         except ImportError:
-            raise ImportError(
-                'curses not available, try installing it or jinxed on Windows.'
-            )
+            raise ImportError('terminfo not available, try installing ncurses.'
+                ' On Windows, install the package from PyPI named "jinxed".')
     _curses.setupterm()
     using_terminfo = True
 
