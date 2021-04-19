@@ -106,6 +106,7 @@ def init(using_terminfo=False, _stream=sys.stdout, _basic_palette=()):
     level = pal_name = webcolors = None
     log.debug('console package, version: %s', __version__)
     log.debug('os.name/sys.platform: %s/%s', os_name, sys.platform)
+    log.debug('using_terminfo: %s', using_terminfo)
 
     # find terminal capability level - given preferences and environment
     if color_is_forced() or (not color_is_disabled() and is_a_tty(stream=_stream)):
