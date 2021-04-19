@@ -52,8 +52,8 @@ if _env.PY_CONSOLE_USE_TERMINFO.truthy or _env.SSH_CLIENT:
     using_terminfo = True
 
 
-# defer imports for proper ordering
-from .constants import TermLevel as _TermLevel  # reads using_terminfo
+# defer imports for proper ordering, read using_terminfo
+from .constants import TermLevel as _TermLevel
 from .detection import TermStack
 
 
