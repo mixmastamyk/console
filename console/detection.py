@@ -661,7 +661,7 @@ def get_position(fallback=defaults.CURSOR_POS_FALLBACK):
             sys.stdout.flush()
             log.debug('about to read get_position response…')
             resp = _read_until_select(max_bytes=10, end='R')
-    except AttributeError:  # no .fileno()
+    except (AttributeError, OSError):  # no .fileno(), or ssh into Windows
         return fallback
 
     # parse response
@@ -774,7 +774,7 @@ def get_theme(timeout=defaults.READ_TIMEOUT):
 
 # Override default implementations
 
-if os_name == 'nt':  # I'm a PC
+if os_name == 'nt' and not env.SSH_CLIENT:  # I'm a PC
 
     from .windows import (
         detect_unicode_support,
