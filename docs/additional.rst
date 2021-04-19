@@ -57,7 +57,7 @@ there are a few public values,
 and ``using_terminfo``,
 to help in this case.
 
-The first is assigned to one of the members of the Enum shown below,
+``term_level`` is assigned to one of the members of the Enum shown below,
 the second is similar,
 but reduced to a boolean for simple comparisons.
 For example:
@@ -105,7 +105,6 @@ Operating System:
 
     - ``TERM`` - basic category of terminal, more info is often needed due to
       most terminals lying that they are an xterm.
-    - ``TERM_PROGRAM`` - for hints on what it supports
     - ``SSH_CLIENT`` - when remote, downgrade to terminfo detection, with
       potentially simpler support.
     - ``LANG`` - is Unicode available?
@@ -128,14 +127,16 @@ MacOS:
 
 Console itself:
 
-    - ``PY_CONSOLE_AUTODETECT`` - Disables automatic detection routines.
+    - ``PY_CONSOLE_AUTODETECT`` = (``'0'``, ``'1'``, …) -
+      Disables automatic detection routines.
 
-    - ``PY_CONSOLE_COLOR_SEP`` - The inner separator char for extended color
-      sequences.
-      Often ``:``, but may need to be changed to ``;`` under legacy terms.
+    - ``PY_CONSOLE_COLOR_SEP`` = (``':'``, ``';'``) -
+      The inner separator char for extended color sequences.
+      Often ``':'``, but may need to be changed to ``';'`` under most/legacy
+      terms.
 
-    - ``PY_CONSOLE_USE_TERMINFO`` - Enables terminfo lookup for many
-      capabilities.
+    - ``PY_CONSOLE_USE_TERMINFO`` = (``'0'``, ``'1'``, …) -
+      Enables terminfo lookup for many capabilities.
 
 
 Custom Initialization
@@ -175,7 +176,7 @@ one may build palette objects yourself:
 
 .. code-block:: shell
 
-    ⏵ env PY_CONSOLE_AUTODETECT='0' script.py
+    ⏵ env PY_CONSOLE_AUTODETECT=0 script.py
 
 .. code-block:: python
 
@@ -237,7 +238,7 @@ Entries:
     - Last but not least,
       can be rendered as an escape sequence string on any form of output.
 
-Similar functionality is available from
+Vaguely similar functionality is available from
 :mod:`console.screen`'s screen object.
 
 
@@ -328,7 +329,7 @@ See below for more.
 - ``sc.hidden_cursor()``
 - ``sc.location(x, y)``
 - ``sc.rare_mode()  # aka "cbreak mode"``
-- ``sc.raw_mode()``
+- ``sc.raw_mode() # keystrokes sent direct to program``
 
 
 .. rubric:: Fullscreen Apps, a la Blessings
@@ -401,7 +402,7 @@ Hello world looks like this:
     >>> from console.progress import ProgressBar
 
     >>> bar = ProgressBar()  # "Hey HEY, hey!"
-    >>> print(bar(50))       # out of 100
+    >>> print(bar(50))       # out of 0-99
 
 .. raw:: html
 
@@ -412,7 +413,7 @@ Hello world looks like this:
     </style>
     <pre style="margin-top: -13px; padding-top: .1em">
     <span class=g>
-    ▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮</span><span class=b>▯▯▯▯▯▯▯▯▯▯▯▯▯▯▯</span>  <span class=o>50%</span>
+    ▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮</span><span class=b>▯▯▯▯▯▯▯▯▯▯▯▯▯▯▯</span>  <span class=o>51%</span>
 
     </pre>
 
@@ -444,7 +445,8 @@ Some examples:
 
 (Windows console has very limited Unicode font support unfortunately,
 though Lucida Console is a bit more comprehensive than Consolas.
-ProgressBar defaults to an ASCII representation in that environment.)
+ProgressBar defaults to an ASCII representation in that environment.
+Use Win Terminal.)
 
 A more robust use of the modules is illustrated below::
 
@@ -606,6 +608,7 @@ and the word "dim":
     <c #b0b>deadbeefcafe</c>
     <c dim>text</c>
 
+Please don't use it 😉.
 
 .. rubric:: Viewing a file
 
@@ -636,7 +639,8 @@ able to be redirected outside the process:
 (This feature is experimental for now. ;-)
 
 
-.. rubric:: TermStack
+TermStack
+-------------------
 
 TermStack is a content-manager for making temporary modifications to the
 terminal via termios,
@@ -683,13 +687,13 @@ all sub-commands support help ``-h`` and verbose ``-v``:
     ──────────────────────────────────────────────────────
 
     # make a ctrl-clickable link in supporting terminals
-    ⏵ console link http://example.com/ "Klicken-Sie hier!"
+    ⏵ console link http://example.com/  --message "Klicken-Sie hier!"
     Klicken-Sie hier!
 
-    ⏵ console ascii         # A four-column chart, -l for links!
+    ⏵ console ascii [-l]    # A four-column chart, -l for links!
     ⏵ console beep          # bidi-bidi-bidi…
     ⏵ console detect [-v]   # prints term level and environ. info
-    ⏵ console flash         # Bam!
+    ⏵ console flash         # Bam… What?!?
     ⏵ console pause         # Press any key to continue…
     ⏵ console progress      # show a progress bar
     ⏵ console view [file]   # view a file, e.g.: foo.html
@@ -741,7 +745,8 @@ Tips
   keep in mind that some folks will have dark backgrounds and some light---\
   which could make your fancy colors unreadable.
 
-  Make two themes preferably and check the background via
+  For that reason,
+  make two themes preferably and check the background via
   ``detection.get_theme()``.
   This is one strategy,
   though not available on every terminal.
@@ -770,6 +775,8 @@ Tips
     >>> cw.enable_vt_processing()  # status for (stdout, stderr)
     (0, 0)
 
+  Not sure this is needed any longer.
+
 
 Troubleshooting
 ------------------
@@ -783,7 +790,7 @@ Troubleshooting
 
     .. code-block:: shell
 
-            ⏵ python -m console.detection
+            ⏵ python3 -m console.detection
 
   - Note: This could *momentarily* hang obscure terminals that advertise xterm
     on posix compatibility without a full implementation.
@@ -850,12 +857,13 @@ Troubleshooting
     # create a new anonymous style, apply it:
     (pal.style1 + pal.style2)(msg)
 
-    # or add it in via a "mixin" style
+    # or add the second as a "mixin" style
     pal.style2(msg, pal.style1)
 
-You could also wrap it around,
-in call form,
-but these will be more efficient.
+.. ~ You could also wrap it around,
+.. ~ in call form,
+.. ~ but these will be more efficient.
+
 
 Deeper Dive
 ------------
@@ -874,6 +882,8 @@ be found below:
     - `ANSI Terminal Animations
       <http://artscene.textfiles.com/vt100/>`_ - Get busy!
     - :mod:`console` source code
+
+|
 
 .. rubric:: Aside - Warm Colors
 
@@ -898,12 +908,12 @@ Interesting knowledge rediscovered perhaps.
     .. ~ ---Jack Palance, on `Ripley's <https://youtu.be/o4ELw6kCEDs>`_
         .. ~ allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
 
-    ---Jack Palance, on `Ripley's <https://youtu.be/HVT3kOxqStA>`_
+    ---Jack Palance, on `Ripley's <https://youtu.be/g3QX5ZXXhi0>`_
 
 .. raw:: html
 
     <iframe width="50%" height="auto" frameborder="0" class="mt mb"
-        src="https://www.youtube.com/embed/HVT3kOxqStA"
+        src="https://www.youtube.com/embed/g3QX5ZXXhi0"
         allowfullscreen>
     </iframe>
 
@@ -924,26 +934,26 @@ Interesting knowledge rediscovered perhaps.
     :figwidth: 40%
 
     *"I'm B. J. McKay,*
-    *and this is my best friend Bear."*
+    *and this is my best friend Bear." ♫*
     `🖺 <https://www.memorabletv.com/tv/b-j-bear-nbc-1979-1981-greg-evigan-claude-akins/>`_
     `🖹 <http://www.lyricsondemand.com/tvthemes/bjandthebearlyrics.html>`_
 
 |
 
-Signing off from late '79.
+Signing off from late '79…
+
+- *Keep On Truckin'*
+- *Catch you on the flip-side!*
+- *"This is Ripley, last survivor of the Nostromo, signing off."*
+- *Good night, John-boy*
+
+and…
+
+- *Whoah-oh Woah…*
+  `Goodbye Seventies <https://www.youtube.com/watch?v=yFimHGt2Nco>`_
+
 A new futuristic decade awaits,
 with an actor as President!
-
-    - *Keep On Truckin'*
-    - *Catch you on the flip-side!*
-    - *"This is Ripley, last survivor of the Nostromo, signing off."*
-    - *Good night, John-boy*
-
-    and…
-
-    - *Whoah-oh Woah…*
-
-            `Goodbye Seventies… <https://www.youtube.com/watch?v=yFimHGt2Nco>`_
 
 |br-all|
 
@@ -980,6 +990,7 @@ with an actor as President!
     </div>
 
     <pre id=dest style="color: #6bc; background: #111; min-height: 26em">
+
     LOGON: </pre>
 
     <script type="text/javascript">

@@ -54,9 +54,9 @@ Background
 So ANSI escape codes for terminals have been standard on UNIX
 with the belt-and-suspenders crowd since the late seventies,
 and even saw use on DOS, VMS, the Amiga, and BBSs back in the day.
-With the advent of macOS X (ten),
+With the advent of macOS (aka X or ten),
 a whole new generation of lumber-sexuals have exposed themselves(?)
-to the terminal environment, command-line shells…
+to the terminal environment/command-line shells…
 *and liked it*.
  🤔
 
@@ -166,14 +166,14 @@ this classic answer to this problem also suffers in that it is:
 
 Turns out that terminfo is a big pain in the butt and not even a full solution
 for all the trouble.
-The console package has implemented some support.
-Use ``import console.terminfo`` first thing or
-set ``PY_CONSOLE_USE_TERMINFO=1`` to try it out.
+The console package has implemented support,
+although it is new.
+Set the environment variable, ``PY_CONSOLE_USE_TERMINFO=1`` to try it out.
 
 However, generally the local detection should work fine on common terminal
 emulators.
-console will default to terminfo if it sees that the terminal is remote via an
-SSH connection,
+console will default to using terminfo if it sees that the terminal is remote
+via an SSH connection,
 or the above environment variable has been set.
 
 
@@ -216,7 +216,7 @@ Unfortunately,
 one or more important items are often missing:
 
     - Styles, cursor movements, clearing the screen,
-      setting titles, bracketed paste, full-screen, etc.
+      setting titles, hyperlinks, full-screen, etc.
 
     - Multiple Palettes:
 

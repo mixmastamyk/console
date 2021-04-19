@@ -413,6 +413,7 @@ some of which may be installed automatically if needed:
 
     colorama              # Needed for: Windows Version < 10
     win_unicode_console   # Useful: for Win Python < 3.6
+    jinxed                # terminfo, for SSH *into* Windows
 
 
 Jah!
@@ -440,16 +441,19 @@ Der ``console`` package has recently been tested on:
   - Very occasionally on kitty, guake
 
 - FreeBSD 11 - Python 3.7
+- MacOS 11.2 - Python 3.8
 - MacOS 10.13 - Python 3.6
 
   - Terminal.app, iTerm2
 
-- Windows XP - Python 3.4 - 32 bit + colorama, ansicon
-- Windows 7 - Python 3.6 - 32 bit + colorama
 - Windows 10 - Python 3.7 - 64bit
 
   - Conhost, WSL, Windows Terminal
 
+Not so recently:
+
+- Windows XP - Python 3.4 - 32 bit + colorama, ansicon
+- Windows 7 - Python 3.6 - 32 bit + colorama
 
 ::
 
@@ -613,7 +617,9 @@ tests can be run from the install folder.
 
     ⏵ pytest -s
 
-The Makefile in the repo at github has more details on such topics.
+The Makefile in the repo
+`at github <https://github.com/mixmastamyk/console>`_
+has more details on such topics.
 
 
 Wrapping Up
