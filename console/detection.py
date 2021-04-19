@@ -113,8 +113,9 @@ def init(using_terminfo=False, _stream=sys.stdout, _basic_palette=()):
         global color_sep  # makes available
 
         if using_terminfo:
-            if (not env.PY_CONSOLE_AUTODETECT.truthy  # set via ssh, not manually
+            if (not env.PY_CONSOLE_USE_TERMINFO.truthy  # set via ssh, not manually
                 and env.LC_TERMINAL == 'iTerm2'):  # a recent iterm
+                log.debug('ssh under iTerm2, skipping detect_terminal_level.')
                 level, color_sep = TermLevel.ANSI_DIRECT, ':'  # upgrayyed
             else:
                 level, color_sep = detect_terminal_level_terminfo()
