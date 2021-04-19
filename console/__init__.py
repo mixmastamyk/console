@@ -29,7 +29,7 @@ except LookupError:
     _codecs.register(_codec_map.get)
 
 
-# Experimental terminfo support, under construction  :-)
+# Early terminfo support
 if _env.PY_CONSOLE_USE_TERMINFO.truthy or _env.SSH_CLIENT:
     try:
         import curses as _curses

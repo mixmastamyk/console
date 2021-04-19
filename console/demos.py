@@ -275,7 +275,7 @@ if __name__ == '__main__':
     from .detection import detect_unicode_support
     from . import style
 
-    init()
+    init(using_terminfo=os.environ.get('PY_CONSOLE_USE_TERMINFO') == "1")
     detect_unicode_support()
     fg = style.ForegroundPalette()
     bg = style.BackgroundPalette()
