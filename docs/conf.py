@@ -176,6 +176,10 @@ todo_include_todos = True
 
 
 rst_prolog = u'''
+.. |br| raw:: html
+
+    <br>
+
 .. |br-all| raw:: html
 
     <br style="clear: both"/>

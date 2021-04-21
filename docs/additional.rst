@@ -46,6 +46,11 @@ Additional Topics
 Automatic Detection
 ------------------------
 
+.. figure:: _static/fembot.jpg
+    :align: right
+    :figwidth: 40%
+
+
 Console takes a look at its environment at start up time (see below).
 This allows it to decide automatically what level of ANSI the terminal supports.
 
@@ -66,12 +71,12 @@ For example:
 
     # console.constants
     class TermLevel(IntEnum):
-        DUMB            = 0     # Stream/not a tty, disabled, or ASCII teleprinter
-        ANSI_MONOCHROME = 1     # Text effects but no color, e.g. vt220
-        ANSI_BASIC      = 2     # + 3,4 Bit, 8/16 indexed colors
-        ANSI_EXTENDED   = 3     # + 8 bit, 256 indexed colors
-        ANSI_DIRECT     = 4     # + 24 bit, 16m direct colors, aka "true"
-        THE_FULL_MONTY  = 9     # + Bleeding edge (not yet a determining factor)
+        DUMB            = 0   # Stream, disabled, or ASCII teleprinter
+        ANSI_MONOCHROME = 1   # Text effects but no color, e.g. vt220
+        ANSI_BASIC      = 2   # + 3,4 Bit, 8/16 indexed colors
+        ANSI_EXTENDED   = 3   # + 8 bit, 256 indexed colors
+        ANSI_DIRECT     = 4   # + 24 bit, 16m direct colors, aka "true"
+        THE_FULL_MONTY  = 9   # + Bleeding edge (not yet a factor)
 
 .. code-block:: python
 
@@ -142,7 +147,12 @@ Console itself:
 Custom Initialization
 ------------------------
 
-    *"I hope you know this violates my warranty!"—Twiki*
+.. figure:: _static/twiki_cosmic.jpg
+    :align: left
+    :figwidth: 40%
+
+    *"I hope you know this violates my warranty!"—Twiki*\ |br|
+    *(and Fox)*
 
 
 On terminals advertising xterm compatibility (though incomplete) color
@@ -246,6 +256,10 @@ Palette Downgrade
 ----------------------
 
     *"Get down, boogie oogie oogie…"—A Taste of Honey*
+
+.. figure:: _static/get_down.jpg
+    :align: right
+    :figwidth: 40%
 
 When using true or extended colors on a terminal that is not configured to
 support it,
@@ -489,7 +503,11 @@ See the docs (:mod:`console.progress`) and source for more details.
 Experimental Stuff
 -------------------
 
-    *“Well, kiss my grits!”—Flo*
+.. figure:: _static/logan_proc33.jpg
+    :align: right
+    :figwidth: 60%
+
+    *Permission granted to penetrate city seals.*
 
 
 Hyperlinks
@@ -551,6 +569,9 @@ in addition to the standard ``fx.u(…)``:
 HTML Viewers
 ~~~~~~~~~~~~~~~~~~~
 
+    *“Well, kiss my grits!”—Flo*
+
+
 Would you like to print some rich text to the terminal,
 but would rather put styles inline and not have to fiddle with objects?
 Maybe you have some existing HTML laying around?
@@ -570,19 +591,21 @@ but has quite a few features,
 collapses whitespace,
 and converts entities:
 
-- a *(see above)*
-- br *(+newline)*
-- b, strong
-- blockquote
-- hr *(+newlines)*
-- h1, h2, h3 *(+newlines)*
-- i, em
-- p *(+newlines)*
-- q "fancy quotes"
-- span
-- s, strike
-- u
-- ul, ol, li
+.. hlist::
+
+    - a *(see above)*
+    - br *(+newline)*
+    - b, strong
+    - blockquote
+    - hr *(+newlines)*
+    - h1, h2, h3 *(+newlines)*
+    - i, em
+    - p *(+newlines)*
+    - q "fancy quotes"
+    - span
+    - s, strike
+    - u
+    - ul, ol, li
 
 It handles a few inline style attributes as well:
 
@@ -731,8 +754,15 @@ e.g. on Windows or Arch Linux.
 Tips
 ------------
 
+.. figure:: _static/super_formula.jpg
+  :align: right
+  :figwidth: 50%
+
+..
+
     | *"Easy Miss, I’ve got you."*
-    | *"You’ve got ME? Who’s got YOU?"—Superman*
+    | *"You’ve got ME? Who’s got YOU?"*
+    | *—Superman*
 
 - The styles bold, italic, underline, and strike have one-letter shortcuts as
   they do in HTML,
@@ -783,6 +813,13 @@ Troubleshooting
 
     *"Goddammit, I'd piss on a spark plug if I thought it'd do any good!"—General Beringer*
 
+
+.. figure:: _static/logan_bad_input.jpg
+  :align: right
+  :figwidth: 60%
+
+  *There is no Sanctuary!*
+
 - Console performs auto-detection of the environment at startup to determine
   terminal capabilities.
 
@@ -801,6 +838,10 @@ Troubleshooting
     you'll now have to create the palette and screen objects
     (and possibly configure them)
     yourself.
+
+  .. figure:: _static/banner_debug.jpg
+      :align: right
+      :figwidth: 40%
 
 - Another way to do the same thing in your own program.
 
@@ -827,11 +868,17 @@ Troubleshooting
     )
 
 
+.. figure:: _static/ihulk_term.jpg
+    :align: center
+    :figwidth: 60%
+
+
 - Try to avoid this type of ambiguous addition operation:
 
   .. code-block:: python
 
     fg.white + bg.red('Hello\nWorld')
+
 
   Why is it ambiguous?
   Well, the left operand is a palette entry object,
@@ -842,6 +889,10 @@ Troubleshooting
   Also, what about the ending sequence?
   Should it reset the foreground, background, styles, or everything?
   Hard to know because there's not enough information here to decide.
+
+  .. figure:: _static/logan_kaboom.jpg
+      :align: center
+      :figwidth: 80%
 
   Console warns you about this.
   It also does its best to divvy up the second object (string),
@@ -953,10 +1004,16 @@ and…
   `Goodbye Seventies <https://www.youtube.com/watch?v=yFimHGt2Nco>`_
 
 A new futuristic decade awaits,
-with an actor as President!
+with…
+
+an actor as President.
+
+*No way!*
+
 
 |br-all|
 
+|
 
 .. raw:: html
 

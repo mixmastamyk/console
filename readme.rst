@@ -47,11 +47,14 @@ It's a piece of cake.
 ␛\ [1;3m *Hello World* ␛\ [0m
 ----------------------------------------------------------
 
+
 There are many flexible ways to use console's styling functionality.
-Most simply, adding a little color with console might look like this.
-First, import the styling palettes and go to town.
-The palette entries (aka attributes) can be used in place of strings and handle
-everything a string might:
+Adding a little color with console might look like one of the snippets below.
+Simply, import the styling palettes and go to town.
+
+The entries (or attributes in Python lingo) of each palette can be used in
+place of strings and handle everything a string might.
+For example:
 
 .. code-block:: python
 
@@ -74,7 +77,7 @@ FYI, the string  ``'\x1b'`` represents the ASCII Escape character
 (``27`` in decimal, ``1b`` hex).
 Command ``[32m`` turns the text green
 and ``[39m`` back to the default color.
-But, there's no need to worry about any of that.
+But, there's no need to worry about any of that gobbledy-gook.
 That's why you're here, right?
 
 
@@ -90,6 +93,7 @@ That's why you're here, right?
 
 **Call() Form**
 
+
 Above, ``fx.end`` is a convenient object to note---\
 it ends all styles and fore/background colors at once,
 where as ``fg.default`` or ``bg.default`` for example,
@@ -102,11 +106,11 @@ where
 
 .. code-block:: python
 
-    >>> fg.yellow('Far Out!')  # <-- ends fg color only
+    >>> fg.yellow('Far Out!')  # ◂ ends fg-color only
     '\x1b[33mFar Out!\x1b[39m'
 
-    >>> fx.italic('Up your nose with a rubber hose!')  # italic only
-    '\x1b[3mUp your nose with a rubber hose!\x1b[23m'
+    >>> fx.italic('Up ya nose with a rubber hose!')  # ◂ ends italic
+    '\x1b[3mUp ya nose with a rubber hose!\x1b[23m'
 
 This is neat because call-form will end specific colors/styles and not
 interfere with others.
@@ -119,9 +123,9 @@ if your terminal supports it):
 .. code-block:: python
 
     >>> from console.viewers import hprint as print
-    >>> print('<i>Hello <b>World!</b> ;-)</i>')
+    >>> print('<i>Hello <b>Woirld!</b> ;-)</i>')
 
-    *Hello World! ;-)*  # 😉
+    *Hello Woirld! ;-)*  # 😉
 
 
 But there's a shitload,^H^H^H^H^H, crap-ton,^H^H^H^H^H
@@ -534,10 +538,13 @@ Wrapping Up
 ----------------
 
 
+With a brand-new new sound called *hip hop.*
+
+
 Contributions
 ~~~~~~~~~~~~~~~~
 
-    *"Use the Source, Luke!"—'Ben' Kenobi*
+*"Use the Source, Luke!"—'Ben' Kenobi*
 
 Could use some help testing on Windows and MacOS as my daily driver is a 🐧 Tux
 racer.

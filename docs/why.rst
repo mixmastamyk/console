@@ -24,6 +24,7 @@ Another One, eh 🤔?
 
     *"First I was afraid, I was petrified…"—Gloria Gaynor*
 
+
 .. raw:: html
 
 
@@ -46,6 +47,7 @@ Another One, eh 🤔?
     </pre>
 
 
+
 Background
 ---------------
 
@@ -54,8 +56,8 @@ Background
 So ANSI escape codes for terminals have been standard on UNIX
 with the belt-and-suspenders crowd since the late seventies,
 and even saw use on DOS, VMS, the Amiga, and BBSs back in the day.
-With the advent of macOS (aka X or ten),
-a whole new generation of lumber-sexuals have exposed themselves(?)
+With the advent of macOS,
+a whole new generation of lumber-sexuals have exposed *themselves(?)*
 to the terminal environment/command-line shells…
 *and liked it*.
  🤔
@@ -63,6 +65,7 @@ to the terminal environment/command-line shells…
 .. figure:: _static/dilbert_95-06-24.png
     :align: center
     :figwidth: 80%
+    :class: o8
 
     Dilbert, desde `1995-06-24 <https://dilbert.com/strip/1995-06-24>`_
 
@@ -73,7 +76,15 @@ to the terminal environment/command-line shells…
     *“Oooh! Oooh! Oooh!”—Arnold Horshack*\
     `† <https://www.vulture.com/2012/08/why-welcome-back-kotters-horshack-mattered.html>`_
 
-Not on Windows NT, though.
+.. figure:: _static/mac_pc.jpg
+    :align: right
+    :figwidth: 40%
+    :class: o8
+
+
+Not on Windows NT, though.  Big nopity-nope in that department—\
+negatory.
+
 Amazingly,
 with recent versions of Windows 10
 the Ballmer/Suit barrier was finally breached,
@@ -83,19 +94,22 @@ allowing *multi-decade-late*
 to be made to its until-now pathetic "console."
 Often still known as the "DOS Prompt" since it has been frozen that long.
 Vaguely analogous to today's virtual terminals,
-as a Yugo might compare to a classic BMW.
+as an AMC Gremlin, Pacer, or Ford Pinto might compare to a BMW.
 But now, it's supercharged with VT power.
 But, don't bother with it, it's kind of a waste of time.
 
-Why?
-Now that `Windows Terminal <https://en.wikipedia.org/wiki/Windows_Terminal>`_
+Huh, why?
+Well,
+now that `Windows Terminal <https://en.wikipedia.org/wiki/Windows_Terminal>`_
 exists, I'd recommend that instead 1000%.
 Even though not currently complete,
 it is getting there quickly and much better than a "souped up Yugo."
 
-So, now all the top/extant platforms support ANSI escape sequences, again!
+So, now all the top/extant computing platforms support ANSI escape sequences,
+again!
 What's old is new… err, again.
-Add in Unicode and millions of colors and it's now better than ever.
+Add in Unicode, hyperlinks,
+and millions of colors and it's now better than ever.
 
 We need great command-line/TUI tools and that's where ``console`` fits in.
 
@@ -134,9 +148,14 @@ while continuing to abstract hardware that now only exists in
 The ANSI standard may have won,
 but styling a text snippet here and there or setting a title without a bunch
 of ugly C-style function calls was thought too…
-trivial perhaps.
+trivial perhaps?
 
 .. rubric:: Terminfo?
+
+.. figure:: _static/logan_unacceptable.jpg
+    :align: right
+    :figwidth: 60%
+
 
 Besides the difficulty factor mentioned,
 this classic answer to this problem also suffers in that it is:
@@ -147,13 +166,13 @@ this classic answer to this problem also suffers in that it is:
 
 - Not up to date with capability support, i.e. lags the real world:
 
+    - Tons of obsolete capabilities *are* supported, crowding the docs
+
     - "True color," lagged for almost a decade (though now has some support)
 
-    - Extended xterm capabilities not fully supported
+    - Extended xterm capabilities not supported
 
     - Many terminals claim xterm support but aren't completely compatible
-
-    - Tons of obsolete capabilities are supported, crowding the docs
 
     - New or experimental capabilities are *not* supported, eg:
 
@@ -162,19 +181,19 @@ this classic answer to this problem also suffers in that it is:
         - Curly/colored underlines
         - Hyper-links
 
-      (And the maintainers have been resistant to add them.)
+      (And the maintainers have been resistant to add them. :-/)
 
 Turns out that terminfo is a big pain in the butt and not even a full solution
 for all the trouble.
-The console package has implemented support,
+The console package has implemented support however,
 although it is new.
 Set the environment variable, ``PY_CONSOLE_USE_TERMINFO=1`` to try it out.
 
-However, generally the local detection should work fine on common terminal
+However, generally the standard detection should work fine on common terminal
 emulators.
 console will default to using terminfo if it sees that the terminal is remote
 via an SSH connection,
-or the above environment variable has been set.
+or if the above environment variable has been set.
 
 
 Meanwhile, over at the Cheeseshop…
@@ -212,6 +231,12 @@ areas of focus,
 they generally aren't very comprehensive──\
 usually providing 8 colors
 and a few styles/effects like bold and underline.
+
+.. figure:: _static/irac_05.jpg
+    :align: right
+    :figwidth: 50%
+
+
 Unfortunately,
 one or more important items are often missing:
 
@@ -252,12 +277,23 @@ but may still miss one of these nice to haves:
     - Hyperlinks
 
 
-.. rubric:: Result
+Result: The Console Package
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. figure:: _static/irac_01.jpg
+    :align: center
+    :figwidth: 80%
+
+    Diana @ The IRAC-Z Console
+
 
 Looking over at PyPI with the criteria above finds many interesting pieces but
 far from the full Monty.
 So, had some fun building my own of course.
 Looked at and picked out a few design cues from several of these:
+
+.. hlist::
+    :columns: 2
 
     - ansi
     - ansicolors
@@ -266,7 +302,7 @@ Looked at and picked out a few design cues from several of these:
     - click.style and utilities (reminded me of pause)
     - colorama.ansi (palette collection objects)
     - `colorful <https://tuxtimo.me/posts/colorful-python>`_
-      (why terminfo is a bust)
+        (why terminfo is a bust)
     - colorize
     - escape
     - fabric.colors
@@ -276,7 +312,9 @@ Looked at and picked out a few design cues from several of these:
     - style
     - termcolor
     - ptpython, urwid
-    - rich
-    - tqdm
+    - rich - text
+    - tqdm - progress
 
 etc.
+Have thought about doing a widget library as well,
+but feels like it should be another package layered on top.

@@ -149,6 +149,9 @@ code, span.pre  {
 .dark {
     background: #080808;
 }
+.o8 {
+    opacity: .8
+}
 /*
     syntax highlighting
 */
