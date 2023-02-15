@@ -6,6 +6,9 @@
     This module contains capability detection routines for use under ANSI
     compatible terminals.  Most functions return None when not able to detect
     requested information.
+
+    TODO:
+        get_color is run under redirection... it shouldn't.
 '''
 import sys, os
 import logging

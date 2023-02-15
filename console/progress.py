@@ -24,7 +24,7 @@ from .detection import detect_unicode_support, get_size, os_name
 from .disabled import empty as _empty
 from .utils import len_stripped, notify_progress
 
-DEF_TOTAL = 99
+DEF_TOTAL = 100
 DEF_WIDTH = 32
 MIN_WIDTH = 12
 TIMEDELTAS = (60, 300)  # accuracy thresholds, in seconds, one and five minutes
@@ -181,7 +181,6 @@ class ProgressBar:
     ''' A stylable bar graph for displaying the current progress of task
         completion.
 
-        ProgressBar is 0-based, i.e. think 0-99 rather than 1-100
         The execution flows like this:
 
             - __init__()
@@ -227,7 +226,7 @@ class ProgressBar:
             iterable: object        An object to iterate on.
             label_mode:  True       Enable progress percentage label
             oob_error:  False       Out of bounds error occurred
-            total:  99              Set the total number of items
+            total:  100             Set the total number of items
             unicode_support: bool   Detection result, determines default icons
             width: 32               Full width of bar, padding, and labels
 
@@ -599,12 +598,10 @@ def progress(value: float,
             debug: None             Enable debug output
             expand: False           Set width to full terminal width
             label_mode:  True       Enable progress percentage label
-            total:  99              Set the total number of items
+            total:  100             Set the total number of items
             width: 32               Full width of bar, padding, and labels
 
         Note:
-            The value parameter is 0-based, therefore think 0-99,
-            rather than 1-100.
             If you'd like value to signify a percentage instead,
             pass ``--total 100`` or other round number as well.
 
@@ -665,7 +662,7 @@ if __name__ == '__main__':
 
     with sc.hidden_cursor():
         try:
-            for i in range(100):
+            for i in range(101):
                 print()
                 for label, bar in bars:
                     print(f' {label:12}', bar(i), sep='')

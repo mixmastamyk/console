@@ -507,7 +507,7 @@ Experimental Stuff
     :align: right
     :figwidth: 60%
 
-    *Permission granted to penetrate city seals.*
+    ESC *"Permission granted to penetrate city seals."*
 
 
 Hyperlinks
