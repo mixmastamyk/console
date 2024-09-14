@@ -1,5 +1,6 @@
 '''
-    .. © 2018-2020, Mike Miller - Released under the LGPL, version 3+.
+    .. console - Comprehensive utility library for ANSI terminals.
+    .. © 2018-2025, Mike Miller - Released under the LGPL, version 3+.
 
     Project metadata is specified here.
 

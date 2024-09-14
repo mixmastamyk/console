@@ -1,6 +1,6 @@
 '''
     .. console - Comprehensive utility library for ANSI terminals.
-    .. © 2018, Mike Miller - Released under the LGPL, version 3+.
+    .. © 2018-2025, Mike Miller - Released under the LGPL, version 3+.
 
     Complicated gobbyldegook supporting the simple color/style interface
     located here.
@@ -358,7 +358,7 @@ class _LineWriter(object):
             bytes_written = 0
             for line in data.splitlines(True):  # keep ends: True
                 end = ''
-                if line.endswith('\n'):  # mv nl to end:
+                if line.endswith('\n'):  # mv nl to end of output below:
                     line = line[:-1]
                     end = '\n'
                 bytes_written += self.stream.write(

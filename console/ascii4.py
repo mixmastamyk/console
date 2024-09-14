@@ -1,5 +1,8 @@
 '''
-    ascii4 - "Þe Auld" Four-Column ASCII Table, FTW!
+    .. console - Comprehensive utility library for ANSI terminals.
+    .. © 2018-2025, Mike Miller - Released under the LGPL, version 3+.
+
+    ascii4 - "Þe Auld" Four-Column ASCII Table FTW!
 '''
 from console import fg, bg, fx, defx
 from console.detection import get_theme
@@ -89,6 +92,7 @@ index_table = (
 
 
 ctrl_symbols = (
+    # bin     symbols     Wikipedia page
     ('00000', 'NUL', '␀', 'Null_character'),
     ('00001', 'SOH', '␁', 'C0_and_C1_control_codes#SOH'),
     ('00010', 'STX', '␂', 'C0_and_C1_control_codes#STX'),
@@ -161,13 +165,14 @@ def print_ascii_chart(
             evn_bg_clr = str(bg.i255)
             odd_bg_clr = str(bg.i253)
             hdr_style = bg.i253 + fx.italic
+        title_style = dec_clr + fx.bold
 
         if headers:
             ASCII = 'ASCII'
             if link:
                 ASCII = make_hyperlink(_wp_base_url + 'ASCII', ASCII)
             print('\n                       ',
-                fx.bold(f'Four-Column Grouped {ASCII} Table'), '\n'
+                title_style(f'Four-Column Grouped {ASCII} Table'), '\n'
             )
             Bin = bin_clr('Bin')
             Dc = dec_clr('Dc')

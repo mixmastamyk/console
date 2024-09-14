@@ -1,6 +1,6 @@
 '''
     .. console - Comprehensive utility library for ANSI terminals.
-    .. © 2020, Mike Miller - Released under the LGPL, version 3+.
+    .. © 2018-2025, Mike Miller - Released under the LGPL, version 3+.
 
     An EXPERIMENTAL module containing an HTML to ANSI sequence converter.
     It supports quick rich-text in scripting applications for those familiar

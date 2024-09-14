@@ -1,6 +1,6 @@
 '''
     | console - Comprehensive utility library for ANSI terminals.
-    | © 2018-2021, Mike Miller - Released under the LGPL, version 3+.
+    | © 2018-2025, Mike Miller - Released under the LGPL, version 3+.
 '''
 from .disabled import empty_bin as _empty_bin, empty_scr_bin as _empty_scr_bin
 

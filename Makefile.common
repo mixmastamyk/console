@@ -17,12 +17,13 @@ common_file := $(wildcard ../Makefile.common ../../Makefile.common)
 prj_pattern := full_name # <-- extra space at end
 ver_pattern := version # <-- extra space at end
 ver_file := */meta.py
-grep := $(wildcard /bin/grep /usr/bin/grep)  # portability
+# wildcard for portability.  No longer works because both are found on Ubuntu:
+#~ grep := $(wildcard /bin/grep /usr/bin/grep)
 
 # live variables, expanded on use:
-prj_name = $(shell ${grep} "${prj_pattern}" ${ver_file} | cut -d "'" -f 2)
+prj_name = $(shell /usr/bin/grep "${prj_pattern}" ${ver_file} | cut -d "'" -f 2)
 prj_width = $(shell expr $(target_width) - 2)
-version = $(shell ${grep} "${ver_pattern}" ${ver_file} | cut -d "'" -f 2)
+version = $(shell /usr/bin/grep "${ver_pattern}" ${ver_file} | cut -d "'" -f 2)
 
 
 # Default action is to update the local copy of Makefile.common,

@@ -1,6 +1,6 @@
 '''
-    .. console - Comprehensive ANSI sequence utility library for terminals.
-    .. © 2018, Mike Miller - Released under the LGPL, version 3+.
+    .. console - Comprehensive utility library for ANSI terminals.
+    .. © 2018-2025, Mike Miller - Released under the LGPL, version 3+.
 
     Testen-Sie, bitte.  Supported under Linux with a libvte terminal.
 '''

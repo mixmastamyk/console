@@ -1,3 +1,4 @@
+# Console Makefile
 
 include Makefile.common
 
@@ -41,7 +42,7 @@ publish: publish-default
 
 
 test:  ## Test suite
-	-pyflakes *.py */*.py console/console; \
+	-pyflakes *.py */*.py ; \
 		if [ $$? -ne 0 ] ; then sleep 3 ; fi
 	tput reset  # clear screen, scrollback
 	pytest --color=no --showlocals --verbose

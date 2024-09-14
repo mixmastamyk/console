@@ -9,8 +9,6 @@ from os.path import dirname, join
 from setuptools import setup
 
 # avoid starting console detection:
-# import imp
-# meta = imp.load_source('meta', 'console/meta.py')
 from importlib import import_module
 meta = import_module('console.meta')
 

@@ -1,6 +1,6 @@
 '''
     .. console - Comprehensive utility library for ANSI terminals.
-    .. © 2018, Mike Miller - Released under the LGPL, version 3+.
+    .. © 2018-2025, Mike Miller - Released under the LGPL, version 3+.
 
     Singletons that mimic the style/palette/entry interface but do not print
     ANSI control sequences, i.e.: for use when a terminal doesn't support them.

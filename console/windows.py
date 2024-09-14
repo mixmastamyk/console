@@ -1,10 +1,10 @@
 '''
     .. console - Comprehensive utility library for ANSI terminals.
-    .. © 2018, Mike Miller - Released under the LGPL, version 3+.
+    .. © 2018-2025, Mike Miller - Released under the LGPL, version 3+.
 
     Module for traditional Windows API crud (though not WSL).
     Typically, it is not necessary to use this module directly;
-    the detection module is preferred.
+    the detection/utils modules are preferred.
 
     https://docs.microsoft.com/en-us/windows/console/console-reference
 '''

@@ -1,6 +1,6 @@
 '''
     .. console - Comprehensive utility library for ANSI terminals.
-    .. © 2018, Mike Miller - Released under the LGPL, version 3+.
+    .. © 2018-2025, Mike Miller - Released under the LGPL, version 3+.
 
     This module contains capability detection routines for use under ANSI
     compatible terminals.  Most functions return None when not able to detect
@@ -17,11 +17,10 @@ import env
 from . import color_tables
 from console.color_tables import DEFAULT_BASIC_PALETTE, term_palette_map
 from .constants import (BS, BEL, CSI, ESC, ENQ, OSC, RS, ST, TermLevel,
-                        _COLOR_CODE_MAP)
+                        _COLOR_CODE_MAP, TERMS_DIRECT_COLON)
 from .meta import __version__, defaults
 
 
-TERMS_DIRECT_COLON = ('xterm-', 'iterm2-', 'kitty-', 'mintty-', 'mlterm-')
 color_sep = ';'  # the above prefer to use colons as the direct color separator
 termios = tty = None
 
@@ -220,13 +219,12 @@ def detect_terminal_level():
     level = TermLevel.DUMB
     TERM = env.TERM.value or ''  # shortcut
     WSL = bool(env.WSLENV)  # Linux Subsystem for Winders
-    _color_sep = ';'  # color sequences delimiter
-
-    if TERM.startswith('vt'):  # openbsd, hardware
-        level = TermLevel.ANSI_MONOCHROME  # 525 had color
+    _color_sep = ';'  # ansi sequences delimiter
 
     if TERM.startswith(('xterm', 'linux')):
         level = TermLevel.ANSI_BASIC
+    elif TERM.startswith('vt'):  # openbsd, hardware
+        level = TermLevel.ANSI_MONOCHROME  # 525 had color
 
     # upgrades
     if TERM.endswith('-256color') or is_fbterm:
@@ -788,7 +786,7 @@ if os_name == 'nt' and not env.SSH_CLIENT:  # I'm a PC
         get_theme,
     )
 
-elif sys.platform == 'darwin':  # Think different
+elif sys.platform == 'darwin':  # Think diff'rnt
 
     def _find_basic_palette_from_os():
         ''' Find the platform-dependent 16-color basic palette—macOS version.
