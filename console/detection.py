@@ -776,6 +776,15 @@ def get_theme(timeout=defaults.READ_TIMEOUT):
 
 if os_name == 'nt' and not env.SSH_CLIENT:  # I'm a PC
 
+    # quiet pyflakes
+    assert detect_unicode_support
+    assert detect_terminal_level
+    assert _find_basic_palette_from_os
+    assert get_color
+    assert get_position
+    assert get_title
+    assert get_theme
+
     from .windows import (
         detect_unicode_support,
         detect_terminal_level,

@@ -342,38 +342,6 @@ def measure(start=1, limit=200, offset=0, newlines=True):
         return ''.join(chain.from_iterable(results))
 
 
-def notify_cwd(path=None):
-    ''' Notify the terminal of the current working directory. EXPERIMENTAL
-
-        Arguments:
-            path:  str
-
-        Returns: text sequence to be written, for testing.
-
-        Notes:
-            https://gitlab.freedesktop.org/terminal-wg/specifications/-/issues/20
-            https://conemu.github.io/en/AnsiEscapeCodes.html#OSC_Operating_system_commands
-    '''
-    if not path:
-        path = os.getcwd()
-
-    if os_name == 'nt':
-        code = '9;9'
-        path = f'"{path}"'
-    else:
-        code = '7'
-        # encode as path as an url
-        scheme = 'file://'
-        if not path.startswith(scheme):
-            path = scheme + path
-        path = quote(path)
-
-    text = f'{OSC}{code};{path}{ST}'
-    if _ansi_capable:
-        print(text, end='', flush=True)
-    return text
-
-
 def notify_message(message, title=''):
     ''' Notify the user with the given message. EXPERIMENTAL
 
