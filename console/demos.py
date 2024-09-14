@@ -1,4 +1,3 @@
-# -*- coding: future_fstrings -*-
 '''
     .. console - Comprehensive utility library for ANSI terminals.
     .. © 2018, Mike Miller - Released under the LGPL, version 3+.
@@ -251,11 +250,6 @@ if __name__ == '__main__':
     log = logging.getLogger(__name__)
     if os.name == 'nt':
         import env
-        try:  # wuc must come before colorama.init() for detection to work.
-            import win_unicode_console as wuc
-            wuc.enable()
-        except ImportError:
-            pass
         try:
             if not env.ANSICON:
                 import colorama

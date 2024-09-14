@@ -1,6 +1,6 @@
 import sys
 
-assert sys.version_info >= (3, 4, 0), "This package requires Python 3.4+"
+assert sys.version_info >= (3, 6, 0), "This package requires Python 3.6+"
 if sys.version_info.major < 3:
     raise NotImplementedError('Sorry, only Python 3 and above is supported.')
 
@@ -18,11 +18,8 @@ meta = import_module('console.meta')
 # https://www.python.org/dev/peps/pep-0508/#environment-markers
 install_requires = (
     'ezenv>=0.92',
-    'future_fstrings;     python_version < "3.6" ',
-    'typing;              python_version < "3.5" ',  # seems future-fs related.
     'jinxed;              os_name == "nt" ',  # for ssh into windows
     'colorama;            os_name == "nt" and platform_version < "10.0.10586" ',
-    'win_unicode_console; os_name == "nt" and python_version < "3.6" ',
 )
 tests_require = ('pyflakes', 'pytest', 'readme_renderer'),
 extras_require = dict(
