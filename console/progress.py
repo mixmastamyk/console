@@ -39,7 +39,7 @@ icons = dict(
     boxes       = (' ', '▣', '□', ' ', '✓', '⏴', '⏵', '✗'),
     bullets     = (' ', '•', '•', ' ', '✓', '⏴', '⏵', '✗'),
     dies        = (' ', '⚅', '⚀', ' ', '✓', '⏴', '⏵', '✗'),
-    horns       = ('🤘', '⛧', '⛤', '🤘', '✓', '⏴', '⏵', '✗'),
+    horns       = ('🤘', '⛧', '⛤', '🤘', '✓', '🔥', '🔥', '✗'),
     segmented   = ('▕', '▉', '▉', '▏', '✓', '⏴', '⏵', '✗ '),
     faces       = (' ', '☻', '☹', ' ', '✓', '⏴', '⏵', '✗'),
     wide_faces  = (' ', '😎', '😞', ' ', '✓', '⏴', '⏵', '✗'),
@@ -667,7 +667,7 @@ if __name__ == '__main__':
                     print(f' {label:12}', bar(i), sep='')
 
                 sleep(.1)
-                if i < 99:
+                if i < 100:
                     cls()
             sleep(2)
         except KeyboardInterrupt:
@@ -684,7 +684,7 @@ if __name__ == '__main__':
             bar._last = bar.styles[_il](bar.icons[_il])
 
         print(label)
-        for complete in (-2, 0, 51, 99, 123):
+        for complete in (-2, 0, 51, 100, 123):
             if bar.expand:
                 print(bar(complete))
             else:
