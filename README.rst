@@ -23,6 +23,7 @@ Console
     - *“Better… Stronger… Faster” —Oscar Goldman*
     - *"There is nothing we won't try…" —Laverne and Shirley*
     - *"Nothin' can stand in our way…" —Olivia Newton-John*
+    - *"You're gonna eat lightning and crap thunder!"—Mickey Goldmill*
     - *"Fightin' the system like a true modern-day Robin Hood" —Waylon Jennings*
 
 |
@@ -77,7 +78,7 @@ FYI, the string  ``'\x1b'`` represents the ASCII Escape character
 (``27`` in decimal, ``1b`` hex).
 Command ``[32m`` turns the text green
 and ``[39m`` back to the default color.
-But, there's no need to worry about any of that gobbledy-gook.
+But there's no need to worry about any of that gobbledy-gook.
 That's why you're here, right?
 
 
@@ -138,8 +139,8 @@ err…
 Composability++
 ~~~~~~~~~~~~~~~~
 
-    | *"East bound and down, loaded up and truckin'…*
-    | *We gonna do what they say can't be done"—Smokey and the Bandit*
+    | *We've got a long way to go, and a short time to get there…*
+    | *I'm east bound, just watch ol' Bandit run"—Jerry Reed*
 
 Console's palette entry objects are meant to be highly composable and useful in
 multiple ways.
@@ -246,7 +247,7 @@ Color Palettes
 The color palettes entries may be further broken down into three main
 categories of available colors.
 Unleash your inner
-`Britto <https://www.art.com/gallery/id--a266/romero-britto-posters.htm>`_
+`Britto <https://web.archive.org/web/20150909152716/http://www.art.com/gallery/id--a266/Romero-Britto-posters.htm>`_
 below:
 
     - Basic, the original 8/16 ANSI named colors
@@ -321,10 +322,7 @@ some of which may be installed automatically if needed:
 .. code-block:: shell
 
     webcolors             # Moar! color names
-    future_fstrings       # Needed for: Python Version < 3.6
-
     colorama              # Needed for: Windows Version < 10
-    win_unicode_console   # Useful: for Win Python < 3.6
     jinxed                # terminfo, for SSH *into* Windows
 
 
@@ -337,24 +335,17 @@ under the lame (no-ANSI support) versions of Windows < 10
 .. note::
 
     ``console`` supports Python 3.6 and over by default.
-    However!  It is trying out
-    `"future-fstrings" <https://github.com/asottile/future-fstrings>`_
-    for experimental support under Python versions 3.5 and 3.4,
-    perhaps earlier.
-    Keep an eye peeled for oddities under older Pythons.
     Sorry, neither 2.X or 1.X is supported.  ``:-P``
 
 
 Der ``console`` package has recently been tested on:
 
-- Ubuntu Linux 20.04 - Python 3.8
+- Mint Linux 22 (24.04) - Python 3.12
 
   - xterm, mate-terminal, linux console, fbterm
   - Very occasionally on kitty, guake
 
-- FreeBSD 11 - Python 3.7
-- MacOS 11.2 - Python 3.8
-- MacOS 10.13 - Python 3.6
+- MacOS 11.7 - Python 3.12
 
   - Terminal.app, iTerm2
 
@@ -364,8 +355,11 @@ Der ``console`` package has recently been tested on:
 
 Not so recently:
 
-- Windows XP - Python 3.4 - 32 bit + colorama, ansicon
+- Ubuntu Linux 20.04 - Python 3.8
+- FreeBSD 11 - Python 3.7
 - Windows 7 - Python 3.6 - 32 bit + colorama
+- Windows XP - Python 3.4 - 32 bit + colorama, ansicon
+- MacOS 10.13 - Python 3.6
 
 ::
 
@@ -389,7 +383,7 @@ includes a number of nifty functions:
 
     >>> from console.utils import cls, set_title
 
-    >>> cls()  # whammo! a.k.a. reset terminal
+    >>> cls()  # whammo! a.k.a. clear screen, scrollback
     >>> set_title('Le Freak')  # c'est chic
     '\x1b]2;Le Freak\x07'
 
@@ -534,7 +528,7 @@ The Makefile in the repo
 has more details on such topics.
 
 
-Wrapping Up
+WRapping Up
 ----------------
 
 
@@ -553,6 +547,9 @@ Can you help?
 
 Release Notes
 ~~~~~~~~~~~~~~~~
+
+- Version 0.9908 - Apologies, the progress bar has changed from a 0-99 scale to
+  a 0-100.
 
 - Version 0.9907 - Apologies, the Screen class will have a few changes in the
   names of attributes to make them more consistent.
