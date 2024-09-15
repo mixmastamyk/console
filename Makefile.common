@@ -65,9 +65,11 @@ docs-default:  ## Build documents
 
 
 publish-default: test check-readme docs ## Upload to PyPi.
-	rm -rf build
+	rm -rf build dist
 	git push  # any stragglers
-	python3 setup.py sdist bdist_wheel --universal upload
+#~ 	python3 setup.py sdist bdist_wheel --universal upload  # old
+	python3 -m build  # new
+	twine upload dist/*
 
 	# pip3 install --user -e .  # fix bug on next invocation, still needed?
 

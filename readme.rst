@@ -56,7 +56,7 @@ The entries (or attributes in Python lingo) of each palette can be used in
 place of strings and handle everything a string might.
 For example:
 
-.. code-block:: python
+.. code-block:: python-console
 
     >>> from console import fg, bg, fx
 
@@ -104,7 +104,7 @@ one may also use the call-form instead,
 where
 `it's automatic <https://youtu.be/y5ybok6ZGXk>`_:
 
-.. code-block:: python
+.. code-block:: python-console
 
     >>> fg.yellow('Far Out!')  # ◂ ends fg-color only
     '\x1b[33mFar Out!\x1b[39m'
@@ -120,7 +120,7 @@ There's also a rich-text printer that handles basic HTML
 `hyperlinks <https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda>`_
 if your terminal supports it):
 
-.. code-block:: python
+.. code-block:: python-console
 
     >>> from console.viewers import hprint as print
     >>> print('<i>Hello <b>Woirld!</b> ;-)</i>')
@@ -154,7 +154,7 @@ Just add 'em up:
 .. ~ of each line in the string (to avoid breaking pagers),
 .. ~ so those tasks no longer need to be managed manually:
 
-.. code-block:: python
+.. code-block:: python-console
 
     >>> muy_importante = fg.white + fx.bold + bg.red
     >>> print(muy_importante('¡AHORITA!', fx.underline))  # ← mixin
@@ -175,7 +175,7 @@ no matter how many you add:
 
 Styles can be built on the fly as well, if need-be:
 
-.. code-block:: python
+.. code-block:: python-console
 
     >>> print(
     ...   f'{fg.i208 + fx.reverse}Tangerine Dream{fx.end}',  # or
@@ -189,14 +189,14 @@ To build templates,
 call a palette entry with placeholder strings,
 with (or instead of) text:
 
-.. code-block:: python
+.. code-block:: python-console
 
     >>> sam_template = bg.i22('{}')  # dark green
     >>> print(sam_template.format(' GREEN Eggs… '))
 
-.. code-block:: python
+.. code-block:: python-console
 
-     GREEN Eggs…   # No, I do not like… 😉
+    GREEN Eggs…   # No, I do not like… 😉
 
 Other template formats are no problem either,
 try ``%s`` or ``${}``.
@@ -211,7 +211,7 @@ but perhaps you'd like a pre-rendered string to be used in a tight loop for
 performance reasons.
 Simply use ``str()`` to finalize the output then use it in the loop.
 
-.. code-block:: python
+.. code-block:: python-console
 
     >>> msg = str(muy_importante('¡AHORITA!'))
 
@@ -385,7 +385,7 @@ console handles lots more than color and styles.
 `console.utils`
 includes a number of nifty functions:
 
-.. code-block:: python
+.. code-block:: python-console
 
     >>> from console.utils import cls, set_title
 
@@ -417,7 +417,7 @@ if any of that floats your boat. 
 `Blessings <https://pypi.org/project/blessings/>`_-\
 compatible context managers are available for full-screen fun.
 
-.. code-block:: python
+.. code-block:: python-console
 
     >>> from console.screen import sc
 
@@ -497,7 +497,7 @@ program that runs quite a few of these utility functions and methods:
 
     ⏵ console ascii --link
 
-    00111   7 07  BEL         39 27  '           71 47  G          103 67  g
+    00111   7 07  BEL         39 27  \'           71 47  G          103 67  g
     ...  # 😉
 
 Remember the detection CLI we mentioned above?  Here's how to use it:
