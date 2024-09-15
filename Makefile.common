@@ -74,8 +74,8 @@ publish-default: test check-readme docs ## Upload to PyPi.
 	# pip3 install --user -e .  # fix bug on next invocation, still needed?
 
 
-readme.html: readme.rst  ## Build readme.html
-	rst2html.py readme.rst > readme.html
+readme.html: README.rst  ## Build readme.html
+	rst2html.py README.rst > readme.html
 	-refresh.sh Firefox
 
 

@@ -29,8 +29,8 @@ docs/readme.rst: docs/readme.templ
 	RM_MODE=sphx python3 -c "$$JINJA_FU" > docs/readme.rst
 
 
-readme.rst: docs/readme.templ
-	RM_MODE=pypi python3 -c "$$JINJA_FU" > readme.rst
+README.rst: docs/readme.templ
+	RM_MODE=pypi python3 -c "$$JINJA_FU" > README.rst
 
 
 publish: publish-default

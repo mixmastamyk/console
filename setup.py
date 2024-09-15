@@ -17,7 +17,7 @@ meta = import_module('console.meta')
 install_requires = (
     'ezenv>=0.92',
     'jinxed;              os_name == "nt" ',  # for ssh into windows
-    #~ 'colorama;            os_name == "nt" and platform_version < "10.0.10586" ',
+    'colorama;            os_name == "nt" and platform_version < "10.0.10586" ',
 )
 tests_require = ('pyflakes', 'pytest', 'readme_renderer'),
 extras_require = dict(
@@ -48,7 +48,7 @@ setup(
     author              = meta.authors,
     keywords            = meta.keywords,
     license             = 'LGPL 3',
-    long_description    = slurp('readme.rst'),
+    long_description    = slurp('README.rst'),
     long_description_content_type
                         = 'text/x-rst',
     packages            = (meta.pkgname,),
