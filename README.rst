@@ -22,8 +22,8 @@ Console
     - *"DYN-O-MITE!!" —J.J. from Good Times*
     - *“Better… Stronger… Faster” —Oscar Goldman*
     - *"There is nothing we won't try…" —Laverne and Shirley*
-    - *"Nothin' can stand in our way…" —Olivia Newton-John*
     - *"You're gonna eat lightning and crap thunder!"—Mickey Goldmill*
+    - *"Nothin' can stand in our way…" —Olivia Newton-John*
     - *"Fightin' the system like a true modern-day Robin Hood" —Waylon Jennings*
 
 |
