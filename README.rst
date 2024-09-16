@@ -353,6 +353,8 @@ Der ``console`` package has recently been tested on:
 
   - Conhost, WSL, Windows Terminal
 
+- Haiku R1/Beta5 - Python 3.12
+
 Not so recently:
 
 - Ubuntu Linux 20.04 - Python 3.8
@@ -549,7 +551,7 @@ Release Notes
 ~~~~~~~~~~~~~~~~
 
 - Version 0.9908 - Apologies, the progress bar has changed from a 0-99 scale to
-  a 0-100.
+  a 0-100.  Perhaps should use 0-1 ?
 
 - Version 0.9907 - Apologies, the Screen class will have a few changes in the
   names of attributes to make them more consistent.
