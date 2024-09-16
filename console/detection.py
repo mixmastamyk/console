@@ -512,6 +512,8 @@ def _get_color_xterm(name, number=None, timeout=None):
             log.debug('warning - no .fileno() attribute was found on the stream.')
         except EnvironmentError:  # Winders
             log.debug('see console.windows.get_color()')
+        except termios.error as err:  # some "xterm" compats can't handle, haiku
+            log.debug('get_position return value failed: %s', err)
         else:  # parse response
             colors = resp.partition(':')[2].split('/')
             if colors == ['']:  # nuttin
@@ -634,8 +636,10 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
         if env.WSLENV or env.TERM_PROGRAM == 'vscode':
             pass  # LSW, vscode on Linux don't support xterm query
 
-        elif env.TERM =='xterm' and sys.platform.startswith('freebsd'):
-            pass  # freebsd console
+        elif env.TERM =='xterm' and sys.platform.startswith(
+            ('freebsd', 'haiku')
+        ):
+            pass  # defective xterms, TODO: probably should opt-in instead
 
         elif env.TERM.startswith('xterm'):
             color = _get_color_xterm(name, number, timeout=timeout)
@@ -661,7 +665,11 @@ def get_position(fallback=defaults.CURSOR_POS_FALLBACK):
             sys.stdout.flush()
             log.debug('about to read get_position response…')
             resp = _read_until_select(max_bytes=10, end='R')
+
     except (AttributeError, OSError):  # no .fileno(), or ssh into Windows
+        return fallback
+    except termios.error as err:  # some "xterm" compats can't handle, haiku
+        log.debug('get_position return value failed: %s', err)
         return fallback
 
     # parse response
