@@ -145,19 +145,19 @@ def run():
     pb = ProgressBar(clear_left=False, label=True, width=36)
     print('    ', pb(0), end='')
     print('  ', pb(45), end='')
-    print('  ', pb(99))
+    print('  ', pb(100))
     print()
 
     pb = ProgressBar(clear_left=False, theme='solid', width=32)
     print('    ', pb(0), end='')
-    print('      ', pb(55), end='')
-    print('      ', pb(99))
+    print('      ', pb(65), end='')
+    print('      ', pb(100))
     print()
 
     pb = HiDefProgressBar(clear_left=False, styles='greyen', width=36)
     print('    ', pb(0), end='')
-    print('  ', pb(55), end='')
-    print('  ', pb(99))
+    print('  ', pb(85), end='')
+    print('  ', pb(100))
     print()
 
     print(make_header(i+5), 'Test color downgrade support '
