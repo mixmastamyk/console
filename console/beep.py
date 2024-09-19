@@ -27,22 +27,29 @@ def _check_environment():
                   'or an audio playback module such as BoomBox.')
 
 
-def beep_curses(**kwargs):
+def beep_curses():
     ''' Curses beep. '''
     _check_environment()
     log.debug('trying curses.beep…')
     curses.beep()
 
 
-def beep_macos(**kwargs):
-    ''' Simple system beep for MacOS. '''
-    # Note: makes the terminal/app icon in the taskbar jump.
+def beep_macos(wait_secs=.5):
+    ''' Simple audio-system beep for MacOS.
+
+        If the program runs too quickly it will get killed before the sound
+        is played, so a small sleep, say .5 seconds afterward may be necessary.
+    '''
     log.debug('trying AppKit.NSBeep…')
     from AppKit import NSBeep
+
     NSBeep()
+    if wait_secs:
+        from time import sleep
+        sleep(wait_secs)
 
 
-def beep_posix(**kwargs):
+def beep_posix():
     ''' Simple system beep for POSIX terminals, may be disabled. '''
     _check_environment()
     log.debug('outputting BEL…')
@@ -50,8 +57,8 @@ def beep_posix(**kwargs):
     stdout.flush()
 
 
-def beep_windows(**kwargs):
-    ''' Simple system beep for Windows. '''
+def beep_windows():
+    ''' Simple audio-system beep for Windows. '''
     import winsound
 
     log.debug('trying winsound.MessageBeep…')
@@ -73,12 +80,13 @@ else:
         beep = beep_curses
     else:
         if sys.platform == 'darwin':  # Think different
-            try:
-                import AppKit
-                beep = beep_macos
-            except ImportError:
-                AppKit = None
-                beep = beep_posix
+            #~ try:
+                #~ import AppKit
+                #~ beep = beep_macos
+            #~ except ImportError:
+                 #~ AppKit = None
+            # default to posix, less troublesome
+            beep = beep_posix
 
         elif os_name == 'posix':        # Tron leotards
             beep = beep_posix
