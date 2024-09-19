@@ -1,6 +1,6 @@
 import sys
 
-assert sys.version_info >= (3, 6, 0), "This package requires Python 3.6+"
+assert sys.version_info >= (3, 8, 0), "This package requires Python 3.8+"
 if sys.version_info.major < 3:
     raise NotImplementedError('Sorry, only Python 3 and above is supported.')
 

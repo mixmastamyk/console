@@ -441,7 +441,7 @@ under the lame (no-ANSI support) versions of Windows < 10
 
 .. note::
 
-    ``console`` supports Python 3.6 and over by default.
+    ``console`` supports Python 3.8 and over by default.
     Sorry, neither 2.X or 1.X is supported.  ``:-P``
 
 
@@ -667,13 +667,17 @@ Can you help?
 Release Notes
 ~~~~~~~~~~~~~~~~
 
+Breakages: should be rare before 1.0 and non-existent afterwards.
+
+- Version 0.9909 - Pyupgrade to 3.8 idioms, probably doesn't fully support 3.6
+  any longer.
+
 - Version 0.9908 - Apologies, the progress bar has changed from a 0-99 scale to
   a 0-100.  Perhaps should use 0-1 ?
 
 - Version 0.9907 - Apologies, the Screen class will have a few changes in the
   names of attributes to make them more consistent.
   Stick with 0.9906 until older code can be ported.
-  This should be rare before 1.0 and non-existent afterwards.
 
 
 Documentation
