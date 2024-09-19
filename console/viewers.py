@@ -21,7 +21,7 @@ from .detection import _sized_char_support, get_size
 from html.parser import HTMLParser
 
 
-HALF2FULL = dict((i, i + 0xFEE0) for i in range(0x21, 0x7F))  # Wide ASCII map
+HALF2FULL = {i: i + 0xFEE0 for i in range(0x21, 0x7F)}  # Wide ASCII map
 HALF2FULL[0x20] = 0x3000  # https://stackoverflow.com/a/36693548/450917
 log = logging.getLogger(__name__)
 debug = log.debug
@@ -178,9 +178,9 @@ class LiteHTMLParser(HTMLParser):
         for key, val in attrs:
             if key == 'style':
                 for pair in val.split(';'):
-                    prop, _, prop_val = [
+                    prop, _, prop_val = (
                         x.strip() for x in pair.partition(':')
-                    ]
+                    )
                     if prop == 'color':
                         self._set_fg_color(prop_val)
                     elif prop in ('background', 'background-color'):

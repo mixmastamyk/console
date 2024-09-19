@@ -34,8 +34,8 @@ def run():
     hello_world = f'''Greetings: {fx.bold + fg.blue}Hello {fx.reverse +
                     fg.yellow}World{fg.default + defx.reverse}!{fx.end}'''
     # styles
-    bad_grammar = fx.curly_underline + ul.i2
-    bad_spelling = fx.curly_underline + ul.i1
+    bad_grammar = fx.curly_underline + ul.i2    # indexed green
+    bad_spelling = fx.curly_underline + ul.i1   # index red
 
     demos = [
         hello_world,
@@ -50,6 +50,7 @@ def run():
 
         'hyper-link: ' + make_hyperlink('http://www.coolsiteoftheday.com/',
                                         'Cool Site of the Day!'),
+        # below is printf style on purpose to confirm it works, do not upgrade
         'underline-hijinks: I %s %s' % (bad_grammar('not'), bad_spelling('mizpelled.')),
     ]
 

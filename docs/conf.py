@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Configuration file for the Sphinx documentation builder.
 #
@@ -175,7 +174,7 @@ todo_include_todos = True
     #~ app.add_stylesheet('css/custom.css')  # may also be an URL
 
 
-rst_prolog = u'''
+rst_prolog = '''
 .. |br| raw:: html
 
     <br>

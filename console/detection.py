@@ -57,7 +57,7 @@ class TermStack:
     '''
     def __init__(self, stream=sys.stdin, exit_mode='flush'):
         if not termios:
-            raise EnvironmentError('The termios module was not loaded, is '
+            raise OSError('The termios module was not loaded, is '
                                    'this a POSIX-compatible environment?')
         self.fd = stream.fileno()
         self._exit_mode = exit_mode.upper()
@@ -432,7 +432,7 @@ def parse_vtrgb(path='/etc/vtrgb'):
                     break
 
         palette = tuple(zip(*table))  # swap rows to columns
-    except IOError:
+    except OSError:
         pass
 
     return palette
@@ -510,7 +510,7 @@ def _get_color_xterm(name, number=None, timeout=None):
                 #~ log.debug('response: %r', resp)
         except AttributeError:
             log.debug('warning - no .fileno() attribute was found on the stream.')
-        except EnvironmentError:  # Winders
+        except OSError:  # Winders
             log.debug('see console.windows.get_color()')
         except termios.error as err:  # some "xterm" compats can't handle, haiku
             log.debug('get_position return value failed: %s', err)
@@ -545,7 +545,7 @@ def _read_clipboard(
                     )
     except AttributeError:
         log.debug('warning - no .fileno() attribute was found on the stream.')
-    except EnvironmentError:  # Winders
+    except OSError:  # Winders
         log.debug('_read_clipboard not yet implemented by Windows.')
     else:
         if resp:  # parse response
@@ -576,7 +576,7 @@ def get_answerback(max_bytes=32, end=(BEL, ST, '\n'), timeout=defaults.READ_TIME
                     )
     except AttributeError:  # 
         log.debug('warning - no .fileno() attribute was found on the stream.')
-    except EnvironmentError:  # Winders
+    except OSError:  # Winders
         log.debug('answerback not yet implemented by Windows.')
 
 

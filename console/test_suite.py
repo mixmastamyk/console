@@ -402,7 +402,7 @@ if True:  # fold
             for name in ('up', 'down', 'left', 'right'):
                 attr = getattr(sc, 'move_' + name)
                 text = attr(val)
-                assert repr(text) == "'\\x1b[%s%s'" % (val, attr.endcode)
+                assert repr(text) == f"'\\x1b[{val}{attr.endcode}'"
 
 
 # Utils

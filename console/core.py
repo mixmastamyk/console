@@ -341,7 +341,7 @@ class _HighColorPaletteBuilder(_BasicPaletteBuilder):
         self.__dict__.clear()
 
 
-class _LineWriter(object):
+class _LineWriter:
     ''' Writes each line with escape sequences terminated so paging works
         correctly, a la Pygments.
     '''

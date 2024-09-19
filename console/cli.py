@@ -160,7 +160,7 @@ def setup():
     acv = fx.italic + ac
     _action = acv('action')
 
-    action_choices = sorted(set(f for f in actions if not f.startswith('_')))
+    action_choices = sorted({f for f in actions if not f.startswith('_')})
     action_help = _get_action_help(action_choices)
 
     # build top-level parser
@@ -273,7 +273,7 @@ def main(args, kwargs):
         print_err(err)
         status = os.EX_NOINPUT
 
-    except IOError as err:
+    except OSError as err:  # was IOError
         print_err(err)
         status = os.EX_IOERR
 

@@ -32,7 +32,7 @@ repo_account    = 'mixmastamyk'
 repo_name       = pkgname
 repo_provider   = 'github.com'
 doc_url         = 'https://mixmastamyk.bitbucket.io/console/'
-repo_url        = 'https://%s/%s/%s' % (repo_provider, repo_account, repo_name)
+repo_url        = f'https://{repo_provider}/{repo_account}/{repo_name}'
 project_urls    = {'Repository': repo_url, 'Issues': _join(repo_url, 'issues'),
                     'Documentation': doc_url}
 home_url = repo_url
