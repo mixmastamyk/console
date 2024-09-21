@@ -80,6 +80,7 @@ Command ``[32m`` turns the text green
 and ``[39m`` back to the default color.
 But there's no need to worry about any of that gobbledy-gook.
 That's why you're here, right?
+See call() form below.
 
 
 .. note::
@@ -90,7 +91,7 @@ That's why you're here, right?
     `Sphinx docs <https://mixmastamyk.bitbucket.io/console/>`_
     *instead.
     When you see "😉" in a comment, that's a reminder you're not getting
-    the full monty.*
+    the 'full monty.'*
 
 **Call() Form**
 
@@ -113,7 +114,7 @@ where
     >>> fx.italic('Up ya nose with a rubber hose!')  # ◂ ends italic
     '\x1b[3mUp ya nose with a rubber hose!\x1b[23m'
 
-This is neat because call-form will end specific colors/styles and not
+This is neat because call-form will end *specific* colors/styles and not
 interfere with others.
 
 There's also a rich-text printer that handles basic HTML
@@ -334,7 +335,7 @@ under the lame (no-ANSI support) versions of Windows < 10
 
 .. note::
 
-    ``console`` supports Python 3.6 and over by default.
+    ``console`` supports Python 3.8 and over by default.
     Sorry, neither 2.X or 1.X is supported.  ``:-P``
 
 
@@ -523,7 +524,7 @@ tests can be run from the install folder.
 
 .. code-block:: shell
 
-    ⏵ pytest -s
+    ⏵ pytest --color=no --showlocals --verbose
 
 The Makefile in the repo
 `at github <https://github.com/mixmastamyk/console>`_
@@ -533,6 +534,7 @@ has more details on such topics.
 WRapping Up
 ----------------
 
+    *(image missing)*  # 😉
 
 With a brand-new new sound called *hip hop.*
 
@@ -550,20 +552,24 @@ Can you help?
 Release Notes
 ~~~~~~~~~~~~~~~~
 
+Breakages: should be rare before 1.0 and non-existent afterwards.
+
+- Version 0.9909 - Pyupgrade to 3.8 idioms, probably doesn't fully support 3.6
+  any longer.
+
 - Version 0.9908 - Apologies, the progress bar has changed from a 0-99 scale to
   a 0-100.  Perhaps should use 0-1 ?
 
 - Version 0.9907 - Apologies, the Screen class will have a few changes in the
   names of attributes to make them more consistent.
   Stick with 0.9906 until older code can be ported.
-  This should be rare before 1.0 and non-existent afterwards.
 
 
 Documentation
 ~~~~~~~~~~~~~~~~
 
 Additional docs may be found
-`here at bitbucket. <https://mixmastamyk.bitbucket.io/console/>`_
+`over/here at bitbucket. <https://mixmastamyk.bitbucket.io/console/>`_
 
 
 Legalese
@@ -571,9 +577,9 @@ Legalese
 
 *"Stickin' it to the Man"*
 
-- Copyright 2018-2021, Mike Miller
+- Copyright 2018-2025, Mike Miller
 - Released under the LGPL, version 3+.
 - Enterprise Pricing:
 
   | 6 MEEllion dollars…  *Bwah-haha-ha!*
-  | (only have to sell *one* copy!)
+  | (only need to sell *one* copy!)
