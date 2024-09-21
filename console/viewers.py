@@ -11,7 +11,7 @@
 '''
 import re
 import logging
-from os.path import splitext
+from os.path import splitext, dirname
 from enum import Enum, auto
 
 from . import fg, bg, fx, defx
@@ -21,6 +21,7 @@ from .detection import _sized_char_support, get_size
 from html.parser import HTMLParser
 
 
+SUPPORTED_FILETYPES = ('.md', '.html', '.htm')
 HALF2FULL = {i: i + 0xFEE0 for i in range(0x21, 0x7F)}  # Wide ASCII map
 HALF2FULL[0x20] = 0x3000  # https://stackoverflow.com/a/36693548/450917
 log = logging.getLogger(__name__)
@@ -33,6 +34,7 @@ figure footer form header main nav noscript p sectiontable tfoot video
 # blockquote h1-h6 hr pre ul ol li https://www.w3schools.com/htmL/html_blocks.asp
 multi_whitespace_hunter = re.compile(r'\s\s+')
 _width = get_size().columns
+parser = None
 
 
 # find html header mode for rendering
@@ -57,12 +59,13 @@ else:
         if '-i' in sys.argv:  # testing
             raise ImportError
         from pyfiglet import Figlet  # gettin' figgy with it, na na na…
+
         header_mode = HeaderMode.FIGLET
         Figlet.render = Figlet.renderText
-        _figlet_fonts = dict(
-            h1=Figlet(font='standard', width=_width),
+        _figlet_fonts = dict(  # standard, small, toilet: pagga, future
+            h1=Figlet(font='standard', justify='center', width=_width),
             h2=Figlet(font='small', width=_width),
-            #~ h3=Figlet(font='wideterm', width=_width),
+            #~ h3=Figlet(font='cybersmall', width=_width),
         )
     except ImportError:
         header_mode = HeaderMode.NORMAL
@@ -120,9 +123,10 @@ class LiteHTMLParser(HTMLParser):
     _setting_text_decoration_u = _setting_text_decoration_o = None
     _skip_data = None
     _preformatted_data = None
-    _list_mode = None
+    _list_mode = _list_item = None
     _blockquote = None
     _in_header = None
+    _dir_name = None
 
     def _to_full_width(self, data, is_ascii):
         ''' Converts ASCII characters to their full-width counterpart,
@@ -275,20 +279,24 @@ class LiteHTMLParser(HTMLParser):
             self._handle_header_styles(self._in_header, data)
         elif self._preformatted_data:
             self.tokens.append(data.lstrip('\n'))  # new para already
+        elif self._list_item and not data.isspace() and '\n' in data:
+            from textwrap import indent, wrap
+
+            data = '\n'.join(wrap(data, width=78))
+
+            data = indent(data, ' ' * 4).lstrip()
+            if data:
+                self.tokens.append(data)
+        #~ elif self._list_mode:  # not list item
+            #~ pass
         else:
             tokens = self.tokens
             new_line = tokens and tokens[-1].endswith('\n')
-            if data.startswith('\n'):  # at the end of each line
+            if new_line and data.startswith(('\n', ' ')):
                 data = data.lstrip()
-                if tokens and not new_line:
-                    data = ' ' + data  # give breathing room
-                elif not data:
+                if not data:
                     return
-                debug('data1: %r', data)
-
-            if new_line:
-                data = data.lstrip()
-                debug('data2: %r', data)
+            debug('data1: %r', data)
 
             # consolidate remaining whitespace to a single space:
             data = multi_whitespace_hunter.sub(' ', data)
@@ -363,13 +371,14 @@ class LiteHTMLParser(HTMLParser):
                 self._list_mode = 1
 
             elif tag == 'li':
+                self._list_item = 1
                 mode = self._list_mode
                 if mode == 'ul':
                     bullet = '•'
                 else:
                     bullet = f'{mode}.'  # below could be nested  :-/
                     self._list_mode = (self._list_mode or 0) + 1
-                self.tokens.append(f'  {bullet} ')
+                self.tokens.append(f'\n  {bullet} ')
 
             elif tag in block_tags:  # behind pre, hr, etc
                 self._new_paragraph()
@@ -409,6 +418,13 @@ class LiteHTMLParser(HTMLParser):
             elif tag == 'a':
                 self._set_fg_color('lightblue')
                 target, caption = self._anchor[0], ''.join(self._anchor[1:])
+                if target.startswith(('#', '//')):
+                    pass
+                else:
+                    dir_name = '' if target.startswith('/') else self._dir_name
+                    if target.find('://', 0, 12) == -1:
+                        # no scheme, prepend file:// and perhaps absolute path
+                        target = f'file://{dir_name or ""}{target}'
                 self.tokens.append(make_hyperlink(target, caption, icon=''))  # 🔗?
                 self._set_fg_color_default()
                 self._anchor.clear()
@@ -443,7 +459,7 @@ class LiteHTMLParser(HTMLParser):
                 self._new_paragraph()
 
             elif tag == 'li':
-                self.tokens.append('\n')
+                self._list_item = 0
 
             elif tag in block_tags:
                 self._new_paragraph()
@@ -454,13 +470,12 @@ class LiteHTMLParser(HTMLParser):
 fg_cache = StringCache(fg)
 bg_cache = StringCache(bg)
 fx_cache = StringCache(
-    fx, em='i', h1='b,u', h2='b', h3='b', h4='i', h5='b', h6='i', strong='b'
+    fx, em='i', h1='b,u', h2='b', h3='b', h4='i', h5='i', h6='i', strong='b'
 )
 # disables individual styles, must match above
 dx_cache = StringCache(
-    defx, em='i', h1='b,u', h2='b', h3='b', h4='i', h5='b', h6='i', strong='b'
+    defx, em='i', h1='b,u', h2='b', h3='b', h4='i', h5='i', h6='i', strong='b'
 )
-parser = LiteHTMLParser()
 
 
 def hprint(*args, newline=False, **kwargs):
@@ -479,6 +494,11 @@ def hprint(*args, newline=False, **kwargs):
 
 def hrender(text):
     ''' Renders HTML to an ANSI-compatible string. '''
+    global parser
+
+    if not parser:
+        parser = LiteHTMLParser()
+
     if '<' in text:
         parser.feed(text)
         result = ''.join(parser.tokens)
@@ -493,11 +513,41 @@ def view(path):
         Currently supports limited-HTML only.
     '''
     result = ''
-    if splitext(path)[1] in ('.html', '.htm'):
+    ext = splitext(path.lower())[1]
+    dir_name = None
+
+    if ext in SUPPORTED_FILETYPES:
+        global parser
+        # absolute path for needed for relative file://links, pass along
+        if path.startswith('/'):
+            dir_name = dirname(path) + '/'
+        else:
+            import os
+            dir_name = os.getcwd() + '/'
+
         with open(path) as infile:
-            parser.feed(infile.read())
-            result = ''.join(parser.tokens)
-            parser.tokens.clear()
+            data = infile.read()
+
+        if ext == '.md':
+            try:
+                from markdown import markdown
+
+                html = markdown(data)
+            except ModuleNotFoundError as err:
+                log.error('%s: %s', err.__class__.__name__, err)
+                return result
+
+        if ext in ('.html', '.htm'):
+            html = data
+
+        if not parser:
+            parser = LiteHTMLParser()
+
+        parser._dir_name = dir_name
+        parser.feed(html)
+        result = ''.join(parser.tokens)
+        parser.tokens.clear()
+
     return result
 
 
@@ -555,6 +605,17 @@ if __name__ == '__main__':
         This is a long line.
     </blockquote>
     <!-- nothing in this comment should be shown, Buh-BYE ! -->
+    &lt;-- was previous comment skipped?<br>
     Hello <h3>H3. woild!</h3><h4>H4. Heré</h4><h5>H5. Here</h5><h6>H6. Here</h6>
-    ;-) '''
+    ;-)
+
+    <ul>
+        <li>one</li>  <li>two  <li>three</li>
+    </ul>
+    <ol>
+        <li>one\nfoo\nbar</li>
+        <li>three</li>
+        <li><b>two</b> point</li>
+    </ol>
+    '''
     hprint(html)

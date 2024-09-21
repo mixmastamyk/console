@@ -33,6 +33,8 @@ actions = dict(
     progress            = 'console.progress',
 
     clear_lines         = 'console.utils',
+    #~ clear_screen        = 'console.utils',  # too fidly for cmdline
+    cls                 = 'console.utils',
     flash               = 'console.utils',
     get_clipboard       = 'console.utils',
     #~ len_stripped        = 'console.utils',
@@ -224,7 +226,8 @@ def setup():
         # load, store, and inspect signature
         mod = import_module(modname)
         funk = getattr(mod, funcname)
-        if '-h' in sys.argv:  # avoid extra work when subparser not ready
+        if '-h' in sys.argv or '--help' in sys.argv:
+            # avoid extra work when subparser not ready
             from textwrap import dedent, indent
             sub_parser.description = indent(
                 dedent('       ' + funk.__doc__), '    '
