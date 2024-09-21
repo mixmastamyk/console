@@ -476,9 +476,12 @@ class _PaletteEntry:
         for attr in styles:
             self += attr
 
-        # add and end styles per line, to facilitate paging:
-        pos = text.find('\n', 0, MAX_NL_SEARCH)  # if '\n' in text, w/limit
-        if pos == -1:  # not found
+        # add end styles per line, to facilitate paging:
+        if isinstance(text, str):
+            pos = text.find('\n', 0, MAX_NL_SEARCH)  # if '\n' in text, w/limit
+        else:
+            pos = None
+        if pos in (-1, None):  # not found | not str, to str
             result = f'{self}{text}{self.default}'
         else:
             lines = text.splitlines()
