@@ -181,7 +181,7 @@ def print_ascii_chart(
             d, n = fx.dim, defx.dim
             print(hdr_style(
                 f' {Bin}    {Dc} {Hx}  {bin_clr("00")} {d}Ctrl{n}     '
-                f'{Dc} {Hx}  {bin_clr("01")} {d}Punct{n}    '
+                f'{Dc} {Hx}  {bin_clr("01")} {d}Punct #{n}  '
                 f'{Dc} {Hx}  {bin_clr("10")} {d}Upper{n}   '
                 f'{Dec} {Hx} {bin_clr("11")} {d}Lower{n} '
             ))

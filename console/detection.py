@@ -784,7 +784,7 @@ def get_theme(timeout=defaults.READ_TIMEOUT):
 
 if os_name == 'nt' and not env.SSH_CLIENT:  # I'm a PC
 
-    # quiet pyflakes
+    # quiet pyflakes, before redefinition:
     assert detect_unicode_support
     assert detect_terminal_level
     assert _find_basic_palette_from_os
