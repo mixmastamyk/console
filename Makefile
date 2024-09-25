@@ -21,7 +21,7 @@ demos:  ## Show various functionality
 	echo | CLICOLOR_FORCE=1 python3 -m console.demos -d # works oddly under make
 
 
-docs: docs/readme.rst readme.rst docs-default
+docs: docs/readme.rst README.rst docs-default
 	rsync --recursive --human-readable --delete-before  --update docs/_build/html/ ../../mixmastamyk.bitbucket.org/console/
 
 
@@ -36,7 +36,7 @@ README.rst: docs/readme.templ
 publish: publish-default
 	DOC_DIR='../../mixmastamyk.bitbucket.org/console'
 	if [ -d "$$DOC_DIR" ]; then
-		cd ../../mixmastamyk.bitbucket.org/console/ \
+		cd "$$DOC_DIR" \
 			&& git add . && git commit -m . && git push
 	fi
 

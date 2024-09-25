@@ -624,7 +624,9 @@ Like the inline-CSS above,
 it handles X11 or Webcolors (if installed) color names, hex digits,
 and the word "dim":
 
-.. code-block:: plain
+.. text ?
+
+.. code-block:: html
 
     <c orange>l'orange</c>
     <c black on bisque3>bisque3</c>
@@ -658,8 +660,6 @@ able to be redirected outside the process:
     with Dodgers:
         print('Infield: Garvey, Lopes, Russel, Cey, Yeager')
         print('Outfield: Baker, Monday, Smith')
-
-(This feature is experimental for now. ;-)
 
 
 TermStack
@@ -818,7 +818,7 @@ Troubleshooting
   :align: right
   :figwidth: 60%
 
-  *There is no Sanctuary!*
+  *"There is no Sanctuary!"—Logan 5*
 
 - Console performs auto-detection of the environment at startup to determine
   terminal capabilities.

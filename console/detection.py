@@ -213,7 +213,7 @@ def detect_terminal_level():
 
         Returns:
             level:      None or TermLevel member
-            color_sep   The extended color sequence separator character,
+            color_sep:  The extended color sequence separator character,
                         i.e. ":" or ";".
     '''
     level = TermLevel.DUMB

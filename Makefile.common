@@ -61,7 +61,7 @@ check-readme-default: readme.rst  ## Check readme for syntax errors.
 
 docs-default:  ## Build documents
 	make -C docs html
-	-refresh.sh Console
+	-send_refresh.sh Console
 
 
 publish-default: test check-readme docs ## Upload to PyPi.
@@ -74,9 +74,9 @@ publish-default: test check-readme docs ## Upload to PyPi.
 	# pip3 install --user -e .  # fix bug on next invocation, still needed?
 
 
-readme.html: README.rst  ## Build readme.html
-	rst2html.py README.rst > readme.html
-	-refresh.sh Firefox
+readme.html: readme.rst  ## Build readme.html
+	rst2html.py readme.rst > readme.html
+	-send_refresh.sh Firefox
 
 
 tag-default:  ## Tag in git with current version and push.

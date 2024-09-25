@@ -35,6 +35,9 @@ div.body ul li { margin-bottom: .6em }
 /*
     sphinxsidebar
 */
+aside.sidebar {
+    background-color: inherit;  /* problem with new style bleeding in */
+}
 a, div.sphinxsidebar a {
     color: #eca218;  /* Amber */
     font-family: "Source Code Pro", monospace, monospace !important;
@@ -53,8 +56,9 @@ a:active, div.sphinxsidebar a:active {
     background: #e80;
     color: #222 !important;
 }
-a:visited, div.sphinxsidebar a:visited {
-    opacity: .9
+a:visited {
+    opacity: .6 !important;
+    color: #eca218;  /* Amber */
 }
 a.reference {
     border-bottom: 0 !important;
@@ -159,6 +163,13 @@ div.highlight, pre.highlight { background: inherit; }
 .highlight .kn, .highlight .k {
     color: #3894e8;
     font-weight: bold;
+}
+.highlight .nt {
+    color: #3894e8;
+    font-weight: bold;
+}
+.highlight .p {
+    color: #3894e8;
 }
 .highlight .go {
     color: FireBrick;

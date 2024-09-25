@@ -29,6 +29,7 @@ Console
     - *"DYN-O-MITE!!" —J.J. from Good Times*
     - *“Better… Stronger… Faster” —Oscar Goldman*
     - *"There is nothing we won't try…" —Laverne and Shirley*
+    - *"You're gonna eat lightning and crap thunder!"—Mickey Goldmill*
     - *"Nothin' can stand in our way…" —Olivia Newton-John*
     - *"Fightin' the system like a true modern-day Robin Hood" —Waylon Jennings*
 
@@ -69,7 +70,7 @@ The entries (or attributes in Python lingo) of each palette can be used in
 place of strings and handle everything a string might.
 For example:
 
-.. code-block:: python
+.. code-block:: python-console
 
     >>> from console import fg, bg, fx
 
@@ -93,8 +94,9 @@ FYI, the string  ``'\x1b'`` represents the ASCII Escape character
 (``27`` in decimal, ``1b`` hex).
 Command ``[32m`` turns the text green
 and ``[39m`` back to the default color.
-But, there's no need to worry about any of that gobbledy-gook.
+But there's no need to worry about any of that gobbledy-gook.
 That's why you're here, right?
+See call() form below.
 
 
 
@@ -116,7 +118,7 @@ one may also use the call-form instead,
 where
 `it's automatic <https://youtu.be/y5ybok6ZGXk>`_:
 
-.. code-block:: python
+.. code-block:: python-console
 
     >>> fg.yellow('Far Out!')  # ◂ ends fg-color only
     '\x1b[33mFar Out!\x1b[39m'
@@ -124,7 +126,7 @@ where
     >>> fx.italic('Up ya nose with a rubber hose!')  # ◂ ends italic
     '\x1b[3mUp ya nose with a rubber hose!\x1b[23m'
 
-This is neat because call-form will end specific colors/styles and not
+This is neat because call-form will end *specific* colors/styles and not
 interfere with others.
 
 There's also a rich-text printer that handles basic HTML
@@ -132,7 +134,7 @@ There's also a rich-text printer that handles basic HTML
 `hyperlinks <https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda>`_
 if your terminal supports it):
 
-.. code-block:: python
+.. code-block:: python-console
 
     >>> from console.viewers import hprint as print
     >>> print('<i>Hello <b>Woirld!</b> ;-)</i>')
@@ -157,8 +159,8 @@ if your terminal supports it):
 Composability++
 ~~~~~~~~~~~~~~~~
 
-    | *"East bound and down, loaded up and truckin'…*
-    | *We gonna do what they say can't be done"—Smokey and the Bandit*
+    | *We've got a long way to go, and a short time to get there…*
+    | *I'm east bound, just watch ol' Bandit run"—Jerry Reed*
 
 Console's palette entry objects are meant to be highly composable and useful in
 multiple ways.
@@ -173,7 +175,7 @@ Just add 'em up:
 .. ~ of each line in the string (to avoid breaking pagers),
 .. ~ so those tasks no longer need to be managed manually:
 
-.. code-block:: python
+.. code-block:: python-console
 
     >>> muy_importante = fg.white + fx.bold + bg.red
     >>> print(muy_importante('¡AHORITA!', fx.underline))  # ← mixin
@@ -205,7 +207,7 @@ no matter how many you add:
 
 Styles can be built on the fly as well, if need-be:
 
-.. code-block:: python
+.. code-block:: python-console
 
     >>> print(
     ...   f'{fg.i208 + fx.reverse}Tangerine Dream{fx.end}',  # or perhaps
@@ -224,7 +226,7 @@ To build templates,
 call a palette entry with placeholder strings,
 with (or instead of) text:
 
-.. code-block:: python
+.. code-block:: python-console
 
     >>> sam_template = bg.i22('{}')  # dark green
     >>> print(sam_template.format(' GREEN Eggs… '))
@@ -248,7 +250,7 @@ but perhaps you'd like a pre-rendered string to be used in a tight loop for
 performance reasons.
 Simply use ``str()`` to finalize the output then use it in the loop.
 
-.. code-block:: python
+.. code-block:: python-console
 
     >>> msg = str(muy_importante('¡AHORITA!'))
 
@@ -283,7 +285,7 @@ Color Palettes
 The color palettes entries may be further broken down into three main
 categories of available colors.
 Unleash your inner
-`Britto <https://www.art.com/gallery/id--a266/romero-britto-posters.htm>`_
+`Britto <https://web.archive.org/web/20150909152716/http://www.art.com/gallery/id--a266/Romero-Britto-posters.htm>`_
 below:
 
     - Basic, the original 8/16 ANSI named colors
@@ -358,10 +360,7 @@ some of which may be installed automatically if needed:
 .. code-block:: shell
 
     webcolors             # Moar! color names
-    future_fstrings       # Needed for: Python Version < 3.6
-
     colorama              # Needed for: Windows Version < 10
-    win_unicode_console   # Useful: for Win Python < 3.6
     jinxed                # terminfo, for SSH *into* Windows
 
 
@@ -373,25 +372,18 @@ under the lame (no-ANSI support) versions of Windows < 10
 
 .. note::
 
-    ``console`` supports Python 3.6 and over by default.
-    However!  It is trying out
-    `"future-fstrings" <https://github.com/asottile/future-fstrings>`_
-    for experimental support under Python versions 3.5 and 3.4,
-    perhaps earlier.
-    Keep an eye peeled for oddities under older Pythons.
+    ``console`` supports Python 3.8 and over by default.
     Sorry, neither 2.X or 1.X is supported.  ``:-P``
 
 
 Der ``console`` package has recently been tested on:
 
-- Ubuntu Linux 20.04 - Python 3.8
+- Mint Linux 22 (24.04) - Python 3.12
 
   - xterm, mate-terminal, linux console, fbterm
   - Very occasionally on kitty, guake
 
-- FreeBSD 11 - Python 3.7
-- MacOS 11.2 - Python 3.8
-- MacOS 10.13 - Python 3.6
+- MacOS 11.7 - Python 3.12
 
   - Terminal.app, iTerm2
 
@@ -399,10 +391,15 @@ Der ``console`` package has recently been tested on:
 
   - Conhost, WSL, Windows Terminal
 
+- Haiku R1/Beta5 - Python 3.12
+
 Not so recently:
 
-- Windows XP - Python 3.4 - 32 bit + colorama, ansicon
+- Ubuntu Linux 20.04 - Python 3.8
+- FreeBSD 11 - Python 3.7
 - Windows 7 - Python 3.6 - 32 bit + colorama
+- Windows XP - Python 3.4 - 32 bit + colorama, ansicon
+- MacOS 10.13 - Python 3.6
 
 ::
 
@@ -422,11 +419,11 @@ console handles lots more than color and styles.
 :mod:`console.utils`
 includes a number of nifty functions:
 
-.. code-block:: python
+.. code-block:: python-console
 
     >>> from console.utils import cls, set_title
 
-    >>> cls()  # whammo! a.k.a. reset terminal
+    >>> cls()  # whammo! a.k.a. clear screen, scrollback
     >>> set_title('Le Freak')  # c'est chic
     '\x1b]2;Le Freak\x07'
 
@@ -454,7 +451,7 @@ if any of that floats your boat. 
 `Blessings <https://pypi.org/project/blessings/>`_-\
 compatible context managers are available for full-screen fun.
 
-.. code-block:: python
+.. code-block:: python-console
 
     >>> from console.screen import sc
 
@@ -534,7 +531,7 @@ program that runs quite a few of these utility functions and methods:
 
     ⏵ console ascii --link
 
-    00111   7 07  BEL         39 27  '           71 47  G          103 67  g
+    00111   7 07  BEL         39 27  \'           71 47  G          103 67  g
     ...  # 😉
 
 Remember the detection CLI we mentioned above?  Here's how to use it:
@@ -564,14 +561,14 @@ tests can be run from the install folder.
 
 .. code-block:: shell
 
-    ⏵ pytest -s
+    ⏵ pytest --color=no --showlocals --verbose
 
 The Makefile in the repo
 `at github <https://github.com/mixmastamyk/console>`_
 has more details on such topics.
 
 
-Wrapping Up
+WRapping Up
 ----------------
 
 .. figure:: _static/rap_delight.jpg
@@ -582,6 +579,7 @@ Wrapping Up
     *I'm rappin' to the beat*\ |br|
     *And me, the groove, and my friends*\ |br|
     *are gonna try to move your feet…*
+
 
 With a brand-new new sound called *hip hop.*
 
@@ -599,17 +597,24 @@ Can you help?
 Release Notes
 ~~~~~~~~~~~~~~~~
 
+Breakages: should be rare before 1.0 and non-existent afterwards.
+
+- Version 0.9909 - Pyupgrade to 3.8 idioms, probably doesn't fully support 3.6
+  any longer.
+
+- Version 0.9908 - Apologies, the progress bar has changed from a 0-99 scale to
+  a 0-100.  Perhaps should use 0-1 ?
+
 - Version 0.9907 - Apologies, the Screen class will have a few changes in the
   names of attributes to make them more consistent.
   Stick with 0.9906 until older code can be ported.
-  This should be rare before 1.0 and non-existent afterwards.
 
 
 Documentation
 ~~~~~~~~~~~~~~~~
 
 Additional docs may be found
-`here at bitbucket. <https://mixmastamyk.bitbucket.io/console/>`_
+`over/here at bitbucket. <https://mixmastamyk.bitbucket.io/console/>`_
 
 
 Legalese
@@ -617,9 +622,9 @@ Legalese
 
 *"Stickin' it to the Man"*
 
-- Copyright 2018-2021, Mike Miller
+- Copyright 2018-2025, Mike Miller
 - Released under the LGPL, version 3+.
 - Enterprise Pricing:
 
   | 6 MEEllion dollars…  *Bwah-haha-ha!*
-  | (only have to sell *one* copy!)
+  | (only need to sell *one* copy!)
