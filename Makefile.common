@@ -54,7 +54,7 @@ clean-default:  ## Sweep up detritus
 	git gc
 
 
-check-readme-default: readme.rst  ## Check readme for syntax errors.
+check-readme-default: README.rst  ## Check readme for syntax errors.
 	# requires readme_renderer from PyPi
 	python3 setup.py check --restructuredtext --strict
 
