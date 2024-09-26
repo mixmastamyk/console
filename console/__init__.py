@@ -11,22 +11,6 @@ fg = bg = ul = fx = defx = _empty_bin
 sc = _empty_scr_bin
 
 
-# Py3.6+ - set up a dummy future-fstrings encoding that is really utf8
-#~ import sys as _sys
-#~ if _sys.version_info >= (3, 6):
-# issue #12 - lets install it if need be, to be removed in a later version
-try:
-    from codecs import lookup as _lookup
-    _lookup('future-fstrings')
-except LookupError:
-    import codecs as _codecs
-    import encodings as _encodings
-
-    _utf8 = _encodings.search_function('utf8')
-    _codec_map = {'future-fstrings': _utf8, 'future_fstrings': _utf8}
-    _codecs.register(_codec_map.get)
-
-
 try:  # avoid install issue with new pip:2024 :-/
     import env as _env
 except ModuleNotFoundError as err:
