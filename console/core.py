@@ -26,14 +26,11 @@ except ImportError:
     webcolors = None
 
 
-log = logging.getLogger(__name__)
 MAX_NL_SEARCH = defaults.MAX_NL_SEARCH
-_string_plus_call_warning_template = '''
-
-    Ambiguous and/or inefficient addition operation used:
-        Form:  pal.style1 + pal.style2(msg)
-          or:  adding a style to a previously ANSI escaped string.
-        Given: %r + %r
+_STRING_PLUS_CALL_ERROR_TEMPLATE = '''\
+Ambiguous addition—first sequence has may not have been ended.
+    Example Form:  pal.style1 + pal.style2(msg)
+    Given:         {!r} + {!r}
 
     Suggested alternatives:
         (pal.style1 + pal.style2)(msg)  # new anonymous style
@@ -41,8 +38,8 @@ _string_plus_call_warning_template = '''
         pal.style2(msg, pal.style1)     # via "mixins"
 '''
 
+log = logging.getLogger(__name__)
 # Palette attribute name finders.  Now we've got two problems.
-# Not a huge fan of regex but they nicely enforce the attribute naming rules:
 _hd = '[0-9A-Fa-f]'  # hex digits
 _index_finder = re.compile(r'^i_?\d{1,3}$', re.A)                   # i_DDD
 _nearest_finder = re.compile(f'^n_?{_hd}{{3}}$', re.A)              # n_HHH
@@ -109,17 +106,14 @@ class _BasicPaletteBuilder:
 
 
 class _MonochromePaletteBuilder(_BasicPaletteBuilder):
-    ''' A type of PaletteBuilder that let's us classify and enable effects
-        objects.
-    '''
+    ''' A type of PaletteBuilder that let's us enable effects objects. '''
     pass
 
 
 class _HighColorPaletteBuilder(_BasicPaletteBuilder):
     ''' Container/Router for ANSI Extended & Truecolor palettes.
 
-        Unlike the Basic palette builder, this one computes attributes on the
-        fly.
+        Unlike the Basic palette builder, computes attributes on the fly.
     '''
     def __init__(self, downgrade_method='euclid', **kwargs):
         super().__init__(**kwargs)
@@ -371,7 +365,7 @@ class _LineWriter:
 
 
 class _PaletteEntry:
-    ''' Palette Entry Attribute, a.k.a. a "color"
+    ''' Palette Entry Attribute, a.k.a. a "color" or "effect".
 
         Enables:
 
@@ -410,7 +404,9 @@ class _PaletteEntry:
         ''' Add: self + other '''
         if isinstance(other, str):
             if other.startswith(CSI) and other.endswith(self._end_code):
-                return self._handle_ambiguous_op(other)
+                raise TypeError(
+                    _STRING_PLUS_CALL_ERROR_TEMPLATE.format(self, other)
+                )
             else:
                 return str(self) + other
 
@@ -499,50 +495,6 @@ class _PaletteEntry:
 
     def __repr__(self):
         return repr(self.__str__())
-
-    def _handle_ambiguous_op(self, other):
-        ''' This operation is ambiguous and difficult to handle fully, e.g.::
-
-                pal.style1 + pal.style2('hello')
-
-            Attempts to break up the other ansi string by lines,
-            insert codes into each opening sequence, conditionally fix end.
-        '''
-        import warnings
-
-        msg = _string_plus_call_warning_template % (self, other)
-        warnings.warn(msg, SyntaxWarning)  # warn first
-        log.debug(msg)
-        try:
-            # do line by line to avoid doubling mem reqs
-            lines = other.splitlines()
-            for i, line in enumerate(lines):
-                tokens = [CSI]
-                tokens.append(';'.join(self._codes))            # if multiple
-                tokens.append(';')
-                tokens.append(CSI.join(line.split(CSI)[1:-1]))  # if multiple
-
-                # figure end code:
-                try:
-                    end_code = self.default._codes[0]
-                except AttributeError:  # already rendered
-                    end_code = self.default.strip('\x1b[m')
-
-                if end_code == other[-3:-1]:    # same category
-                    tokens.append(str(self.default))
-                else:                           # different
-                    tokens.append(ANSI_RESET)
-                # put humpty (pronounced with an -umpty) back together again:
-                lines[i] = ''.join(tokens)
-            result = '\n'.join(lines)
-
-        except IndexError as err:
-            log.warn('Could not perform enhanced addition with operands'
-                     ': %r %r.  Falling back to str concatenation. %s',
-                      self, other, err)
-            result = str(self) + other
-
-        return result
 
     def template(self, placeholder='{}'):
         ''' Returns a template string from this Entry with its attributes.

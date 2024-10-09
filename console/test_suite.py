@@ -807,15 +807,17 @@ if True:  # fold
 
     def test_style_plus_call_construct():
         ''' test warning on inefficient/problematic form '''
-        import warnings
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")  # all warnings always
-            # trigger
+        #~ import warnings  # old way, just going to make it an exception
+        #~ with warnings.catch_warnings(record=True) as w:
+            #~ warnings.simplefilter("always")  # all warnings always
+            #~ # trigger
+            #~ fg.green + bg.red('Merry\nXmas!')
+            #~ # verify:
+            #~ assert len(w) == 1
+            #~ assert issubclass(w[-1].category, SyntaxWarning)
+            #~ assert "Ambiguous" in str(w[-1].message)
+        with pytest.raises(TypeError):
             fg.green + bg.red('Merry\nXmas!')
-            # verify:
-            assert len(w) == 1
-            assert issubclass(w[-1].category, SyntaxWarning)
-            assert "Ambiguous" in str(w[-1].message)
 
     def test_raise_on_call_default_defx():
         '''  Prevent calling on default or defx. '''

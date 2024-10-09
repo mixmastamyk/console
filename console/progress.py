@@ -79,7 +79,7 @@ styles = dict(
                   ),
     # eight-bit color or higher
     amber       = (
-                    _dim_amber,   # first
+                    _dim_amber,         # first
                     fg.i208,            # complete
                     fg.i172,            # empty
                     fx.dim + fg.i172,   # last
@@ -111,7 +111,7 @@ styles = dict(
                     _err_color,         # error
                   ),
     greyam       = (
-                    _dim_amber,   # first
+                    _dim_amber,         # first
                     fg.i208,            # complete
                     fg.i236,            # empty
                     fx.dim + fg.i236,   # last
@@ -218,16 +218,16 @@ class ProgressBar:
                     sleep(.1)
 
         Arguments:
-            clear_left: True        True to clear and mv to 0, or int offset
-            debug: None             Enable debug output
+            clear_left: True        True to clear and mv to 0, or int offset.
+            debug: None             Enable debug output.
             done: False             True on completion, moderates style
             expand: False           Set width to full terminal width
-            iterable: object        An object to iterate on.
+            iterable: object        An object to iterate on, see tqdm example.
             label_mode:  True       Enable progress percentage label
-            oob_error:  False       Out of bounds error occurred
-            total:  100             Set the total number of items
+            oob_error:  False       Out of bounds error occurred.
+            total:  100             Set the total number of items.
             unicode_support: bool   Detection result, determines default icons
-            width: 32               Full width of bar, padding, and labels
+            width: 32               Full width of bar, padding, and labels.
 
             icons:  (,,,)           Tuple of chars
             styles: (,,,)           Tuple of ANSI styles

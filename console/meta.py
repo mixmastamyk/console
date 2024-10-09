@@ -4,7 +4,7 @@
 
     Project metadata is specified here.
 
-    This module *should not* import anything from the project or third-party
+    This module should *not* import anything from the project or third-party
     modules, to avoid dependencies in setup.py or circular import issues.
 '''
 from os.path import join as _join
@@ -14,7 +14,7 @@ from types import SimpleNamespace as _Namespace
 
 pkgname         = 'console'
 full_name       = 'Console'  # rendered for Makefile
-__version__     = version = '0.9909a1'
+__version__     = version = '0.9909a2'
 __author__      = authors = ', '.join([
                                 'Mike Miller',
                                 #~ 'and contributors',

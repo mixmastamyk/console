@@ -741,7 +741,7 @@ def get_title(mode='title'):
     return title
 
 
-def get_theme(timeout=defaults.READ_TIMEOUT):
+def get_theme(timeout=defaults.READ_TIMEOUT, default=None):
     ''' Checks terminal for light/dark theme information.
 
         First checks for the environment variable COLORFGBG.
@@ -749,10 +749,15 @@ def get_theme(timeout=defaults.READ_TIMEOUT):
         perhaps others.
         See notes on get_color().
 
+
+        Arguments:
+            timeout: int, time before giving up
+            default: string, fallback value
+
         Returns:
             str, None:  'dark', 'light', or None if no information.
     '''
-    theme = None
+    theme = default
     COLORFGBG = env.COLORFGBG.value
     log.debug('COLORFGBG: %s', COLORFGBG)
 
@@ -844,4 +849,5 @@ if __name__ == '__main__':
         logging.basicConfig(level=logging.DEBUG, format=fmt)
 
     from . import using_terminfo as _using_terminfo
+
     init(using_terminfo=_using_terminfo)  # run again so detection gets logged

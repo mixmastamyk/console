@@ -105,7 +105,7 @@ class BackgroundPalette(_HighColorPaletteBuilder):
 
 class UnderlinePalette(_HighColorPaletteBuilder):
     ''' Container for color codes specific to underlines.
-        EXPERIMENTAL, see notes.  Supported by libvte and kitty.
+        ddSupported by libvte and kitty.
 
         This palette supports extended and true color sequences only.
         However the first 16 colors of extended coincide with standard colors,

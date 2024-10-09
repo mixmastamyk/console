@@ -9,7 +9,7 @@ from console.detection import get_theme
 from console.utils import make_hyperlink
 
 
-ASCII_MODE = 1  # TODO: rm these
+ASCII_MODE = 1
 UNICODE_MODE = 2
 
 _wp_base_url = 'https://en.wikipedia.org/wiki/'
@@ -20,22 +20,23 @@ _i = fx.italic
 _kb = fx.reverse  # keyboard
 
 _help_text = __doc__ + f'''
-    This four-column table (of thirty-two rows each) helps better illustrate
-    relationships between characters and control codes:
+    This four-column table (of thirty-two rows each) helps illustrate the
+    relationships between characters and control codes better than more common
+    ASCII chart layouts:
 
         • To find the binary representation of a character, concatenate the
           two digit group code above its column, with its five digit row code:
 
           {_i}Optional 8th bit{n} →  {_d}0{n}  {_bd}10{n}  {_d}01000{n}        ⇒  {_d}0{_bd}10{n}{_d}01000{n}
-                     {_i}Group code{n} ↗      ↑ {_i}Row code{n}      ↑ {_i}Full byte, aka "H"{n}
+                     {_i}Group code{n} ↗     ↑ {_i}Row code{n}      ↑ {_i}Full Monty byte, aka "H"{n}
 
         • To generate a control code, a key is pressed then AND-ed with the
-          control key group code of 00, forcing the sixth and seventh bits
-          to zero.  This is why, for example:
+          control key group code of 00, forcing the sixth and seventh most
+          significant bits (from the right!) to zero.  This is why, for example:
 
           • {_i}BEL{n}, the Bell may be activated with {_kb}^G{n} {_i}(column to right){n}
           • {_i}BS{n}, the Backspace key is represented by {_kb}^H{n}
-          • {_i}ESC{n}, the Escape key is represented by {_kb}^[{n} etc.
+          • {_i}ESC{n}, the Escape key is represented by {_kb}^[{n}, etc.
 
         • This is also why one can add 32/20h to the index of a capital to
           find the corresponding lower case letter.
@@ -129,6 +130,25 @@ ctrl_symbols = (
     (None,    'DEL', '␡', 'Delete_character'),  # aka index -1
 )
 
+styles = dict(
+    dark = dict(
+        bin_clr = fg.darkred,
+        dec_clr = fg.darkorange3,
+        hex_clr = fg.purple,
+        evn_bg_clr = str(bg.i233),
+        odd_bg_clr = str(bg.i235),
+        hdr_style = bg.i235 + fx.italic,
+    ),
+    light = dict(
+        bin_clr = fg.blue,
+        dec_clr = fg.green,
+        hex_clr = fg.cyan,
+        evn_bg_clr = str(bg.i255),
+        odd_bg_clr = str(bg.i253),
+        hdr_style = bg.i253 + fx.italic,
+    ),
+)
+
 
 class SilentString(str):
     # Used when output is redirected.  Shouldn't be necessary, but here we are.
@@ -143,28 +163,20 @@ def print_ascii_chart(
         unicode_symbols=False,
     ):
     # see module doc string
-    mode = UNICODE_MODE if unicode_symbols else ASCII_MODE  # TODO
+    mode = UNICODE_MODE if unicode_symbols else ASCII_MODE
     try:
         # Get theme - defaults
         bin_clr = dec_clr = hex_clr = hdr_style = SilentString()
         evn_bg_clr = odd_bg_clr = ''
+        style = styles[get_theme(default='dark')]
 
-        theme = get_theme()
-        if theme == 'dark':
-            bin_clr = fg.darkred
-            dec_clr = fg.darkorange3
-            hex_clr = fg.purple
-            evn_bg_clr = str(bg.i233)
-            odd_bg_clr = str(bg.i235)
-            hdr_style = bg.i235 + fx.italic
-
-        elif theme == 'light':
-            bin_clr = fg.blue
-            dec_clr = fg.green
-            hex_clr = fg.cyan
-            evn_bg_clr = str(bg.i255)
-            odd_bg_clr = str(bg.i253)
-            hdr_style = bg.i253 + fx.italic
+        # writing locals() doesn't work consistently until 3.13
+        bin_clr = style['bin_clr']
+        dec_clr = style['dec_clr']
+        hex_clr = style['hex_clr']
+        evn_bg_clr = style['evn_bg_clr']
+        odd_bg_clr = style['odd_bg_clr']
+        hdr_style = style['hdr_style']
         title_style = dec_clr + fx.bold
 
         if headers:

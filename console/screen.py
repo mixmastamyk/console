@@ -480,6 +480,7 @@ if _ansi_capable:
     )
 else:
     from .meta import defaults
+
     Screen.get_position = ScreenTermInfo.get_position = (
         lambda *args, **kwargs: defaults.CURSOR_POS_FALLBACK
     )

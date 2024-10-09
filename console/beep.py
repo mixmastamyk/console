@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 
 
 def _check_environment():
-    ''' Warn if we're in a audio poor environment. '''
+    ''' Warn if we're in an audio-poor environment. '''
     if env.TERM in ('linux', 'fbterm'):
         log.debug('Warning: console beep may require `sudo modprobe pcspkr` '
                   'or an audio playback module such as BoomBox.')
@@ -38,7 +38,7 @@ def beep_macos(wait_secs=.5):
     ''' Simple audio-system beep for MacOS.
 
         If the program runs too quickly it will get killed before the sound
-        is played, so a small sleep, say .5 seconds afterward may be necessary.
+        is played.  A small sleep, say .5 seconds afterward may be necessary.
     '''
     log.debug('trying AppKit.NSBeep…')
     from AppKit import NSBeep
@@ -70,7 +70,7 @@ beep = lambda *args: log.error('beep impl. not loaded. (%s)', args)
 
 
 # Load a default implementation at beep()
-if os_name == 'nt':             # I'm a PC
+if os_name == 'nt':                     # I'm a PC
     beep = beep_windows
 
 else:
@@ -79,13 +79,13 @@ else:
         curses.initscr()
         beep = beep_curses
     else:
-        if sys.platform == 'darwin':  # Think different
+        if sys.platform == 'darwin':    # Think diffr'nt
             #~ try:
                 #~ import AppKit
                 #~ beep = beep_macos
             #~ except ImportError:
                  #~ AppKit = None
-            # default to posix, less troublesome
+            # default to posix, less troublesome:
             beep = beep_posix
 
         elif os_name == 'posix':        # Tron leotards

@@ -3,8 +3,7 @@
     .. © 2018-2025, Mike Miller - Released under the LGPL, version 3+.
 
     Convenience command-line interface script for select utility functions
-    and methods that don't have common implementations,
-    such as tput.
+    and methods that don't have common implementations.
     (Optional arguments may be shortened and are recognized when unique.)
 '''
 import sys, os
@@ -59,6 +58,7 @@ actions = dict(
 )
 if os.name == 'nt':  # :-/
     from .windows import add_os_sysexits
+
     add_os_sysexits()
 
 

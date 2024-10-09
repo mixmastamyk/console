@@ -324,8 +324,8 @@ Simply use ``str()`` to finalize the output then use it in the loop.
 
     >>> msg = str(muy_importante('¡AHORITA!'))
 
-    >>> for i in range(100000000):
-    ...     print(msg)  # rapidinho, por favor
+    >>> for i in range(100_000_000):
+    ...     print(msg, end=' ')  # rapidinho, por favor
 
 
 .. rubric:: **Managers**
@@ -451,7 +451,6 @@ Der ``console`` package has recently been tested on:
 - Mint Linux 22 (24.04) - Python 3.12
 
   - xterm, mate-terminal, linux console, fbterm
-  - Very occasionally on kitty, guake
 
 - MacOS 11.7 - Python 3.12
 
@@ -470,6 +469,8 @@ Not so recently:
 - Windows 7 - Python 3.6 - 32 bit + colorama
 - Windows XP - Python 3.4 - 32 bit + colorama, ansicon
 - MacOS 10.13 - Python 3.6
+
+- Very occasionally on kitty, guake
 
 ::
 
@@ -584,6 +585,7 @@ You can:
 .. code-block:: python
 
     from console.constants import BEL
+
     print(f'Ring my {BEL}… Ring my {BEL}')  # ring-a-ling-a-ling…
 
 
