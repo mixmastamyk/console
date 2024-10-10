@@ -392,7 +392,7 @@ Der ``console`` package has recently been tested on:
 
 - Haiku R1/Beta5 - Python 3.12
 
-Not so recently:
+Not so recently, likely will need an older version:
 
 - Ubuntu Linux 20.04 - Python 3.8
 - FreeBSD 11 - Python 3.7
@@ -424,7 +424,7 @@ includes a number of nifty functions:
 
     >>> from console.utils import cls, set_title
 
-    >>> cls()  # whammo! a.k.a. clear screen, scrollback
+    >>> cls()  # whammo! a.k.a. clear screen & scrollback
     >>> set_title('Le Freak')  # c'est chic
     '\x1b]2;Le Freak\x07'
 
@@ -583,7 +583,7 @@ WRapping Up
     *are gonna try to move your feet…*
 
 
-With a brand-new new sound called *hip hop.*
+With a brand-new new sound called "rap music", aka *hip hop.*
 
 
 Contributions
@@ -604,8 +604,8 @@ Breakages: should be rare before 1.0 and non-existent afterwards.
 - Version 0.9909 - Pyupgrade to 3.8 idioms, probably doesn't fully support 3.6
   any longer.
 
-- Version 0.9908 - Apologies, the progress bar has changed from a 0-99 scale to
-  a 0-100.  Perhaps should use 0-1 ?
+- Version 0.9908 - Apologies, the progress bar has changed from a default 0-99
+  scale to a 0-100.  Using your own scale (or tqdm style) should continue to work.
 
 - Version 0.9907 - Apologies, the Screen class will have a few changes in the
   names of attributes to make them more consistent.
