@@ -133,7 +133,7 @@ def init(using_terminfo=False, _stream=sys.stdout, _basic_palette=()):
 
         # find the platform-dependent 16-color basic palette
         if level and not using_terminfo:
-            pal_name, _basic_palette = _find_basic_palette_from_os()
+            pal_name, _basic_palette = _find_basic_palette_from_os(_stream)
 
         log.debug('Basic palette: %r %r', pal_name, _basic_palette)
         if _basic_palette:
@@ -348,7 +348,7 @@ def detect_unicode_support():
     return result
 
 
-def _find_basic_palette_from_os():
+def _find_basic_palette_from_os(stream=sys.stdout):
     ''' Find the platform-dependent 16-color basic palette—posix version.
 
         This is used for "downgrading to the nearest color" support.
@@ -366,7 +366,7 @@ def _find_basic_palette_from_os():
             basic_palette = color_tables.vga_palette4
         else:  # Look harder by querying terminal; get_color may timeout
             try:  # TODO: this comparison could be much better:
-                colors = get_color('index', 2)
+                colors = get_color('index', 2, stream=stream)
                 if colors[0][:2] == '85':
                     pal_name = 'solarized'
                     basic_palette = color_tables.solarized_dark_palette4
@@ -484,7 +484,7 @@ def _read_until_select(infile=sys.stdin, max_bytes=20, end=RS, timeout=None):
     return ''.join(chars)
 
 
-def _get_color_xterm(name, number=None, timeout=None):
+def _get_color_xterm(name, number=None, stream=sys.stdout, timeout=None):
     ''' Query xterm for color settings.
 
         Warning: likely to block on incompatible terminals, use timeout.
@@ -499,11 +499,11 @@ def _get_color_xterm(name, number=None, timeout=None):
         query_sequence = f'{OSC}{color_code};?{ST}'
         #~ log.debug('query seq: %r', query_sequence)
         try:
-            with TermStack() as fd:
+            with TermStack(stream) as fd:
                 termios.tcflush(fd, termios.TCIFLUSH)   # clear input
                 tty.setcbreak(fd, termios.TCSANOW)      # shut off echo
-                sys.stdout.write(query_sequence)
-                sys.stdout.flush()
+                stream.write(query_sequence)
+                stream.flush()
                 resp = _read_until_select(  # max bytes 26 + 2 for 256 digits
                             max_bytes=28, end=(BEL, ST), timeout=timeout
                         )
@@ -580,7 +580,7 @@ def get_answerback(max_bytes=32, end=(BEL, ST, '\n'), timeout=defaults.READ_TIME
         log.debug('answerback not yet implemented by Windows.')
 
 
-def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
+def get_color(name, number=None, stream=sys.stdout, timeout=defaults.READ_TIMEOUT):
     ''' Query the default terminal, for colors, etc.
 
         Direct queries supported on xterm, iTerm, perhaps others.
@@ -630,7 +630,7 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
     if sys.platform == 'darwin':  # check first
         if env.TERM_PROGRAM == 'iTerm.app':
             # supports, though returns only two chars per
-            color = _get_color_xterm(name, number, timeout=timeout)
+            color = _get_color_xterm(name, number, stream=stream, timeout=timeout)
 
     elif os_name == 'posix':
         if env.WSLENV or env.TERM_PROGRAM == 'vscode':
@@ -642,7 +642,7 @@ def get_color(name, number=None, timeout=defaults.READ_TIMEOUT):
             pass  # defective xterms, TODO: probably should opt-in instead
 
         elif env.TERM.startswith('xterm'):
-            color = _get_color_xterm(name, number, timeout=timeout)
+            color = _get_color_xterm(name, number, stream=stream, timeout=timeout)
 
     # Windows impl. uses its API, Terminal has begun support of xterm query
     log.debug('%s %s color: %r', name, number, color)
@@ -810,10 +810,11 @@ if os_name == 'nt' and not env.SSH_CLIENT:  # I'm a PC
 
 elif sys.platform == 'darwin':  # Think diff'rnt
 
-    def _find_basic_palette_from_os():
+    def _find_basic_palette_from_os(stream=None):
         ''' Find the platform-dependent 16-color basic palette—macOS version.
 
             This is used for "downgrading to the nearest color" support.
+            The posix impl. takes stream as an argument, so this does too.
         '''
         pal_name = 'default (xterm)'
         basic_palette = DEFAULT_BASIC_PALETTE

@@ -182,10 +182,12 @@ def detect_unicode_support(codepage='cp65001'):  # aka utf8
     return result
 
 
-def _find_basic_palette_from_os():
+def _find_basic_palette_from_os(stream=None):
     ''' Find the platform-dependent 16-color basic palette—Windows version.
 
         This is used for "downgrading to the nearest color" support.
+
+        The posix impl. takes stream as an argument, so this does too.
     '''
     if sys.getwindowsversion()[2] >= 16299: # new palette after Win10 1709 FCU
         pal_name = 'cmd_1709'
