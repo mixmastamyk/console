@@ -416,7 +416,7 @@ Hello world looks like this:
     >>> from console.progress import ProgressBar
 
     >>> bar = ProgressBar()  # "Hey HEY, hey!"
-    >>> print(bar(50))       # out of 0-99
+    >>> print(bar(.5))       # value from 0-1
 
 .. raw:: html
 
@@ -460,7 +460,7 @@ Some examples:
 (Windows console has very limited Unicode font support unfortunately,
 though Lucida Console is a bit more comprehensive than Consolas.
 ProgressBar defaults to an ASCII representation in that environment.
-Use Win Terminal.)
+Instead, recommended to use Win Terminal.)
 
 A more robust use of the modules is illustrated below::
 
@@ -470,32 +470,34 @@ A more robust use of the modules is illustrated below::
 
     with sc.hidden_cursor():  # "Ooooohh, I'm tellin' Mama!"
 
-        items = range(256)      # example tasks, set total
-        bar = ProgressBar(total=len(items)-1)
+        # download example
+        filesize, downloaded = 1048576, 262144
+        bar = ProgressBar(total=filesize)
+        print(bar(downloaded))
+        # or perhaps
+        print(ProgressBar()(downloaded / filesize))
 
-        # simple loop
-        for i in items:
-            print(bar(i), end='', flush=True)
-            sleep(.02)         # "Uh-Uhn"
-        print()
+        # task list example
+        items = range(256)
+        bar = ProgressBar(total=len(items))  # manual set
 
-        # how to use with a trailing caption:
+        # with caption
         for i in items:
-            print(bar(i), f' copying: /path/to/img_{i:>04}.jpg',
+            print(bar(i+1), f' copying: /path/to/img_{i:>04}.jpg',
                   end='', flush=True)
-            sleep(.05)
+            sleep(.06)
         print()
 
-        # or use as a simple tqdm-style iterable wrapper, sans print
-        for i in ProgressBar(range(100)):
-            sleep(.05)
-
+        # or use as a simple tqdm-style iterable wrapper:
+        for i in ProgressBar(items):
+            sleep(.06)
 
 
 Not all of this code is required, of course.
 For example, you may not want to hide the cursor or clear the line each time,
 but often will.
-To expand to the full line,
+The ProgressBar is themeable, via colors and Unicode icons. 🤘
+To expand to the full width of the line,
 ``expand=True`` is available as well.
 See the docs (:mod:`console.progress`) and source for more details.
 

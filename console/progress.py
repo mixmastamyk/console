@@ -23,9 +23,9 @@ from .detection import detect_unicode_support, get_size, os_name
 from .disabled import empty as _empty
 from .utils import len_stripped, notify_progress
 
-DEF_TOTAL = 100
-DEF_WIDTH = 32
-MIN_WIDTH = 12
+DEF_TOTAL = 1
+DEF_WIDTH = 24+6
+MIN_WIDTH = 12+6
 TIMEDELTAS = (60, 300)  # accuracy thresholds, in seconds, one and five minutes
 term_width = _term_width_orig = get_size()[0]
 log = logging.getLogger(__name__)
@@ -197,8 +197,16 @@ class ProgressBar:
 
             with sc.hidden_cursor():
 
-                items = range(256)      # example tasks
-                bar = ProgressBar(total=len(items))  # set total
+                # download
+                filesize, downloaded = 1048576, 262144
+                bar = ProgressBar(total=filesize)
+                print(bar(downloaded))
+                # or perhaps
+                print(ProgressBar()(downloaded / filesize))
+
+                # task list
+                items = range(256)
+                bar = ProgressBar(total=len(items))  # manual set
 
                 # simple loop
                 for i in items:
@@ -208,17 +216,17 @@ class ProgressBar:
 
                 # with caption
                 for i in items:
-                    print(bar(i), f' copying: /path/to/img_{i:>04}.jpg',
+                    print(bar(i+1), f' copying: /path/to/img_{i:>04}.jpg',
                           end='', flush=True)
-                    sleep(.1)
+                    sleep(.06)
                 print()
 
                 # or use as a simple tqdm-style iterable wrapper:
-                for i in ProgressBar(range(100)):
-                    sleep(.1)
+                for i in ProgressBar(items):
+                    sleep(.06)
 
         Arguments:
-            clear_left: True        True to clear and mv to 0, or int offset.
+            clear_left: bool | int  True to clear and mv to 0, or int offset.
             debug: None             Enable debug output.
             done: False             True on completion, moderates style
             expand: False           Set width to full terminal width
@@ -227,7 +235,7 @@ class ProgressBar:
             oob_error:  False       Out of bounds error occurred.
             total:  100             Set the total number of items.
             unicode_support: bool   Detection result, determines default icons
-            width: 32               Full width of bar, padding, and labels.
+            width: 30               Full width of bar, padding, and labels.
 
             icons:  (,,,)           Tuple of chars
             styles: (,,,)           Tuple of ANSI styles
@@ -439,6 +447,7 @@ class ProgressBar:
             elif delta > self.timedeltas[0]:
                 label_fmt = self.label_fmt[1]
 
+        # decide how to draw this in its current state
         if 0 <= ratio < 1:  # in progress
             if label_mode:
                 label = label_unstyled = label_fmt % (ratio * 100)
@@ -448,32 +457,39 @@ class ProgressBar:
                 self._comp_style = self.styles[_ic]
                 self.oob_error = False
                 self.done = False
-        else:
-            if ratio == 1:  # done
-                self.done = True
-                self._comp_style = self.styles[_id]
-                self._last = self.styles[_if](self.icons[_il])
-                if label_mode:
-                    label = label_unstyled = self.label_fmt_str % self.icons[_id]
-                if self.oob_error:  # now fixed, reset
-                    self._first = self.styles[_if](self.icons[_if])
-                    self.oob_error = False
 
-            # error - out of bounds :-/
-            elif ratio > 1:
-                self.done = True
-                self.oob_error = True
-                self._last = self._err_style(self.icons[_ieh])
-                if label_mode and not label_mode == 'internal':
-                    label_unstyled = self.label_fmt_str % self.icons[_ieb]
-                    label = self._err_style(label_unstyled)
-            else:  # < 0
-                self.oob_error = True
-                self.done = False
-                self._first = self._err_style(self.icons[_iel])
-                if label_mode and not label_mode == 'internal':
-                    label_unstyled = self.label_fmt_str % self.icons[_ieb]
-                    label = self._err_style(label_unstyled)
+        elif ratio == 1:  # done
+            self.done = True
+            self._comp_style = self.styles[_id]
+            self._last = self.styles[_if](self.icons[_il])
+            if label_mode:
+                label = label_unstyled = self.label_fmt_str % self.icons[_id]
+            if self.oob_error:  # now fixed, reset
+                self._first = self.styles[_if](self.icons[_if])
+                self.oob_error = False
+
+        # error - out of bounds :-/
+        elif ratio >= 2:
+            # help folks who are using 100 default and it changed on them :-/
+            self.total = 100
+            label_unstyled = self.label_fmt_str % 'Error: reducing total to 1'
+            label = self._err_style(label_unstyled)
+
+        elif ratio > 1:
+            self.done = True
+            self.oob_error = True
+            self._last = self._err_style(self.icons[_ieh])
+            if label_mode and not label_mode == 'internal':
+                label_unstyled = self.label_fmt_str % self.icons[_ieb]
+                label = self._err_style(label_unstyled)
+
+        else:  # < 0
+            self.oob_error = True
+            self.done = False
+            self._first = self._err_style(self.icons[_iel])
+            if label_mode and not label_mode == 'internal':
+                label_unstyled = self.label_fmt_str % self.icons[_ieb]
+                label = self._err_style(label_unstyled)
 
         self._lbl = label
         # dynamic resizing of the bar, depending on label length:
@@ -584,7 +600,7 @@ def progress(value: float,
         label_mode=ProgressBar.label_mode,
         list_themes=False,
         theme=ProgressBar.theme,
-        total: int=DEF_TOTAL,
+        total: int = DEF_TOTAL,
         width=ProgressBar.width,
         debug=bool(ProgressBar.debug),
     ):
@@ -631,7 +647,9 @@ if __name__ == '__main__':
     # set defaults
     ProgressBar.debug = '-d' in sys.argv
     ProgressBar.label_mode = '-l' in sys.argv
+    # change class defaults
     ProgressBar._clear_left = False  # new class default
+    ProgressBar.total = 100
 
     bars = [
         ('basic, expanded:\n',
