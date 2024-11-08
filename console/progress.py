@@ -233,7 +233,7 @@ class ProgressBar:
             iterable: object        An object to iterate on, see tqdm example.
             label_mode:  True       Enable progress percentage label
             oob_error:  False       Out of bounds error occurred.
-            total:  100             Set the total number of items.
+            total:  1               Set the total number of items.
             unicode_support: bool   Detection result, determines default icons
             width: 30               Full width of bar, padding, and labels.
 
