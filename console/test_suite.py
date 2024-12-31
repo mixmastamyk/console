@@ -358,6 +358,16 @@ if True:  # fold
         text = muy_importante(msg, fx.u)
         assert text == f'{CSI}37;1;41;4m{msg}{CSI}0m'
 
+    def test_call_empty_falsey_types():
+        ''' Don't emit codes when value empty.  '''
+        assert fg.red('foo') == '\x1b[31mfoo\x1b[39m'
+        assert fg.lightgreen('') == ''
+        assert fx.bold(None) == ''
+        # allow falsey values
+        assert bg.salmon(0) == '\x1b[48:2::250:128:114m0\x1b[49m'  # colons?
+        assert fg.red(0.0) == '\x1b[31m0.0\x1b[39m'
+        assert fx.underline(False) ==  '\x1b[4mFalse\x1b[24m'
+
 # Screen
 # ----------------------------------------------------------------------------
 if True:  # fold

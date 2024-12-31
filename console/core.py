@@ -464,7 +464,8 @@ class _PaletteEntry:
             self.name in ('DEFAULT', 'END')):
             raise NotImplementedError("call form undefined for "
                                       "EffectsTerminator or 'default'.")
-        if not text:  # when an empty string/None is passed, don't emit codes.
+        # when an empty string/None is passed, don't emit, but allow falsey.
+        if text == '' or text is None:
             return ''
 
         # if the defaults of mixins are different,
@@ -539,7 +540,8 @@ class _CallableFBString(str):
         Palettes of a different category.  :-/
     '''
     def __call__(self, text, *styles, original_length=False):
-        if not text:  # when an empty string/None is passed, don't emit codes.
+        # when an empty string/None is passed, don't emit, but allow falsey.
+        if text == '' or text is None:
             return ''
 
         # add and end styles per line, to facilitate paging:
