@@ -551,9 +551,12 @@ if True:  # fold
         utils.wait_key
         utils.pause
         if not detection.is_a_tty():
+            import warnings
 
-            utils.wait_key()
-            utils.pause('')
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                utils.wait_key()  # doesn't wait when not a tty
+                utils.pause('')
 
 
 # Detection
