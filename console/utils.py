@@ -636,3 +636,10 @@ def wait_key(keys=None):
                     return key
         else:
             return _get_char()
+    else:
+        from warnings import warn
+
+        warn(
+            'POSIX wait_key() cannot work when input is redirected.',
+            RuntimeWarning,
+        )
