@@ -627,7 +627,12 @@ def get_color(name, number=None, stream=sys.stdout, timeout=defaults.READ_TIMEOU
             which may be different if they were customized.
     '''
     color = ()
-    if sys.platform == 'darwin':  # check first
+
+    if not is_a_tty(stream=sys.stdin):
+        # skip this on posix/xterm when stdin is redirected—can't read answer!
+        pass  # check here because Windows impl. does not need
+
+    elif sys.platform == 'darwin':  # check first
         if env.TERM_PROGRAM == 'iTerm.app':
             # supports, though returns only two chars per
             color = _get_color_xterm(name, number, stream=stream, timeout=timeout)
