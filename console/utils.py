@@ -626,7 +626,7 @@ def wait_key(keys=None):
             char or ESC - depending on key hit.
             None - immediately under i/o redirection, not an interactive tty.
     '''
-    if is_a_tty():
+    if is_a_tty(stream=sys.stdin):
         if keys:
             if not isinstance(keys, tuple):
                 keys = (keys,)

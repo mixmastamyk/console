@@ -14,7 +14,7 @@ from types import SimpleNamespace as _Namespace
 
 pkgname         = 'console'
 full_name       = 'Console'  # rendered for Makefile
-__version__     = version = '0.9910'
+__version__     = version = '0.9911a2'
 __author__      = authors = ', '.join([
                                 'Mike Miller',
                                 #~ 'and contributors',
