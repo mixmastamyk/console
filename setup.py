@@ -14,7 +14,8 @@ meta = import_module('console.meta')
 install_requires = (
     'ezenv>=0.92',  # https://peps.python.org/pep-0508/#environment-markers
     'jinxed;        os_name == "nt" ',  # for ssh into windows
-    'colorama;      os_name == "nt" and platform_version < "10.0.10586" ',
+    # Below broken by pip, Win 10 EOL
+    #~ 'colorama;      os_name == "nt" and platform_version < "10.0.10586" ',
 )
 tests_require = ('pyflakes', 'pytest', 'readme_renderer'),
 extras_require = dict(

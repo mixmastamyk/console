@@ -400,7 +400,7 @@ Not so recently, likely will need an older version:
 - Windows XP - Python 3.4 - 32 bit + colorama, ansicon
 - MacOS 10.13 - Python 3.6
 
-- Very occasionally on kitty, guake
+- Very occasionally on kitty, guake, ghostty.
 
 ::
 
@@ -601,11 +601,12 @@ Release Notes
 
 Breakages: should be rare before 1.0 and non-existent afterwards.
 
+- Version 0.9910 - Apologies, the progress bar has changed its default 0-99
+  scale to a 0-1 float scale to avoid having to multiply the quotient by 100.
+  Using your own scale (or iterable/tqdm style), should continue to work.
+
 - Version 0.9909 - Pyupgrade to 3.8 idioms and removal of future-fstrings—\
   doesn't support 3.6 or earlier any longer.
-
-- Version 0.9908 - Apologies, the progress bar has changed from a default 0-99
-  scale to a 0-100.  Using your own scale (or tqdm style) should continue to work.
 
 - Version 0.9907 - Apologies, the Screen class will have a few changes in the
   names of attributes to make them more consistent.

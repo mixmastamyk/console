@@ -363,7 +363,7 @@ Not so recently, likely will need an older version:
 - Windows XP - Python 3.4 - 32 bit + colorama, ansicon
 - MacOS 10.13 - Python 3.6
 
-- Very occasionally on kitty, guake
+- Very occasionally on kitty, guake, ghostty.
 
 ::
 
