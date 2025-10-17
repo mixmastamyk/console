@@ -45,7 +45,7 @@ setup(
     author_email        = meta.email,
     author              = meta.authors,
     keywords            = meta.keywords,
-    license             = 'LGPL 3',
+    license             = meta.license,
     long_description    = slurp('README.rst'),
     long_description_content_type
                         = 'text/x-rst',

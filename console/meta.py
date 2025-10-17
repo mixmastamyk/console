@@ -14,7 +14,7 @@ from types import SimpleNamespace as _Namespace
 
 pkgname         = 'console'
 full_name       = 'Console'  # rendered for Makefile
-__version__     = version = '0.9912b1'
+__version__     = version = '0.9912'
 __author__      = authors = ', '.join([
                                 'Mike Miller',
                                 #~ 'and contributors',
@@ -23,7 +23,7 @@ copyright       = '© 2018-%s' % _localtime().tm_year
 description     = ('Comprehensive, composable utility library for ANSI terminals.'
                    ' Better, stronger, faster.  Tch-tch-tch-tch…')
 email           = 'mixmastamyk@github.com'
-license         = 'LGPL 3',
+license         = 'LGPL-3.0-or-later',
 keywords        = ('ansi terminal emulator console color detection '
                    'escape sequence cursor style screen shell xterm')
 
