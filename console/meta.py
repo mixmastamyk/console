@@ -23,7 +23,7 @@ copyright       = '© 2018-%s' % _localtime().tm_year
 description     = ('Comprehensive, composable utility library for ANSI terminals.'
                    ' Better, stronger, faster.  Tch-tch-tch-tch…')
 email           = 'mixmastamyk@github.com'
-license         = 'LGPL-3.0-or-later',
+license         = 'LGPL-3.0-or-later'
 keywords        = ('ansi terminal emulator console color detection '
                    'escape sequence cursor style screen shell xterm')
 
