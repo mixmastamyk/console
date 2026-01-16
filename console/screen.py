@@ -69,10 +69,11 @@ NAME_TO_TERMINFO_MAP = dict(
     enable_alt_screen   = 'smcup',
     disable_alt_screen  = 'rmcup',
 )
-
+from typing import IO
 
 class _ContextMixin:
     ''' Various Blessings-inspired context handlers are defined here. '''
+    _stream: IO
 
     # these don't have terminfo names to associate with
     enable_flash = CSI + '?5h'      # terminfo cap name, only single "flash"
@@ -348,6 +349,7 @@ class Screen(_ContextMixin):
 class _TemplateString(str):
     ''' A template string that renders itself with given or default args. '''
     _default = 1
+    _swap = None
 
     def __new__(cls, endcode, arg='%s', swap=None):
         self = str.__new__(cls, CSI + arg + endcode)
@@ -457,6 +459,7 @@ class ScreenTermInfo(_ContextMixin):
 
 class _TemplateStringTermInfo(str):
     ''' A callable template string that renders itself with given args. '''
+    _swap = None
 
     def __new__(cls, value, swap=None):
         self = str.__new__(cls, value.decode('ascii'))  # as str

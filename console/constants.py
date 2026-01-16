@@ -61,10 +61,10 @@ if _using_terminfo:
 
 # Mappings for xterm funcionality:
 _COLOR_CODE_MAP = dict(foreground='10', fg='10', background='11', bg='11')
-_MODE_MAP = dict(
+_MODE_MAP: dict[str, str] = dict(
     forward='0', backward='1', right='0', left='1', full='2', history='3'
 )
-_TITLE_MODE_MAP = dict(both='0', icon='1', title='2')
+_TITLE_MODE_MAP: dict[str, str] = dict(both='0', icon='1', title='2')
 
 # those that use colon sep
 TERMS_DIRECT_COLON = ('xterm-', 'iterm2-', 'kitty-', 'mintty-', 'mlterm-')

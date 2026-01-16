@@ -270,7 +270,7 @@ For example:
 
     # Basic                Comment
     fg.red                # One of the original 8 colors
-    fg.lightred           # Another 8 brighter colors w/o bold
+    fg.lightred           # Another 8 higher-contrast colors w/o bold
 
     # Truecolor variants
     fg.bisque             # Webcolors or X11 color name

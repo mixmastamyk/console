@@ -19,7 +19,7 @@ _bd = fx.bold + _d      # bold and/or bright digit
 _i = fx.italic
 _kb = fx.reverse  # keyboard
 
-_help_text = __doc__ + f'''
+_help_text = (__doc__ or '') + f'''
     This four-column table (of thirty-two rows each) helps illustrate the
     relationships between characters and control codes better than more common
     ASCII chart layouts:
@@ -52,7 +52,7 @@ _help_text = __doc__ + f'''
         lines in height. The standard eight-column "ascii" command for
         Unix-likes is recommended under shorter terminals when a complete view
         is desired.
-'''
+'''  # 'or' makes ty happy.
 
 
 # A range of 0…128, rendered in a table with four columns of 32 rows

@@ -739,14 +739,17 @@ if True:  # fold
         )
 
         for result in results:
-            full = getattr(bgall, result[0])
-            dwne = getattr(bge, result[0])
-            dwnb = getattr(bgb, result[0])
+            try:
+                full = getattr(bgall, result[0])
+                dwne = getattr(bge, result[0])
+                dwnb = getattr(bgb, result[0])
 
-            assert str(full) == result[1]
-            assert str(dwne) == result[2]
-            assert str(dwnb) == result[3]
-
+                assert str(full) == result[1]
+                assert str(dwne) == result[2]
+                assert str(dwnb) == result[3]
+            except AttributeError as err:
+                if 'webcolors' not in err.args[0]:  # not installed
+                    raise
 
 # Misc
 # ----------------------------------------------------------------------------

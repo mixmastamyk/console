@@ -57,6 +57,8 @@ class _BasicPaletteBuilder:
 
         Used for the basic 8/16 color and fx palettes.
     '''
+    _level = TermLevel.DUMB
+
     def __new__(cls, color_sep=None, level=Ellipsis):
         ''' Override new() to replace the class entirely on deactivation.
 
@@ -65,7 +67,6 @@ class _BasicPaletteBuilder:
                               - Ellipsis - Detect from environment.
         '''
         self = super().__new__(cls)
-        self._level = TermLevel.DUMB
 
         if level is Ellipsis:                   # autodetecten-Sie
             if _term_level:
@@ -94,7 +95,7 @@ class _BasicPaletteBuilder:
                 value = getattr(self, name, None)  # fx has no default
                 if type(value) in (int, str, tuple):  # skip methods, default²
                     if color_available or mono_available:
-                        attr = _PaletteEntry(self, name.upper(), value)
+                        attr: _PaletteEntry = _PaletteEntry(self, name.upper(), value)
                     else:
                         attr = empty
                     setattr(self, name, attr)
@@ -447,7 +448,7 @@ class _PaletteEntry:
         log.debug(repr(str(self.default)))
         self._stream.write(str(self.default))  # just in case
 
-    def __call__(self, text, *styles, save_length=False):
+    def __call__(self, text, *styles, save_length=False) -> str | _LengthyString:
         ''' Formats text.  Not appropriate for *huge* input strings.
 
             Arguments:
@@ -478,6 +479,7 @@ class _PaletteEntry:
             pos = text.find('\n', 0, MAX_NL_SEARCH)  # if '\n' in text, w/limit
         else:
             pos = None
+
         if pos in (-1, None):  # not found | not str, to str
             result = f'{self}{text}{self.default}'
         else:

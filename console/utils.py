@@ -57,7 +57,7 @@ def clear_line(mode=2):
     return text
 
 
-def clear_lines(lines: int, mode=2):
+def clear_lines(lines: int, mode: int | str = 2):
     ''' Clear the given number of lines above.
 
         Arguments:
